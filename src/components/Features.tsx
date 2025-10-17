@@ -1,34 +1,49 @@
-import { Stethoscope, Award, Building2 } from "lucide-react";
+import { Sparkles, BookOpen, Users, Target, Zap, Award } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 const Features = () => {
   const features = [
     {
-      icon: Stethoscope,
-      title: "Experienced Vets",
-      description: "Our team of certified veterinarians brings years of expertise and genuine care to every appointment.",
+      icon: Sparkles,
+      title: "AI-Powered Generation",
+      description: "Advanced AI creates intelligent, contextual questions tailored to your topic.",
+    },
+    {
+      icon: Zap,
+      title: "Instant Results",
+      description: "Generate complete quizzes in seconds, not hours. Save time and boost productivity.",
+    },
+    {
+      icon: BookOpen,
+      title: "Multiple Topics",
+      description: "Create quizzes on any subject - science, history, language, or custom topics.",
+    },
+    {
+      icon: Target,
+      title: "Customizable Difficulty",
+      description: "Control difficulty levels from beginner to expert for your specific audience.",
+    },
+    {
+      icon: Users,
+      title: "For Everyone",
+      description: "Perfect for teachers, trainers, content creators, and anyone who needs quizzes.",
     },
     {
       icon: Award,
-      title: "Locally Licensed",
-      description: "Fully accredited and licensed veterinary practice meeting the highest standards of pet care.",
-    },
-    {
-      icon: Building2,
-      title: "Modern Clinics",
-      description: "State-of-the-art facilities equipped with advanced medical technology for comprehensive pet care.",
+      title: "Quality Questions",
+      description: "Every question includes detailed explanations to enhance learning.",
     },
   ];
 
   return (
-    <section className="py-20 px-4">
+    <section className="py-20 px-4 bg-secondary/10">
       <div className="container mx-auto max-w-7xl">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            Because Your Pet <span className="text-primary">Deserves the Best</span>
+            Why Choose QuizAI
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            We combine professional expertise with genuine compassion to provide the best possible care for your beloved companions.
+            The smartest way to create engaging quizzes. Powered by advanced AI to deliver quality educational content instantly.
           </p>
         </div>
 

@@ -5,35 +5,37 @@ import { Star } from "lucide-react";
 const Testimonials = () => {
   const testimonials = [
     {
-      name: "Sarah P.",
+      name: "Sarah Mitchell",
       initial: "S",
-      text: "My senior dog received the best care possible. The vets were so patient and knowledgeable. I'm grateful for their compassion.",
+      role: "High School Teacher",
+      text: "QuizAI has revolutionized how I create assessments. What used to take hours now takes minutes, and my students love the engaging questions!",
       rating: 5,
     },
     {
-      name: "Mike T.",
+      name: "David Park",
+      initial: "D",
+      role: "Corporate Trainer",
+      text: "The quality of AI-generated quizzes is outstanding. Perfect for employee training programs and knowledge assessments.",
+      rating: 5,
+    },
+    {
+      name: "Maria Garcia",
       initial: "M",
-      text: "Clean facilities, friendly staff and they really care about every animal. Our cat feels comfortable here.",
-      rating: 5,
-    },
-    {
-      name: "Emily R.",
-      initial: "E",
-      text: "Emergency visit at night and they were amazing! Quick response and professional care. Highly recommended!",
+      role: "Content Creator",
+      text: "This tool is a game-changer! I create educational content for thousands of followers, and QuizAI makes it so much easier.",
       rating: 5,
     },
   ];
 
   return (
-    <section className="py-20 px-4 bg-secondary/50">
+    <section className="py-20 px-4 bg-secondary/10">
       <div className="container mx-auto max-w-7xl">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            Loved by <span className="text-primary">Pets</span>, Trusted by{" "}
-            <span className="text-primary">Owners</span>
+            What Users Say
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            See what our happy customers have to say about their experience
+            Join thousands of satisfied educators and content creators
           </p>
         </div>
 
@@ -55,7 +57,7 @@ const Testimonials = () => {
                   </Avatar>
                   <div>
                     <div className="font-semibold">{testimonial.name}</div>
-                    <div className="text-sm text-muted-foreground">Pet Owner</div>
+                    <div className="text-sm text-muted-foreground">{testimonial.role}</div>
                   </div>
                 </div>
               </CardContent>

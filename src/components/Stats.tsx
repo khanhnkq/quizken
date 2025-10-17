@@ -1,50 +1,35 @@
-import dogCharacter from "@/assets/dog-character.png";
+const stats = [
+  { number: "50K+", label: "Quizzes Generated" },
+  { number: "100+", label: "Topics Covered" },
+  { number: "99%", label: "Satisfaction Rate" },
+  { number: "<10s", label: "Average Generation" },
+];
 
 const Stats = () => {
   return (
-    <section className="py-20 px-4 bg-secondary/50">
+    <section className="py-20 px-4 bg-background">
       <div className="container mx-auto max-w-7xl">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Left - Character */}
-          <div className="relative flex justify-center lg:justify-start">
-            <div className="relative">
-              <img 
-                src={dogCharacter} 
-                alt="Cute shiba inu character" 
-                className="w-80 h-80 object-contain drop-shadow-xl"
-              />
-              <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-48 h-8 bg-muted/50 rounded-full blur-lg" />
-            </div>
+        <div className="space-y-12">
+          <div className="text-center">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+              Trusted by Educators Worldwide
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Join thousands of teachers, trainers, and content creators who use QuizAI to create engaging educational content.
+            </p>
           </div>
 
-          {/* Right - Content */}
-          <div className="space-y-8 text-center lg:text-left">
-            <div>
-              <h2 className="text-4xl md:text-5xl font-bold mb-4">
-                Perfect Care for Every <span className="text-primary">Paw</span>,{" "}
-                <span className="text-primary">Wing</span>, and{" "}
-                <span className="text-primary">Whisker</span>
-              </h2>
-              <p className="text-lg text-muted-foreground">
-                At PawPrint Care, we believe in treating every pet like family with personalized attention and expert medical care.
-              </p>
-            </div>
-
-            {/* Stats Grid */}
-            <div className="grid grid-cols-3 gap-6">
-              <div className="space-y-2">
-                <div className="text-4xl font-bold text-primary">3-5</div>
-                <div className="text-sm text-muted-foreground">Min Response</div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {stats.map((stat, index) => (
+              <div key={index} className="text-center p-6 rounded-2xl bg-secondary/20 backdrop-blur-sm">
+                <div className="text-4xl md:text-5xl font-bold text-primary mb-2">
+                  {stat.number}
+                </div>
+                <div className="text-sm md:text-base text-muted-foreground font-medium">
+                  {stat.label}
+                </div>
               </div>
-              <div className="space-y-2">
-                <div className="text-4xl font-bold text-primary">98%</div>
-                <div className="text-sm text-muted-foreground">Satisfaction</div>
-              </div>
-              <div className="space-y-2">
-                <div className="text-4xl font-bold text-primary">1,500+</div>
-                <div className="text-sm text-muted-foreground">Happy Pets</div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </div>

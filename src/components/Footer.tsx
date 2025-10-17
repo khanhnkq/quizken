@@ -1,75 +1,83 @@
 import { Button } from "@/components/ui/button";
-import happyPets from "@/assets/happy-pets.png";
+import { Sparkles } from "lucide-react";
 
 const Footer = () => {
+  const scrollToGenerator = () => {
+    document.getElementById('generator')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
-    <footer>
+    <footer className="bg-foreground/5 border-t">
       {/* CTA Section */}
-      <section className="py-20 px-4 bg-gradient-to-b from-primary/10 to-background relative overflow-hidden">
-        <div className="container mx-auto max-w-7xl relative z-10">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              Keep Your Pets <span className="text-primary">Happy & Healthy</span>
+      <div className="py-16 px-4">
+        <div className="container mx-auto max-w-7xl">
+          <div className="text-center space-y-6 max-w-3xl mx-auto">
+            <div className="flex justify-center">
+              <Sparkles className="w-16 h-16 text-primary" />
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold">
+              Start Creating Amazing Quizzes Today
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
-              Schedule your appointment today and give your pet the care they deserve
+            <p className="text-lg text-muted-foreground">
+              Join educators worldwide who are transforming how they create educational content with AI.
             </p>
-            <Button variant="hero" size="lg" className="text-base">
-              Book Appointment Now
+            <Button variant="hero" size="lg" onClick={scrollToGenerator}>
+              Generate Your First Quiz
             </Button>
           </div>
-          
-          <div className="mt-12 flex justify-center">
-            <img 
-              src={happyPets} 
-              alt="Happy pets playing together" 
-              className="max-w-3xl w-full h-auto drop-shadow-2xl"
-            />
-          </div>
         </div>
-      </section>
+      </div>
 
       {/* Footer Links */}
-      <div className="bg-foreground text-background py-12 px-4">
+      <div className="border-t py-12 px-4">
         <div className="container mx-auto max-w-7xl">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <h3 className="text-xl font-bold mb-4">PawPrint Care</h3>
-              <p className="text-background/80 text-sm">
-                Professional veterinary care with compassion and expertise.
+          <div className="grid md:grid-cols-4 gap-8">
+            <div className="space-y-4">
+              <h3 className="text-xl font-bold">QuizAI</h3>
+              <p className="text-sm text-muted-foreground">
+                AI-powered quiz generation for educators and content creators worldwide.
               </p>
             </div>
+            
             <div>
-              <h4 className="font-semibold mb-4">Services</h4>
-              <ul className="space-y-2 text-sm text-background/80">
-                <li>Veterinary Care</li>
-                <li>Pet Grooming</li>
-                <li>Pet Daycare</li>
-                <li>Emergency Services</li>
+              <h4 className="font-semibold mb-4">Features</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><a href="#" className="hover:text-primary transition-colors">Quiz Generator</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">Custom Topics</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">Export Options</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">AI Models</a></li>
               </ul>
             </div>
+            
             <div>
               <h4 className="font-semibold mb-4">Company</h4>
-              <ul className="space-y-2 text-sm text-background/80">
-                <li>About Us</li>
-                <li>Our Team</li>
-                <li>Careers</li>
-                <li>Contact</li>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><a href="#" className="hover:text-primary transition-colors">About Us</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">Blog</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">Careers</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">Contact</a></li>
               </ul>
             </div>
+            
             <div>
-              <h4 className="font-semibold mb-4">Contact</h4>
-              <ul className="space-y-2 text-sm text-background/80">
-                <li>123 Pet Street</li>
-                <li>Pet City, PC 12345</li>
-                <li>phone: (555) 123-4567</li>
-                <li>info@pawprintcare.com</li>
+              <h4 className="font-semibold mb-4">Support</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><a href="#" className="hover:text-primary transition-colors">Help Center</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">Privacy Policy</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">Terms of Service</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">FAQs</a></li>
               </ul>
             </div>
           </div>
-          <div className="border-t border-background/20 pt-8 text-center text-sm text-background/80">
-            <p>&copy; 2025 PawPrint Care. All rights reserved.</p>
-          </div>
+        </div>
+      </div>
+      
+      {/* Copyright */}
+      <div className="border-t py-6 px-4">
+        <div className="container mx-auto max-w-7xl">
+          <p className="text-center text-sm text-muted-foreground">
+            © 2025 QuizAI. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>
