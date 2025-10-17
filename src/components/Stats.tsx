@@ -7,7 +7,7 @@ const stats = [
 
 const Stats = () => {
   return (
-    <section className="py-20 px-4 bg-background">
+    <section className="relative overflow-hidden bg-gradient-to-b from-secondary/30 to-background min-h-screen py-20 px-4">
       <div className="container mx-auto max-w-7xl">
         <div className="space-y-12">
           <div className="text-center">
@@ -15,13 +15,16 @@ const Stats = () => {
               Trusted by Educators Worldwide
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Join thousands of teachers, trainers, and content creators who use QuizAI to create engaging educational content.
+              Join thousands of teachers, trainers, and content creators who use
+              QuizAI to create engaging educational content.
             </p>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {stats.map((stat, index) => (
-              <div key={index} className="text-center p-6 rounded-2xl bg-secondary/20 backdrop-blur-sm">
+              <div
+                key={index}
+                className="text-center p-6 rounded-2xl bg-secondary/20 backdrop-blur-sm">
                 <div className="text-4xl md:text-5xl font-bold text-primary mb-2">
                   {stat.number}
                 </div>

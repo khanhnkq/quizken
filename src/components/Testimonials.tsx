@@ -28,7 +28,7 @@ const Testimonials = () => {
   ];
 
   return (
-    <section className="py-20 px-4 bg-secondary/10">
+    <section className="relative overflow-hidden bg-gradient-to-b from-secondary/30 to-background min-h-screen py-20 px-4">
       <div className="container mx-auto max-w-7xl">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
@@ -45,19 +45,24 @@ const Testimonials = () => {
               <CardContent className="pt-6 space-y-4">
                 <div className="flex gap-1">
                   {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 fill-primary text-primary" />
+                    <Star
+                      key={i}
+                      className="w-5 h-5 fill-primary text-primary"
+                    />
                   ))}
                 </div>
                 <p className="text-foreground italic">"{testimonial.text}"</p>
                 <div className="flex items-center gap-3 pt-2">
                   <Avatar>
-                    <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
+                    <AvatarFallback className="bg-[#B5CC89] text-black font-semibold">
                       {testimonial.initial}
                     </AvatarFallback>
                   </Avatar>
                   <div>
                     <div className="font-semibold">{testimonial.name}</div>
-                    <div className="text-sm text-muted-foreground">{testimonial.role}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {testimonial.role}
+                    </div>
                   </div>
                 </div>
               </CardContent>
