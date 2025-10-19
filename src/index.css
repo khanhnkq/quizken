@@ -1,3 +1,79 @@
+/* Ubuntu Font Family - Việt Hóa */
+@font-face {
+  font-family: "Ubuntu";
+  src: url("./assets/fonts/ubuntu-viethoa/Ubuntu-Thin.woff2") format("woff2"),
+    url("./assets/fonts/ubuntu-viethoa/Ubuntu-Thin.woff") format("woff");
+  font-weight: 100;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Ubuntu";
+  src: url("./assets/fonts/ubuntu-viethoa/Ubuntu-Light.woff2") format("woff2"),
+    url("./assets/fonts/ubuntu-viethoa/Ubuntu-Light.woff") format("woff");
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Ubuntu";
+  src: url("./assets/fonts/ubuntu-viethoa/Ubuntu.woff2") format("woff2"),
+    url("./assets/fonts/ubuntu-viethoa/Ubuntu.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Ubuntu";
+  src: url("./assets/fonts/ubuntu-viethoa/Ubuntu-Medium.woff2") format("woff2"),
+    url("./assets/fonts/ubuntu-viethoa/Ubuntu-Medium.woff") format("woff");
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Ubuntu";
+  src: url("./assets/fonts/ubuntu-viethoa/Ubuntu-Bold.woff2") format("woff2"),
+    url("./assets/fonts/ubuntu-viethoa/Ubuntu-Bold.woff") format("woff");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Ubuntu";
+  src: url("./assets/fonts/ubuntu-viethoa/Ubuntu-LightItalic.woff2")
+      format("woff2"),
+    url("./assets/fonts/ubuntu-viethoa/Ubuntu-LightItalic.woff") format("woff");
+  font-weight: 300;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Ubuntu";
+  src: url("./assets/fonts/ubuntu-viethoa/Ubuntu-Italic.woff2") format("woff2"),
+    url("./assets/fonts/ubuntu-viethoa/Ubuntu-Italic.woff") format("woff");
+  font-weight: 400;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Ubuntu";
+  src: url("./assets/fonts/ubuntu-viethoa/Ubuntu-MediumItalic.woff2")
+      format("woff2"),
+    url("./assets/fonts/ubuntu-viethoa/Ubuntu-MediumItalic.woff") format("woff");
+  font-weight: 500;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Ubuntu";
+  src: url("./assets/fonts/ubuntu-viethoa/Ubuntu-BoldItalic.woff2")
+      format("woff2"),
+    url("./assets/fonts/ubuntu-viethoa/Ubuntu-BoldItalic.woff") format("woff");
+  font-weight: 700;
+  font-style: italic;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -17,7 +93,7 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 13%;
 
-    --primary: 88 50% 55%;
+    --primary: 81 40% 67%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 45 35% 96%;
@@ -26,15 +102,15 @@ All colors MUST be HSL.
     --muted: 45 20% 92%;
     --muted-foreground: 0 0% 45%;
 
-    --accent: 88 60% 45%;
+    --accent: 81 40% 67%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 88 30% 85%;
-    --input: 88 30% 85%;
-    --ring: 88 50% 55%;
+    --border: 81 30% 85%;
+    --input: 81 30% 85%;
+    --ring: 81 40% 67%;
 
     --radius: 1rem;
 
@@ -65,7 +141,7 @@ All colors MUST be HSL.
     --popover: 0 0% 13%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 88 50% 55%;
+    --primary: 81 40% 67%;
     --primary-foreground: 0 0% 13%;
 
     --secondary: 0 0% 20%;
@@ -74,7 +150,7 @@ All colors MUST be HSL.
     --muted: 0 0% 20%;
     --muted-foreground: 0 0% 65%;
 
-    --accent: 88 60% 45%;
+    --accent: 81 40% 67%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62.8% 50%;
@@ -82,7 +158,7 @@ All colors MUST be HSL.
 
     --border: 0 0% 25%;
     --input: 0 0% 25%;
-    --ring: 88 50% 55%;
+    --ring: 81 40% 67%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -119,5 +195,51 @@ All colors MUST be HSL.
 
   .animate-slow-blink {
     animation: slow-blink 0.8s infinite;
+  }
+
+  /* Progress: indeterminate sweep animation */
+  @keyframes progress-indeterminate {
+    0% {
+      transform: translateX(-120%);
+    }
+    50% {
+      transform: translateX(0%);
+    }
+    100% {
+      transform: translateX(120%);
+    }
+  }
+
+  .animate-progress-indeterminate {
+    animation: progress-indeterminate 1.4s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  /* Subtle diagonal stripes that move to give a premium shimmer effect */
+  @keyframes stripes-move {
+    0% {
+      background-position: 0 0;
+    }
+    100% {
+      background-position: 16px 0;
+    }
+  }
+
+  .progress-stripes {
+    background-image: linear-gradient(
+      45deg,
+      rgba(255, 255, 255, 0.3) 25%,
+      transparent 25%,
+      transparent 50%,
+      rgba(255, 255, 255, 0.3) 50%,
+      rgba(255, 255, 255, 0.3) 75%,
+      transparent 75%,
+      transparent
+    );
+    background-size: 16px 16px;
+    animation: stripes-move 1s linear infinite;
+    opacity: 0.35;
+    mix-blend-mode: overlay;
+    pointer-events: none;
   }
 }

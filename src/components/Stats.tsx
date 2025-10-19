@@ -1,3 +1,5 @@
+import { Users } from "lucide-react";
+
 const stats = [
   { number: "50K+", label: "Quizzes Generated" },
   { number: "100+", label: "Topics Covered" },
@@ -11,6 +13,9 @@ const Stats = () => {
       <div className="container mx-auto max-w-7xl">
         <div className="space-y-12">
           <div className="text-center">
+            <div className="flex justify-center mb-6">
+              <Users className="w-12 h-12 text-[#B5CC89]" />
+            </div>
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
               Trusted by Educators Worldwide
             </h2>

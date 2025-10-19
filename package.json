@@ -2,6 +2,10 @@
   "name": "vite_react_shadcn_ts",
   "private": true,
   "version": "0.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/hinh-ve-web-dong.git"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -49,18 +53,21 @@
     "framer-motion": "^12.23.24",
     "gsap": "^3.13.0",
     "input-otp": "^1.4.2",
+    "jspdf": "^3.0.3",
     "lucide-react": "^0.462.0",
     "next-themes": "^0.3.0",
     "react": "^18.3.1",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.61.1",
+    "react-hot-toast": "^2.6.0",
     "react-resizable-panels": "^2.1.9",
     "react-router-dom": "^6.30.1",
     "recharts": "^2.15.4",
     "sonner": "^1.7.4",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
+    "three": "^0.180.0",
     "vaul": "^0.9.9",
     "zod": "^3.25.76"
   },

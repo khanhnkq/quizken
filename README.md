@@ -1,73 +1,121 @@
-# Welcome to your Lovable project
+# Hình Vẽ Web Động – AI Quiz Generator
 
-## Project info
+Dự án web tạo bộ câu hỏi trắc nghiệm bằng AI dựa trên chủ đề người dùng nhập. Frontend dùng Vite + React + TypeScript + Tailwind + shadcn/ui. Backend sử dụng Supabase Edge Functions (Deno) gọi Google Gemini API để sinh câu hỏi, chạy bất đồng bộ và trả trạng thái qua API polling. Hỗ trợ xuất PDF tiếng Việt chuẩn dấu, giới hạn ẩn danh, đăng nhập và API Key cá nhân.
 
-**URL**: https://lovable.dev/projects/bb8a64b6-7e31-4f12-8f20-cefd0a40d9ce
+## Công nghệ chính
 
-## How can I edit this code?
+- Vite, React, TypeScript, TailwindCSS
+- shadcn/ui (Radix UI)
+- Supabase (Auth, Database, Edge Functions)
+- Google Gemini API (AI quiz generation)
+- jsPDF (xuất PDF Unicode tiếng Việt)
 
-There are several ways of editing your application.
+## Tính năng nổi bật
 
-**Use Lovable**
+- Tạo quiz async với hàng đợi trạng thái: pending → processing → completed/failed/expired
+- Chọn số lượng câu hỏi: 10, 15, 20, 25, 30
+- Giới hạn người dùng ẩn danh theo IP + fingerprint (reset theo ngày)
+- Người dùng đăng nhập có thể dùng API key cá nhân để vượt rate limit
+- Lưu quiz vào DB (public), phát thông báo cross-tab qua BroadcastChannel
+- Xuất PDF hiển thị tiếng Việt đúng dấu (nạp font động)
+- UI mượt, có tiến trình, stepper và hủy tạo quiz
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/bb8a64b6-7e31-4f12-8f20-cefd0a40d9ce) and start prompting.
+## Yêu cầu môi trường
 
-Changes made via Lovable will be committed automatically to this repo.
+- Node.js 18+ (khuyến nghị 20+)
+- npm hoặc pnpm (repo dùng npm lockfile)
+- Git
+- (Tùy chọn) Supabase CLI để deploy/kiểm thử functions
+- (Tùy chọn) Google AI Studio API Key nếu muốn triển khai server-side Gemini
 
-**Use your preferred IDE**
+## Cấu trúc thư mục
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- ./src: mã nguồn frontend (React + shadcn/ui)
+- ./public: tệp tĩnh
+- ./supabase/functions/generate-quiz: Edge Function tạo quiz (Deno)
+- ./supabase/migrations: migration SQL cho database
+- ./supabase/config.toml: cấu hình Supabase local/dev
+- ./package.json: script, dependency
+- ./vite.config.ts, ./tailwind.config.ts: cấu hình công cụ
+- ./.gitignore: quy tắc ignore Git
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## Thiết lập nhanh
 
-Follow these steps:
+1. Cài dependencies
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+- npm install
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+2. Biến môi trường frontend
+   Tạo file .env (đã được .gitignore) tại project root với nội dung:
 
-# Step 3: Install the necessary dependencies.
-npm i
+- VITE_SUPABASE_URL=YOUR_SUPABASE_URL
+- VITE_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+3. Chạy phát triển
 
-**Edit a file directly in GitHub**
+- npm run dev
+  Ứng dụng chạy ở http://localhost:5173 (mặc định của Vite)
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+4. Build sản phẩm
 
-**Use GitHub Codespaces**
+- npm run build
+- npm run preview (serve build)
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Thiết lập Supabase
 
-## What technologies are used for this project?
+Database:
 
-This project is built with:
+- Áp dụng các migration trong ./supabase/migrations theo thứ tự thời gian (đề xuất dùng Supabase CLI hoặc Studio để apply)
+- Các bảng/đối tượng chính:
+  - quizzes: lưu metadata quiz, câu hỏi, trạng thái, token usage
+  - anonymous_usage: đếm lượt tạo của người dùng ẩn danh theo ngày
+  - user_api_keys: lưu API key người dùng (đã có migration)
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Edge Function generate-quiz:
 
-## How can I deploy this project?
+- Mã nguồn: ./supabase/functions/generate-quiz
+- Endpoint chính:
+  - POST /start-quiz: khởi tạo bản ghi quiz và chạy xử lý nền
+  - GET /get-quiz-status?quiz_id=...: trả trạng thái và dữ liệu quiz khi xong
 
-Simply open [Lovable](https://lovable.dev/projects/bb8a64b6-7e31-4f12-8f20-cefd0a40d9ce) and click on Share -> Publish.
+Triển khai (tham khảo, yêu cầu Supabase CLI đã đăng nhập và chọn project):
 
-## Can I connect a custom domain to my Lovable project?
+- supabase functions deploy generate-quiz
+- supabase secrets set GEMINI_API_KEY=your_server_side_key
+- supabase secrets set PROJECT_URL=your_supabase_project_url
+- supabase secrets set SERVICE_ROLE_KEY=your_service_role_key
 
-Yes, you can!
+Lưu ý:
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+- GEMINI_API_KEY phía server là tùy chọn nếu bạn cho phép người dùng dùng API key cá nhân khi đã xác thực. Nếu không có GEMINI_API_KEY server và không có user key hợp lệ, function sẽ báo lỗi cấu hình.
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+## Sử dụng trên UI
+
+- Nhập chủ đề (tối đa 500 ký tự), chọn số lượng câu hỏi (10/15/20/25/30), nhấn Tạo Quiz
+- Có thể hủy tiến trình
+- Khi hoàn tất sẽ tự động hiện quiz, cho phép làm bài và xuất PDF
+
+## Git và đẩy lên repository
+
+Đã cấu hình:
+
+- .gitignore đã bỏ qua .env và biến thể .env.\*
+- package.json thêm trường repository (HTTPS GitHub)
+
+Quy trình gợi ý:
+
+- git init
+- git branch -M main
+- git add .
+- git commit -m "chore: initial commit"
+- git remote add origin https://github.com/your-username/hinh-ve-web-dong.git
+- git push -u origin main
+
+Lưu ý: Nếu chưa cấu hình user/email cho Git cục bộ, Git sẽ yêu cầu:
+
+- git config user.name "Your Name"
+- git config user.email "your@email.com"
+
+## License
+
+Dự án sử dụng giấy phép MIT. File LICENSE sẽ được thêm vào repository.

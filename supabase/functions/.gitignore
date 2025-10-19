@@ -1,0 +1,2 @@
+# Ignore local environment files with real secrets
+.env

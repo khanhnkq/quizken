@@ -1,186 +1,149 @@
+export const TOAST_ADAPTER_NOTE = "react-hot-toast adapter";
+
 import * as React from "react";
+import { toast as hotToast } from "react-hot-toast";
 
-import type { ToastActionElement, ToastProps } from "@/components/ui/toast";
+type Variant = "default" | "destructive" | "success" | "info" | "warning";
 
-const TOAST_LIMIT = 1;
-const TOAST_REMOVE_DELAY = 1000000;
-
-type ToasterToast = ToastProps & {
-  id: string;
+type ToastOptions = {
   title?: React.ReactNode;
   description?: React.ReactNode;
-  action?: ToastActionElement;
+  duration?: number;
+  variant?: Variant;
+  action?: React.ReactNode;
 };
 
-const actionTypes = {
-  ADD_TOAST: "ADD_TOAST",
-  UPDATE_TOAST: "UPDATE_TOAST",
-  DISMISS_TOAST: "DISMISS_TOAST",
-  REMOVE_TOAST: "REMOVE_TOAST",
-} as const;
+type ToastHandle = {
+  id: string | number;
+  dismiss: () => void;
+  update: (opts: ToastOptions) => ToastHandle;
+};
 
-let count = 0;
+const DEFAULT_DURATION = 3000;
 
-function genId() {
-  count = (count + 1) % Number.MAX_SAFE_INTEGER;
-  return count.toString();
-}
+/**
+ * Render toast content using React.createElement so file can remain .ts
+ */
+function renderContent(
+  title?: React.ReactNode,
+  description?: React.ReactNode,
+  variant?: Variant,
+  action?: React.ReactNode
+) {
+  const children: Array<React.ReactNode> = [];
 
-type ActionType = typeof actionTypes;
-
-type Action =
-  | {
-      type: ActionType["ADD_TOAST"];
-      toast: ToasterToast;
-    }
-  | {
-      type: ActionType["UPDATE_TOAST"];
-      toast: Partial<ToasterToast>;
-    }
-  | {
-      type: ActionType["DISMISS_TOAST"];
-      toastId?: ToasterToast["id"];
-    }
-  | {
-      type: ActionType["REMOVE_TOAST"];
-      toastId?: ToasterToast["id"];
-    };
-
-interface State {
-  toasts: ToasterToast[];
-}
-
-const toastTimeouts = new Map<string, ReturnType<typeof setTimeout>>();
-
-const addToRemoveQueue = (toastId: string) => {
-  if (toastTimeouts.has(toastId)) {
-    return;
+  if (title) {
+    children.push(
+      React.createElement(
+        "div",
+        { key: "title", className: "text-sm font-semibold" },
+        title
+      )
+    );
   }
 
-  const timeout = setTimeout(() => {
-    toastTimeouts.delete(toastId);
-    dispatch({
-      type: "REMOVE_TOAST",
-      toastId: toastId,
-    });
-  }, TOAST_REMOVE_DELAY);
-
-  toastTimeouts.set(toastId, timeout);
-};
-
-export const reducer = (state: State, action: Action): State => {
-  switch (action.type) {
-    case "ADD_TOAST":
-      return {
-        ...state,
-        toasts: [action.toast, ...state.toasts].slice(0, TOAST_LIMIT),
-      };
-
-    case "UPDATE_TOAST":
-      return {
-        ...state,
-        toasts: state.toasts.map((t) => (t.id === action.toast.id ? { ...t, ...action.toast } : t)),
-      };
-
-    case "DISMISS_TOAST": {
-      const { toastId } = action;
-
-      // ! Side effects ! - This could be extracted into a dismissToast() action,
-      // but I'll keep it here for simplicity
-      if (toastId) {
-        addToRemoveQueue(toastId);
-      } else {
-        state.toasts.forEach((toast) => {
-          addToRemoveQueue(toast.id);
-        });
-      }
-
-      return {
-        ...state,
-        toasts: state.toasts.map((t) =>
-          t.id === toastId || toastId === undefined
-            ? {
-                ...t,
-                open: false,
-              }
-            : t,
-        ),
-      };
-    }
-    case "REMOVE_TOAST":
-      if (action.toastId === undefined) {
-        return {
-          ...state,
-          toasts: [],
-        };
-      }
-      return {
-        ...state,
-        toasts: state.toasts.filter((t) => t.id !== action.toastId),
-      };
+  if (description) {
+    children.push(
+      React.createElement(
+        "div",
+        { key: "description", className: "text-sm opacity-90 mt-1" },
+        description
+      )
+    );
   }
-};
 
-const listeners: Array<(state: State) => void> = [];
+  const variantClasses: Record<Variant, string> = {
+    default: "border-2 bg-background text-foreground",
+    destructive:
+      "destructive group border-2 border-destructive bg-destructive text-destructive-foreground",
+    success: "group border-2 border-[#B5CC89] bg-[#B5CC89]/15 text-foreground",
+    info: "group border-2 border-blue-300 bg-blue-50 text-blue-900",
+    warning: "group border-2 border-amber-300 bg-amber-50 text-amber-900",
+  };
 
-let memoryState: State = { toasts: [] };
+  const baseClass =
+    "max-w-md w-full rounded-md border p-4 shadow flex items-start justify-between gap-4";
 
-function dispatch(action: Action) {
-  memoryState = reducer(memoryState, action);
-  listeners.forEach((listener) => {
-    listener(memoryState);
-  });
-}
+  const containerClass = `${baseClass} ${
+    variant ? variantClasses[variant] : variantClasses.default
+  }`;
 
-type Toast = Omit<ToasterToast, "id">;
+  const content = React.createElement(
+    "div",
+    { key: "content", className: "flex-1" },
+    children
+  );
 
-function toast({ ...props }: Toast) {
-  const id = genId();
+  const actionNode = action
+    ? React.createElement(
+        "div",
+        { key: "action", className: "ml-4 flex items-center" },
+        action
+      )
+    : null;
 
-  const update = (props: ToasterToast) =>
-    dispatch({
-      type: "UPDATE_TOAST",
-      toast: { ...props, id },
-    });
-  const dismiss = () => dispatch({ type: "DISMISS_TOAST", toastId: id });
-
-  dispatch({
-    type: "ADD_TOAST",
-    toast: {
-      ...props,
-      id,
-      open: true,
-      onOpenChange: (open) => {
-        if (!open) dismiss();
-      },
+  return React.createElement(
+    "div",
+    {
+      className: containerClass,
     },
-  });
-
-  return {
-    id: id,
-    dismiss,
-    update,
-  };
+    [content, actionNode]
+  );
 }
 
-function useToast() {
-  const [state, setState] = React.useState<State>(memoryState);
+/**
+ * Show a toast via react-hot-toast and return a handle similar to the old API.
+ */
+export function toast(opts: ToastOptions): ToastHandle {
+  const id = hotToast.custom(
+    () =>
+      renderContent(opts.title, opts.description, opts.variant, opts.action),
+    {
+      duration: opts.duration ?? DEFAULT_DURATION,
+    }
+  );
 
-  React.useEffect(() => {
-    listeners.push(setState);
-    return () => {
-      const index = listeners.indexOf(setState);
-      if (index > -1) {
-        listeners.splice(index, 1);
-      }
-    };
-  }, [state]);
+  const dismiss = () => hotToast.dismiss(String(id));
 
-  return {
-    ...state,
-    toast,
-    dismiss: (toastId?: string) => dispatch({ type: "DISMISS_TOAST", toastId }),
+  const update = (next: ToastOptions) => {
+    // Simple update: remove the old toast and show a new one with updated content.
+    hotToast.dismiss(id);
+    const newId = hotToast.custom(
+      () =>
+        renderContent(
+          next.title ?? opts.title,
+          next.description ?? opts.description,
+          next.variant ?? opts.variant,
+          next.action ?? opts.action
+        ),
+      { duration: next.duration ?? opts.duration ?? DEFAULT_DURATION }
+    );
+
+    return {
+      id: newId,
+      dismiss: () => hotToast.dismiss(String(newId)),
+      update: () => {
+        // noop for simplicity
+        return {
+          id: newId,
+          dismiss: () => hotToast.dismiss(String(newId)),
+          update: () => ({} as unknown as ToastHandle),
+        } as ToastHandle;
+      },
+    } as ToastHandle;
   };
+
+  return { id, dismiss, update };
 }
 
-export { useToast, toast };
+/**
+ * Hook used across the codebase. Keeps the same surface as before:
+ * const { toast, dismiss } = useToast()
+ */
+export function useToast() {
+  return {
+    toast: (opts: ToastOptions) => toast(opts),
+    dismiss: (toastId?: string | number) =>
+      toastId ? hotToast.dismiss(String(toastId)) : hotToast.dismiss(),
+  };
+}

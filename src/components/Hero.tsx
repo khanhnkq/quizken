@@ -1,19 +1,30 @@
 import { Button } from "@/components/ui/button";
 import { Sparkles, Zap, Brain } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, type MouseEvent } from "react";
+import { gsap } from "gsap";
+import ThreeBackground from "@/components/ThreeBackground";
+import { useNavigate } from "react-router-dom";
 
 const Hero = () => {
+  const navigate = useNavigate();
   const scrollToGenerator = () => {
-    document
-      .getElementById("generator")
-      ?.scrollIntoView({ behavior: "smooth" });
+    const element = document.getElementById("generator");
+    if (element) {
+      const yOffset = 0; // Khoảng cách từ top (cho header/navbar)
+      const y =
+        element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({
+        top: y,
+        behavior: "smooth",
+      });
+    }
   };
 
   // Typing effect state
   const [displayText, setDisplayText] = useState("");
   const [showCursor, setShowCursor] = useState(true);
   const fullText =
-    "Transform any topic into engaging quizzes instantly. Perfect for teachers, trainers, and content creators.";
+    "Biến đổi mọi chủ đề thành các bài kiểm tra thú vị ngay lập tức. Hoàn hảo cho giáo viên, huấn luyện viên và những người tạo nội dung.";
 
   useEffect(() => {
     let currentIndex = 0;
@@ -57,44 +68,69 @@ const Hero = () => {
     };
   }, []);
 
+  const handleHoverEnter = (e: MouseEvent<HTMLButtonElement>) => {
+    const target = e.currentTarget as HTMLButtonElement;
+    gsap.to(target, {
+      y: -2,
+      scale: 1.04,
+      boxShadow: "0 12px 30px rgba(0,0,0,0.45)",
+      duration: 0.18,
+      ease: "power3.out",
+    });
+  };
+
+  const handleHoverLeave = (e: MouseEvent<HTMLButtonElement>) => {
+    const target = e.currentTarget as HTMLButtonElement;
+    gsap.to(target, {
+      y: 0,
+      scale: 1,
+      boxShadow: "0 0 0 rgba(0,0,0,0)",
+      duration: 0.22,
+      ease: "power3.inOut",
+    });
+  };
+
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-secondary/30 to-background min-h-screen py-20 px-4">
+    <section className="relative overflow-hidden bg-gradient-to-b from-secondary/30 to-background min-h-[90svh] md:min-h-screen py-16 sm:py-20 md:py-28 px-4">
+      <ThreeBackground />
       <div className="container mx-auto max-w-7xl">
-        <div className="max-w-4xl mx-auto text-center space-y-8">
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight group hover:text-primary transition-all duration-500 hover:drop-shadow-2xl hover:scale-105 cursor-pointer">
-            Create{" "}
+        <div className="max-w-4xl mx-auto text-center space-y-6 md:space-y-8 lg:space-y-10">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1] md:leading-tight group hover:text-primary transition-all duration-500 hover:drop-shadow-2xl hover:scale-105 cursor-pointer">
+            Tạo{" "}
             <span className="text-primary group-hover:text-yellow-300 group-hover:scale-110 group-hover:animate-pulse transition-all duration-700">
-              Amazing Quizzes
+              Bài Kiểm Tra Tuyệt Vời
             </span>{" "}
-            with{" "}
+            với{" "}
             <span className="text-primary group-hover:text-yellow-300 group-hover:scale-110 group-hover:animate-pulse transition-all duration-700">
               AI
             </span>{" "}
-            in Seconds
+            trong vài giây
           </h1>
-          <div className="h-16 flex items-center justify-center">
+          <div className="h-auto sm:h-14 md:h-16 lg:h-20 flex items-center justify-center">
             {" "}
             {/* Fixed height container */}
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto font-mono">
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto font-mono leading-relaxed">
               {displayText}
               {showCursor && (
                 <span
-                  className="inline-block w-1 h-6 ml-1 animate-slow-blink"
+                  className="inline-block w-1 h-5 md:h-6 ml-1 animate-slow-blink"
                   style={{ backgroundColor: "#B5CC89" }}></span>
               )}
             </p>
           </div>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 md:gap-6 justify-center">
             <Button
               variant="hero"
               size="lg"
-              className="text-base flex items-center gap-2"
-              onClick={scrollToGenerator}>
-              Generate Quiz Now
+              className="group text-base flex items-center gap-2 w-full sm:w-auto hover:bg-black hover:text-white transition-colors"
+              onClick={scrollToGenerator}
+              onMouseEnter={handleHoverEnter}
+              onMouseLeave={handleHoverLeave}>
+              Tạo Bài Kiểm Tra Ngay
               <div className="bg-[#B5CC89] p-1 rounded-lg">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="w-5 h-5 text-black"
+                  className="w-5 h-5 text-black group-hover:text-white"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor">
@@ -107,37 +143,49 @@ const Hero = () => {
                 </svg>
               </div>
             </Button>
-            <Button variant="outline" size="lg" className="text-base">
-              See Examples
+            <Button
+              variant="outline"
+              size="lg"
+              className="text-base w-full sm:w-auto hover:bg-primary hover:text-primary-foreground hover:border-foreground transition-colors"
+              onClick={() => navigate("/library")}
+              onMouseEnter={handleHoverEnter}
+              onMouseLeave={handleHoverLeave}>
+              Xem Ví Dụ
             </Button>
           </div>
 
           {/* Trust Badges */}
-          <div className="flex flex-wrap gap-6 justify-center pt-4">
+          <div className="flex flex-wrap gap-4 md:gap-6 lg:gap-8 justify-center pt-6 md:pt-8">
             <div className="flex items-center gap-2">
-              <div className="p-2 rounded-full bg-[#B5CC89]/20">
-                <Sparkles className="w-5 h-5 text-black" />
+              <div className="p-1.5 md:p-2 rounded-full bg-[#B5CC89]/20">
+                <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-black" />
               </div>
-              <span className="text-sm font-medium">AI-Powered</span>
+              <span className="text-xs md:text-sm font-medium">
+                Được Power Bởi AI
+              </span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="p-2 rounded-full bg-[#B5CC89]/20">
-                <Zap className="w-5 h-5 text-black" />
+              <div className="p-1.5 md:p-2 rounded-full bg-[#B5CC89]/20">
+                <Zap className="w-4 h-4 md:w-5 md:h-5 text-black" />
               </div>
-              <span className="text-sm font-medium">Instant Generation</span>
+              <span className="text-xs md:text-sm font-medium">
+                Tạo Trong Tức Thì
+              </span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="p-2 rounded-full bg-[#B5CC89]/20">
-                <Brain className="w-5 h-5 text-black" />
+              <div className="p-1.5 md:p-2 rounded-full bg-[#B5CC89]/20">
+                <Brain className="w-4 h-4 md:w-5 md:h-5 text-black" />
               </div>
-              <span className="text-sm font-medium">Smart Questions</span>
+              <span className="text-xs md:text-sm font-medium">
+                Câu Hỏi Thông Minh
+              </span>
             </div>
           </div>
         </div>
 
         {/* Decorative Elements */}
-        <div className="absolute top-0 right-0 w-72 h-72 bg-[#B5CC89]/20 rounded-full blur-3xl -z-0" />
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-accent/20 rounded-full blur-3xl -z-0" />
+        <div className="hidden md:block absolute top-0 right-0 w-72 h-72 bg-[#B5CC89]/20 rounded-full blur-3xl -z-0" />
+        <div className="hidden md:block absolute bottom-0 left-0 w-64 h-64 bg-accent/20 rounded-full blur-3xl -z-0" />
       </div>
     </section>
   );

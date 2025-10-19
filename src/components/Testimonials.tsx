@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Star } from "lucide-react";
+import { Star, MessageSquare } from "lucide-react";
 
 const Testimonials = () => {
   const testimonials = [
@@ -31,6 +31,9 @@ const Testimonials = () => {
     <section className="relative overflow-hidden bg-gradient-to-b from-secondary/30 to-background min-h-screen py-20 px-4">
       <div className="container mx-auto max-w-7xl">
         <div className="text-center mb-16">
+          <div className="flex justify-center mb-6">
+            <MessageSquare className="w-12 h-12 text-[#B5CC89]" />
+          </div>
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
             What Users Say
           </h2>

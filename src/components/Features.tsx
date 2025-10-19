@@ -1,4 +1,12 @@
-import { Sparkles, BookOpen, Users, Target, Zap, Award } from "lucide-react";
+import {
+  Sparkles,
+  BookOpen,
+  Users,
+  Target,
+  Zap,
+  Award,
+  Star,
+} from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 const Features = () => {
@@ -45,6 +53,9 @@ const Features = () => {
     <section className="relative overflow-hidden bg-gradient-to-b from-secondary/30 to-background min-h-screen py-20 px-4">
       <div className="container mx-auto max-w-7xl">
         <div className="text-center mb-16">
+          <div className="flex justify-center mb-6">
+            <Star className="w-12 h-12 text-[#B5CC89]" />
+          </div>
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
             Why Choose QuizAI
           </h2>
