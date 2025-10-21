@@ -7,22 +7,22 @@ const Testimonials = () => {
     {
       name: "Sarah Mitchell",
       initial: "S",
-      role: "High School Teacher",
-      text: "QuizAI has revolutionized how I create assessments. What used to take hours now takes minutes, and my students love the engaging questions!",
+      role: "Giáo viên trung học",
+      text: "QuizKen đã thay đổi hoàn toàn cách tôi tạo bài kiểm tra. Việc từng mất hàng giờ giờ chỉ còn vài phút, và học sinh của tôi rất thích những câu hỏi hấp dẫn!",
       rating: 5,
     },
     {
       name: "David Park",
       initial: "D",
-      role: "Corporate Trainer",
-      text: "The quality of AI-generated quizzes is outstanding. Perfect for employee training programs and knowledge assessments.",
+      role: "Chuyên gia đào tạo doanh nghiệp",
+      text: "Chất lượng quiz do AI tạo ra thật xuất sắc. Rất phù hợp cho chương trình đào tạo nhân viên và đánh giá năng lực.",
       rating: 5,
     },
     {
       name: "Maria Garcia",
       initial: "M",
-      role: "Content Creator",
-      text: "This tool is a game-changer! I create educational content for thousands of followers, and QuizAI makes it so much easier.",
+      role: "Người sáng tạo nội dung",
+      text: "Công cụ này thực sự bứt phá! Tôi tạo nội dung giáo dục cho hàng nghìn người theo dõi và QuizKen giúp mọi thứ dễ dàng hơn rất nhiều.",
       rating: 5,
     },
   ];
@@ -35,10 +35,10 @@ const Testimonials = () => {
             <MessageSquare className="w-12 h-12 text-[#B5CC89]" />
           </div>
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            What Users Say
+            Người dùng nói gì
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Join thousands of satisfied educators and content creators
+            Tham gia cùng hàng nghìn nhà giáo và người tạo nội dung hài lòng
           </p>
         </div>
 

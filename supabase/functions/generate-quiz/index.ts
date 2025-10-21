@@ -2,6 +2,379 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 // @ts-expect-error Deno import
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.47.6?target=deno";
+/**
+ * Embedded badwords list to avoid importing project files at deploy time.
+ * Deploy environments (Edge/Deno) cannot resolve file:/// paths to repo files.
+ * Keep this list relatively small — it's derived from src/assets/filter/badwords_vi.json.
+ */
+const badwordsData = {
+  tuc_tieu: [
+    "địt mẹ",
+    "đụ mẹ",
+    "đụ má",
+    "đù mẹ",
+    "đù má",
+    "đm",
+    "dm",
+    "đmm",
+    "vcl",
+    "vl",
+    "clm",
+    "clgt",
+    "vãi lồn",
+    "vãi cặc",
+    "vãi buồi",
+    "vãi lol",
+    "vãi lon",
+    "cặc",
+    "buồi",
+    "lồn",
+    "lol",
+    "lon",
+    "đĩ mẹ",
+    "con đĩ",
+    "đồ đĩ",
+    "con điếm",
+    "đồ điếm",
+    "con phò",
+    "phò",
+    "dâm đãng",
+    "đồ dâm",
+    "đồ dơ",
+    "tục tĩu",
+    "đồ mất nết",
+    "mất dạy",
+    "bố láo",
+    "láo toét",
+    "láo lếu",
+    "láo cá",
+  ],
+  xuc_pham: [
+    "thằng chó",
+    "con chó",
+    "óc chó",
+    "đồ chó",
+    "đồ khốn",
+    "thằng khốn",
+    "đồ ngu",
+    "đồ điên",
+    "thằng điên",
+    "thằng ngu",
+    "con ngu",
+    "ngu học",
+    "ngu như bò",
+    "ngu như chó",
+    "ngu vãi",
+    "đần độn",
+    "não phẳng",
+    "đồ ranh",
+    "thằng ranh",
+    "con ranh",
+    "đồ ranh con",
+    "vô học",
+    "vô đạo đức",
+    "mất dạy",
+    "khốn nạn",
+    "đồ khốn nạn",
+    "đồ mất dạy",
+    "vô liêm sỉ",
+    "đê tiện",
+    "bỉ ổi",
+    "đểu cáng",
+    "bá dơ",
+  ],
+  phan_biet: [
+    "đồ mọi",
+    "đồ dân tộc",
+    "đồ chệt",
+    "đồ tây ba lô",
+    "bọn tàu",
+    "bọn mọi",
+    "bọn chệt",
+    "bọn do thái",
+    "đồ da đen",
+    "đồ da vàng",
+  ],
+  bao_luc_de_doa: [
+    "tao giết mày",
+    "tao đâm mày",
+    "tao đốt nhà mày",
+    "tao bắn mày",
+    "tao xử mày",
+    "mày chết chắc",
+    "mày tới số rồi",
+    "giết nó đi",
+    "chém nó",
+    "đập chết mẹ mày",
+    "đánh chết mẹ mày",
+  ],
+  nhay_cam_tinh_duc: [
+    "sex",
+    "địt",
+    "đụ",
+    "hiếp",
+    "hiếp dâm",
+    "thủ dâm",
+    "xxx",
+    "porn",
+    "gái gọi",
+    "dâm dục",
+    "hentai",
+    "jav",
+    "loạn luân",
+    "gái mại dâm",
+    "gái bao",
+    "đồ dâm tặc",
+    "clip nóng",
+    "ảnh nóng",
+    "giao hợp",
+    "dương vật",
+    "âm đạo",
+    "xuất tinh",
+    "liếm",
+    "bú",
+    "hôn hít",
+    "húp sò",
+    "bắn tinh",
+    "thổi kèn",
+    "địt nhau",
+  ],
+  chui_rua_thong_dung: [
+    "mẹ mày",
+    "má mày",
+    "con mẹ mày",
+    "cha mày",
+    "bố mày",
+    "ông nội mày",
+    "bà nội mày",
+    "mẹ kiếp",
+    "mẹ cha mày",
+    "mẹ nó",
+    "má nó",
+    "bố mày nói",
+    "mày ngu",
+    "mày khùng",
+    "mày điên",
+    "mày câm",
+    "mày dốt",
+    "mày mất dạy",
+  ],
+  viet_tat_bien_the: [
+    "đm",
+    "dm",
+    "đmm",
+    "dmm",
+    "đcm",
+    "cl",
+    "vl",
+    "vcl",
+    "cc",
+    "clgt",
+    "clm",
+    "đjt",
+    "đjtme",
+    "djtme",
+    "đjt mẹ",
+    "djt mẹ",
+    "đjt ma",
+    "djt ma",
+    "đjtmm",
+    "đụmm",
+    "đụm",
+    "đụmẹ",
+    "đụmá",
+    "đụmạ",
+  ],
+  profanity: [
+    "đm",
+    "dm",
+    "địt",
+    "đjt",
+    "đụ",
+    "đù",
+    "đéo",
+    "cl",
+    "clgt",
+    "vcl",
+    "cặc",
+    "lồn",
+    "loz",
+    "mẹ",
+    "cc",
+    "vãi",
+    "vl",
+    "ml",
+    "óc chó",
+    "ngu",
+    "thằng ngu",
+    "bố mày",
+    "tao",
+    "mày",
+    "đồ ngu",
+    "chó má",
+    "đồ khốn",
+    "đồ ranh",
+    "thằng chó",
+    "thằng điên",
+    "con ngu",
+    "đồ hâm",
+    "cờ hó",
+    "chó đẻ",
+    "đồ chó đẻ",
+    "ngu như bò",
+    "ngu như lợn",
+    "đần",
+    "óc lợn",
+    "óc bò",
+    "não phẳng",
+    "não tàn",
+    "não chó",
+    "đụmẹ",
+    "địtmẹ",
+    "dume",
+    "ditme",
+    "chome",
+    "chó má",
+  ],
+  sexual: [
+    "dâm",
+    "sexy",
+    "hiếp",
+    "hiếp dâm",
+    "đồi trụy",
+    "tục tĩu",
+    "giao phối",
+    "thủ dâm",
+    "kích dục",
+    "nứng",
+    "jav",
+    "porn",
+    "xxx",
+    "hentai",
+    "loạn luân",
+    "dildo",
+    "sướng",
+    "biến thái",
+    "gái gọi",
+    "trai bao",
+    "buồi",
+    "chim",
+    "bướm",
+    "vú",
+    "đít",
+    "mông",
+    "ngực",
+  ],
+  violence: [
+    "giết",
+    "chém",
+    "bắn",
+    "đâm",
+    "hành hung",
+    "đập chết",
+    "máu me",
+    "khủng bố",
+    "bom",
+    "tự tử",
+    "tự sát",
+    "đánh nhau",
+    "bạo lực",
+    "đe dọa",
+    "thủ tiêu",
+    "giết người",
+    "tàn sát",
+    "tra tấn",
+    "hành hạ",
+    "thảm sát",
+    "diệt chủng",
+    "thanh trừng",
+  ],
+  discrimination: [
+    "đồ ngu",
+    "đồ khùng",
+    "đồ điên",
+    "con điên",
+    "vô học",
+    "rác rưởi",
+    "thằng ranh",
+    "đồ chó",
+    "hạ đẳng",
+    "ngu si",
+    "miệt thị",
+    "phân biệt chủng tộc",
+    "kỳ thị",
+    "gay",
+    "les",
+    "lgbt",
+    "pê đê",
+    "bóng",
+    "less",
+    "đồng tính",
+  ],
+  political: [
+    "phản động",
+    "lật đổ",
+    "chính trị",
+    "chế độ",
+    "đảng",
+    "biểu tình",
+    "xâm phạm nhà nước",
+    "tôn giáo",
+    "thiên chúa",
+    "phật giáo",
+    "hồi giáo",
+    "chửi chính quyền",
+    "lãnh tụ",
+    "hồ chí minh",
+    "võ nguyên giáp",
+    "nguyễn phú trọng",
+    "việt tân",
+    "nhà nước",
+    "công an",
+    "chính phủ",
+  ],
+};
+
+// Build a simple sanitizer from the JSON list (case-insensitive, unicode-aware)
+function escapeRegExp(s: string) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+const rawWords: string[] = Object.values(badwordsData)
+  .flat()
+  .filter(Boolean)
+  .map((w: unknown) => String(w).trim())
+  .filter(Boolean);
+
+const sortedEscaped = Array.from(new Set(rawWords))
+  .sort((a, b) => b.length - a.length)
+  .map((w) => escapeRegExp(w));
+
+const BADWORDS_REGEX =
+  sortedEscaped.length > 0 ? new RegExp(sortedEscaped.join("|"), "giu") : /a^/;
+
+function sanitizeVietnameseBadwords(
+  text: string,
+  maskChar = "[removed]"
+): string {
+  if (!text) return text;
+  return text.replace(BADWORDS_REGEX, () => maskChar);
+}
+
+function containsVietnameseBadwords(text: string): boolean {
+  if (!text) return false;
+  return BADWORDS_REGEX.test(text);
+}
+
+/**
+ * Replace badwords with a safe placeholder for sending to AI.
+ * Avoid using '*' masking because it confuses AI output (shows as **** in generated text).
+ * Use a bracketed placeholder like "[removed]" which is clearer and won't break JSON.
+ */
+function replaceBadwordsForAi(text: string, placeholder = "[removed]"): string {
+  if (!text) return text;
+  return text.replace(BADWORDS_REGEX, placeholder);
+}
 
 declare global {
   const Deno: {
@@ -15,7 +388,7 @@ const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
 };
 
 const SUPABASE_URL = Deno.env.get("PROJECT_URL");
@@ -26,7 +399,7 @@ const adminClient =
     : null;
 
 // CẤU HÌNH: Số câu hỏi mặc định
-const QUESTIONS_COUNT = 15;
+const QUESTIONS_COUNT = 10;
 
 const QUIZ_STATUS = {
   PENDING: "pending",
@@ -170,13 +543,17 @@ async function processQuizGeneration(
 
     // API Key setup and authentication
     const SERVER_GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
+    // Allow anonymous users to generate with SERVER key even if they provided an apiKey field
     if (apiKey && !isAuthenticated) {
-      await updateQuizStatus(
-        quizId,
-        QUIZ_STATUS.FAILED,
-        "Authentication required for user API key"
+      console.log(
+        "[BACKEND] Unauthenticated user API key provided; falling back to server-managed key"
       );
-      return;
+      // Provide clearer progress for frontend UI, but do NOT fail
+      await adminClient
+        .from("quizzes")
+        .update({ progress: "Authenticating... Using server key" })
+        .eq("id", quizId);
+      // Continue using server key; do not set usingUserKey/skipUsageLimit
     }
 
     let apiKeyToUse = SERVER_GEMINI_API_KEY;
@@ -206,11 +583,16 @@ async function processQuizGeneration(
       console.error("❌ No valid Gemini API key found!");
       console.error("SERVER_GEMINI_API_KEY exists:", !!SERVER_GEMINI_API_KEY);
       console.error("User provided key:", !!apiKey);
-      await updateQuizStatus(
-        quizId,
-        QUIZ_STATUS.FAILED,
-        "No valid Gemini API key available. Please set GEMINI_API_KEY in Supabase secrets."
-      );
+
+      // Provide clearer failure details to frontend with guidance links
+      const detailedMsg =
+        "No valid Gemini API key available (server or user). " +
+        "If you are the project owner, add a server-side Gemini key to Supabase secrets: " +
+        "`supabase secrets set GEMINI_API_KEY=your_server_key`. " +
+        "If you are a user, verify your personal key and permissions. " +
+        "Docs: https://makersuite.google.com/app/apikey and https://developers.generativeai.google/docs/";
+
+      await updateQuizStatus(quizId, QUIZ_STATUS.FAILED, detailedMsg);
       return;
     }
 
@@ -272,38 +654,33 @@ async function processQuizGeneration(
     const createPrompt = (
       topic: string,
       count: number
-    ): string => `Bạn phải trả về CHỈ JSON hợp lệ, không có ký tự đặc biệt, không có văn bản bên ngoài hoặc markdown formatting.
+    ): string => `ạo một JSON duy nhất, không có văn bản hay markdown, về chủ đề "${topic}".
 
-Chủ đề: ${topic}
+**QUY TẮC NGHIÊM NGẶT:**
+1.  **Định dạng:** Chỉ trả về JSON hợp lệ.
+2.  **Ngôn ngữ:** Toàn bộ nội dung phải bằng tiếng Việt.
+3.  **Số lượng:** JSON phải chứa chính xác **${count}** câu hỏi.
+4.  **Chất lượng:** Các câu hỏi phải có "bẫy" (lựa chọn sai gây nhầm lẫn) và phân bổ độ khó như sau:
+    *   **20% Trung bình:** Yêu cầu hiểu biết, bẫy dựa trên lỗi sai phổ biến.
+    *   **30% Nâng cao:** Kiến thức sâu, bẫy thuyết phục.
+    *   **50% Cực khó:** Dành cho chuyên gia, bẫy cực kỳ tinh vi dựa trên chi tiết nhỏ/ngoại lệ.
 
-Cấu trúc JSON bắt buộc (không được thêm bất kỳ ký tự nào khác):
+**Cấu trúc JSON bắt buộc:**
 {
-  "title": "tiêu đề thích hợp bằng tiếng Việt",
-  "description": "mô tả ngắn gọn bằng tiếng Việt",
+  "title": "tiêu đề tiếng Việt về ${topic}",
+  "description": "mô tả ngắn gọn về bài kiểm tra và độ khó của nó",
+  "category": "Tự do đặt tên category phù hợp nhất (1-2 từ, lowercase, tiếng Anh hoặc Việt không dấu). VD: history, technology, science, art, music, cooking, gaming, anime, fashion, fitness, literature, math, psychology, philosophy, economics, law, architecture, photography, film, etc. Bạn có thể sáng tạo category mới nếu chủ đề đặc biệt.",
+  "difficulty": "chọn 1 trong: easy, medium, hard - dựa vào độ khó trung bình của các câu hỏi",
+  "tags": ["từ khóa 1", "từ khóa 2", "từ khóa 3"] - 3-5 tags ngắn gọn phù hợp với chủ đề (viết thường, không dấu hoặc có dấu),
   "questions": [
     {
-      "question": "câu hỏi bằng tiếng Việt",
+      "question": "câu hỏi tiếng Việt",
       "options": ["lựa chọn A", "lựa chọn B", "lựa chọn C", "lựa chọn D"],
       "correctAnswer": 0,
-      "explanation": "giải thích bằng tiếng Việt"
-    },
-    {
-      "question": "câu hỏi thứ 2",
-      "options": ["lựa chọn A", "lựa chọn B", "lựa chọn C", "lựa chọn D"],
-      "correctAnswer": 1,
-      "explanation": "giải thích"
-    },
-    {"question": "câu hỏi...", "options": ["A", "B", "C", "D"], "correctAnswer": 2, "explanation": "..."}
+      "explanation": "giải thích chi tiết tại sao đáp án đúng (1-2 câu)"
+    }
   ]
-}
-
-YÊU CẦU NGHIÊM NGẶT:
-- ĐÚNG ${count} câu hỏi (không nhiều, không ít) - giả sử bạn tạo ${count} câu hỏi thì chỉ trả về ${count} câu
-- CHỈ trả về JSON hợp lệ
-- KHÔNG có markdown blocks (\`\`\`json) hoặc backticks
-- KHÔNG có văn bản trước hoặc sau JSON
-- KHÔNG có ký tự đặc biệt, emoji, định dạng
-- Bạn phải đếm chính xác ${count} câu hỏi trước khi trả về`;
+}`;
 
     const generateQuiz = async (
       promptText: string,
@@ -326,105 +703,302 @@ YÊU CẦU NGHIÊM NGẶT:
         }
       );
 
-    let data, quizData, tokenUsage;
+    let data: unknown,
+      quizData: unknown,
+      tokenUsage: {
+        prompt: number;
+        candidates: number;
+        total: number;
+      } | null = null;
+
+    // Improved retry/backoff and logging metrics
     let retryCount = 0;
-    const maxRetries = 3;
+    const maxRetries = 5; // increase retries for transient errors
+    const baseDelayMs = 1000;
 
-    do {
-      const response = await generateQuiz(
-        createPrompt(
-          typeof payload.prompt === "string"
-            ? payload.prompt
-            : "Default quiz topic",
-          questionCount
-        ),
-        apiKeyToUse
-      );
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        console.error(`❌ Gemini API Error (${response.status}):`, errorData);
+    const sleep = (ms: number) =>
+      new Promise((resolve) => setTimeout(resolve, ms));
 
-        if (response.status === 429) {
-          await updateQuizStatus(
-            quizId,
-            QUIZ_STATUS.FAILED,
-            "Gemini rate limit exceeded. Please check your API quota."
-          );
-          return;
-        }
-        if (response.status === 401) {
-          await updateQuizStatus(
-            quizId,
-            QUIZ_STATUS.FAILED,
-            "Invalid Gemini API key. Please check your configuration."
-          );
-          return;
-        }
-        if (response.status === 403) {
-          await updateQuizStatus(
-            quizId,
-            QUIZ_STATUS.FAILED,
-            "Gemini API access forbidden. Check your account status."
-          );
-          return;
-        }
-        const errorMsg = errorData?.error?.message || `Gemini API request failed: ${response.status}`;
-        throw new Error(errorMsg);
-      }
-
-      data = await response.json();
-
-      // Capture token usage from Gemini API response
-      tokenUsage = data.usageMetadata
-        ? {
-            prompt: data.usageMetadata.promptTokenCount || 0,
-            candidates: data.usageMetadata.candidatesTokenCount || 0,
-            total: data.usageMetadata.totalTokenCount || 0,
-          }
-        : {
-            prompt: 0,
-            candidates: 0,
-            total: 0,
-          };
-
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (!text) throw new Error("No quiz data generated");
-
-      // Parse JSON (same logic as original)
-      let jsonText = text.trim();
-      if (jsonText.startsWith("```")) {
-        const jsonMatch = jsonText.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-        jsonText = jsonMatch ? jsonMatch[1].trim() : jsonText;
-      }
-      const jsonObjectMatch = jsonText.match(/\{[\s\S]*\}/);
-      if (jsonObjectMatch) jsonText = jsonObjectMatch[0];
-
+    for (retryCount = 0; retryCount <= maxRetries; retryCount++) {
+      const attempt = retryCount + 1;
       try {
-        quizData = JSON.parse(jsonText);
-      } catch {
-        throw new Error("Invalid JSON from AI");
-      }
+        console.log(
+          `🔁 [BACKEND] Gemini attempt ${attempt}/${
+            maxRetries + 1
+          } for quiz ${quizId}`
+        );
 
-      const actualCount = quizData.questions?.length || 0;
-      if (actualCount !== questionCount && retryCount < maxRetries) {
-        retryCount++;
+        // Persist attempt count & progress to DB for observability
+        try {
+          await adminClient
+            .from("quizzes")
+            .update({
+              progress: `Generating with AI... (attempt ${attempt})`,
+              attempts: attempt,
+              last_attempt_at: new Date().toISOString(),
+            })
+            .eq("id", quizId);
+        } catch (e) {
+          // Non-fatal: just log if metrics update fails
+          console.warn(
+            "[BACKEND] Failed to persist attempt/metrics to DB:",
+            e instanceof Error ? e.message : e
+          );
+        }
+
+        const topicForAI =
+          typeof payload.prompt === "string"
+            ? replaceBadwordsForAi(payload.prompt, "[removed]")
+            : "Default quiz topic";
+
+        const response = await generateQuiz(
+          createPrompt(topicForAI, questionCount),
+          apiKeyToUse
+        );
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          console.error(
+            `❌ Gemini API Error (${response.status}) on attempt ${attempt}:`,
+            errorData
+          );
+
+          // Handle non-retriable status codes immediately
+          if (response.status === 429) {
+            const msg429 =
+              "Gemini rate limit exceeded (HTTP 429). This usually means the API key's quota was reached. " +
+              "If you are using a personal key, check your usage in Google AI Studio. " +
+              "If using the server key, consider requesting higher quota or using user keys for authenticated users. " +
+              "See: https://makersuite.google.com/app/apikey";
+            await updateQuizStatus(quizId, QUIZ_STATUS.FAILED, msg429);
+            return;
+          }
+          if (response.status === 401) {
+            const msg401 =
+              "Authentication error (HTTP 401). The provided Gemini API key is invalid or revoked. " +
+              "For user keys, re-generate in Google AI Studio. For server key, ensure GEMINI_API_KEY is set in Supabase secrets. " +
+              "Guide: https://makersuite.google.com/app/apikey";
+            await updateQuizStatus(quizId, QUIZ_STATUS.FAILED, msg401);
+            return;
+          }
+          if (response.status === 403) {
+            const msg403 =
+              "Access forbidden (HTTP 403). The API key does not have permission to use the Gemini model or account access is restricted. " +
+              "Check IAM/permissions and that the key is enabled for generative AI. See: https://developers.generativeai.google/docs/";
+            await updateQuizStatus(quizId, QUIZ_STATUS.FAILED, msg403);
+            return;
+          }
+
+          // For 5xx and other transient errors, retry with backoff
+          if (response.status >= 500 && retryCount < maxRetries) {
+            const jitter = 0.5 + Math.random() * 0.5;
+            const delay = Math.round(
+              baseDelayMs * Math.pow(2, retryCount) * jitter
+            );
+            console.warn(
+              `[BACKEND] Transient Gemini error (status=${response.status}). Retrying in ${delay}ms...`
+            );
+            await sleep(delay);
+            continue;
+          }
+
+          const errorMsg =
+            errorData?.error?.message ||
+            `Gemini API request failed: ${response.status}`;
+          throw new Error(errorMsg);
+        }
+
+        // Parse response JSON safely
+        data = await response.json().catch((e) => {
+          throw new Error(`Failed to parse Gemini JSON response: ${e}`);
+        });
+
+        // Normalize parsed 'data' to a record for safe property access
+        const parsedData = (data as Record<string, unknown>) || {};
+
+        // Capture token usage from Gemini API response (if available)
+        const usageMetadata = parsedData["usageMetadata"] as
+          | Record<string, unknown>
+          | undefined;
+        tokenUsage = usageMetadata
+          ? {
+              prompt: Number(usageMetadata["promptTokenCount"] ?? 0),
+              candidates: Number(usageMetadata["candidatesTokenCount"] ?? 0),
+              total: Number(usageMetadata["totalTokenCount"] ?? 0),
+            }
+          : { prompt: 0, candidates: 0, total: 0 };
+
+        // Extract generated text safely from nested structure
+        let text: string | undefined;
+        try {
+          const candidates = parsedData["candidates"] as unknown;
+          if (Array.isArray(candidates) && candidates.length > 0) {
+            const first = candidates[0] as Record<string, unknown>;
+            const content = first["content"] as
+              | Record<string, unknown>
+              | undefined;
+            const parts = content?.["parts"] as unknown;
+            if (Array.isArray(parts) && parts.length > 0) {
+              const part0 = parts[0] as Record<string, unknown>;
+              const maybeText = part0["text"];
+              if (typeof maybeText === "string") text = maybeText;
+            }
+          }
+        } catch {
+          text = undefined;
+        }
+
+        if (!text) {
+          const msg = "No quiz data generated";
+          throw new Error(msg);
+        }
+
+        // Parse JSON from AI output robustly
+        let jsonText = text.trim();
+        if (jsonText.startsWith("```")) {
+          const jsonMatch = jsonText.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+          jsonText = jsonMatch ? jsonMatch[1].trim() : jsonText;
+        }
+        const jsonObjectMatch = jsonText.match(/\{[\s\S]*\}/);
+        if (jsonObjectMatch) jsonText = jsonObjectMatch[0];
+
+        // Parse quiz JSON and compute actual question count safely
+        try {
+          const parsedQuiz = JSON.parse(jsonText);
+          quizData = parsedQuiz;
+        } catch (parseErr) {
+          console.error(
+            `[BACKEND] JSON parse error on attempt ${attempt} for quiz ${quizId}:`,
+            parseErr instanceof Error ? parseErr.message : parseErr
+          );
+          if (retryCount < maxRetries) {
+            const jitter = 0.5 + Math.random() * 0.5;
+            const delay = Math.round(
+              baseDelayMs * Math.pow(2, retryCount) * jitter
+            );
+            console.warn(
+              `[BACKEND] Invalid JSON from AI. Retrying in ${delay}ms (attempt ${attempt})...`
+            );
+            await sleep(delay);
+            continue;
+          }
+          throw new Error("Invalid JSON from AI");
+        }
+
+        const quizDataObj = (quizData as Record<string, unknown>) || {};
+        const questionsArr = Array.isArray(quizDataObj["questions"])
+          ? (quizDataObj["questions"] as unknown[])
+          : [];
+        const actualCount = questionsArr.length;
+        if (actualCount !== questionCount) {
+          const msg = `AI returned ${actualCount} questions (expected ${questionCount})`;
+          console.warn(
+            `[BACKEND] ${msg} on attempt ${attempt} for quiz ${quizId}`
+          );
+          if (retryCount < maxRetries) {
+            const jitter = 0.5 + Math.random() * 0.5;
+            const delay = Math.round(
+              baseDelayMs * Math.pow(2, retryCount) * jitter
+            );
+            console.warn(
+              `[BACKEND] Question count mismatch. Retrying in ${delay}ms (attempt ${attempt})...`
+            );
+            await sleep(delay);
+            continue;
+          } else {
+            throw new Error(msg);
+          }
+        }
+
+        // Success: break out of retry loop
+        console.log(
+          `✅ [BACKEND] Successfully generated quiz on attempt ${attempt} for ${quizId}`
+        );
+        break;
+      } catch (err) {
+        console.error(
+          `❌ [BACKEND] Attempt ${attempt} failed for quiz ${quizId}:`,
+          err instanceof Error ? err.message : err
+        );
+
+        // If last attempt, rethrow to be handled by outer catch
+        if (retryCount >= maxRetries) {
+          console.error(
+            `[BACKEND] Max retries reached (${maxRetries}). Failing generation for ${quizId}`
+          );
+          throw err;
+        }
+
+        // Backoff before next retry
+        const jitter = 0.5 + Math.random() * 0.5;
+        const delay = Math.round(
+          baseDelayMs * Math.pow(2, retryCount) * jitter
+        );
+        console.log(`[BACKEND] Waiting ${delay}ms before next retry...`);
+        await sleep(delay);
         continue;
       }
-      break;
-    } while (retryCount <= maxRetries);
+    }
 
-    // Success! Save to database
+    // Success! Use original AI output for DB so frontend shows original words.
+    // We still produce a sanitized copy if needed (not saved by default).
+    const quizObj = (quizData as Record<string, unknown>) || {};
+    const rawTitle = String(quizObj.title ?? "");
+    const rawDescription = String(quizObj.description ?? "");
+    const rawCategory = String(quizObj.category ?? "general");
+    const rawDifficulty = String(quizObj.difficulty ?? "medium");
+    const rawTags: string[] = Array.isArray(quizObj.tags)
+      ? (quizObj.tags as string[]).slice(0, 5).map(t => String(t ?? "").toLowerCase())
+      : [];
+
+    const rawQuestions: unknown[] = Array.isArray(quizObj.questions)
+      ? (quizObj.questions as unknown[])
+      : [];
+
+    // Keep sanitizedQuestions locally (not saved) in case needed for logging/debug
+    const sanitizedQuestions = rawQuestions.map((q) => {
+      const qq = q as Record<string, unknown>;
+      const optionsRaw = Array.isArray(qq.options)
+        ? (qq.options as unknown[])
+        : [];
+      const safeOptions = optionsRaw.map((o) =>
+        sanitizeVietnameseBadwords(String(o ?? ""), "[censored]")
+      );
+
+      return {
+        question: sanitizeVietnameseBadwords(
+          String(qq.question ?? ""),
+          "[censored]"
+        ),
+        options: safeOptions,
+        correctAnswer:
+          typeof qq.correctAnswer === "number" ? qq.correctAnswer : 0,
+        explanation: sanitizeVietnameseBadwords(
+          String(qq.explanation ?? ""),
+          "[censored]"
+        ),
+      };
+    });
+
+    // Save original AI output to DB so the UI shows the quiz as generated by AI
     await adminClient
       .from("quizzes")
       .update({
-        title: quizData.title,
-        description: quizData.description,
-        questions: quizData.questions,
+        title: rawTitle,
+        description: rawDescription,
+        questions: rawQuestions,
+        category: rawCategory,
+        difficulty: rawDifficulty,
+        tags: rawTags,
         status: QUIZ_STATUS.COMPLETED,
         progress: "Completed!",
-        prompt_tokens: tokenUsage.prompt,
-        candidates_tokens: tokenUsage.candidates,
-        total_tokens: tokenUsage.total,
+        prompt_tokens: (tokenUsage ?? { prompt: 0, candidates: 0, total: 0 })
+          .prompt,
+        candidates_tokens: (
+          tokenUsage ?? { prompt: 0, candidates: 0, total: 0 }
+        ).candidates,
+        total_tokens: (tokenUsage ?? { prompt: 0, candidates: 0, total: 0 })
+          .total,
         is_public: true, // Always set completed quizzes as public
       })
       .eq("id", quizId);
@@ -501,11 +1075,22 @@ async function handleStartQuiz(req: Request) {
 
     console.log(`[START-QUIZ] Attempting to insert quiz record: ${quizId}`);
 
+    const rawPromptForInsert =
+      typeof payload.prompt === "string" ? payload.prompt : "Custom quiz topic";
+    const sanitizedPromptForInsert = sanitizeVietnameseBadwords(
+      rawPromptForInsert,
+      "[censored]"
+    );
+    const insertTitle =
+      sanitizedPromptForInsert && sanitizedPromptForInsert.length > 0
+        ? sanitizedPromptForInsert
+        : "Custom Quiz";
+
     const insertResult = await adminClient!.from("quizzes").insert({
       id: quizId,
       status: QUIZ_STATUS.PENDING,
-      prompt: payload.prompt || "Custom quiz topic",
-      title: payload.prompt || "Custom Quiz", // ✅ Required title
+      prompt: sanitizedPromptForInsert,
+      title: insertTitle, // ✅ Required title
       questions: [], // ✅ Required questions - empty array initially
       session_id: sessionId,
       user_id: userId,
@@ -597,6 +1182,9 @@ async function handleGetQuizStatus(req: Request) {
                 title: quiz.title,
                 description: quiz.description,
                 questions: quiz.questions,
+                category: quiz.category || "general",
+                difficulty: quiz.difficulty || "medium",
+                tags: quiz.tags || [],
                 tokenUsage: {
                   prompt: quiz.prompt_tokens || 0,
                   candidates: quiz.candidates_tokens || 0,

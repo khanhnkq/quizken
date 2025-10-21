@@ -3,8 +3,8 @@ import { Menu, Sparkles, LogOut, User, Settings, BookOpen } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/auth";
 import { Link } from "react-router-dom";
-import AuthModal from "./AuthModal";
-import ApiKeySettings from "./ApiKeySettings";
+import AuthModal from "@/components/AuthModal";
+import ApiKeySettings from "@/components/ApiKeySettings";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -60,7 +60,7 @@ const Navbar = () => {
           <div className="flex items-center gap-2">
             <Sparkles className="w-6 h-6 text-primary" />
             <span className="text-2xl font-bold">
-              Quiz<span className="text-primary">AI</span>
+              Quiz<span className="text-primary">Ken</span>
             </span>
           </div>
 
@@ -76,11 +76,11 @@ const Navbar = () => {
               className="text-foreground hover:text-primary transition-colors flex items-center gap-1">
               Thư viện
             </Link>
-            <a
-              href="#"
+            <Link
+              to="/about"
               className="text-foreground hover:text-primary transition-colors">
               Giới thiệu
-            </a>
+            </Link>
           </div>
 
           <div className="hidden md:flex items-center space-x-4">
@@ -93,7 +93,7 @@ const Navbar = () => {
                         variant="outline"
                         className="flex items-center gap-2">
                         <User className="h-4 w-4" />
-                        {user.email?.split("@")[0] || "Account"}
+                        {user.email?.split("@")[0] || "Tài khoản"}
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
@@ -148,11 +148,12 @@ const Navbar = () => {
               onClick={() => setIsOpen(false)}>
               Thư viện
             </Link>
-            <a
-              href="#"
-              className="block text-foreground hover:text-primary transition-colors">
+            <Link
+              to="/about"
+              className="block text-foreground hover:text-primary transition-colors"
+              onClick={() => setIsOpen(false)}>
               Giới thiệu
-            </a>
+            </Link>
             <div className="pt-4 space-y-2">
               {!loading && (
                 <>

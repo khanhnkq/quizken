@@ -2,6 +2,7 @@ export const TOAST_ADAPTER_NOTE = "react-hot-toast adapter";
 
 import * as React from "react";
 import { toast as hotToast } from "react-hot-toast";
+import { CheckCircle, XCircle, AlertTriangle, Info } from "lucide-react";
 
 type Variant = "default" | "destructive" | "success" | "info" | "warning";
 
@@ -32,11 +33,34 @@ function renderContent(
 ) {
   const children: Array<React.ReactNode> = [];
 
+  // Icon mapping for each variant
+  const iconMap: Record<Variant, React.ReactNode> = {
+    default: null,
+    success: React.createElement(CheckCircle, { 
+      className: "w-5 h-5 flex-shrink-0 mt-0.5",
+      "aria-hidden": "true"
+    }),
+    destructive: React.createElement(XCircle, { 
+      className: "w-5 h-5 flex-shrink-0 mt-0.5",
+      "aria-hidden": "true"
+    }),
+    warning: React.createElement(AlertTriangle, { 
+      className: "w-5 h-5 flex-shrink-0 mt-0.5",
+      "aria-hidden": "true"
+    }),
+    info: React.createElement(Info, { 
+      className: "w-5 h-5 flex-shrink-0 mt-0.5",
+      "aria-hidden": "true"
+    }),
+  };
+
+  const icon = variant ? iconMap[variant] : null;
+
   if (title) {
     children.push(
       React.createElement(
         "div",
-        { key: "title", className: "text-sm font-semibold" },
+        { key: "title", className: "text-sm font-semibold leading-tight text-opacity-100" },
         title
       )
     );
@@ -46,23 +70,23 @@ function renderContent(
     children.push(
       React.createElement(
         "div",
-        { key: "description", className: "text-sm opacity-90 mt-1" },
+        { key: "description", className: "text-xs mt-1 leading-relaxed text-opacity-90" },
         description
       )
     );
   }
 
   const variantClasses: Record<Variant, string> = {
-    default: "border-2 bg-background text-foreground",
+    default: "border-2 bg-background/95 backdrop-blur-sm text-foreground shadow-lg",
     destructive:
-      "destructive group border-2 border-destructive bg-destructive text-destructive-foreground",
-    success: "group border-2 border-[#B5CC89] bg-[#B5CC89]/15 text-foreground",
-    info: "group border-2 border-blue-300 bg-blue-50 text-blue-900",
-    warning: "group border-2 border-amber-300 bg-amber-50 text-amber-900",
+      "destructive group border-2 border-red-500 bg-red-50/95 dark:bg-red-950/95 backdrop-blur-sm text-red-900 dark:text-red-100 shadow-lg",
+    success: "group border-2 border-[#B5CC89] bg-[#B5CC89]/20 dark:bg-[#B5CC89]/25 backdrop-blur-sm text-[#1a3009] dark:text-[#B5CC89] shadow-lg",
+    info: "group border-2 border-blue-500 bg-blue-50/95 dark:bg-blue-950/95 backdrop-blur-sm text-blue-900 dark:text-blue-100 shadow-lg",
+    warning: "group border-2 border-amber-500 bg-amber-50/95 dark:bg-amber-950/95 backdrop-blur-sm text-amber-900 dark:text-amber-100 shadow-lg",
   };
 
   const baseClass =
-    "max-w-md w-full rounded-md border p-4 shadow flex items-start justify-between gap-4";
+    "max-w-md w-full rounded-xl border p-4 shadow-lg flex items-start gap-3 font-['Ubuntu']";
 
   const containerClass = `${baseClass} ${
     variant ? variantClasses[variant] : variantClasses.default
@@ -70,14 +94,14 @@ function renderContent(
 
   const content = React.createElement(
     "div",
-    { key: "content", className: "flex-1" },
+    { key: "content", className: "flex-1 min-w-0" },
     children
   );
 
   const actionNode = action
     ? React.createElement(
         "div",
-        { key: "action", className: "ml-4 flex items-center" },
+        { key: "action", className: "flex items-center flex-shrink-0" },
         action
       )
     : null;
@@ -87,7 +111,7 @@ function renderContent(
     {
       className: containerClass,
     },
-    [content, actionNode]
+    [icon, content, actionNode].filter(Boolean)
   );
 }
 
@@ -106,9 +130,9 @@ export function toast(opts: ToastOptions): ToastHandle {
   const dismiss = () => hotToast.dismiss(String(id));
 
   const update = (next: ToastOptions) => {
-    // Simple update: remove the old toast and show a new one with updated content.
-    hotToast.dismiss(id);
-    const newId = hotToast.custom(
+    // Update in-place by reusing the same id so animations and ordering are preserved.
+    // react-hot-toast supports passing an `id` option to replace an existing toast.
+    const updatedId = hotToast.custom(
       () =>
         renderContent(
           next.title ?? opts.title,
@@ -116,20 +140,15 @@ export function toast(opts: ToastOptions): ToastHandle {
           next.variant ?? opts.variant,
           next.action ?? opts.action
         ),
-      { duration: next.duration ?? opts.duration ?? DEFAULT_DURATION }
+      { id, duration: next.duration ?? opts.duration ?? DEFAULT_DURATION }
     );
 
     return {
-      id: newId,
-      dismiss: () => hotToast.dismiss(String(newId)),
-      update: () => {
-        // noop for simplicity
-        return {
-          id: newId,
-          dismiss: () => hotToast.dismiss(String(newId)),
-          update: () => ({} as unknown as ToastHandle),
-        } as ToastHandle;
-      },
+      id: updatedId,
+      dismiss: () => hotToast.dismiss(String(updatedId)),
+      update: (nxt: ToastOptions) =>
+        // Delegate to same update logic to allow chained updates
+        update(nxt),
     } as ToastHandle;
   };
 

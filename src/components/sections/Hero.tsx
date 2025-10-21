@@ -91,11 +91,13 @@ const Hero = () => {
   };
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-secondary/30 to-background min-h-[90svh] md:min-h-screen py-16 sm:py-20 md:py-28 px-4">
+    <section
+      id="hero"
+      className="relative overflow-hidden bg-gradient-to-b from-secondary/30 to-background min-h-[90svh] md:min-h-screen py-16 sm:py-20 md:py-28 px-4">
       <ThreeBackground />
       <div className="container mx-auto max-w-7xl">
         <div className="max-w-4xl mx-auto text-center space-y-6 md:space-y-8 lg:space-y-10">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1] md:leading-tight group hover:text-primary transition-all duration-500 hover:drop-shadow-2xl hover:scale-105 cursor-pointer">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-normal leading-snug md:leading-normal group hover:text-primary transition-all duration-500 hover:drop-shadow-2xl hover:scale-105 cursor-pointer">
             Tạo{" "}
             <span className="text-primary group-hover:text-yellow-300 group-hover:scale-110 group-hover:animate-pulse transition-all duration-700">
               Bài Kiểm Tra Tuyệt Vời
@@ -109,7 +111,7 @@ const Hero = () => {
           <div className="h-auto sm:h-14 md:h-16 lg:h-20 flex items-center justify-center">
             {" "}
             {/* Fixed height container */}
-            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto font-mono leading-relaxed">
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto font-sans leading-relaxed">
               {displayText}
               {showCursor && (
                 <span
@@ -186,6 +188,12 @@ const Hero = () => {
         {/* Decorative Elements */}
         <div className="hidden md:block absolute top-0 right-0 w-72 h-72 bg-[#B5CC89]/20 rounded-full blur-3xl -z-0" />
         <div className="hidden md:block absolute bottom-0 left-0 w-64 h-64 bg-accent/20 rounded-full blur-3xl -z-0" />
+      </div>
+
+      <div className="absolute inset-x-0 bottom-0 h-16">
+        <div className="container mx-auto max-w-7xl h-full">
+          <div className="h-px bg-border/60" />
+        </div>
       </div>
     </section>
   );

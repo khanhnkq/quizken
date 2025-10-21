@@ -13,55 +13,55 @@ const Features = () => {
   const features = [
     {
       icon: Sparkles,
-      title: "AI-Powered Generation",
+      title: "Tạo nội dung bằng AI",
       description:
-        "Advanced AI creates intelligent, contextual questions tailored to your topic.",
+        "AI tiên tiến tạo ra câu hỏi thông minh, phù hợp ngữ cảnh theo đúng chủ đề của bạn.",
     },
     {
       icon: Zap,
-      title: "Instant Results",
+      title: "Kết quả tức thì",
       description:
-        "Generate complete quizzes in seconds, not hours. Save time and boost productivity.",
+        "Tạo trọn bộ quiz trong vài giây thay vì hàng giờ. Tiết kiệm thời gian và tăng hiệu suất.",
     },
     {
       icon: BookOpen,
-      title: "Multiple Topics",
+      title: "Nhiều chủ đề",
       description:
-        "Create quizzes on any subject - science, history, language, or custom topics.",
+        "Tạo quiz cho mọi lĩnh vực: khoa học, lịch sử, ngôn ngữ hoặc chủ đề tùy chỉnh.",
     },
     {
       icon: Target,
-      title: "Customizable Difficulty",
+      title: "Tùy chỉnh độ khó",
       description:
-        "Control difficulty levels from beginner to expert for your specific audience.",
+        "Điều chỉnh mức độ khó từ cơ bản đến nâng cao cho đúng đối tượng người học.",
     },
     {
       icon: Users,
-      title: "For Everyone",
+      title: "Phù hợp cho mọi người",
       description:
-        "Perfect for teachers, trainers, content creators, and anyone who needs quizzes.",
+        "Lý tưởng cho giáo viên, huấn luyện viên, người tạo nội dung và bất kỳ ai cần quiz.",
     },
     {
       icon: Award,
-      title: "Quality Questions",
+      title: "Câu hỏi chất lượng",
       description:
-        "Every question includes detailed explanations to enhance learning.",
+        "Mỗi câu hỏi đều có giải thích chi tiết để tăng hiệu quả học tập.",
     },
   ];
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-secondary/30 to-background min-h-screen py-20 px-4">
+    <section id="features" className="relative overflow-hidden bg-gradient-to-b from-secondary/30 to-background min-h-screen py-20 px-4">
       <div className="container mx-auto max-w-7xl">
         <div className="text-center mb-16">
           <div className="flex justify-center mb-6">
             <Star className="w-12 h-12 text-[#B5CC89]" />
           </div>
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            Why Choose QuizAI
+            Vì sao chọn QuizKen
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            The smartest way to create engaging quizzes. Powered by advanced AI
-            to deliver quality educational content instantly.
+            Cách thông minh nhất để tạo các bài kiểm tra hấp dẫn. Sử dụng AI
+            tiên tiến để cung cấp nội dung giáo dục chất lượng ngay lập tức.
           </p>
         </div>
 
@@ -79,6 +79,12 @@ const Features = () => {
               </CardContent>
             </Card>
           ))}
+        </div>
+      </div>
+
+      <div className="absolute inset-x-0 bottom-0 h-12 pointer-events-none">
+        <div className="container mx-auto max-w-7xl h-full">
+          <div className="h-px bg-border/50" />
         </div>
       </div>
     </section>

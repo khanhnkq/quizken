@@ -328,7 +328,7 @@ const ApiKeySettings: React.FC = () => {
           <div className="bg-[#B5CC89] p-2 rounded-full">
             <Shield className="w-6 h-6 text-black" />
           </div>
-          <h2 className="text-2xl font-bold">API Key Settings</h2>
+          <h2 className="text-2xl font-bold">Cài đặt API Key</h2>
         </div>
         <p className="text-sm text-muted-foreground">
           Thêm API key riêng để sử dụng dịch vụ AI của bạn
@@ -341,7 +341,7 @@ const ApiKeySettings: React.FC = () => {
           <CardTitle className="flex items-center justify-between text-lg">
             <div className="flex items-center gap-2">
               <Key className="w-4 h-4" />
-              Gemini AI API Key
+              API Key Gemini AI
             </div>
             {apiKeys.some((k) => k.provider === "gemini") && (
               <Check className="w-4 h-4 text-green-600" />
@@ -371,7 +371,7 @@ const ApiKeySettings: React.FC = () => {
           {/* Input field */}
           <div className="space-y-2">
             <Label htmlFor="gemini-key" className="text-sm font-medium">
-              Gemini API Key
+              API Key Gemini
             </Label>
             <div className="relative">
               <Input

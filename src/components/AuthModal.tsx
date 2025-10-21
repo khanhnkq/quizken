@@ -58,7 +58,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onOpenChange }) => {
                 QuizGen AI
               </DialogTitle>
             </div>
-            <DialogDescription className="text-center text-[11px] text-muted-foreground leading-tight">
+            <DialogDescription className="text-center text-[11px] text-muted-foreground leading-relaxed">
               Chỉ hỗ trợ đăng nhập bằng Google
             </DialogDescription>
           </DialogHeader>

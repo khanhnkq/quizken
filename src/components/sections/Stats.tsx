@@ -1,10 +1,10 @@
 import { Users } from "lucide-react";
 
 const stats = [
-  { number: "50K+", label: "Quizzes Generated" },
-  { number: "100+", label: "Topics Covered" },
-  { number: "99%", label: "Satisfaction Rate" },
-  { number: "<10s", label: "Average Generation" },
+  { number: "50K+", label: "Quiz đã tạo" },
+  { number: "100+", label: "Chủ đề được bao phủ" },
+  { number: "99%", label: "Mức độ hài lòng" },
+  { number: "<10s", label: "Thời gian tạo trung bình" },
 ];
 
 const Stats = () => {
@@ -17,11 +17,11 @@ const Stats = () => {
               <Users className="w-12 h-12 text-[#B5CC89]" />
             </div>
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              Trusted by Educators Worldwide
+              Được tin dùng bởi nhà giáo trên toàn thế giới
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Join thousands of teachers, trainers, and content creators who use
-              QuizAI to create engaging educational content.
+              Tham gia cùng hàng nghìn giáo viên, huấn luyện viên và người tạo
+              nội dung đang dùng QuizKen để tạo nội dung học tập hấp dẫn.
             </p>
           </div>
 

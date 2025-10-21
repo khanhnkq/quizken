@@ -78,6 +78,47 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Custom Toast Animations */
+@layer utilities {
+  .toast-animation {
+    animation: toast-enter 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .toast-animation[data-removed="true"] {
+    animation: toast-exit 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  /* Responsive toast positioning */
+  @media (max-width: 768px) {
+    .toast-animation {
+      max-width: calc(100vw - 32px) !important;
+      margin: 0 16px !important;
+    }
+  }
+}
+
+@keyframes toast-enter {
+  from {
+    opacity: 0;
+    transform: translateX(100%) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes toast-exit {
+  from {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%) scale(0.95);
+  }
+}
+
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
 All colors MUST be HSL.
 */
@@ -176,8 +217,22 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans antialiased leading-normal;
     overflow-x: hidden;
+  }
+
+  [data-hot-toast],
+  [data-sonner-toaster] {
+    position: fixed !important;
+    transform: none !important;
+    inset: auto !important;
+  }
+
+  #__react-hot-toast {
+    position: absolute !important;
+    top: 1rem !important;
+    right: 1rem !important;
+    transform: translate3d(0, 0, 0) !important;
   }
 }
 
