@@ -34,8 +34,12 @@ import {
   Filter,
   ArrowUpDown,
 } from "lucide-react";
-import type jsPDF from "jspdf";
-import { ScrollVelocityContainer, ScrollVelocityRow } from "@/components/ScrollVelocity";
+import { warmupPdfWorker, generateAndDownloadPdf } from "@/lib/pdfWorkerClient";
+import type { Question } from "@/types/quiz";
+import {
+  ScrollVelocityContainer,
+  ScrollVelocityRow,
+} from "@/components/ScrollVelocity";
 import AuthModal from "@/components/AuthModal";
 import Navbar from "@/components/layout/Navbar";
 import {
@@ -48,7 +52,10 @@ import {
   type QuizDifficulty,
 } from "@/lib/constants/quizCategories";
 import { CategoryFilters } from "@/components/library/CategoryFilters";
-import { QuizCategoryBadge, QuizTags } from "@/components/library/QuizCategoryBadge";
+import {
+  QuizCategoryBadge,
+  QuizTags,
+} from "@/components/library/QuizCategoryBadge";
 
 interface PublicQuiz {
   id: string;
@@ -85,14 +92,18 @@ const QuizLibrary: React.FC = () => {
   const [selectedQuiz, setSelectedQuiz] = useState<PublicQuiz | null>(null);
   const [sortBy, setSortBy] = useState<"usage" | "downloads" | "date">("usage");
   const [searchIn, setSearchIn] = useState<"all" | "title" | "content">("all");
-  const [selectedCategory, setSelectedCategory] = useState<QuizCategory | "all">("all");
-  const [selectedDifficulty, setSelectedDifficulty] = useState<QuizDifficulty | "all">("all");
+  const [selectedCategory, setSelectedCategory] = useState<
+    QuizCategory | "all"
+  >("all");
+  const [selectedDifficulty, setSelectedDifficulty] = useState<
+    QuizDifficulty | "all"
+  >("all");
   const searchInputRef = React.useRef<HTMLInputElement>(null);
 
   // Scroll to top when opening a new quiz preview
   useEffect(() => {
     if (selectedQuiz) {
-      window.scrollTo({ top: 300, behavior: 'smooth' });
+      window.scrollTo({ top: 300, behavior: "smooth" });
     }
   }, [selectedQuiz]);
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -101,18 +112,27 @@ const QuizLibrary: React.FC = () => {
   const PAGE_SIZE = 9;
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
-  
+
   // Total stats from database
   const [totalStats, setTotalStats] = useState({
     totalQuizzes: 0,
     totalCategories: 0,
     totalCreators: 0,
   });
-  
+
   // GSAP count up animation refs
-  const totalQuizzesRef = useCountUp(totalStats.totalQuizzes, { duration: 1.5, delay: 0.1 });
-  const totalCategoriesRef = useCountUp(totalStats.totalCategories, { duration: 1.5, delay: 0.3 });
-  const totalCreatorsRef = useCountUp(totalStats.totalCreators, { duration: 1.5, delay: 0.5 });
+  const totalQuizzesRef = useCountUp(totalStats.totalQuizzes, {
+    duration: 1.5,
+    delay: 0.1,
+  });
+  const totalCategoriesRef = useCountUp(totalStats.totalCategories, {
+    duration: 1.5,
+    delay: 0.3,
+  });
+  const totalCreatorsRef = useCountUp(totalStats.totalCreators, {
+    duration: 1.5,
+    delay: 0.5,
+  });
 
   // Debounce search để giảm tính toán khi người dùng đang gõ
   const [debouncedQuery, setDebouncedQuery] = useState("");
@@ -132,9 +152,11 @@ const QuizLibrary: React.FC = () => {
       if (error) throw error;
 
       if (data) {
-        const uniqueCategories = new Set(data.map(q => q.category).filter(Boolean)).size;
-        const uniqueCreators = new Set(data.map(q => q.user_id)).size;
-        
+        const uniqueCategories = new Set(
+          data.map((q) => q.category).filter(Boolean)
+        ).size;
+        const uniqueCreators = new Set(data.map((q) => q.user_id)).size;
+
         setTotalStats({
           totalQuizzes: data.length,
           totalCategories: uniqueCategories,
@@ -187,13 +209,13 @@ const QuizLibrary: React.FC = () => {
   // Keyboard shortcut: Ctrl/Cmd + K to focus search
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
         searchInputRef.current?.focus();
       }
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
   // Tải thêm trang tiếp theo (phân trang phía server)
@@ -223,15 +245,27 @@ const QuizLibrary: React.FC = () => {
       }
 
       const rows = data || [];
-      console.log('📥 loadMore - loaded rows:', rows.length, 'current quizzes:', quizzes.length);
-      
+      console.log(
+        "📥 loadMore - loaded rows:",
+        rows.length,
+        "current quizzes:",
+        quizzes.length
+      );
+
       // Direct state updates without startTransition to avoid race conditions
       setQuizzes((prev) => {
         const updated = [...prev, ...rows];
-        console.log('📥 setQuizzes - prev:', prev.length, 'rows:', rows.length, 'updated:', updated.length);
+        console.log(
+          "📥 setQuizzes - prev:",
+          prev.length,
+          "rows:",
+          rows.length,
+          "updated:",
+          updated.length
+        );
         return updated;
       });
-      setDisplayLimit(prev => prev + PAGE_SIZE);
+      setDisplayLimit((prev) => prev + PAGE_SIZE);
       setHasMore(rows.length === PAGE_SIZE);
     } finally {
       setLoadingMore(false);
@@ -241,7 +275,7 @@ const QuizLibrary: React.FC = () => {
   // Discover all unique categories from loaded quizzes
   const availableCategories = useMemo(() => {
     const categoriesSet = new Set<string>();
-    quizzes.forEach(quiz => {
+    quizzes.forEach((quiz) => {
       if (quiz.category) {
         categoriesSet.add(quiz.category);
       }
@@ -250,7 +284,7 @@ const QuizLibrary: React.FC = () => {
   }, [quizzes]);
 
   const filteredQuizzes = useMemo(() => {
-    console.log('🔍 filteredQuizzes memo - quizzes.length:', quizzes.length);
+    console.log("🔍 filteredQuizzes memo - quizzes.length:", quizzes.length);
     const q = debouncedQuery.toLowerCase();
     let results = quizzes;
 
@@ -261,7 +295,9 @@ const QuizLibrary: React.FC = () => {
 
     // Apply difficulty filter
     if (selectedDifficulty !== "all") {
-      results = results.filter((quiz) => quiz.difficulty === selectedDifficulty);
+      results = results.filter(
+        (quiz) => quiz.difficulty === selectedDifficulty
+      );
     }
 
     // Apply search filter
@@ -270,14 +306,16 @@ const QuizLibrary: React.FC = () => {
         const title = (quiz.title || "").toLowerCase();
         const desc = (quiz.description || "").toLowerCase();
         const prompt = (quiz.prompt || "").toLowerCase();
-        
+
         // Search in questions content
         let questionsText = "";
         if (Array.isArray(quiz.questions)) {
           questionsText = quiz.questions
             .map((q: QuizQuestion) => {
               const question = q.question || "";
-              const options = Array.isArray(q.options) ? q.options.join(" ") : "";
+              const options = Array.isArray(q.options)
+                ? q.options.join(" ")
+                : "";
               const explanation = q.explanation || "";
               return `${question} ${options} ${explanation}`;
             })
@@ -293,7 +331,12 @@ const QuizLibrary: React.FC = () => {
             return questionsText.includes(q) || prompt.includes(q);
           case "all":
           default:
-            return title.includes(q) || desc.includes(q) || prompt.includes(q) || questionsText.includes(q);
+            return (
+              title.includes(q) ||
+              desc.includes(q) ||
+              prompt.includes(q) ||
+              questionsText.includes(q)
+            );
         }
       });
     }
@@ -306,18 +349,31 @@ const QuizLibrary: React.FC = () => {
         case "downloads":
           return (b.pdf_download_count || 0) - (a.pdf_download_count || 0);
         case "date":
-          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+          return (
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          );
         default:
           return 0;
       }
     });
 
     return sorted;
-  }, [quizzes, debouncedQuery, sortBy, searchIn, selectedCategory, selectedDifficulty]);
+  }, [
+    quizzes,
+    debouncedQuery,
+    sortBy,
+    searchIn,
+    selectedCategory,
+    selectedDifficulty,
+  ]);
 
   // Reset displayLimit chỉ khi search query hoặc filters thay đổi
   useEffect(() => {
-    if (debouncedQuery || selectedCategory !== "all" || selectedDifficulty !== "all") {
+    if (
+      debouncedQuery ||
+      selectedCategory !== "all" ||
+      selectedDifficulty !== "all"
+    ) {
       // Reset về PAGE_SIZE khi có filter
       setDisplayLimit(PAGE_SIZE);
     }
@@ -329,25 +385,33 @@ const QuizLibrary: React.FC = () => {
   // Stats cho dashboard - dựa vào quiz đang hiển thị
   const displayedStats = useMemo(() => {
     const displayedQuizzesForStats = filteredQuizzes.slice(0, displayLimit);
-    const totalTokens = displayedQuizzesForStats.reduce((sum, quiz) => sum + (quiz.total_tokens || 0), 0);
-    const uniqueCreators = new Set(displayedQuizzesForStats.map((q) => q.user_id)).size;
-    
+    const totalTokens = displayedQuizzesForStats.reduce(
+      (sum, quiz) => sum + (quiz.total_tokens || 0),
+      0
+    );
+    const uniqueCreators = new Set(
+      displayedQuizzesForStats.map((q) => q.user_id)
+    ).size;
+
     return {
       quizCount: displayedQuizzesForStats.length,
       totalTokens,
-      uniqueCreators
+      uniqueCreators,
     };
   }, [filteredQuizzes, displayLimit]);
 
   // Stats tổng cho toàn bộ quiz đã load (để hiển thị khi cần)
   const allQuizzesStats = useMemo(() => {
-    const totalTokens = quizzes.reduce((sum, quiz) => sum + (quiz.total_tokens || 0), 0);
+    const totalTokens = quizzes.reduce(
+      (sum, quiz) => sum + (quiz.total_tokens || 0),
+      0
+    );
     const uniqueCreators = new Set(quizzes.map((q) => q.user_id)).size;
-    
+
     return {
       quizCount: quizzes.length,
       totalTokens,
-      uniqueCreators
+      uniqueCreators,
     };
   }, [quizzes]);
 
@@ -355,18 +419,18 @@ const QuizLibrary: React.FC = () => {
     // Đảm bảo displayLimit không vượt quá số quiz có sẵn
     const maxDisplay = Math.min(displayLimit, filteredQuizzes.length);
     const result = filteredQuizzes.slice(0, maxDisplay);
-    
+
     // Debug log để theo dõi
-    console.log('DisplayedQuizzes Debug:', {
+    console.log("DisplayedQuizzes Debug:", {
       displayLimit,
       filteredQuizzesLength: filteredQuizzes.length,
       maxDisplay,
       resultLength: result.length,
       hasMore,
       debouncedQuery,
-      quizzesLength: quizzes.length
+      quizzesLength: quizzes.length,
     });
-    
+
     return result;
   }, [filteredQuizzes, displayLimit, hasMore, debouncedQuery, quizzes.length]);
 
@@ -386,80 +450,32 @@ const QuizLibrary: React.FC = () => {
     }
   };
 
-  // Helpers: đảm bảo jsPDF nhúng font Unicode để hiển thị tiếng Việt đúng dấu
-  const arrayBufferToBinaryString = (buffer: ArrayBuffer) => {
-    const bytes = new Uint8Array(buffer);
-    let binary = "";
-    const chunkSize = 0x8000;
-    for (let i = 0; i < bytes.length; i += chunkSize) {
-      const chunk = bytes.subarray(i, i + chunkSize);
-      binary += String.fromCharCode(...chunk);
-    }
-    return binary;
-  };
+  // Warm up PDF worker và font để lần bấm đầu nhanh hơn
+  useEffect(() => {
+    warmupPdfWorker().catch(() => {});
+  }, []);
 
-  const ensurePdfVnFont = async (doc: jsPDF) => {
-    // Cache dữ liệu font trong window, nhưng luôn add vào VFS của tài liệu hiện tại
-    const w = window as unknown as {
-      __pdfVnFontDataReg?: string;
-      __pdfVnFontDataBold?: string;
-    };
-
-    // Tải Regular nếu chưa có
-    if (!w.__pdfVnFontDataReg) {
-      const regCandidates = [
-        "https://cdn.jsdelivr.net/gh/googlefonts/roboto@v20.0.0/src/hinted/Roboto-Regular.ttf",
-        "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/roboto/Roboto-Regular.ttf",
-        "https://cdn.jsdelivr.net/gh/googlefonts/noto-fonts/hinted/ttf/NotoSans/NotoSans-Regular.ttf",
-      ];
-      for (const url of regCandidates) {
-        try {
-          const res = await fetch(url, { mode: "cors" });
-          if (!res.ok) continue;
-          const buf = await res.arrayBuffer();
-          w.__pdfVnFontDataReg = arrayBufferToBinaryString(buf);
-          break;
-        } catch {
-          // thử candidate tiếp theo
-        }
-      }
-    }
-
-    // Tải Bold nếu chưa có
-    if (!w.__pdfVnFontDataBold) {
-      const boldCandidates = [
-        "https://cdn.jsdelivr.net/gh/googlefonts/roboto@v20.0.0/src/hinted/Roboto-Bold.ttf",
-        "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/roboto/Roboto-Bold.ttf",
-        "https://cdn.jsdelivr.net/gh/googlefonts/noto-fonts/hinted/ttf/NotoSans/NotoSans-Bold.ttf",
-      ];
-      for (const url of boldCandidates) {
-        try {
-          const res = await fetch(url, { mode: "cors" });
-          if (!res.ok) continue;
-          const buf = await res.arrayBuffer();
-          w.__pdfVnFontDataBold = arrayBufferToBinaryString(buf);
-          break;
-        } catch {
-          // thử candidate tiếp theo
-        }
-      }
-    }
-
-    if (w.__pdfVnFontDataReg) {
-      // Luôn add vào VFS của jsPDF hiện tại
-      doc.addFileToVFS("Roboto-Regular.ttf", w.__pdfVnFontDataReg);
-      doc.addFont("Roboto-Regular.ttf", "Roboto", "normal");
-      if (w.__pdfVnFontDataBold) {
-        doc.addFileToVFS("Roboto-Bold.ttf", w.__pdfVnFontDataBold);
-        doc.addFont("Roboto-Bold.ttf", "Roboto", "bold");
-      }
-      return true;
-    }
-
-    console.warn(
-      "Không thể tải font hỗ trợ tiếng Việt cho jsPDF; sẽ dùng font mặc định (có thể lỗi dấu)."
-    );
-    return false;
+  // Chuẩn hóa dữ liệu JSON từ DB thành Question[] chặt chẽ, không dùng any
+  const normalizeToQuestions = (raw: unknown): Question[] => {
+    const arr = Array.isArray(raw) ? raw : [];
+    return arr.map((q) => {
+      const obj: Record<string, unknown> =
+        typeof q === "object" && q !== null
+          ? (q as Record<string, unknown>)
+          : {};
+      const question =
+        typeof obj.question === "string"
+          ? obj.question
+          : String(obj.question ?? "");
+      const options = Array.isArray(obj.options)
+        ? (obj.options as unknown[]).map((o) => String(o ?? ""))
+        : [];
+      const correctAnswer =
+        typeof obj.correctAnswer === "number" ? obj.correctAnswer : 0;
+      const explanation =
+        typeof obj.explanation === "string" ? obj.explanation : undefined;
+      return { question, options, correctAnswer, explanation };
+    });
   };
 
   const handleUseQuiz = async (quiz: PublicQuiz) => {
@@ -475,9 +491,9 @@ const QuizLibrary: React.FC = () => {
 
     // Increment usage count
     try {
-      await supabase.rpc('increment_quiz_usage', { quiz_id: quiz.id });
+      await supabase.rpc("increment_quiz_usage", { quiz_id: quiz.id });
     } catch (error) {
-      console.error('Failed to increment usage count:', error);
+      console.error("Failed to increment usage count:", error);
     }
 
     // Navigate to home and open the quiz generator with selected quiz data
@@ -561,10 +577,9 @@ const QuizLibrary: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
             <Card className="rounded-2xl bg-secondary/20 backdrop-blur-sm">
               <CardContent className="p-6 text-center">
-                <div 
+                <div
                   ref={totalQuizzesRef}
-                  className="text-4xl md:text-5xl font-bold text-primary mb-2"
-                >
+                  className="text-4xl md:text-5xl font-bold text-primary mb-2">
                   0
                 </div>
                 <p className="text-sm md:text-base text-muted-foreground font-medium">
@@ -574,10 +589,9 @@ const QuizLibrary: React.FC = () => {
             </Card>
             <Card className="rounded-2xl bg-secondary/20 backdrop-blur-sm">
               <CardContent className="p-6 text-center">
-                <div 
+                <div
                   ref={totalCategoriesRef}
-                  className="text-4xl md:text-5xl font-bold text-primary mb-2"
-                >
+                  className="text-4xl md:text-5xl font-bold text-primary mb-2">
                   0
                 </div>
                 <p className="text-sm md:text-base text-muted-foreground font-medium">
@@ -587,10 +601,9 @@ const QuizLibrary: React.FC = () => {
             </Card>
             <Card className="rounded-2xl bg-secondary/20 backdrop-blur-sm">
               <CardContent className="p-6 text-center">
-                <div 
+                <div
                   ref={totalCreatorsRef}
-                  className="text-4xl md:text-5xl font-bold text-primary mb-2"
-                >
+                  className="text-4xl md:text-5xl font-bold text-primary mb-2">
                   0
                 </div>
                 <p className="text-sm md:text-base text-muted-foreground font-medium">
@@ -616,8 +629,7 @@ const QuizLibrary: React.FC = () => {
                 <button
                   onClick={() => setSearchQuery("")}
                   className="absolute right-4 top-1/2 -translate-y-1/2 p-1 hover:bg-muted rounded-full transition-colors"
-                  aria-label="Xóa tìm kiếm"
-                >
+                  aria-label="Xóa tìm kiếm">
                   <X className="h-4 w-4 text-muted-foreground" />
                 </button>
               )}
@@ -629,13 +641,19 @@ const QuizLibrary: React.FC = () => {
                 {/* Sort By */}
                 <div className="flex items-center gap-2">
                   <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
-                  <Select value={sortBy} onValueChange={(v) => setSortBy(v as typeof sortBy)}>
+                  <Select
+                    value={sortBy}
+                    onValueChange={(v) => setSortBy(v as typeof sortBy)}>
                     <SelectTrigger className="w-[180px] border-2">
                       <SelectValue placeholder="Sắp xếp theo" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="usage">Nhiều lượt dùng nhất</SelectItem>
-                      <SelectItem value="downloads">Nhiều lượt tải nhất</SelectItem>
+                      <SelectItem value="usage">
+                        Nhiều lượt dùng nhất
+                      </SelectItem>
+                      <SelectItem value="downloads">
+                        Nhiều lượt tải nhất
+                      </SelectItem>
                       <SelectItem value="date">Mới nhất</SelectItem>
                     </SelectContent>
                   </Select>
@@ -644,7 +662,9 @@ const QuizLibrary: React.FC = () => {
                 {/* Search In */}
                 <div className="flex items-center gap-2">
                   <Filter className="h-4 w-4 text-muted-foreground" />
-                  <Select value={searchIn} onValueChange={(v) => setSearchIn(v as typeof searchIn)}>
+                  <Select
+                    value={searchIn}
+                    onValueChange={(v) => setSearchIn(v as typeof searchIn)}>
                     <SelectTrigger className="w-[160px] border-2">
                       <SelectValue placeholder="Tìm trong" />
                     </SelectTrigger>
@@ -668,7 +688,9 @@ const QuizLibrary: React.FC = () => {
 
               {/* Search Results Count */}
               {debouncedQuery && (
-                <Badge variant="secondary" className="bg-[#B5CC89]/20 text-[#B5CC89] px-4 py-2">
+                <Badge
+                  variant="secondary"
+                  className="bg-[#B5CC89]/20 text-[#B5CC89] px-4 py-2">
                   {filteredQuizzes.length} kết quả
                 </Badge>
               )}
@@ -718,13 +740,17 @@ const QuizLibrary: React.FC = () => {
                       <QuizTags tags={quiz.tags} maxTags={3} />
                     )}
                     <div className="flex flex-wrap items-center text-sm text-muted-foreground gap-3">
-                      <div className="flex items-center gap-1" title="Số lần sử dụng">
+                      <div
+                        className="flex items-center gap-1"
+                        title="Số lần sử dụng">
                         <TrendingUp className="h-3.5 w-3.5 text-[#B5CC89]" />
                         <span className="font-semibold text-foreground">
                           {formatNumber(quiz.usage_count || 0)}
                         </span>
                       </div>
-                      <div className="flex items-center gap-1" title="Số lần tải PDF">
+                      <div
+                        className="flex items-center gap-1"
+                        title="Số lần tải PDF">
                         <FileDown className="h-3.5 w-3.5 text-blue-500" />
                         <span className="font-semibold text-foreground">
                           {formatNumber(quiz.pdf_download_count || 0)}
@@ -735,7 +761,8 @@ const QuizLibrary: React.FC = () => {
                         <span>
                           {Array.isArray(quiz.questions)
                             ? quiz.questions.length
-                            : 0} câu
+                            : 0}{" "}
+                          câu
                         </span>
                       </div>
                       <div className="flex items-center gap-1">
@@ -766,121 +793,33 @@ const QuizLibrary: React.FC = () => {
                         onClick={async () => {
                           try {
                             // Increment PDF download count
-                            await supabase.rpc('increment_quiz_pdf_download', { quiz_id: quiz.id });
+                            await supabase.rpc("increment_quiz_pdf_download", {
+                              quiz_id: quiz.id,
+                            });
 
-                            // Normalize questions to an array
-                            const questionsArray = Array.isArray(quiz.questions)
-                              ? (quiz.questions as unknown[])
-                              : JSON.parse(String(quiz.questions || "[]"));
+                            // Chuẩn hóa về Question[] chặt chẽ
+                            const questionsArray: Question[] =
+                              normalizeToQuestions(
+                                Array.isArray(quiz.questions)
+                                  ? quiz.questions
+                                  : JSON.parse(String(quiz.questions || "[]"))
+                              );
+
                             const title = quiz.title || "quiz";
                             const filename = `${
                               title.replace(/\s+/g, "-").toLowerCase() || "quiz"
                             }.pdf`;
 
-                            const { default: JsPDF } = await import("jspdf");
-                            const doc = new JsPDF({ unit: "mm", format: "a4" });
-                            const vnFontReady = await ensurePdfVnFont(doc);
-                            const FONT_FAMILY = vnFontReady
-                              ? "Roboto"
-                              : "helvetica";
-                            const pageWidth = doc.internal.pageSize.getWidth();
-                            const pageHeight =
-                              doc.internal.pageSize.getHeight();
-                            const marginX = 15;
-                            const marginTop = 15;
-                            const marginBottom = 15;
-                            const contentWidth = pageWidth - marginX * 2;
-                            let y = marginTop;
-
-                            const addPageIfNeeded = (increment: number) => {
-                              if (y + increment > pageHeight - marginBottom) {
-                                doc.addPage();
-                                y = marginTop;
-                              }
-                            };
-
-                            const addBlock = (
-                              text: string,
-                              fontSize = 11,
-                              fontStyle: "normal" | "bold" = "normal",
-                              gapAfter = 3
-                            ) => {
-                              doc.setFont(FONT_FAMILY, fontStyle);
-                              doc.setFontSize(fontSize);
-                              const lines = doc.splitTextToSize(
-                                text,
-                                contentWidth
-                              );
-                              const lineHeight = fontSize * 0.55;
-                              lines.forEach((line: string) => {
-                                addPageIfNeeded(lineHeight);
-                                doc.text(line, marginX, y);
-                                y += lineHeight;
-                              });
-                              y += gapAfter;
-                            };
-
-                            // Header
-                            addBlock(title, 16, "bold", 2);
-                            addBlock(
-                              `Mô tả: ${quiz.description || ""}`,
-                              10,
-                              "normal",
-                              4
-                            );
-                            addBlock(
-                              `Tải xuống: ${new Date().toLocaleString(
-                                "vi-VN"
-                              )}`,
-                              10,
-                              "normal",
-                              4
-                            );
-
-                            // Divider
-                            addPageIfNeeded(2);
-                            doc.setDrawColor(200);
-                            doc.line(marginX, y, pageWidth - marginX, y);
-                            y += 6;
-
-                            // Questions
-                            (questionsArray || []).forEach(
-                              (q: QuizQuestion, idx: number) => {
-                                if (!q) return;
-                                const questionText =
-                                  typeof q.question === "string"
-                                    ? q.question
-                                    : String(q.question || "");
-                                addBlock(
-                                  `${idx + 1}. ${questionText}`,
-                                  11,
-                                  "bold",
-                                  2
-                                );
-
-                                const options = Array.isArray(q.options)
-                                  ? q.options
-                                  : [];
-                                options.forEach((opt: string, i: number) => {
-                                  const prefix =
-                                    String.fromCharCode(65 + i) + ". ";
-                                  addBlock(`${prefix}${opt}`, 11, "normal", 1);
-                                });
-
-                                if (q.explanation) {
-                                  addBlock(
-                                    `Giải thích: ${q.explanation}`,
-                                    10,
-                                    "normal",
-                                    3
-                                  );
-                                } else {
-                                  y += 2;
-                                }
-                              }
-                            );
-
-                            doc.save(filename);
+                            // Warm up worker (no-op if already warmed) then generate in background thread
+                            await warmupPdfWorker().catch(() => {});
+                            await generateAndDownloadPdf({
+                              filename,
+                              title,
+                              description: quiz.description || "",
+                              questions: questionsArray,
+                              showResults: false,
+                              userAnswers: [],
+                            });
 
                             toast({
                               title: "Đã tải xuống PDF",
@@ -906,7 +845,8 @@ const QuizLibrary: React.FC = () => {
             </div>
           )}
 
-          {(filteredQuizzes.length > PAGE_SIZE || (hasMore && !debouncedQuery)) && (
+          {(filteredQuizzes.length > PAGE_SIZE ||
+            (hasMore && !debouncedQuery)) && (
             <div className="flex justify-center gap-3 mt-8">
               {filteredQuizzes.length > PAGE_SIZE && (
                 <Button
@@ -915,7 +855,9 @@ const QuizLibrary: React.FC = () => {
                     if (displayLimit > PAGE_SIZE) {
                       setDisplayLimit(PAGE_SIZE);
                     } else {
-                      setDisplayLimit(Math.max(PAGE_SIZE, filteredQuizzes.length));
+                      setDisplayLimit(
+                        Math.max(PAGE_SIZE, filteredQuizzes.length)
+                      );
                     }
                   }}
                   className="min-w-[140px]">
@@ -966,8 +908,7 @@ const QuizLibrary: React.FC = () => {
                     <Button
                       variant="outline"
                       onClick={() => setSearchQuery("")}
-                      className="mt-4"
-                    >
+                      className="mt-4">
                       Xóa bộ lọc
                     </Button>
                   </div>
@@ -983,212 +924,154 @@ const QuizLibrary: React.FC = () => {
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="w-full max-w-3xl h-[85vh] flex flex-col">
             <Card className="w-full h-full border-2 rounded-xl shadow-lg bg-card flex flex-col">
-            <CardHeader className="pb-4 border-b bg-card z-10 flex-shrink-0">
-              <div className="flex justify-between items-start gap-4">
-                <div className="flex-1">
-                  <CardTitle className="text-2xl md:text-3xl font-bold mb-2">
-                    {selectedQuiz.title}
-                  </CardTitle>
-                  {selectedQuiz.description && (
-                    <CardDescription className="text-base">
-                      {selectedQuiz.description}
-                    </CardDescription>
-                  )}
-                  <div className="mt-3">
-                    <QuizCategoryBadge
-                      category={selectedQuiz.category}
-                      difficulty={selectedQuiz.difficulty}
-                      size="md"
-                    />
+              <CardHeader className="pb-4 border-b bg-card z-10 flex-shrink-0">
+                <div className="flex justify-between items-start gap-4">
+                  <div className="flex-1">
+                    <CardTitle className="text-2xl md:text-3xl font-bold mb-2">
+                      {selectedQuiz.title}
+                    </CardTitle>
+                    {selectedQuiz.description && (
+                      <CardDescription className="text-base">
+                        {selectedQuiz.description}
+                      </CardDescription>
+                    )}
+                    <div className="mt-3">
+                      <QuizCategoryBadge
+                        category={selectedQuiz.category}
+                        difficulty={selectedQuiz.difficulty}
+                        size="md"
+                      />
+                    </div>
                   </div>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setSelectedQuiz(null)}
+                    className="rounded-full hover:bg-destructive hover:text-destructive-foreground flex-shrink-0">
+                    ✕
+                  </Button>
                 </div>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => setSelectedQuiz(null)}
-                  className="rounded-full hover:bg-destructive hover:text-destructive-foreground flex-shrink-0">
-                  ✕
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="flex-1 overflow-y-auto">
-              <div className="space-y-6">
-                <div className="flex flex-wrap gap-3 py-4 border-b">
-                  {/* Tags */}
-                  {selectedQuiz.tags && selectedQuiz.tags.length > 0 && (
-                    <QuizTags tags={selectedQuiz.tags} />
-                  )}
-                  <Badge variant="secondary" className="bg-[#B5CC89]/20 text-[#B5CC89]">
-                    {Array.isArray(selectedQuiz.questions) ? selectedQuiz.questions.length : 0} câu hỏi
-                  </Badge>
-                  <Badge variant="secondary" className="bg-secondary/50">
-                    {formatDate(selectedQuiz.created_at)}
-                  </Badge>
-                </div>
-                <div className="space-y-4">
-                  <h3 className="font-semibold text-lg mb-4">Danh sách câu hỏi:</h3>
-                  {Array.isArray(selectedQuiz.questions) && selectedQuiz.questions.length > 0 ? (
-                    (selectedQuiz.questions as QuizQuestion[]).map((q, idx) => (
-                      <div key={idx} className="border-2 hover:border-[#B5CC89] rounded-lg p-4 space-y-3 transition-colors duration-300 hover:shadow-md">
-                        <h4 className="font-semibold text-base text-foreground">
-                          {idx + 1}. {q.question || "Không có câu hỏi"}
-                        </h4>
-                        <div className="space-y-2 pl-4">
-                          {Array.isArray(q.options) && q.options.length > 0 ? (
-                            q.options.map((opt, optIdx) => (
-                              <div key={optIdx} className="text-sm text-muted-foreground">
-                                <span className="font-medium text-foreground">{String.fromCharCode(65 + optIdx)}.</span> {opt}
+              </CardHeader>
+              <CardContent className="flex-1 overflow-y-auto">
+                <div className="space-y-6">
+                  <div className="flex flex-wrap gap-3 py-4 border-b">
+                    {/* Tags */}
+                    {selectedQuiz.tags && selectedQuiz.tags.length > 0 && (
+                      <QuizTags tags={selectedQuiz.tags} />
+                    )}
+                    <Badge
+                      variant="secondary"
+                      className="bg-[#B5CC89]/20 text-[#B5CC89]">
+                      {Array.isArray(selectedQuiz.questions)
+                        ? selectedQuiz.questions.length
+                        : 0}{" "}
+                      câu hỏi
+                    </Badge>
+                    <Badge variant="secondary" className="bg-secondary/50">
+                      {formatDate(selectedQuiz.created_at)}
+                    </Badge>
+                  </div>
+                  <div className="space-y-4">
+                    <h3 className="font-semibold text-lg mb-4">
+                      Danh sách câu hỏi:
+                    </h3>
+                    {Array.isArray(selectedQuiz.questions) &&
+                    selectedQuiz.questions.length > 0 ? (
+                      (selectedQuiz.questions as QuizQuestion[]).map(
+                        (q, idx) => (
+                          <div
+                            key={idx}
+                            className="border-2 hover:border-[#B5CC89] rounded-lg p-4 space-y-3 transition-colors duration-300 hover:shadow-md">
+                            <h4 className="font-semibold text-base text-foreground">
+                              {idx + 1}. {q.question || "Không có câu hỏi"}
+                            </h4>
+                            <div className="space-y-2 pl-4">
+                              {Array.isArray(q.options) &&
+                              q.options.length > 0 ? (
+                                q.options.map((opt, optIdx) => (
+                                  <div
+                                    key={optIdx}
+                                    className="text-sm text-muted-foreground">
+                                    <span className="font-medium text-foreground">
+                                      {String.fromCharCode(65 + optIdx)}.
+                                    </span>{" "}
+                                    {opt}
+                                  </div>
+                                ))
+                              ) : (
+                                <div className="text-sm text-muted-foreground italic">
+                                  Không có đáp án
+                                </div>
+                              )}
+                            </div>
+                            {q.explanation && (
+                              <div className="text-xs text-muted-foreground pt-3 border-t">
+                                <span className="font-semibold text-foreground">
+                                  Giải thích:
+                                </span>{" "}
+                                {q.explanation}
                               </div>
-                            ))
-                          ) : (
-                            <div className="text-sm text-muted-foreground italic">Không có đáp án</div>
-                          )}
-                        </div>
-                        {q.explanation && (
-                          <div className="text-xs text-muted-foreground pt-3 border-t">
-                            <span className="font-semibold text-foreground">Giải thích:</span> {q.explanation}
+                            )}
                           </div>
-                        )}
-                      </div>
-                    ))
-                  ) : (
-                    <div className="text-sm text-muted-foreground text-center py-8">Không có câu hỏi</div>
-                  )}
-                </div>
-                <Button
-                  onClick={async () => {
-                    try {
-                      // Increment PDF download count
-                      await supabase.rpc('increment_quiz_pdf_download', { quiz_id: selectedQuiz.id });
-
-                      const questionsArray = Array.isArray(
-                        selectedQuiz.questions
+                        )
                       )
-                        ? (selectedQuiz.questions as unknown[])
-                        : JSON.parse(String(selectedQuiz.questions || "[]"));
-                      const title = selectedQuiz.title || "quiz";
-                      const filename = `${
-                        title.replace(/\s+/g, "-").toLowerCase() || "quiz"
-                      }.pdf`;
-
-                      const { default: JsPDF } = await import("jspdf");
-                      const doc = new JsPDF({ unit: "mm", format: "a4" });
-                      const vnFontReady = await ensurePdfVnFont(doc);
-                      const FONT_FAMILY = vnFontReady ? "Roboto" : "helvetica";
-                      const pageWidth = doc.internal.pageSize.getWidth();
-                      const pageHeight = doc.internal.pageSize.getHeight();
-                      const marginX = 15;
-                      const marginTop = 15;
-                      const marginBottom = 15;
-                      const contentWidth = pageWidth - marginX * 2;
-                      let y = marginTop;
-
-                      const addPageIfNeeded = (increment: number) => {
-                        if (y + increment > pageHeight - marginBottom) {
-                          doc.addPage();
-                          y = marginTop;
-                        }
-                      };
-
-                      const addBlock = (
-                        text: string,
-                        fontSize = 11,
-                        fontStyle: "normal" | "bold" = "normal",
-                        gapAfter = 3
-                      ) => {
-                        doc.setFont(FONT_FAMILY, fontStyle);
-                        doc.setFontSize(fontSize);
-                        const lines = doc.splitTextToSize(text, contentWidth);
-                        const lineHeight = fontSize * 0.55;
-                        lines.forEach((line: string) => {
-                          addPageIfNeeded(lineHeight);
-                          doc.text(line, marginX, y);
-                          y += lineHeight;
+                    ) : (
+                      <div className="text-sm text-muted-foreground text-center py-8">
+                        Không có câu hỏi
+                      </div>
+                    )}
+                  </div>
+                  <Button
+                    onClick={async () => {
+                      try {
+                        // Increment PDF download count
+                        await supabase.rpc("increment_quiz_pdf_download", {
+                          quiz_id: selectedQuiz.id,
                         });
-                        y += gapAfter;
-                      };
 
-                      // Header
-                      addBlock(title, 16, "bold", 2);
-                      addBlock(
-                        `Mô tả: ${selectedQuiz.description || ""}`,
-                        10,
-                        "normal",
-                        4
-                      );
-                      addBlock(
-                        `Tải xuống: ${new Date().toLocaleString("vi-VN")}`,
-                        10,
-                        "normal",
-                        4
-                      );
+                        const questionsArray: Question[] = normalizeToQuestions(
+                          Array.isArray(selectedQuiz.questions)
+                            ? selectedQuiz.questions
+                            : JSON.parse(String(selectedQuiz.questions || "[]"))
+                        );
 
-                      // Divider
-                      addPageIfNeeded(2);
-                      doc.setDrawColor(200);
-                      doc.line(marginX, y, pageWidth - marginX, y);
-                      y += 6;
+                        const title = selectedQuiz.title || "quiz";
+                        const filename = `${
+                          title.replace(/\s+/g, "-").toLowerCase() || "quiz"
+                        }.pdf`;
 
-                      (questionsArray || []).forEach(
-                        (q: unknown, idx: number) => {
-                          if (!q) return;
-                          const qq = q as QuizQuestion;
-                          const questionText =
-                            typeof qq.question === "string"
-                              ? qq.question
-                              : String(qq.question || "");
-                          addBlock(
-                            `${idx + 1}. ${questionText}`,
-                            11,
-                            "bold",
-                            2
-                          );
+                        await warmupPdfWorker().catch(() => {});
+                        await generateAndDownloadPdf({
+                          filename,
+                          title,
+                          description: selectedQuiz.description || "",
+                          questions: questionsArray,
+                          showResults: false,
+                          userAnswers: [],
+                        });
 
-                          const options = Array.isArray(qq.options)
-                            ? qq.options
-                            : [];
-                          options.forEach((opt: string, i: number) => {
-                            const prefix = String.fromCharCode(65 + i) + ". ";
-                            addBlock(`${prefix}${opt}`, 11, "normal", 1);
-                          });
-
-                          if (qq.explanation) {
-                            addBlock(
-                              `Giải thích: ${qq.explanation}`,
-                              10,
-                              "normal",
-                              3
-                            );
-                          } else {
-                            y += 2;
-                          }
-                        }
-                      );
-
-                      doc.save(filename);
-
-                      toast({
-                        title: "Đã tải xuống PDF",
-                        description: `Đã lưu ${filename}`,
-                        variant: "success",
-                      });
-                    } catch (e) {
-                      console.error("Download quiz PDF error:", e);
-                      toast({
-                        title: "Lỗi",
-                        description: "Không thể tạo/tải PDF.",
-                        variant: "destructive",
-                      });
-                    }
-                  }}
-                  variant="hero"
-                  className="w-full group hover:bg-black hover:text-white">
-                  <Download className="h-4 w-4 mr-2" />
-                  Tải xuống PDF Quiz
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+                        toast({
+                          title: "Đã tải xuống PDF",
+                          description: `Đã lưu ${filename}`,
+                          variant: "success",
+                        });
+                      } catch (e) {
+                        console.error("Download quiz PDF error:", e);
+                        toast({
+                          title: "Lỗi",
+                          description: "Không thể tạo/tải PDF.",
+                          variant: "destructive",
+                        });
+                      }
+                    }}
+                    variant="hero"
+                    className="w-full group hover:bg-black hover:text-white">
+                    <Download className="h-4 w-4 mr-2" />
+                    Tải xuống PDF Quiz
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       )}

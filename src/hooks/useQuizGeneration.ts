@@ -1,10 +1,19 @@
 import { useCallback, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-type Status = "pending" | "processing" | "completed" | "failed" | "expired" | null;
+type Status =
+  | "pending"
+  | "processing"
+  | "completed"
+  | "failed"
+  | "expired"
+  | null;
 
 interface StartPollingCallbacks<Quiz> {
-  onCompleted: (data: { quiz: Quiz; tokenUsage?: { prompt: number; candidates: number; total: number } }) => void;
+  onCompleted: (data: {
+    quiz: Quiz;
+    tokenUsage?: { prompt: number; candidates: number; total: number };
+  }) => void;
   onFailed: (errorMessage?: string) => void;
   onExpired: () => void;
   onProgress?: (status: Status, progress: string) => void;
@@ -24,15 +33,27 @@ export function useQuizGeneration<Quiz = any>() {
     setIsPolling(false);
   }, []);
 
+  const reset = useCallback(() => {
+    if (pollIntervalRef.current) {
+      clearInterval(pollIntervalRef.current);
+      pollIntervalRef.current = null;
+    }
+    setIsPolling(false);
+    setStatus(null);
+    setProgress("");
+  }, []);
+
   const startPolling = useCallback(
-    async (
-      quizId: string,
-      callbacks: StartPollingCallbacks<Quiz>
-    ) => {
-      if (!quizId || isPolling) return;
+    async (quizId: string, callbacks: StartPollingCallbacks<Quiz>) => {
+      if (!quizId) return;
+
+      // Ensure any previous polling is stopped before starting a new one
+      stopPolling();
+
+      // Reset base state unconditionally for a fresh progress UI
       setIsPolling(true);
-      setStatus((prev) => prev ?? "pending");
-      setProgress((p) => p || "Đang chuẩn bị...");
+      setStatus("pending");
+      setProgress("Đang chuẩn bị...");
 
       const interval = setInterval(async () => {
         try {
@@ -56,7 +77,10 @@ export function useQuizGeneration<Quiz = any>() {
 
           if (nextStatus === "completed") {
             stopPolling();
-            callbacks.onCompleted({ quiz: data.quiz, tokenUsage: data.quiz?.tokenUsage });
+            callbacks.onCompleted({
+              quiz: data.quiz,
+              tokenUsage: data.quiz?.tokenUsage,
+            });
           } else if (nextStatus === "failed") {
             stopPolling();
             callbacks.onFailed(data?.error);
@@ -70,7 +94,7 @@ export function useQuizGeneration<Quiz = any>() {
       }, 2000);
       pollIntervalRef.current = interval;
     },
-    [isPolling, stopPolling]
+    [stopPolling]
   );
 
   return {
@@ -79,14 +103,8 @@ export function useQuizGeneration<Quiz = any>() {
     isPolling,
     startPolling,
     stopPolling,
+    reset,
   };
 }
 
 export default useQuizGeneration;
-
-
-
-
-
-
-

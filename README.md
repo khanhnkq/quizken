@@ -119,3 +119,66 @@ Lưu ý: Nếu chưa cấu hình user/email cho Git cục bộ, Git sẽ yêu c�
 ## License
 
 Dự án sử dụng giấy phép MIT. File LICENSE sẽ được thêm vào repository.
+
+## Hành vi khi tạo quiz mới (reset tiến trình và UI)
+
+Mục tiêu: Khi đang hiển thị một bài quiz ở phần QuizContent, nếu người dùng bấm “Tạo Quiz mới”, hệ thống phải:
+
+- Ẩn và xóa ngay bài quiz hiện tại khỏi UI
+- Reset hoàn toàn tiến trình hiển thị (status/progress)
+- Bắt đầu tiến trình tạo mới với trạng thái “Đang chuẩn bị…”
+
+Thay đổi kỹ thuật đã thực hiện
+
+- Hook quản lý polling: [src/hooks/useQuizGeneration.ts](src/hooks/useQuizGeneration.ts)
+  - Bổ sung phương thức reset() để:
+    - Dừng interval hiện tại (nếu có)
+    - Đưa trạng thái về ban đầu: status=null, progress=""
+    - setIsPolling(false)
+  - Điều chỉnh startPolling():
+    - Luôn gọi stopPolling() trước khi khởi động session mới
+    - Luôn set trạng thái khởi tạo không điều kiện:
+      - status="pending"
+      - progress="Đang chuẩn bị..."
+    - Loại bỏ điều kiện chặn khi isPolling đang true (do đã stop trước)
+- Luồng tạo mới: [src/components/quiz/QuizGenerator.tsx](src/components/quiz/QuizGenerator.tsx)
+  - Ngay khi bắt đầu generateQuiz:
+    - Gọi stopPolling() và reset() từ hook
+    - Xóa nội dung quiz khỏi UI: setQuiz(null), setUserAnswers([]), setShowResults(false), setTokenUsage(null)
+    - Reset tiến trình cục bộ: setGenerationStatus("pending"), setGenerationProgress("Đang chuẩn bị..."), setLoading(true)
+    - Dọn trạng thái persistence cũ (localStorage) bằng clearPersist() ngay trước khi bắt đầu tiến trình mới
+  - Sau khi nhận quizId mới:
+    - Ghi lại persistence state cho quizId mới
+    - Bắt đầu startPolling cho quizId mới
+
+Luồng thực thi (tóm tắt)
+
+1. Người dùng bấm “Tạo Quiz Ngay” trong khi đang có quiz hiển thị
+2. stopPolling() + reset() → dừng session cũ, reset trạng thái UI
+3. UI ẩn ngay QuizContent (quiz=null) và hiển thị tiến trình “Đang chuẩn bị…”
+4. Gọi API start-quiz → nhận quizId → ghi persistence → startPolling(quizId)
+5. Khi completed → render quiz mới và dọn tiến trình
+6. Khi failed/expired → dọn tiến trình, hiển thị thông báo phù hợp
+
+Hướng dẫn kiểm thử thủ công
+
+- Trường hợp A: Đang có quiz hiển thị, bấm “Tạo Quiz Ngay”
+  - Kỳ vọng: QuizContent biến mất ngay lập tức; khối tiến trình hiển thị status="pending" và progress="Đang chuẩn bị..."
+  - Khi hoàn tất: hiển thị quiz mới; không còn dùng lại status/progress từ phiên trước
+- Trường hợp B: Bấm “Hủy” giữa chừng
+  - Kỳ vọng: Tiến trình biến mất; có thể bấm “Tạo Quiz Ngay” và thấy tiến trình mới sạch
+- Trường hợp C: Thất bại hoặc hết hạn
+  - Kỳ vọng: Dọn persistence, dừng polling; có thể tạo lại và thấy tiến trình mới sạch
+- Trường hợp D: Bấm nhanh nhiều lần
+  - Kỳ vọng: Không bị chặn bởi isPolling cũ; chỉ phiên sau cùng có hiệu lực; tiến trình luôn reset đúng
+
+Ghi chú về persistence/khôi phục
+
+- State đang tạo được lưu ngắn hạn trong localStorage nhằm hỗ trợ khôi phục khi đổi route trong SPA:
+  - Khi tạo mới, persistence cũ được xóa ngay và ghi lại cho quizId mới
+  - Khi completed/failed/expired, persistence được dọn sạch để tránh trạng thái cũ ảnh hưởng các lần tạo sau
+
+Vị trí mã liên quan
+
+- Hook polling và reset: [src/hooks/useQuizGeneration.ts](src/hooks/useQuizGeneration.ts)
+- Trình khởi tạo quiz và UI tiến trình: [src/components/quiz/QuizGenerator.tsx](src/components/quiz/QuizGenerator.tsx)

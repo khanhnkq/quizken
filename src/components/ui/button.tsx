@@ -62,11 +62,12 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const handleEnter = (e: React.MouseEvent<HTMLButtonElement>) => {
       onMouseEnter?.(e);
       const el = e.currentTarget;
+      const fast = el.hasAttribute("data-fast-hover");
       gsap.to(el, {
         y: -2,
         scale: 1.04,
         boxShadow: "0 12px 30px rgba(0,0,0,0.45)",
-        duration: 0.18,
+        duration: fast ? 0.12 : 0.18,
         ease: "power3.out",
       });
     };
@@ -74,11 +75,12 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const handleLeave = (e: React.MouseEvent<HTMLButtonElement>) => {
       onMouseLeave?.(e);
       const el = e.currentTarget;
+      const fast = el.hasAttribute("data-fast-hover");
       gsap.to(el, {
         y: 0,
         scale: 1,
         boxShadow: "0 0 0 rgba(0,0,0,0)",
-        duration: 0.22,
+        duration: fast ? 0.16 : 0.22,
         ease: "power3.inOut",
       });
     };
@@ -86,11 +88,12 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const handleFocus = (e: React.FocusEvent<HTMLButtonElement>) => {
       onFocus?.(e);
       const el = e.currentTarget;
+      const fast = el.hasAttribute("data-fast-hover");
       gsap.to(el, {
         y: -2,
         scale: 1.04,
         boxShadow: "0 12px 30px rgba(0,0,0,0.45)",
-        duration: 0.18,
+        duration: fast ? 0.12 : 0.18,
         ease: "power3.out",
       });
     };
@@ -98,15 +101,15 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const handleBlur = (e: React.FocusEvent<HTMLButtonElement>) => {
       onBlur?.(e);
       const el = e.currentTarget;
+      const fast = el.hasAttribute("data-fast-hover");
       gsap.to(el, {
         y: 0,
         scale: 1,
         boxShadow: "0 0 0 rgba(0,0,0,0)",
-        duration: 0.22,
+        duration: fast ? 0.16 : 0.22,
         ease: "power3.inOut",
       });
     };
-
 
     return (
       <Comp

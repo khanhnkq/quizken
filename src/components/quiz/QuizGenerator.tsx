@@ -25,6 +25,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -38,8 +48,11 @@ import {
   Target,
   Shield,
 } from "lucide-react";
-import { ScrollVelocityContainer, ScrollVelocityRow } from "@/components/ScrollVelocity";
-import jsPDF from "jspdf";
+import {
+  ScrollVelocityContainer,
+  ScrollVelocityRow,
+} from "@/components/ScrollVelocity";
+import { warmupPdfWorker, generateAndDownloadPdf } from "@/lib/pdfWorkerClient";
 import { containsVietnameseBadwords } from "@/lib/vnBadwordsFilter";
 import type { Quiz, Question } from "@/types/quiz";
 import { GenerationProgress } from "@/components/quiz/GenerationProgress";
@@ -50,6 +63,15 @@ import useQuizGeneration from "@/hooks/useQuizGeneration";
 import { useGenerationPersistence } from "@/hooks/useGenerationPersistence";
 import { useAnonQuota } from "@/hooks/useAnonQuota";
 
+type TokenUsage = { prompt: number; candidates: number; total: number };
+
+type GenerationState = {
+  quizId: string;
+  loading: boolean;
+  generationStatus: string | null;
+  generationProgress: string;
+  timestamp?: number;
+};
 
 const QuizGenerator = () => {
   const customIsProfane = (input: string) =>
@@ -73,6 +95,7 @@ const QuizGenerator = () => {
   const [showApiKeyErrorDialog, setShowApiKeyErrorDialog] =
     useState<boolean>(false);
   const [apiKeyError, setApiKeyError] = useState<string>("");
+  const [showConfirmDialog, setShowConfirmDialog] = useState<boolean>(false);
 
   // Async quiz polling state
   const [quizId, setQuizId] = useState<string | null>(null);
@@ -92,11 +115,22 @@ const QuizGenerator = () => {
     progress: genProgress,
     startPolling: startPollingHook,
     stopPolling,
+    reset,
   } = useQuizGeneration<Quiz>();
-  const { read: readPersist, write: writePersist, clear: clearPersist, setLegacyId, getLegacyId } =
-    useGenerationPersistence();
-  const { count: anonCount, hasReachedLimit, increment: incrementAnon, getTimeUntilReset, DAILY_LIMIT } =
-    useAnonQuota();
+  const {
+    read: readPersist,
+    write: writePersist,
+    clear: clearPersist,
+    setLegacyId,
+    getLegacyId,
+  } = useGenerationPersistence();
+  const {
+    count: anonCount,
+    hasReachedLimit,
+    increment: incrementAnon,
+    getTimeUntilReset,
+    DAILY_LIMIT,
+  } = useAnonQuota();
 
   const loadUserApiKey = useCallback(async () => {
     if (!user) return;
@@ -225,7 +259,7 @@ const QuizGenerator = () => {
             history.replaceState({}, document.title);
           }
         } catch (e) {
-          /* ignore */
+          console.debug("history.replaceState not available", e);
         }
       } catch (e) {
         console.error("Failed to parse quiz from navigation state:", e);
@@ -311,7 +345,7 @@ const QuizGenerator = () => {
           generationStatus: storedStatus,
           generationProgress: storedProgress,
           timestamp,
-        } = generationState as any;
+        } = generationState as GenerationState;
 
         // Check if the generation state is recent (not older than 10 minutes)
         const stateAge = timestamp ? Date.now() - timestamp : 0;
@@ -337,7 +371,7 @@ const QuizGenerator = () => {
         startPollingHook(quizId, {
           onCompleted: ({ quiz, tokenUsage }) => {
             setQuiz(quiz);
-            if (tokenUsage) setTokenUsage(tokenUsage as any);
+            if (tokenUsage) setTokenUsage(tokenUsage as TokenUsage);
             setGenerationStatus(null);
             setGenerationProgress("");
             setLoading(false);
@@ -365,7 +399,11 @@ const QuizGenerator = () => {
             localStorage.removeItem("currentQuizGeneration");
             localStorage.removeItem("currentQuizId");
             const msg = errorMessage || "Có lỗi xảy ra khi tạo quiz";
-            toast({ title: "Tạo câu hỏi thất bại", description: msg, variant: "destructive" });
+            toast({
+              title: "Tạo câu hỏi thất bại",
+              description: msg,
+              variant: "destructive",
+            });
             try {
               const reasonText = String(errorMessage || "").toLowerCase();
               if (
@@ -380,7 +418,9 @@ const QuizGenerator = () => {
                 setApiKeyError(errorMessage || msg);
                 setShowApiKeyErrorDialog(true);
               }
-            } catch {}
+            } catch (err) {
+              console.debug("classify API key error (restore flow)", err);
+            }
             const channel = new BroadcastChannel("quiz-notifications");
             channel.postMessage({
               type: "quiz-failed",
@@ -396,7 +436,11 @@ const QuizGenerator = () => {
             setLoading(false);
             localStorage.removeItem("currentQuizGeneration");
             localStorage.removeItem("currentQuizId");
-            toast({ title: "Quiz đã hết hạn", description: "Quiz này đã hết hạn. Vui lòng tạo quiz mới", variant: "warning" });
+            toast({
+              title: "Quiz đã hết hạn",
+              description: "Quiz này đã hết hạn. Vui lòng tạo quiz mới",
+              variant: "warning",
+            });
             const channel = new BroadcastChannel("quiz-notifications");
             channel.postMessage({
               type: "quiz-failed",
@@ -480,7 +524,7 @@ const QuizGenerator = () => {
             startPollingHook(savedQuizId, {
               onCompleted: ({ quiz, tokenUsage }) => {
                 setQuiz(quiz);
-                if (tokenUsage) setTokenUsage(tokenUsage as any);
+                if (tokenUsage) setTokenUsage(tokenUsage as TokenUsage);
                 setGenerationStatus(null);
                 setGenerationProgress("");
                 setLoading(false);
@@ -507,7 +551,11 @@ const QuizGenerator = () => {
                 localStorage.removeItem("currentQuizGeneration");
                 localStorage.removeItem("currentQuizId");
                 const msg = errorMessage || "Có lỗi xảy ra khi tạo quiz";
-                toast({ title: "Tạo câu hỏi thất bại", description: msg, variant: "destructive" });
+                toast({
+                  title: "Tạo câu hỏi thất bại",
+                  description: msg,
+                  variant: "destructive",
+                });
                 try {
                   const reasonText = String(errorMessage || "").toLowerCase();
                   if (
@@ -522,7 +570,9 @@ const QuizGenerator = () => {
                     setApiKeyError(errorMessage || msg);
                     setShowApiKeyErrorDialog(true);
                   }
-                } catch {}
+                } catch (err) {
+                  console.debug("classify API key error (resume flow)", err);
+                }
                 const channel = new BroadcastChannel("quiz-notifications");
                 channel.postMessage({
                   type: "quiz-failed",
@@ -538,7 +588,11 @@ const QuizGenerator = () => {
                 setLoading(false);
                 localStorage.removeItem("currentQuizGeneration");
                 localStorage.removeItem("currentQuizId");
-                toast({ title: "Quiz đã hết hạn", description: "Quiz này đã hết hạn. Vui lòng tạo quiz mới", variant: "warning" });
+                toast({
+                  title: "Quiz đã hết hạn",
+                  description: "Quiz này đã hết hạn. Vui lòng tạo quiz mới",
+                  variant: "warning",
+                });
                 const channel = new BroadcastChannel("quiz-notifications");
                 channel.postMessage({
                   type: "quiz-failed",
@@ -582,7 +636,8 @@ const QuizGenerator = () => {
       generationProgress: string;
     }>
   ) => {
-    writePersist({ ...partial, timestamp: Date.now() } as any);
+    // timestamp sẽ được thêm trong hook useGenerationPersistence.write()
+    writePersist({ ...partial });
   };
 
   // Progress UI moved to GenerationProgress component
@@ -628,6 +683,19 @@ const QuizGenerator = () => {
       return;
     }
 
+    // Reset any ongoing generation and clear current quiz UI before starting a new one
+    stopPolling();
+    reset();
+    setQuiz(null);
+    setUserAnswers([]);
+    setShowResults(false);
+    setTokenUsage(null);
+    setGenerationStatus("pending");
+    setGenerationProgress("Đang chuẩn bị...");
+    setLoading(true);
+    // Clear persisted state for previous generation
+    clearPersist();
+
     console.log("🚀 [FRONTEND] Starting async quiz generation...");
 
     // Prepare device info for fingerprinting
@@ -654,20 +722,24 @@ const QuizGenerator = () => {
         prompt,
         device: deviceInfo,
         questionCount: parseInt(questionCount),
-        apiKey: userApiKey || undefined,
       };
 
       console.log("▶️ Starting quiz generation request...");
       const { data: startResponse, error: startError } =
-        await supabase.functions.invoke("generate-quiz/start-quiz", {
-          body: startQuizPayload,
-        });
+        await supabase.functions.invoke<{ id: string }>(
+          "generate-quiz/start-quiz",
+          {
+            body: startQuizPayload,
+          }
+        );
 
       if (startError) {
         console.error("❌ Start quiz error:", startError);
-        throw new Error(
-          startError.message || "Failed to start quiz generation"
-        );
+        const errMsg =
+          typeof (startError as { message?: unknown }).message === "string"
+            ? (startError as { message: string }).message
+            : "Failed to start quiz generation";
+        throw new Error(errMsg);
       }
 
       if (!startResponse?.id) {
@@ -686,20 +758,20 @@ const QuizGenerator = () => {
         generationProgress: "Đang chuẩn bị..." as string,
         timestamp: Date.now(),
       };
-      writePersist(generationState as any);
+      writePersist(generationState as GenerationState);
       setLegacyId(quizId);
 
       // Step 3: Start polling for status via hook
       startPollingHook(quizId, {
         onCompleted: ({ quiz, tokenUsage }) => {
           setQuiz(quiz);
-          if (tokenUsage) setTokenUsage(tokenUsage as any);
+          if (tokenUsage) setTokenUsage(tokenUsage as TokenUsage);
           setGenerationStatus(null);
           setGenerationProgress("");
           setLoading(false);
           clearPersist();
-  
-        toast({
+
+          toast({
             title: "Tạo câu hỏi thành công!",
             description: `Đã tạo "${quiz.title}" với ${quiz.questions.length} câu hỏi`,
             variant: "success",
@@ -721,7 +793,11 @@ const QuizGenerator = () => {
           localStorage.removeItem("currentQuizGeneration");
           localStorage.removeItem("currentQuizId");
           const msg = errorMessage || "Có lỗi xảy ra khi tạo quiz";
-          toast({ title: "Tạo câu hỏi thất bại", description: msg, variant: "destructive" });
+          toast({
+            title: "Tạo câu hỏi thất bại",
+            description: msg,
+            variant: "destructive",
+          });
           try {
             const reasonText = String(errorMessage || "").toLowerCase();
             if (
@@ -736,7 +812,9 @@ const QuizGenerator = () => {
               setApiKeyError(errorMessage || msg);
               setShowApiKeyErrorDialog(true);
             }
-          } catch {}
+          } catch (err) {
+            console.debug("classify API key error (generate flow)", err);
+          }
           const channel = new BroadcastChannel("quiz-notifications");
           channel.postMessage({
             type: "quiz-failed",
@@ -752,7 +830,11 @@ const QuizGenerator = () => {
           setLoading(false);
           localStorage.removeItem("currentQuizGeneration");
           localStorage.removeItem("currentQuizId");
-          toast({ title: "Quiz đã hết hạn", description: "Quiz này đã hết hạn. Vui lòng tạo quiz mới", variant: "warning" });
+          toast({
+            title: "Quiz đã hết hạn",
+            description: "Quiz này đã hết hạn. Vui lòng tạo quiz mới",
+            variant: "warning",
+          });
           const channel = new BroadcastChannel("quiz-notifications");
           channel.postMessage({
             type: "quiz-failed",
@@ -813,6 +895,15 @@ const QuizGenerator = () => {
         variant: "destructive",
       });
     }
+  };
+
+  const handleGenerateClick = (e: MouseEvent<HTMLButtonElement>) => {
+    // Nếu đang có quiz hiển thị hoặc đang có tiến trình tạo dở, yêu cầu xác nhận
+    if (quiz || loading || genStatus || generationStatus) {
+      setShowConfirmDialog(true);
+      return;
+    }
+    void generateQuiz();
   };
 
   const handleAnswerSelect = (questionIndex: number, answerIndex: number) => {
@@ -935,85 +1026,10 @@ const QuizGenerator = () => {
     return correct;
   };
 
-  /**
-   * PDF font helpers to fix Vietnamese diacritics rendering in jsPDF.
-   * We embed a Unicode-capable TTF (Roboto/NotoSans) at runtime from a public CDN,
-   * then use it for all PDF text output.
-   */
-  const arrayBufferToBinaryString = (buffer: ArrayBuffer) => {
-    const bytes = new Uint8Array(buffer);
-    let binary = "";
-    const chunkSize = 0x8000;
-    for (let i = 0; i < bytes.length; i += chunkSize) {
-      const chunk = bytes.subarray(i, i + chunkSize);
-      binary += String.fromCharCode(...chunk);
-    }
-    return binary;
-  };
-
-  const ensurePdfVnFont = async (doc: jsPDF) => {
-    // Cache dữ liệu font trong window, nhưng luôn add vào VFS của tài liệu hiện tại
-    const w = window as unknown as {
-      __pdfVnFontDataReg?: string;
-      __pdfVnFontDataBold?: string;
-    };
-
-    // Tải Regular nếu chưa có
-    if (!w.__pdfVnFontDataReg) {
-      const regCandidates = [
-        "https://cdn.jsdelivr.net/gh/googlefonts/roboto@v20.0.0/src/hinted/Roboto-Regular.ttf",
-        "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/roboto/Roboto-Regular.ttf",
-        "https://cdn.jsdelivr.net/gh/googlefonts/noto-fonts/hinted/ttf/NotoSans/NotoSans-Regular.ttf",
-      ];
-      for (const url of regCandidates) {
-        try {
-          const res = await fetch(url, { mode: "cors" });
-          if (!res.ok) continue;
-          const buf = await res.arrayBuffer();
-          w.__pdfVnFontDataReg = arrayBufferToBinaryString(buf);
-          break;
-        } catch {
-          // thử candidate tiếp theo
-        }
-      }
-    }
-
-    // Tải Bold nếu chưa có
-    if (!w.__pdfVnFontDataBold) {
-      const boldCandidates = [
-        "https://cdn.jsdelivr.net/gh/googlefonts/roboto@v20.0.0/src/hinted/Roboto-Bold.ttf",
-        "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/roboto/Roboto-Bold.ttf",
-        "https://cdn.jsdelivr.net/gh/googlefonts/noto-fonts/hinted/ttf/NotoSans/NotoSans-Bold.ttf",
-      ];
-      for (const url of boldCandidates) {
-        try {
-          const res = await fetch(url, { mode: "cors" });
-          if (!res.ok) continue;
-          const buf = await res.arrayBuffer();
-          w.__pdfVnFontDataBold = arrayBufferToBinaryString(buf);
-          break;
-        } catch {
-          // thử candidate tiếp theo
-        }
-      }
-    }
-
-    if (w.__pdfVnFontDataReg) {
-      // Luôn add vào VFS của jsPDF hiện tại
-      doc.addFileToVFS("Roboto-Regular.ttf", w.__pdfVnFontDataReg);
-      doc.addFont("Roboto-Regular.ttf", "Roboto", "normal");
-      if (w.__pdfVnFontDataBold) {
-        doc.addFileToVFS("Roboto-Bold.ttf", w.__pdfVnFontDataBold);
-        doc.addFont("Roboto-Bold.ttf", "Roboto", "bold");
-      }
-      return true;
-    }
-
-    console.warn(
-      "Không thể tải font hỗ trợ tiếng Việt cho jsPDF; sẽ dùng font mặc định (có thể lỗi dấu)."
-    );
-    return false;
-  };
+  // Preload PDF worker and fonts on mount to reduce first-click latency
+  useEffect(() => {
+    warmupPdfWorker().catch(() => {});
+  }, []);
 
   const downloadQuiz = async () => {
     if (!quiz) return;
@@ -1021,7 +1037,7 @@ const QuizGenerator = () => {
     try {
       toast({
         title: "Đang tạo PDF...",
-        description: "Vui lòng chờ trong giây lát",
+        description: "Tệp sẽ tải xuống ngay khi sẵn sàng",
         variant: "info",
         duration: 1500,
       });
@@ -1029,99 +1045,20 @@ const QuizGenerator = () => {
       const title = quiz.title || "quiz";
       const filename = `${title.replace(/\s+/g, "-").toLowerCase()}.pdf`;
 
-      const doc = new jsPDF({ unit: "mm", format: "a4" });
-      const vnFontReady = await ensurePdfVnFont(doc);
-      const FONT_FAMILY = vnFontReady ? "Roboto" : "helvetica";
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const pageHeight = doc.internal.pageSize.getHeight();
-      const marginX = 15;
-      const marginTop = 15;
-      const marginBottom = 15;
-      const contentWidth = pageWidth - marginX * 2;
+      // Ensure worker and fonts are warm before generation (no-op if already warmed)
+      await warmupPdfWorker().catch(() => {});
 
-      let y = marginTop;
-
-      const addPageIfNeeded = (increment: number) => {
-        if (y + increment > pageHeight - marginBottom) {
-          doc.addPage();
-          y = marginTop;
-        }
-      };
-
-      const addBlock = (
-        text: string,
-        fontSize = 11,
-        fontStyle: "normal" | "bold" = "normal",
-        gapAfter = 3
-      ) => {
-        doc.setFont(FONT_FAMILY, fontStyle);
-        doc.setFontSize(fontSize);
-        const lines = doc.splitTextToSize(text, contentWidth);
-        const lineHeight = fontSize * 0.55;
-        lines.forEach((line: string) => {
-          addPageIfNeeded(lineHeight);
-          doc.text(line, marginX, y);
-          y += lineHeight;
-        });
-        y += gapAfter;
-      };
-
-      // Header
-      addBlock(title, 16, "bold", 2);
-      addBlock(
-        `Tải xuống: ${new Date().toLocaleString("vi-VN")}`,
-        10,
-        "normal",
-        4
-      );
-
-      // Divider
-      addPageIfNeeded(2);
-      doc.setDrawColor(200);
-      doc.line(marginX, y, pageWidth - marginX, y);
-      y += 4;
-
-      // Score (if available)
-      if (showResults) {
-        const score = `${calculateScore()}/${
-          quiz.questions.length
-        } (${Math.round((calculateScore() / quiz.questions.length) * 100)}%)`;
-        addBlock(`Kết quả: ${score}`, 12, "bold", 4);
-      }
-
-      // Questions
-      (quiz.questions || []).forEach((q: Question, idx: number) => {
-        if (!q) return;
-
-        // Question line
-        addBlock(`${idx + 1}. ${q.question}`, 11, "bold", 2);
-
-        // Options
-        (q.options || []).forEach((opt: string, i: number) => {
-          const isCorrect = showResults ? i === q.correctAnswer : false;
-          const userSelected = showResults ? userAnswers[idx] === i : false;
-          const prefix = String.fromCharCode(65 + i) + ". ";
-          let suffix = "";
-          if (showResults) {
-            if (isCorrect) suffix = "  ✓";
-            else if (userSelected && !isCorrect) suffix = "  ✗";
-          }
-          addBlock(`${prefix}${opt}${suffix}`, 11, "normal", 1);
-        });
-
-        // Explanation
-        if (showResults && q.explanation) {
-          addBlock(`Giải thích: ${q.explanation}`, 10, "normal", 4);
-        } else {
-          y += 2;
-        }
+      await generateAndDownloadPdf({
+        filename,
+        title,
+        description: quiz.description || "",
+        questions: quiz.questions || [],
+        showResults,
+        userAnswers,
       });
 
-      // Trigger browser download immediately
-      doc.save(filename);
-
       toast({
-        title: "Tải xuống thành công",
+        title: "Đã tải xuống PDF",
         description: `Đã lưu tệp ${filename}`,
         variant: "success",
         duration: 2500,
@@ -1216,6 +1153,52 @@ const QuizGenerator = () => {
             errorMessage={apiKeyError}
             onOpenChange={setShowApiKeyErrorDialog}
           />
+
+          {/* Confirm Reset Dialog */}
+          <AlertDialog
+            open={showConfirmDialog}
+            onOpenChange={setShowConfirmDialog}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Xác nhận tạo quiz mới</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Bài quiz hiện tại sẽ bị xóa khỏi màn hình và tiến trình đang
+                  chạy (nếu có) sẽ được hủy. Bạn có muốn tiếp tục tạo quiz mới?
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Hủy</AlertDialogCancel>
+                <AlertDialogAction asChild>
+                  <Button
+                    data-fast-hover
+                    variant="hero"
+                    size="lg"
+                    className="group text-base flex items-center gap-2 bg-black text-white transition-colors hover:bg-black hover:text-white"
+                    onClick={() => {
+                      setShowConfirmDialog(false);
+                      void generateQuiz();
+                    }}>
+                    Xác nhận
+                    <div className="bg-[#B5CC89] p-1 rounded-lg">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="w-5 h-5 text-black group-hover:text-white"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M14 5l7 7m0 0l-7 7m7-7H3"
+                        />
+                      </svg>
+                    </div>
+                  </Button>
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
 
           <Card className="mb-8 border-2 hover:border-primary transition-colors duration-300 hover:shadow-lg">
             <CardContent className="p-6 md:p-10 space-y-8">
@@ -1373,7 +1356,8 @@ const QuizGenerator = () => {
                   {/* Generate Button */}
                   <div className="pt-6">
                     <Button
-                      onClick={generateQuiz}
+                      data-fast-hover
+                      onClick={handleGenerateClick}
                       disabled={
                         loading || !isPromptValid || !isQuestionCountSelected
                       }
