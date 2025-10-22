@@ -1176,6 +1176,15 @@ const QuizGenerator = () => {
                     className="group text-base flex items-center gap-2 bg-black text-white transition-colors hover:bg-black hover:text-white"
                     onClick={() => {
                       setShowConfirmDialog(false);
+                      const el = document.getElementById("generator");
+                      if (el) {
+                        const yOffset = 0;
+                        const y =
+                          el.getBoundingClientRect().top +
+                          window.pageYOffset +
+                          yOffset;
+                        window.scrollTo({ top: y, behavior: "smooth" });
+                      }
                       void generateQuiz();
                     }}>
                     Xác nhận
