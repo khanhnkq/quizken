@@ -13,6 +13,8 @@ import About from "./pages/About";
 import NotFound from "./pages/NotFound";
 import QuizLibrary from "./components/library/QuizLibrary";
 import ScrollToGeneratorButtonWrapper from "./components/ScrollToGeneratorButtonWrapper";
+import { SoundProvider } from "@/contexts/SoundContext";
+import { ChillMusicProvider } from "@/contexts/ChillMusicContext";
 
 gsap.registerPlugin(ScrollSmoother, ScrollTrigger);
 
@@ -119,9 +121,9 @@ const App = () => {
       const smoother = ScrollSmoother.get();
       if (!smoother) return;
 
-      const toastContainer = document.querySelector("[data-hot-toast]") as
-        | HTMLElement
-        | null;
+      const toastContainer = document.querySelector(
+        "[data-hot-toast]"
+      ) as HTMLElement | null;
 
       if (!toastContainer) return;
 
@@ -144,16 +146,20 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        {/* 👇 Toaster nằm ngoài ScrollSmoother */}
-        <HotToaster />
-        <ToastBroadcastReceiver />
-        <BrowserRouter>
-          <AnimatedRoutes />
-          {/* 👇 ScrollToGeneratorButton renders outside AnimatedRoutes to avoid fixed position issues */}
-          <ScrollToGeneratorButtonWrapper />
-        </BrowserRouter>
-      </TooltipProvider>
+      <SoundProvider>
+        <TooltipProvider>
+          <ChillMusicProvider>
+            {/* 👇 Toaster nằm ngoài ScrollSmoother */}
+            <HotToaster />
+            <ToastBroadcastReceiver />
+            <BrowserRouter>
+              <AnimatedRoutes />
+              {/* 👇 ScrollToGeneratorButton renders outside AnimatedRoutes to avoid fixed position issues */}
+              <ScrollToGeneratorButtonWrapper />
+            </BrowserRouter>
+          </ChillMusicProvider>
+        </TooltipProvider>
+      </SoundProvider>
     </QueryClientProvider>
   );
 };

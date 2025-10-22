@@ -56,6 +56,7 @@ import {
   QuizCategoryBadge,
   QuizTags,
 } from "@/components/library/QuizCategoryBadge";
+import { useAudio } from "@/contexts/SoundContext";
 
 interface PublicQuiz {
   id: string;
@@ -108,6 +109,7 @@ const QuizLibrary: React.FC = () => {
   }, [selectedQuiz]);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const navigate = useNavigate();
+  const { play } = useAudio();
 
   const PAGE_SIZE = 9;
   const [hasMore, setHasMore] = useState(true);
@@ -643,7 +645,10 @@ const QuizLibrary: React.FC = () => {
                   <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
                   <Select
                     value={sortBy}
-                    onValueChange={(v) => setSortBy(v as typeof sortBy)}>
+                    onValueChange={(v) => {
+                      play("toggle");
+                      setSortBy(v as typeof sortBy);
+                    }}>
                     <SelectTrigger className="w-[180px] border-2">
                       <SelectValue placeholder="Sắp xếp theo" />
                     </SelectTrigger>
@@ -664,7 +669,10 @@ const QuizLibrary: React.FC = () => {
                   <Filter className="h-4 w-4 text-muted-foreground" />
                   <Select
                     value={searchIn}
-                    onValueChange={(v) => setSearchIn(v as typeof searchIn)}>
+                    onValueChange={(v) => {
+                      play("toggle");
+                      setSearchIn(v as typeof searchIn);
+                    }}>
                     <SelectTrigger className="w-[160px] border-2">
                       <SelectValue placeholder="Tìm trong" />
                     </SelectTrigger>

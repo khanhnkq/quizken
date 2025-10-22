@@ -4,6 +4,8 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 import { gsap } from "gsap";
+import { useAudio } from "@/contexts/SoundContext";
+import type { SoundType } from "@/hooks/useSound";
 
 const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
@@ -40,6 +42,9 @@ export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
+  // Preset A: cấu hình âm thanh cho Button
+  sound?: SoundType | false; // override loại âm thanh; false để tắt riêng nút
+  soundVolume?: number; // override volume 0-1 cho nút này
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -49,6 +54,10 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       variant,
       size,
       asChild = false,
+      sound,
+      soundVolume,
+      onPointerDown,
+      onClick,
       onMouseEnter,
       onMouseLeave,
       onFocus,
@@ -58,6 +67,28 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const Comp = asChild ? Slot : "button";
+    const { play } = useAudio();
+
+    // Mapping theo variant: destructive -> alert, hero -> success, còn lại -> click
+    const mapVariantToSound = (
+      v: VariantProps<typeof buttonVariants>["variant"] | undefined
+    ): SoundType => {
+      if (v === "destructive") return "alert";
+      if (v === "hero") return "success";
+      return "click";
+    };
+
+    // Trigger âm thanh tức thời bằng pointerdown
+    const handlePointerDown = (e: React.PointerEvent<HTMLButtonElement>) => {
+      onPointerDown?.(e);
+      if (sound === false) return;
+      const effective: SoundType =
+        (sound as SoundType) ?? mapVariantToSound(variant);
+      play(
+        effective,
+        soundVolume !== undefined ? { volume: soundVolume } : undefined
+      );
+    };
 
     const handleEnter = (e: React.MouseEvent<HTMLButtonElement>) => {
       onMouseEnter?.(e);
@@ -115,10 +146,12 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
+        onPointerDown={handlePointerDown}
         onMouseEnter={handleEnter}
         onMouseLeave={handleLeave}
         onFocus={handleFocus}
         onBlur={handleBlur}
+        onClick={onClick}
         {...props}
       />
     );

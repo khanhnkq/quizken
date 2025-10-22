@@ -17,7 +17,6 @@ import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 
 gsap.registerPlugin(ScrollToPlugin);
 
-
 interface TokenUsage {
   prompt: number;
   candidates: number;
@@ -63,15 +62,17 @@ export const QuizContent: React.FC<QuizContentProps> = ({
   const handleNavigateQuestion = (index: number, highlight: boolean = true) => {
     const target = questionRefs.current[index];
     if (target) {
-      const elementTop = target.getBoundingClientRect().top + window.pageYOffset;
-      const offsetPosition = elementTop - (window.innerHeight / 2) + (target.offsetHeight / 2);
-      
+      const elementTop =
+        target.getBoundingClientRect().top + window.pageYOffset;
+      const offsetPosition =
+        elementTop - window.innerHeight / 2 + target.offsetHeight / 2;
+
       gsap.to(window, {
         duration: 0.6,
         scrollTo: { y: offsetPosition, autoKill: true },
-        ease: "power2.out"
+        ease: "power2.out",
       });
-      
+
       if (highlight) {
         target.classList.add("ring", "ring-[#B5CC89]", "ring-offset-2");
         window.setTimeout(() => {
@@ -91,7 +92,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
 
   const handleAnswerSelect = (questionIndex: number, answerIndex: number) => {
     onAnswerSelect(questionIndex, answerIndex);
-    
+
     // Auto-scroll to next question if not the last one
     if (questionIndex < quiz.questions.length - 1) {
       setTimeout(() => {
@@ -103,33 +104,40 @@ export const QuizContent: React.FC<QuizContentProps> = ({
   const scrollToTop = () => {
     setTimeout(() => {
       // Try to find score display first
-      const scoreElement = document.querySelector('[data-score-display]') as HTMLElement;
+      const scoreElement = document.querySelector(
+        "[data-score-display]"
+      ) as HTMLElement;
       if (scoreElement) {
-        const elementTop = scoreElement.getBoundingClientRect().top + window.pageYOffset;
-        const offsetPosition = elementTop - (window.innerHeight / 2) + (scoreElement.offsetHeight / 2);
-        
+        const elementTop =
+          scoreElement.getBoundingClientRect().top + window.pageYOffset;
+        const offsetPosition =
+          elementTop - window.innerHeight / 2 + scoreElement.offsetHeight / 2;
+
         gsap.to(window, {
           duration: 0.8,
           scrollTo: { y: offsetPosition, autoKill: true },
-          ease: "power2.inOut"
+          ease: "power2.inOut",
         });
         return;
       }
-      
+
       // Fallback to section
       const quizSection = document.getElementById("quiz");
       if (quizSection) {
         gsap.to(window, {
           duration: 0.8,
           scrollTo: { y: quizSection, autoKill: true },
-          ease: "power2.inOut"
+          ease: "power2.inOut",
         });
       }
     }, 150);
   };
 
   return (
-    <section ref={sectionRef} id="quiz" className="relative overflow-hidden bg-gradient-to-b from-background to-secondary/20 py-20 px-4">
+    <section
+      ref={sectionRef}
+      id="quiz"
+      className="relative overflow-hidden bg-gradient-to-b from-background to-secondary/20 py-20 px-4">
       <div className="container mx-auto max-w-4xl">
         {/* Quiz Section Header */}
         <div className="text-center mb-12">
@@ -138,7 +146,8 @@ export const QuizContent: React.FC<QuizContentProps> = ({
           </div>
           <h2 className="text-4xl md:text-5xl font-bold">{quiz.title}</h2>
           <p className="text-lg text-muted-foreground">
-            {quiz.description || "Trả lời các câu hỏi bên dưới và xem giải thích sau khi chấm điểm"}
+            {quiz.description ||
+              "Trả lời các câu hỏi bên dưới và xem giải thích sau khi chấm điểm"}
           </p>
         </div>
         <Card ref={cardRef} className="border-2 rounded-xl shadow-lg bg-card">
@@ -149,26 +158,40 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                   <Badge variant="secondary">Bài kiểm tra</Badge>
                   <Badge className="text-xs">
                     {quiz.questions.length} câu hỏi
-                    {tokenUsage && <span className="ml-1 opacity-75">({tokenUsage.total} token)</span>}
+                    {tokenUsage && (
+                      <span className="ml-1 opacity-75">
+                        ({tokenUsage.total} token)
+                      </span>
+                    )}
                   </Badge>
                 </div>
-                <CardTitle className="text-2xl md:text-3xl">{quiz.title}</CardTitle>
-                <CardDescription className="mt-1">{quiz.description}</CardDescription>
+                <CardTitle className="text-2xl md:text-3xl">
+                  {quiz.title}
+                </CardTitle>
+                <CardDescription className="mt-1">
+                  {quiz.description}
+                </CardDescription>
               </div>
               <div className="flex gap-2 w-full lg:w-auto">
                 {showResults && (
+                  <Button
+                    onClick={() => {
+                      onReset();
+                      scrollToTop();
+                    }}
+                    variant="outline"
+                    size="sm"
+                    sound="alert"
+                    className="flex-1 lg:flex-initial">
+                    Làm lại
+                  </Button>
+                )}
                 <Button
-                  onClick={() => {
-                    onReset();
-                    scrollToTop();
-                  }}
+                  onClick={onDownload}
                   variant="outline"
                   size="sm"
+                  sound="success"
                   className="flex-1 lg:flex-initial">
-                  Làm lại
-                </Button>
-                )}
-                <Button onClick={onDownload} variant="outline" size="sm" className="flex-1 lg:flex-initial">
                   <Download className="mr-2 h-4 w-4" />
                   <span className="hidden xs:inline">Tải PDF</span>
                   <span className="xs:hidden">PDF</span>
@@ -185,10 +208,16 @@ export const QuizContent: React.FC<QuizContentProps> = ({
               </div>
               <Progress value={completionPercent} />
               {showResults && (
-                <div ref={scoreRef} data-score-display className="mt-4 p-4 bg-[#B5CC89]/10 rounded-lg">
+                <div
+                  ref={scoreRef}
+                  data-score-display
+                  className="mt-4 p-4 bg-[#B5CC89]/10 rounded-lg">
                   <h4 className="text-lg font-semibold">
                     Điểm của bạn: {calculateScore()}/{quiz.questions.length} (
-                    {Math.round((calculateScore() / quiz.questions.length) * 100)}%)
+                    {Math.round(
+                      (calculateScore() / quiz.questions.length) * 100
+                    )}
+                    %)
                   </h4>
                 </div>
               )}
@@ -219,20 +248,33 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                       size="icon"
                       className={`relative w-10 h-10 rounded-full ${stateClasses}`}
                       onClick={() => handleNavigateQuestion(idx)}
-                      title={`Câu ${idx + 1}: ${isCorrect ? "Đúng" : isIncorrect ? "Sai" : isAnswered ? "Đã trả lời" : "Chưa trả lời"}`}>
+                      title={`Câu ${idx + 1}: ${
+                        isCorrect
+                          ? "Đúng"
+                          : isIncorrect
+                          ? "Sai"
+                          : isAnswered
+                          ? "Đã trả lời"
+                          : "Chưa trả lời"
+                      }`}>
                       <span className="relative z-10">{idx + 1}</span>
                       {showResults && isCorrect && (
-                        <span className="pointer-events-none absolute -right-1 -top-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-white text-green-600 border border-green-600 text-[10px] font-bold">✓</span>
+                        <span className="pointer-events-none absolute -right-1 -top-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-white text-green-600 border border-green-600 text-[10px] font-bold">
+                          ✓
+                        </span>
                       )}
                       {showResults && isIncorrect && (
-                        <span className="pointer-events-none absolute -right-1 -top-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-white text-red-600 border border-red-600 text-[10px] font-bold">✗</span>
+                        <span className="pointer-events-none absolute -right-1 -top-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-white text-red-600 border border-red-600 text-[10px] font-bold">
+                          ✗
+                        </span>
                       )}
                     </Button>
                   );
                 })}
               </div>
               <p className="mt-3 text-center text-xs text-muted-foreground">
-                Nhấp để đi tới câu hỏi tương ứng. Vòng tròn sáng màu thể hiện câu đã trả lời, đỏ là sai, xanh là đúng.
+                Nhấp để đi tới câu hỏi tương ứng. Vòng tròn sáng màu thể hiện
+                câu đã trả lời, đỏ là sai, xanh là đúng.
               </p>
             </div>
           </CardHeader>
@@ -267,8 +309,10 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                             q.options.map((option, optIdx) => {
                               const isSelected = userAnswers[idx] === optIdx;
                               const isCorrect = optIdx === q.correctAnswer;
-                              const userSelectedWrong = showResults && isSelected && !isCorrect;
-                              const userSelectedCorrect = showResults && isSelected && isCorrect;
+                              const userSelectedWrong =
+                                showResults && isSelected && !isCorrect;
+                              const userSelectedCorrect =
+                                showResults && isSelected && isCorrect;
 
                               return (
                                 <label
@@ -287,32 +331,45 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                                     name={`question-${idx}`}
                                     value={optIdx}
                                     checked={isSelected}
-                                    onChange={() => handleAnswerSelect(idx, optIdx)}
+                                    onChange={() =>
+                                      handleAnswerSelect(idx, optIdx)
+                                    }
                                     disabled={showResults}
                                     className="mr-3"
                                   />
-                                  <span className="font-medium mr-2">{String.fromCharCode(65 + optIdx)}.</span>
+                                  <span className="font-medium mr-2">
+                                    {String.fromCharCode(65 + optIdx)}.
+                                  </span>
                                   <span className="flex-1">{option}</span>
                                   {showResults && isCorrect && (
-                                    <span className="ml-2 text-green-600 font-semibold">✓ Đáp án đúng</span>
+                                    <span className="ml-2 text-green-600 font-semibold">
+                                      ✓ Đáp án đúng
+                                    </span>
                                   )}
                                   {userSelectedWrong && (
-                                    <span className="ml-2 text-red-600 font-semibold">✗ Câu trả lời của bạn</span>
+                                    <span className="ml-2 text-red-600 font-semibold">
+                                      ✗ Câu trả lời của bạn
+                                    </span>
                                   )}
                                   {userSelectedCorrect && (
-                                    <span className="ml-2 text-green-600 font-semibold">✓ Câu trả lời của bạn</span>
+                                    <span className="ml-2 text-green-600 font-semibold">
+                                      ✓ Câu trả lời của bạn
+                                    </span>
                                   )}
                                 </label>
                               );
                             })
                           ) : (
-                            <div className="text-red-500">Không có đáp án cho câu hỏi {idx}</div>
+                            <div className="text-red-500">
+                              Không có đáp án cho câu hỏi {idx}
+                            </div>
                           )}
                         </div>
                         {showResults && q.explanation && (
                           <div className="pt-2 border-t">
                             <p className="text-sm text-muted-foreground">
-                              <span className="font-semibold">Giải thích:</span> {q.explanation}
+                              <span className="font-semibold">Giải thích:</span>{" "}
+                              {q.explanation}
                             </p>
                           </div>
                         )}
@@ -322,8 +379,13 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                 );
               } catch (error) {
                 return (
-                  <div key={idx} className="text-red-500 border border-red-300 p-4 rounded">
-                    Lỗi hiển thị câu hỏi {idx}: {error instanceof Error ? error.message : "Lỗi không xác định"}
+                  <div
+                    key={idx}
+                    className="text-red-500 border border-red-300 p-4 rounded">
+                    Lỗi hiển thị câu hỏi {idx}:{" "}
+                    {error instanceof Error
+                      ? error.message
+                      : "Lỗi không xác định"}
                   </div>
                 );
               }
@@ -340,6 +402,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                 disabled={answeredCount !== quiz.questions.length}
                 variant="outline"
                 size="lg"
+                sound="success"
                 className="text-base w-full sm:w-auto hover:bg-primary hover:text-primary-foreground hover:border-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                 {answeredCount !== quiz.questions.length
                   ? `Vui lòng trả lời hết tất cả ${quiz.questions.length} câu hỏi (${answeredCount}/${quiz.questions.length} đã trả lời)`
@@ -352,7 +415,8 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                   scrollToTop();
                 }}
                 variant="outline"
-                size="lg">
+                size="lg"
+                sound="alert">
                 Làm lại
               </Button>
             )}
@@ -364,10 +428,3 @@ export const QuizContent: React.FC<QuizContentProps> = ({
 };
 
 export default QuizContent;
-
-
-
-
-
-
-

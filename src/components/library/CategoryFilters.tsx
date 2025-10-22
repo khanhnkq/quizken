@@ -15,6 +15,7 @@ import {
   type QuizDifficulty,
 } from "@/lib/constants/quizCategories";
 import { BookOpen } from "lucide-react";
+import { useAudio } from "@/contexts/SoundContext";
 
 interface CategoryFiltersProps {
   selectedCategory: QuizCategory | "all";
@@ -32,18 +33,23 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
   availableCategories = [],
 }) => {
   // Merge common categories with dynamic categories
-  const commonCategoryValues = QUIZ_CATEGORIES.map(c => c.value as string);
+  const commonCategoryValues = QUIZ_CATEGORIES.map((c) => c.value as string);
   const dynamicCategories = availableCategories.filter(
-    cat => !commonCategoryValues.includes(cat)
+    (cat) => !commonCategoryValues.includes(cat)
   );
+
+  // Preset A: âm thanh khi áp dụng bộ lọc
+  const { play } = useAudio();
 
   return (
     <div className="flex flex-wrap gap-3 items-center">
       {/* Category Filter */}
       <Select
         value={selectedCategory}
-        onValueChange={(v) => onCategoryChange(v as QuizCategory | "all")}
-      >
+        onValueChange={(v) => {
+          play("toggle");
+          onCategoryChange(v as QuizCategory | "all");
+        }}>
         <SelectTrigger className="w-[180px] border-2">
           <SelectValue placeholder="Chủ đề" />
         </SelectTrigger>
@@ -54,7 +60,7 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
               Tất cả chủ đề
             </span>
           </SelectItem>
-          
+
           {/* Common/Suggested Categories */}
           {QUIZ_CATEGORIES.map((cat) => {
             const Icon = cat.icon;
@@ -67,11 +73,14 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
               </SelectItem>
             );
           })}
-          
+
           {/* Dynamic AI-generated Categories */}
           {dynamicCategories.length > 0 && (
             <>
-              <SelectItem value="separator" disabled className="text-xs text-muted-foreground">
+              <SelectItem
+                value="separator"
+                disabled
+                className="text-xs text-muted-foreground">
                 ─── AI-generated ───
               </SelectItem>
               {dynamicCategories.map((cat) => {
@@ -93,8 +102,10 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
       {/* Difficulty Filter */}
       <Select
         value={selectedDifficulty}
-        onValueChange={(v) => onDifficultyChange(v as QuizDifficulty | "all")}
-      >
+        onValueChange={(v) => {
+          play("toggle");
+          onDifficultyChange(v as QuizDifficulty | "all");
+        }}>
         <SelectTrigger className="w-[150px] border-2">
           <SelectValue placeholder="Độ khó" />
         </SelectTrigger>
@@ -118,32 +129,38 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
       {(selectedCategory !== "all" || selectedDifficulty !== "all") && (
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <span>|</span>
-          {selectedCategory !== "all" && (() => {
-            const categoryInfo = QUIZ_CATEGORIES.find((c) => c.value === selectedCategory);
-            if (categoryInfo) {
-              const Icon = categoryInfo.icon;
-              return (
-                <span className="text-foreground font-medium flex items-center gap-1">
-                  <Icon size={14} />
-                  {categoryInfo.label}
-                </span>
+          {selectedCategory !== "all" &&
+            (() => {
+              const categoryInfo = QUIZ_CATEGORIES.find(
+                (c) => c.value === selectedCategory
               );
-            }
-            return null;
-          })()}
-          {selectedDifficulty !== "all" && (() => {
-            const diffInfo = DIFFICULTY_LEVELS.find((d) => d.value === selectedDifficulty);
-            if (diffInfo) {
-              const Icon = diffInfo.icon;
-              return (
-                <span className="text-foreground font-medium flex items-center gap-1">
-                  <Icon size={14} />
-                  {diffInfo.label}
-                </span>
+              if (categoryInfo) {
+                const Icon = categoryInfo.icon;
+                return (
+                  <span className="text-foreground font-medium flex items-center gap-1">
+                    <Icon size={14} />
+                    {categoryInfo.label}
+                  </span>
+                );
+              }
+              return null;
+            })()}
+          {selectedDifficulty !== "all" &&
+            (() => {
+              const diffInfo = DIFFICULTY_LEVELS.find(
+                (d) => d.value === selectedDifficulty
               );
-            }
-            return null;
-          })()}
+              if (diffInfo) {
+                const Icon = diffInfo.icon;
+                return (
+                  <span className="text-foreground font-medium flex items-center gap-1">
+                    <Icon size={14} />
+                    {diffInfo.label}
+                  </span>
+                );
+              }
+              return null;
+            })()}
         </div>
       )}
     </div>

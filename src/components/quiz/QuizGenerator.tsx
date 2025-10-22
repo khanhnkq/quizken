@@ -5,7 +5,6 @@ import React, {
   type MouseEvent,
 } from "react";
 import { useLocation } from "react-router-dom";
-import { gsap } from "gsap";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -47,6 +46,8 @@ import {
   Clock,
   Target,
   Shield,
+  Music4,
+  PauseCircle,
 } from "lucide-react";
 import {
   ScrollVelocityContainer,
@@ -59,9 +60,16 @@ import { GenerationProgress } from "@/components/quiz/GenerationProgress";
 import { QuotaLimitDialog } from "@/components/quiz/QuotaLimitDialog";
 import { ApiKeyErrorDialog } from "@/components/quiz/ApiKeyErrorDialog";
 import { QuizContent } from "@/components/quiz/QuizContent";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+  TooltipProvider,
+} from "@/components/ui/tooltip";
 import useQuizGeneration from "@/hooks/useQuizGeneration";
 import { useGenerationPersistence } from "@/hooks/useGenerationPersistence";
 import { useAnonQuota } from "@/hooks/useAnonQuota";
+import useChillMusic from "@/hooks/useChillMusic";
 
 type TokenUsage = { prompt: number; candidates: number; total: number };
 
@@ -96,6 +104,13 @@ const QuizGenerator = () => {
     useState<boolean>(false);
   const [apiKeyError, setApiKeyError] = useState<string>("");
   const [showConfirmDialog, setShowConfirmDialog] = useState<boolean>(false);
+
+  // Chill background music via hook
+  const {
+    isPlaying: isChillPlaying,
+    toggle: toggleChill,
+    pause: pauseChill,
+  } = useChillMusic();
 
   // Async quiz polling state
   const [quizId, setQuizId] = useState<string | null>(null);
@@ -1026,6 +1041,20 @@ const QuizGenerator = () => {
     return correct;
   };
 
+  // Toggle chill background music via hook
+  const handleToggleChill = async () => {
+    try {
+      await toggleChill();
+    } catch (error) {
+      console.error("Chill audio error:", error);
+      toast({
+        title: "Không thể phát nhạc",
+        description: "Vui lòng kiểm tra quyền trình duyệt hoặc nguồn nhạc",
+        variant: "warning",
+      });
+    }
+  };
+
   // Preload PDF worker and fonts on mount to reduce first-click latency
   useEffect(() => {
     warmupPdfWorker().catch(() => {});
@@ -1135,9 +1164,52 @@ const QuizGenerator = () => {
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
               Tạo bài kiểm tra của bạn
             </h2>
-            <p className="text-lg text-muted-foreground">
-              Mô tả chủ đề bài kiểm tra và để AI tạo ra các câu hỏi hấp dẫn
-            </p>
+            <div className="mt-4 flex items-center justify-center gap-3 flex-wrap">
+              <p className="text-lg text-muted-foreground m-0">
+                Mô tả chủ đề bài kiểm tra và để AI tạo ra các câu hỏi hấp dẫn
+              </p>
+            </div>
+            <div className="flex items-center justify-center gap-3 mt-5">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="lg"
+                      sound="toggle"
+                      className="text-base w-full sm:w-auto hover:bg-primary hover:text-primary-foreground hover:border-foreground transition-colors"
+                      onClick={handleToggleChill}
+                      aria-pressed={isChillPlaying}
+                      aria-label={
+                        isChillPlaying ? "Tạm dừng nhạc" : "Phát nhạc chill"
+                      }>
+                      {isChillPlaying ? (
+                        <PauseCircle className="w-5 h-5" />
+                      ) : (
+                        <Music4 className="w-5 h-5" />
+                      )}
+                      <span className="text-sm font-medium">
+                        {isChillPlaying ? "Tạm dừng nhạc" : "Phát nhạc chill"}
+                      </span>
+                      {isChillPlaying && (
+                        <span
+                          className="flex items-end gap-0.5"
+                          aria-hidden="true">
+                          <span className="w-1 h-3 bg-[#B5CC89] rounded-sm animate-pulse group-hover:bg-primary-foreground" />
+                          <span className="w-1 h-2 bg-[#B5CC89] rounded-sm animate-pulse delay-150 group-hover:bg-primary-foreground/80" />
+                        </span>
+                      )}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent
+                    side="bottom"
+                    className="max-w-xs text-center">
+                    Thư giãn với nhạc nền khi tạo quiz
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
           </div>
 
           {/* Quota Limit Dialog */}
@@ -1167,7 +1239,11 @@ const QuizGenerator = () => {
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Hủy</AlertDialogCancel>
+                <AlertDialogCancel asChild>
+                  <Button variant="secondary" sound="alert">
+                    Hủy
+                  </Button>
+                </AlertDialogCancel>
                 <AlertDialogAction asChild>
                   <Button
                     data-fast-hover
