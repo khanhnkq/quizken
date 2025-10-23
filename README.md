@@ -1,4 +1,4 @@
-# Hình Vẽ Web Động – AI Quiz Generator
+# Quizken – AI Quiz Generator
 
 Dự án web tạo bộ câu hỏi trắc nghiệm bằng AI dựa trên chủ đề người dùng nhập. Frontend dùng Vite + React + TypeScript + Tailwind + shadcn/ui. Backend sử dụng Supabase Edge Functions (Deno) gọi Google Gemini API để sinh câu hỏi, chạy bất đồng bộ và trả trạng thái qua API polling. Hỗ trợ xuất PDF tiếng Việt chuẩn dấu, giới hạn ẩn danh, đăng nhập và API Key cá nhân.
 
@@ -108,7 +108,7 @@ Quy trình gợi ý:
 - git branch -M main
 - git add .
 - git commit -m "chore: initial commit"
-- git remote add origin https://github.com/your-username/hinh-ve-web-dong.git
+- git remote add origin https://github.com/your-username/quizken.git
 - git push -u origin main
 
 Lưu ý: Nếu chưa cấu hình user/email cho Git cục bộ, Git sẽ yêu cầu:
