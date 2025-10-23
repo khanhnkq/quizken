@@ -3,6 +3,7 @@ export const TOAST_ADAPTER_NOTE = "react-hot-toast adapter";
 import * as React from "react";
 import { toast as hotToast } from "react-hot-toast";
 import { CheckCircle, XCircle, AlertTriangle, Info } from "lucide-react";
+import { useAudio } from "@/contexts/SoundContext";
 
 type Variant = "default" | "destructive" | "success" | "info" | "warning";
 
@@ -36,21 +37,21 @@ function renderContent(
   // Icon mapping for each variant
   const iconMap: Record<Variant, React.ReactNode> = {
     default: null,
-    success: React.createElement(CheckCircle, { 
+    success: React.createElement(CheckCircle, {
       className: "w-5 h-5 flex-shrink-0 mt-0.5",
-      "aria-hidden": "true"
+      "aria-hidden": "true",
     }),
-    destructive: React.createElement(XCircle, { 
+    destructive: React.createElement(XCircle, {
       className: "w-5 h-5 flex-shrink-0 mt-0.5",
-      "aria-hidden": "true"
+      "aria-hidden": "true",
     }),
-    warning: React.createElement(AlertTriangle, { 
+    warning: React.createElement(AlertTriangle, {
       className: "w-5 h-5 flex-shrink-0 mt-0.5",
-      "aria-hidden": "true"
+      "aria-hidden": "true",
     }),
-    info: React.createElement(Info, { 
+    info: React.createElement(Info, {
       className: "w-5 h-5 flex-shrink-0 mt-0.5",
-      "aria-hidden": "true"
+      "aria-hidden": "true",
     }),
   };
 
@@ -60,7 +61,10 @@ function renderContent(
     children.push(
       React.createElement(
         "div",
-        { key: "title", className: "text-sm font-semibold leading-tight text-opacity-100" },
+        {
+          key: "title",
+          className: "text-sm font-semibold leading-tight text-opacity-100",
+        },
         title
       )
     );
@@ -70,19 +74,25 @@ function renderContent(
     children.push(
       React.createElement(
         "div",
-        { key: "description", className: "text-xs mt-1 leading-relaxed text-opacity-90" },
+        {
+          key: "description",
+          className: "text-xs mt-1 leading-relaxed text-opacity-90",
+        },
         description
       )
     );
   }
 
   const variantClasses: Record<Variant, string> = {
-    default: "border-2 bg-background/95 backdrop-blur-sm text-foreground shadow-lg",
+    default:
+      "border-2 bg-background/95 backdrop-blur-sm text-foreground shadow-lg",
     destructive:
       "destructive group border-2 border-red-500 bg-red-50/95 dark:bg-red-950/95 backdrop-blur-sm text-red-900 dark:text-red-100 shadow-lg",
-    success: "group border-2 border-[#B5CC89] bg-[#B5CC89]/20 dark:bg-[#B5CC89]/25 backdrop-blur-sm text-[#1a3009] dark:text-[#B5CC89] shadow-lg",
+    success:
+      "group border-2 border-[#B5CC89] bg-[#B5CC89]/20 dark:bg-[#B5CC89]/25 backdrop-blur-sm text-[#1a3009] dark:text-[#B5CC89] shadow-lg",
     info: "group border-2 border-blue-500 bg-blue-50/95 dark:bg-blue-950/95 backdrop-blur-sm text-blue-900 dark:text-blue-100 shadow-lg",
-    warning: "group border-2 border-amber-500 bg-amber-50/95 dark:bg-amber-950/95 backdrop-blur-sm text-amber-900 dark:text-amber-100 shadow-lg",
+    warning:
+      "group border-2 border-amber-500 bg-amber-50/95 dark:bg-amber-950/95 backdrop-blur-sm text-amber-900 dark:text-amber-100 shadow-lg",
   };
 
   const baseClass =
@@ -160,8 +170,23 @@ export function toast(opts: ToastOptions): ToastHandle {
  * const { toast, dismiss } = useToast()
  */
 export function useToast() {
+  const { play } = useAudio();
   return {
-    toast: (opts: ToastOptions) => toast(opts),
+    toast: (opts: ToastOptions) => {
+      // Phát âm thanh theo biến thể thông báo
+      // - success => "success"
+      // - destructive (lỗi/thất bại) => "alert"
+      // - default/info/warning => "notification"
+      const v = opts?.variant;
+      if (v === "success") {
+        play("success");
+      } else if (v === "destructive") {
+        play("alert");
+      } else if (v === "info" || v === "warning" || v === "default") {
+        play("notification");
+      }
+      return toast(opts);
+    },
     dismiss: (toastId?: string | number) =>
       toastId ? hotToast.dismiss(String(toastId)) : hotToast.dismiss(),
   };

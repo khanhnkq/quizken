@@ -18,12 +18,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useAudio } from "@/contexts/SoundContext";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showApiSettings, setShowApiSettings] = useState(false);
   const { user, signOut, loading } = useAuth();
+  const { play } = useAudio();
+  const playClick = () => play("click");
 
   // Lắng nghe sự kiện toàn cục để mở modal đăng nhập từ bất kỳ nơi nào
   useEffect(() => {
@@ -68,17 +71,20 @@ const Navbar = () => {
           <div className="hidden md:flex items-center space-x-8">
             <Link
               to="/"
-              className="text-foreground hover:text-primary transition-colors">
+              className="text-foreground hover:text-primary transition-colors"
+              onPointerDown={playClick}>
               Trang chủ
             </Link>
             <Link
               to="/library"
-              className="text-foreground hover:text-primary transition-colors flex items-center gap-1">
+              className="text-foreground hover:text-primary transition-colors flex items-center gap-1"
+              onPointerDown={playClick}>
               Thư viện
             </Link>
             <Link
               to="/about"
-              className="text-foreground hover:text-primary transition-colors">
+              className="text-foreground hover:text-primary transition-colors"
+              onPointerDown={playClick}>
               Giới thiệu
             </Link>
           </div>
@@ -103,12 +109,14 @@ const Navbar = () => {
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
                         onClick={() => setShowApiSettings(true)}
+                        onSelect={playClick}
                         className="cursor-pointer">
                         <Settings className="h-4 w-4 mr-2" />
                         Cài đặt API
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={handleSignOut}
+                        onSelect={playClick}
                         className="text-red-600">
                         <LogOut className="h-4 w-4 mr-2" />
                         Đăng xuất
@@ -128,7 +136,10 @@ const Navbar = () => {
           </div>
 
           {/* Mobile Menu Button */}
-          <button className="md:hidden" onClick={() => setIsOpen(!isOpen)}>
+          <button
+            className="md:hidden"
+            onClick={() => setIsOpen(!isOpen)}
+            onPointerDown={playClick}>
             <Menu className="h-6 w-6" />
           </button>
         </div>
@@ -139,18 +150,21 @@ const Navbar = () => {
             <Link
               to="/"
               className="block text-foreground hover:text-primary transition-colors"
+              onPointerDown={playClick}
               onClick={() => setIsOpen(false)}>
               Trang chủ
             </Link>
             <Link
               to="/library"
               className="block text-foreground hover:text-primary transition-colors flex items-center gap-2"
+              onPointerDown={playClick}
               onClick={() => setIsOpen(false)}>
               Thư viện
             </Link>
             <Link
               to="/about"
               className="block text-foreground hover:text-primary transition-colors"
+              onPointerDown={playClick}
               onClick={() => setIsOpen(false)}>
               Giới thiệu
             </Link>

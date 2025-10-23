@@ -14,6 +14,7 @@ import {
 import type { Quiz, Question } from "@/types/quiz";
 import { gsap } from "gsap";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
+import { useAudio } from "@/contexts/SoundContext";
 
 gsap.registerPlugin(ScrollToPlugin);
 
@@ -58,6 +59,8 @@ export const QuizContent: React.FC<QuizContentProps> = ({
     if (!quiz.questions.length) return 0;
     return Math.round((answeredCount / quiz.questions.length) * 100);
   }, [answeredCount, quiz.questions.length]);
+
+  const { play } = useAudio();
 
   const handleNavigateQuestion = (index: number, highlight: boolean = true) => {
     const target = questionRefs.current[index];
@@ -331,9 +334,10 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                                     name={`question-${idx}`}
                                     value={optIdx}
                                     checked={isSelected}
-                                    onChange={() =>
-                                      handleAnswerSelect(idx, optIdx)
-                                    }
+                                    onChange={() => {
+                                      play("pop");
+                                      handleAnswerSelect(idx, optIdx);
+                                    }}
                                     disabled={showResults}
                                     className="mr-3"
                                   />
