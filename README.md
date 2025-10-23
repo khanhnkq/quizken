@@ -1,3 +1,133 @@
+## Deploy Production (Vercel + Supabase)
+
+### Tổng quan
+
+Triển khai frontend trên Vercel với SPA fallback và backend bằng Supabase Edge Functions. Frontend gọi function qua [supabase.functions.invoke()](src/components/quiz/QuizGenerator.tsx:744) và [supabase.functions.invoke()](src/hooks/useQuizGeneration.ts:60), không cần hard-code URL nếu [VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY](src/integrations/supabase/client.ts:5) cấu hình chính xác.
+
+- Domain: app.quizken.com (production), staging.quizken.com (staging)
+- Supabase Project (production): project_id vjfpjojwpsrqznmifrjj theo [supabase/config.toml](supabase/config.toml)
+- Tạm thời giữ verify_jwt=false cho function generate-quiz tại [supabase/config.toml](supabase/config.toml:3), sẽ siết chặt sau QA.
+
+### Bước 1: DNS và Vercel Project
+
+1. Trỏ CNAME:
+   - app.quizken.com → cname.vercel-dns.com
+   - staging.quizken.com → cname.vercel-dns.com
+2. Thêm domain vào Vercel Project và chờ trạng thái Verified.
+3. Kết nối GitHub repository, bật Preview Deployments cho Pull Request.
+
+### Bước 2: SPA fallback và cấu hình build
+
+1. SPA fallback: đã thêm [vercel.json](vercel.json) để rewrite mọi route về [index.html](index.html)
+
+```json
+{
+  "version": 2,
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+}
+```
+
+2. Cấu hình Vercel Project:
+   - Build Command: npm run build
+   - Output Directory: dist
+   - Node Version: 20 (hoặc 18+)
+
+### Bước 3: Biến môi trường
+
+- Trên Vercel (Frontend):
+  - VITE_SUPABASE_URL: API URL project Supabase
+  - VITE_SUPABASE_ANON_KEY: anon key Supabase (chỉ dùng phía client)
+- Trên Supabase (Secrets cho Edge Function):
+  - GEMINI_API_KEY: khóa server-side dùng sinh quiz
+  - PROJECT_URL: Supabase project URL
+  - SERVICE_ROLE_KEY: service role key (chỉ dùng server/function)
+
+Tham chiếu mã sử dụng các biến này tại [src/integrations/supabase/client.ts](src/integrations/supabase/client.ts:5) và logic Function tại [supabase/functions/generate-quiz/index.ts](supabase/functions/generate-quiz/index.ts:394).
+
+### Bước 4: Áp dụng migrations và deploy Edge Function
+
+Sử dụng Supabase CLI (yêu cầu đã login và chọn project đúng):
+
+```bash
+# Đăng nhập và liên kết project production
+supabase login
+supabase link --project-ref vjfpjojwpsrqznmifrjj
+
+# Thiết lập secrets cho Edge Function
+supabase secrets set \
+  GEMINI_API_KEY=your_server_side_key \
+  PROJECT_URL=https://your-project.supabase.co \
+  SERVICE_ROLE_KEY=your_service_role_key
+
+# Áp dụng schema/migrations (thư mục supabase/migrations)
+supabase db push
+
+# Deploy Edge Function generate-quiz
+supabase functions deploy generate-quiz
+
+# Kiểm thử Function (verify_jwt=false cho QA nhanh)
+# Lấy URL function: https://&lt;project_ref&gt;.functions.supabase.co
+curl -X POST \
+  https://vjfpjojwpsrqznmifrjj.functions.supabase.co/generate-quiz/start-quiz \
+  -H "Content-Type: application/json" \
+  -d '{"prompt":"Chủ đề kiểm thử","questionCount":10}'
+
+# Kiểm tra trạng thái
+curl -X GET \
+  "https://vjfpjojwpsrqznmifrjj.functions.supabase.co/generate-quiz/get-quiz-status?quiz_id=&lt;ID_TRẢ_VỀ&gt;"
+```
+
+Frontend sẽ gọi endpoints qua [supabase.functions.invoke()](src/components/quiz/QuizGenerator.tsx:744) và [supabase.functions.invoke()](src/hooks/useQuizGeneration.ts:60) nên chỉ cần VITE_SUPABASE_URL và VITE_SUPABASE_ANON_KEY đúng.
+
+### Bước 5: Thu hẹp CORS sau khi domain verified
+
+Hiện CORS đang để "\*" trong corsHeaders ở [supabase/functions/generate-quiz/index.ts](supabase/functions/generate-quiz/index.ts:387). Sau khi domain sẵn sàng, thay thế bằng whitelist:
+
+```ts
+// Ví dụ whitelist động (có thể áp dụng trong handler chính ở serve(), tham chiếu [supabase/functions/generate-quiz/index.ts](supabase/functions/generate-quiz/index.ts:1208))
+const allowedOrigins = new Set([
+  "https://app.quizken.com",
+  "https://staging.quizken.com",
+  // Cho Preview của Vercel nếu cần:
+  // "https://&lt;project&gt;-&lt;hash&gt;-vercel.app"
+]);
+
+const origin = req.headers.get("origin") || "";
+const corsHeaders = {
+  "Access-Control-Allow-Origin": allowedOrigins.has(origin)
+    ? origin
+    : "https://app.quizken.com",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+};
+```
+
+### Bước 6: Giới hạn anonymous và bảo mật
+
+- Giới hạn ẩn danh (mặc định 3/ngày) tại DAILY_LIMIT ở [supabase/functions/generate-quiz/index.ts](supabase/functions/generate-quiz/index.ts:606). Khuyến nghị tách thành biến môi trường để điều chỉnh không cần redeploy.
+- Đảm bảo chỉ anon key xuất hiện ở frontend; các keys nhạy cảm (GEMINI_API_KEY, SERVICE_ROLE_KEY) chỉ ở secrets Supabase/Function.
+
+### Bước 7: Vận hành, quan trắc, rollback
+
+- Quan trắc:
+  - Supabase Logs: api, auth, storage, postgres; và log Function (edge-function).
+  - Vercel Analytics/Logs; thiết lập Uptime check cho app.quizken.com và endpoint Function.
+- Rollback:
+  - Vercel: Revert deployment.
+  - Database: backup/snapshot trước migrations hoặc dùng Supabase Branches để kiểm soát drift.
+- Runbook sự cố:
+  - Gemini 429: vượt quota → xem hướng dẫn, tham chiếu xử lý tại [generate-quiz](supabase/functions/generate-quiz/index.ts:767)
+  - 401/403: khoá không hợp lệ/quyền hạn → tham chiếu [generate-quiz](supabase/functions/generate-quiz/index.ts:777)
+  - CORS: xác nhận whitelist và origin header.
+
+### Nâng cấp sau QA
+
+- Bật verify_jwt=true tại [supabase/config.toml](supabase/config.toml:3) để chỉ người dùng đã đăng nhập gọi function.
+- Cập nhật UI/auth tương ứng (giữ nguyên flow [supabase.functions.invoke()](src/components/quiz/QuizGenerator.tsx:744)).
+
 # Quizken – AI Quiz Generator
 
 Dự án web tạo bộ câu hỏi trắc nghiệm bằng AI dựa trên chủ đề người dùng nhập. Frontend dùng Vite + React + TypeScript + Tailwind + shadcn/ui. Backend sử dụng Supabase Edge Functions (Deno) gọi Google Gemini API để sinh câu hỏi, chạy bất đồng bộ và trả trạng thái qua API polling. Hỗ trợ xuất PDF tiếng Việt chuẩn dấu, giới hạn ẩn danh, đăng nhập và API Key cá nhân.
