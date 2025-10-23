@@ -1290,7 +1290,8 @@ const QuizGenerator = () => {
                       <div className="flex items-center gap-2">
                         <Target className="w-4 h-4 text-[#B5CC89]" />
                         <span className="text-sm font-medium">
-                          Lượt tạo miễn phí: {anonCount}/{DAILY_LIMIT}
+                          Lượt tạo miễn phí:{" "}
+                          {Math.max(0, DAILY_LIMIT - anonCount)}/{DAILY_LIMIT}
                         </span>
                       </div>
                       {anonCount > 0 && (

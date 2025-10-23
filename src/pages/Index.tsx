@@ -15,17 +15,26 @@ const Index = () => {
   useEffect(() => {
     // Check if we need to scroll to quiz section
     const state = location.state as { scrollToQuiz?: boolean } | null;
+    const params = new URLSearchParams(location.search);
+    const hash = location.hash?.replace("#", "");
+    const shouldScroll =
+      !!state?.scrollToQuiz ||
+      hash === "generator" ||
+      hash === "quiz" ||
+      params.get("scrollTo") === "generator" ||
+      params.get("scrollTo") === "quiz";
 
-    if (state?.scrollToQuiz && !hasScrolled.current) {
+    if (shouldScroll && !hasScrolled.current) {
       hasScrolled.current = true;
 
       let retryCount = 0;
       const maxRetries = 50; // Increase retries
-      let timerCleared = false;
 
       const scrollToQuizSection = () => {
         // Try to find quiz section first (where user does the quiz)
-        const quizElement = document.getElementById("quiz");
+        const quizElement =
+          document.getElementById("quiz") ||
+          document.getElementById("generator");
 
         if (!quizElement && retryCount < maxRetries) {
           // Retry if element not found yet
@@ -46,11 +55,11 @@ const Index = () => {
             // Smooth scroll with animation (true = smooth, false = instant)
             smoother.scrollTo(quizElement, true, "top 20px");
           } catch (e) {
-            fallbackScroll();
+            // ignore, will fallback below
           }
-        } else {
-          fallbackScroll();
         }
+        // Always run fallback for consistency across environments
+        fallbackScroll();
 
         function fallbackScroll() {
           // Get element position relative to document
@@ -77,25 +86,17 @@ const Index = () => {
         }
       };
 
-      // Wait for page transition and render to complete
-      const timer = setTimeout(() => {
-        if (timerCleared) return;
-
-        try {
-          requestAnimationFrame(scrollToQuizSection);
-          // Clear state after scroll completes
-          setTimeout(() => {
-            navigate(location.pathname, { replace: true, state: {} });
-          }, 1500);
-        } catch (e) {
-          console.error("Error in scroll:", e);
-        }
-      }, 800);
-
-      return () => {
-        timerCleared = true;
-        clearTimeout(timer);
-      };
+      // Start immediately without additional delay
+      try {
+        requestAnimationFrame(scrollToQuizSection);
+        // Clear state after scroll starts
+        setTimeout(() => {
+          navigate(location.pathname, { replace: true, state: {} });
+        }, 1500);
+      } catch (e) {
+        console.error("Error in scroll:", e);
+      }
+      return () => {};
     }
   }, [location, navigate]);
 
