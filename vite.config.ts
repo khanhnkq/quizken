@@ -66,8 +66,8 @@ export default defineConfig({
     // Tránh pre-bundle các GSAP plugins nặng vào initial deps
     exclude: ["gsap/ScrollTrigger", "gsap/dist/ScrollSmoother"],
 
-    // THÊM DÒNG NÀY (để buộc Vite pre-bundle file UMD) và đảm bảo lucide-react được pre-bundle cùng React
-    include: ["jspdf/dist/jspdf.umd.min.js", "lucide-react"],
+    // Buộc Vite pre-bundle file UMD của jsPDF (không đụng tới lucide-react để tránh chọn sai bản UMD/CJS/UMD)
+    include: ["jspdf/dist/jspdf.umd.min.js"],
   },
   worker: {
     format: "es",

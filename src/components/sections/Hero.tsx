@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Sparkles, Zap, Brain } from "lucide-react";
+import { Sparkles, Zap, Brain } from '@/lib/icons';
 import { useState, useEffect, type MouseEvent, lazy, Suspense } from "react";
 import { gsap } from "gsap";
 const ThreeBackground = lazy(() => import("@/components/ThreeBackground"));

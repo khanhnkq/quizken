@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Star, MessageSquare } from "lucide-react";
+import { Star, MessageSquare } from '@/lib/icons';
 
 const Testimonials = () => {
   const testimonials = [

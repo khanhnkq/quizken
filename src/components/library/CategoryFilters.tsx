@@ -14,7 +14,7 @@ import {
   type QuizCategory,
   type QuizDifficulty,
 } from "@/lib/constants/quizCategories";
-import { BookOpen } from "lucide-react";
+import { BookOpen } from '@/lib/icons';
 import { useAudio } from "@/contexts/SoundContext";
 
 interface CategoryFiltersProps {

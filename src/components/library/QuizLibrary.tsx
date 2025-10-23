@@ -34,7 +34,7 @@ import {
   X,
   Filter,
   ArrowUpDown,
-} from "lucide-react";
+} from '@/lib/icons';
 import { warmupPdfWorker, generateAndDownloadPdf } from "@/lib/pdfWorkerClient";
 import type { Question } from "@/types/quiz";
 import {

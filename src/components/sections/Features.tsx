@@ -6,7 +6,7 @@ import {
   Zap,
   Award,
   Star,
-} from "lucide-react";
+} from '@/lib/icons';
 import { Card, CardContent } from "@/components/ui/card";
 
 const Features = () => {

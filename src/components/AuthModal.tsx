@@ -10,7 +10,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Shield, LogIn } from "lucide-react";
+import { Loader2, Shield, LogIn } from '@/lib/icons';
 
 interface AuthModalProps {
   open: boolean;

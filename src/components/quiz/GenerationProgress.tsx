@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Loader2, XCircle } from "lucide-react";
+import { Loader2, XCircle } from '@/lib/icons';
 
 interface GenerationProgressProps {
   generationStatus: string | null;

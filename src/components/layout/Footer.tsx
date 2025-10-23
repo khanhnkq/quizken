@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Sparkles } from "lucide-react";
+import { Sparkles } from '@/lib/icons';
 import { type MouseEvent } from "react";
 import { gsap } from "gsap";
 

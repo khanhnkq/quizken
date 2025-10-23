@@ -2,7 +2,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Download, Sparkles } from "lucide-react";
+import { Download, Sparkles } from '@/lib/icons';
 import {
   Card,
   CardContent,

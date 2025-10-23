@@ -1,4 +1,4 @@
-import { Users } from "lucide-react";
+import { Users } from '@/lib/icons';
 
 const stats = [
   { number: "50K+", label: "Quiz đã tạo" },

@@ -23,7 +23,7 @@ import {
   Sparkles,
   Loader2,
   ClipboardPaste,
-} from "lucide-react";
+} from '@/lib/icons';
 import { Tables, TablesInsert } from "@/integrations/supabase/types";
 
 type UserApiKey = Tables<"user_api_keys">;

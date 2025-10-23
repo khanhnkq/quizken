@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import { gsap } from "gsap";
 import ScrollSmoother from "gsap/ScrollSmoother";
-import { ArrowUp, Sparkles } from "lucide-react";
+import { ArrowUp, Sparkles } from '@/lib/icons';
 import { Button } from "@/components/ui/button";
 
 const ScrollToGeneratorButtonWrapper: React.FC = () => {

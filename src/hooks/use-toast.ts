@@ -2,7 +2,7 @@ export const TOAST_ADAPTER_NOTE = "react-hot-toast adapter";
 
 import * as React from "react";
 import { toast as hotToast } from "react-hot-toast";
-import { CheckCircle, XCircle, AlertTriangle, Info } from "lucide-react";
+import { CheckCircle, XCircle, AlertTriangle, Info } from '@/lib/icons';
 import { useAudio } from "@/contexts/SoundContext";
 
 type Variant = "default" | "destructive" | "success" | "info" | "warning";

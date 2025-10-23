@@ -48,7 +48,7 @@ import {
   Shield,
   Music4,
   PauseCircle,
-} from "lucide-react";
+} from '@/lib/icons';
 import {
   ScrollVelocityContainer,
   ScrollVelocityRow,

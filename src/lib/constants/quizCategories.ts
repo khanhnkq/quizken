@@ -1,5 +1,5 @@
 // Quiz Categories and Tags Constants
-import type { LucideIcon } from 'lucide-react';
+import type { LucideIcon } from '@/lib/icons';
 import {
   BookOpen,
   GraduationCap,
@@ -22,7 +22,7 @@ import {
   CircleCheck,
   AlertCircle,
   AlertTriangle,
-} from 'lucide-react';
+} from '@/lib/icons';
 
 // Category is now flexible - AI can generate any category name
 export type QuizCategory = string;

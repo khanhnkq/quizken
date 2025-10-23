@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { X } from "lucide-react";
+import { X } from '@/lib/icons';
 import {
   QUIZ_CATEGORIES,
   type QuizCategory,

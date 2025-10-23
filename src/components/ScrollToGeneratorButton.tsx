@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowUp, Sparkles } from 'lucide-react';
+import { ArrowUp, Sparkles } from '@/lib/icons';
 import { Button } from '@/components/ui/button';
 import { useScrollToSection } from '@/hooks/useScrollToSection';
 

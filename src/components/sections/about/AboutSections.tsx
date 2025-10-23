@@ -16,7 +16,7 @@ import {
   Zap,
   Users,
   MousePointer,
-} from "lucide-react";
+} from '@/lib/icons';
 import logo from "@/assets/logo/logo.png";
 import { useEffect, useState, type MouseEvent } from "react";
 import { gsap } from "gsap";
