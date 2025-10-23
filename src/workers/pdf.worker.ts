@@ -94,7 +94,7 @@ const ensurePdfVnFont = async (doc: jsPDF) => {
   };
 
   if (!g.__pdfVnFontDataReg) {
-    const regCandidates = ["public/fonts/vn/Roboto-Light.ttf"];
+    const regCandidates = ["/fonts/vn/Roboto-Light.ttf"];
     for (const url of regCandidates) {
       try {
         const res = await fetch(url, { mode: "cors" });
@@ -118,7 +118,7 @@ const ensurePdfVnFont = async (doc: jsPDF) => {
   }
 
   if (!g.__pdfVnFontDataBold) {
-    const boldCandidates = ["public/fonts/vn/Roboto-Bold.ttf"];
+    const boldCandidates = ["/fonts/vn/Roboto-Bold.ttf"];
     for (const url of boldCandidates) {
       try {
         const res = await fetch(url, { mode: "cors" });
@@ -169,7 +169,15 @@ const ensurePdfVnFont = async (doc: jsPDF) => {
 const ensurePdfCjkFonts = async (
   doc: jsPDF,
   opts?: { needSC?: boolean; needJP?: boolean; needKR?: boolean }
-): Promise<{ any: boolean; sc: boolean; jp: boolean; kr: boolean }> => {
+): Promise<{
+  any: boolean;
+  sc: boolean;
+  jp: boolean;
+  kr: boolean;
+  scBold: boolean;
+  jpBold: boolean;
+  krBold: boolean;
+}> => {
   const g = globalThis as unknown as {
     __pdfCjkFontDataSC?: string;
     __pdfCjkFontDataJP?: string;
@@ -177,6 +185,12 @@ const ensurePdfCjkFonts = async (
     __pdfCjkUrlSC?: string;
     __pdfCjkUrlJP?: string;
     __pdfCjkUrlKR?: string;
+    __pdfCjkFontDataSCBold?: string;
+    __pdfCjkFontDataJPBold?: string;
+    __pdfCjkFontDataKRBold?: string;
+    __pdfCjkUrlSCBold?: string;
+    __pdfCjkUrlJPBold?: string;
+    __pdfCjkUrlKRBold?: string;
   };
 
   const shouldLoadAll = !opts || (!opts.needSC && !opts.needJP && !opts.needKR);
@@ -225,12 +239,15 @@ const ensurePdfCjkFonts = async (
 
   let sc = false,
     jp = false,
-    kr = false;
+    kr = false,
+    scBold = false,
+    jpBold = false,
+    krBold = false;
 
   // Simplified Chinese (SC)
   if (shouldLoadAll || opts?.needSC) {
     if (!g.__pdfCjkFontDataSC) {
-      const scCandidates = ["public/fonts/cjk/NotoSansSC-Regular.ttf"];
+      const scCandidates = ["/fonts/cjk/NotoSansSC-Regular.ttf"];
       const res = await fetchFont(scCandidates);
       if (res) {
         g.__pdfCjkFontDataSC = res.data;
@@ -252,13 +269,36 @@ const ensurePdfCjkFonts = async (
       if (!sc) {
         console.warn("[PDF][Font] Verify failed, disable SC");
       }
+
+      // Try load Bold variant (local only)
+      if (!g.__pdfCjkFontDataSCBold) {
+        const scBoldCandidates = ["/fonts/cjk/NotoSansSC-Bold.ttf"];
+        const resBold = await fetchFont(scBoldCandidates);
+        if (resBold) {
+          g.__pdfCjkFontDataSCBold = resBold.data;
+          g.__pdfCjkUrlSCBold = resBold.url;
+        }
+      }
+      if (g.__pdfCjkFontDataSCBold) {
+        const fileNameBold =
+          g.__pdfCjkUrlSCBold && g.__pdfCjkUrlSCBold.endsWith(".otf")
+            ? "NotoSansSC-Bold.otf"
+            : "NotoSansSC-Bold.ttf";
+        doc.addFileToVFS(fileNameBold, g.__pdfCjkFontDataSCBold);
+        try {
+          doc.addFont(fileNameBold, "NotoSansSC", "bold", "Identity-H");
+        } catch (e) {
+          console.warn("[PDF][Font] addFont SC bold failed", e);
+        }
+        scBold = verifyFontRegistered("NotoSansSC", "bold");
+      }
     }
   }
 
   // Japanese (JP)
   if (shouldLoadAll || opts?.needJP) {
     if (!g.__pdfCjkFontDataJP) {
-      const jpCandidates = ["public/fonts/cjk/NotoSansJP-Regular.ttf"];
+      const jpCandidates = ["/fonts/cjk/NotoSansJP-Regular.ttf"];
       const res = await fetchFont(jpCandidates);
       if (res) {
         g.__pdfCjkFontDataJP = res.data;
@@ -280,13 +320,36 @@ const ensurePdfCjkFonts = async (
       if (!jp) {
         console.warn("[PDF][Font] Verify failed, disable JP");
       }
+
+      // Try load Bold variant (local only)
+      if (!g.__pdfCjkFontDataJPBold) {
+        const jpBoldCandidates = ["/fonts/cjk/NotoSansJP-Bold.ttf"];
+        const resBold = await fetchFont(jpBoldCandidates);
+        if (resBold) {
+          g.__pdfCjkFontDataJPBold = resBold.data;
+          g.__pdfCjkUrlJPBold = resBold.url;
+        }
+      }
+      if (g.__pdfCjkFontDataJPBold) {
+        const fileNameBold =
+          g.__pdfCjkUrlJPBold && g.__pdfCjkUrlJPBold.endsWith(".otf")
+            ? "NotoSansJP-Bold.otf"
+            : "NotoSansJP-Bold.ttf";
+        doc.addFileToVFS(fileNameBold, g.__pdfCjkFontDataJPBold);
+        try {
+          doc.addFont(fileNameBold, "NotoSansJP", "bold", "Identity-H");
+        } catch (e) {
+          console.warn("[PDF][Font] addFont JP bold failed", e);
+        }
+        jpBold = verifyFontRegistered("NotoSansJP", "bold");
+      }
     }
   }
 
   // Korean (KR)
   if (shouldLoadAll || opts?.needKR) {
     if (!g.__pdfCjkFontDataKR) {
-      const krCandidates = ["public/fonts/cjk/NotoSansKR-Regular.ttf"];
+      const krCandidates = ["/fonts/cjk/NotoSansKR-Regular.ttf"];
       const res = await fetchFont(krCandidates);
       if (res) {
         g.__pdfCjkFontDataKR = res.data;
@@ -308,10 +371,33 @@ const ensurePdfCjkFonts = async (
       if (!kr) {
         console.warn("[PDF][Font] Verify failed, disable KR");
       }
+
+      // Try load Bold variant (local only)
+      if (!g.__pdfCjkFontDataKRBold) {
+        const krBoldCandidates = ["/fonts/cjk/NotoSansKR-Bold.ttf"];
+        const resBold = await fetchFont(krBoldCandidates);
+        if (resBold) {
+          g.__pdfCjkFontDataKRBold = resBold.data;
+          g.__pdfCjkUrlKRBold = resBold.url;
+        }
+      }
+      if (g.__pdfCjkFontDataKRBold) {
+        const fileNameBold =
+          g.__pdfCjkUrlKRBold && g.__pdfCjkUrlKRBold.endsWith(".otf")
+            ? "NotoSansKR-Bold.otf"
+            : "NotoSansKR-Bold.ttf";
+        doc.addFileToVFS(fileNameBold, g.__pdfCjkFontDataKRBold);
+        try {
+          doc.addFont(fileNameBold, "NotoSansKR", "bold", "Identity-H");
+        } catch (e) {
+          console.warn("[PDF][Font] addFont KR bold failed", e);
+        }
+        krBold = verifyFontRegistered("NotoSansKR", "bold");
+      }
     }
   }
 
-  return { any: sc || jp || kr, sc, jp, kr };
+  return { any: sc || jp || kr, sc, jp, kr, scBold, jpBold, krBold };
 };
 
 /** Phát hiện script trong một chuỗi để chọn font CJK phù hợp */
@@ -331,7 +417,15 @@ const detectScript = (text: string) => {
 /** Chọn font theo nội dung dòng; ưu tiên JP > KR > SC; ngược lại dùng base */
 const chooseFontFamily = (
   text: string,
-  cjk: { any: boolean; sc: boolean; jp: boolean; kr: boolean },
+  cjk: {
+    any: boolean;
+    sc: boolean;
+    jp: boolean;
+    kr: boolean;
+    scBold?: boolean;
+    jpBold?: boolean;
+    krBold?: boolean;
+  },
   baseFont: string
 ): string => {
   if (!cjk.any) return baseFont;
@@ -409,8 +503,15 @@ const buildPdfArrayBuffer = async (
     lines.forEach((line: string) => {
       addPageIfNeeded(lineHeight);
       const family = chooseFontFamily(line, cjk, BASE_FONT_FAMILY);
-      const style: "normal" | "bold" =
-        family === BASE_FONT_FAMILY ? fontStyle : "normal";
+      const style: "normal" | "bold" = (() => {
+        if (family === BASE_FONT_FAMILY) return fontStyle;
+        if (fontStyle === "bold") {
+          if (family === "NotoSansJP" && cjk.jpBold) return "bold";
+          if (family === "NotoSansKR" && cjk.krBold) return "bold";
+          if (family === "NotoSansSC" && cjk.scBold) return "bold";
+        }
+        return "normal";
+      })();
       try {
         doc.setFont(family, style);
       } catch (e) {
