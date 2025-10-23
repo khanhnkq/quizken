@@ -1170,45 +1170,32 @@ const QuizGenerator = () => {
               </p>
             </div>
             <div className="flex items-center justify-center gap-3 mt-5">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="lg"
-                      sound="toggle"
-                      className="text-base w-full sm:w-auto hover:bg-primary hover:text-primary-foreground hover:border-foreground transition-colors"
-                      onClick={handleToggleChill}
-                      aria-pressed={isChillPlaying}
-                      aria-label={
-                        isChillPlaying ? "Tạm dừng nhạc" : "Phát nhạc chill"
-                      }>
-                      {isChillPlaying ? (
-                        <PauseCircle className="w-5 h-5" />
-                      ) : (
-                        <Music4 className="w-5 h-5" />
-                      )}
-                      <span className="text-sm font-medium">
-                        {isChillPlaying ? "Tạm dừng nhạc" : "Phát nhạc chill"}
-                      </span>
-                      {isChillPlaying && (
-                        <span
-                          className="flex items-end gap-0.5"
-                          aria-hidden="true">
-                          <span className="w-1 h-3 bg-[#B5CC89] rounded-sm animate-pulse group-hover:bg-primary-foreground" />
-                          <span className="w-1 h-2 bg-[#B5CC89] rounded-sm animate-pulse delay-150 group-hover:bg-primary-foreground/80" />
-                        </span>
-                      )}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent
-                    side="bottom"
-                    className="max-w-xs text-center">
-                    Thư giãn với nhạc nền khi tạo quiz
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              <Button
+                type="button"
+                variant="outline"
+                size="lg"
+                sound="toggle"
+                className="text-base w-full sm:w-auto hover:bg-primary hover:text-primary-foreground hover:border-foreground transition-colors"
+                onClick={handleToggleChill}
+                aria-pressed={isChillPlaying}
+                aria-label={
+                  isChillPlaying ? "Tạm dừng nhạc" : "Phát nhạc chill"
+                }>
+                {isChillPlaying ? (
+                  <PauseCircle className="w-5 h-5" />
+                ) : (
+                  <Music4 className="w-5 h-5" />
+                )}
+                <span className="text-sm font-medium">
+                  {isChillPlaying ? "Tạm dừng nhạc" : "Phát nhạc chill"}
+                </span>
+                {isChillPlaying && (
+                  <span className="flex items-end gap-0.5" aria-hidden="true">
+                    <span className="w-1 h-3 bg-[#B5CC89] rounded-sm animate-pulse group-hover:bg-primary-foreground" />
+                    <span className="w-1 h-2 bg-[#B5CC89] rounded-sm animate-pulse delay-150 group-hover:bg-primary-foreground/80" />
+                  </span>
+                )}
+              </Button>
             </div>
           </div>
 

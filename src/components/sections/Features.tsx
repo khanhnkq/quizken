@@ -13,7 +13,7 @@ const Features = () => {
   const features = [
     {
       icon: Sparkles,
-      title: "Tạo nội dung bằng AI",
+      title: "Tạo quiz bằng AI",
       description:
         "AI tiên tiến tạo ra câu hỏi thông minh, phù hợp ngữ cảnh theo đúng chủ đề của bạn.",
     },
@@ -25,7 +25,7 @@ const Features = () => {
     },
     {
       icon: BookOpen,
-      title: "Nhiều chủ đề",
+      title: "Đa dạng chủ đề",
       description:
         "Tạo quiz cho mọi lĩnh vực: khoa học, lịch sử, ngôn ngữ hoặc chủ đề tùy chỉnh.",
     },
@@ -39,18 +39,20 @@ const Features = () => {
       icon: Users,
       title: "Phù hợp cho mọi người",
       description:
-        "Lý tưởng cho giáo viên, huấn luyện viên, người tạo nội dung và bất kỳ ai cần quiz.",
+        "Lý tưởng cho giáo viên, học sinh, sinh viên, người tạo nội dung và bất kỳ ai cần quiz.",
     },
     {
       icon: Award,
       title: "Câu hỏi chất lượng",
       description:
-        "Mỗi câu hỏi đều có giải thích chi tiết để tăng hiệu quả học tập.",
+        "Mỗi câu hỏi đều có giải thích chi tiết để tăng hiệu quả học tập và ghi nhớ",
     },
   ];
 
   return (
-    <section id="features" className="relative overflow-hidden bg-gradient-to-b from-secondary/30 to-background min-h-screen py-20 px-4">
+    <section
+      id="features"
+      className="relative overflow-hidden bg-gradient-to-b from-secondary/30 to-background min-h-screen py-20 px-4">
       <div className="container mx-auto max-w-7xl">
         <div className="text-center mb-16">
           <div className="flex justify-center mb-6">
