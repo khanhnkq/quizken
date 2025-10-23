@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import * as THREE from "three";
+import type * as Three from "three";
 import modelUrl from "@/assets/model/mascot/scene.gltf?url";
 
 const ThreeBackground: React.FC = () => {
@@ -61,8 +61,8 @@ const ThreeBackground: React.FC = () => {
           scene.add(ambient, dir);
 
           const loader = new GLTFLoader();
-          let model: THREE.Group | null = null;
-          let mixer: THREE.AnimationMixer | null = null;
+          let model: Three.Group | null = null;
+          let mixer: Three.AnimationMixer | null = null;
           const clock = new THREE.Clock();
 
           const updateModelResponsive = () => {
@@ -146,12 +146,12 @@ const ThreeBackground: React.FC = () => {
 
           const animate = (currentTime: number) => {
             animationIdRef.current = requestAnimationFrame(animate);
-            
+
             const deltaTime = currentTime - lastTime;
             if (deltaTime < frameInterval) return;
-            
+
             lastTime = currentTime - (deltaTime % frameInterval);
-            
+
             if (mixer) mixer.update(clock.getDelta() * 0.5);
             renderer.render(scene, camera);
           };
@@ -196,19 +196,19 @@ const ThreeBackground: React.FC = () => {
             if (resizeObserver) resizeObserver.disconnect();
             if (resizeRafId !== null) cancelAnimationFrame(resizeRafId);
             window.removeEventListener("resize", handleWindowResize);
-            
+
             // Proper Three.js cleanup
             scene.traverse((object) => {
               if (object instanceof THREE.Mesh) {
                 object.geometry?.dispose();
                 if (Array.isArray(object.material)) {
-                  object.material.forEach(mat => mat.dispose());
+                  object.material.forEach((mat) => mat.dispose());
                 } else {
                   object.material?.dispose();
                 }
               }
             });
-            
+
             renderer.dispose();
             renderer.forceContextLoss();
             gsap.killTweensOf("*");

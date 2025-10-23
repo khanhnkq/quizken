@@ -83,11 +83,11 @@
   .toast-animation {
     animation: toast-enter 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  
+
   .toast-animation[data-removed="true"] {
     animation: toast-exit 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  
+
   /* Responsive toast positioning */
   @media (max-width: 768px) {
     .toast-animation {
@@ -296,5 +296,18 @@ All colors MUST be HSL.
     opacity: 0.35;
     mix-blend-mode: overlay;
     pointer-events: none;
+  }
+}
+
+/* Scroll utilities for modal content */
+@layer utilities {
+  .scroll-touch {
+    -webkit-overflow-scrolling: touch;
+  }
+  .overscroll-contain {
+    overscroll-behavior: contain;
+  }
+  .scrollbar-stable {
+    scrollbar-gutter: stable;
   }
 }

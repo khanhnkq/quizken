@@ -1,6 +1,6 @@
 import React from "react";
 import { Toaster as HotToaster } from "react-hot-toast";
-import { ScrollSmoother } from "gsap/dist/ScrollSmoother";
+/* ScrollSmoother sẽ được nạp động để tránh lỗi ESM export không nhất quán */
 import { gsap } from "gsap";
 
 /**
@@ -15,9 +15,9 @@ type ToasterProps = React.ComponentProps<typeof HotToaster>;
 
 export function Toaster(props: ToasterProps) {
   React.useEffect(() => {
-    const container = document.querySelector("#__react-hot-toast") as
-      | HTMLElement
-      | null;
+    const container = document.querySelector(
+      "#__react-hot-toast"
+    ) as HTMLElement | null;
 
     if (!container) return;
 
@@ -28,9 +28,32 @@ export function Toaster(props: ToasterProps) {
       targetParent.appendChild(container);
     }
 
+    // Lazy-load ScrollSmoother và fallback sang window.scrollY nếu không có
+    type SmootherLike = { scrollTop: () => number };
+    let getSmoother: null | (() => SmootherLike | null) = null;
+
+    (async () => {
+      try {
+        type ScrollSmootherStatic = { get(): SmootherLike | null };
+        const mod = (await import("gsap/ScrollSmoother")) as {
+          ScrollSmoother?: ScrollSmootherStatic;
+          default?: ScrollSmootherStatic;
+        };
+        const Smoother = mod.ScrollSmoother ?? mod.default;
+        if (Smoother) {
+          getSmoother = () => Smoother.get();
+        }
+      } catch {
+        getSmoother = null;
+      }
+    })();
+
     const syncPosition = () => {
-      const smoother = ScrollSmoother.get();
-      const topOffset = smoother ? smoother.scrollTop() + 16 : window.scrollY + 16;
+      const smoother = getSmoother ? getSmoother() : null;
+      const topOffset =
+        smoother && typeof smoother.scrollTop === "function"
+          ? smoother.scrollTop() + 16
+          : window.scrollY + 16;
       const rightOffset = 16;
 
       container.style.position = "absolute";

@@ -12,6 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -57,6 +58,7 @@ import {
   QuizTags,
 } from "@/components/library/QuizCategoryBadge";
 import { useAudio } from "@/contexts/SoundContext";
+import ScrollSmoother from "gsap/ScrollSmoother";
 
 interface PublicQuiz {
   id: string;
@@ -100,17 +102,74 @@ const QuizLibrary: React.FC = () => {
     QuizDifficulty | "all"
   >("all");
   const searchInputRef = React.useRef<HTMLInputElement>(null);
+  // Lưu overflow/touchAction gốc để khôi phục khi đóng modal
+  const bodyOverflowRef = React.useRef<{
+    body: string;
+    html: string;
+    touch: string;
+  }>({
+    body: "",
+    html: "",
+    touch: "",
+  });
 
-  // Scroll to top when opening a new quiz preview
-  useEffect(() => {
-    if (selectedQuiz) {
-      window.scrollTo({ top: 300, behavior: "smooth" });
-    }
-  }, [selectedQuiz]);
+  // Note: Loại bỏ auto scroll khi mở preview để không ảnh hưởng hành vi cuộn trong Dialog
   const [showAuthModal, setShowAuthModal] = useState(false);
   const navigate = useNavigate();
   const { play } = useAudio();
 
+  // Khóa cuộn body/html khi mở preview để không cuộn phía sau Dialog
+  useEffect(() => {
+    if (selectedQuiz) {
+      // Lưu trạng thái inline hiện tại một lần khi mở modal
+      if (
+        !bodyOverflowRef.current.body &&
+        !bodyOverflowRef.current.html &&
+        !bodyOverflowRef.current.touch
+      ) {
+        bodyOverflowRef.current = {
+          body: document.body.style.overflow,
+          html: document.documentElement.style.overflow,
+          touch: document.body.style.touchAction,
+        };
+      }
+      document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
+      document.body.style.touchAction = "none";
+    } else {
+      // Khôi phục khi đóng modal
+      document.body.style.overflow = bodyOverflowRef.current.body || "";
+      document.documentElement.style.overflow =
+        bodyOverflowRef.current.html || "";
+      document.body.style.touchAction = bodyOverflowRef.current.touch || "";
+      bodyOverflowRef.current = { body: "", html: "", touch: "" };
+    }
+
+    return () => {
+      // Khôi phục nếu component unmount trong khi modal đang mở
+      document.body.style.overflow = bodyOverflowRef.current.body || "";
+      document.documentElement.style.overflow =
+        bodyOverflowRef.current.html || "";
+      document.body.style.touchAction = bodyOverflowRef.current.touch || "";
+    };
+  }, [selectedQuiz]);
+
+  // Pause/Resume GSAP ScrollSmoother khi mở/đóng modal xem trước quiz
+  useEffect(() => {
+    const smoother = (ScrollSmoother as any)?.get?.();
+    if (!smoother) return;
+    try {
+      if (selectedQuiz) {
+        if (typeof smoother.paused === "function") smoother.paused(true);
+        else if (typeof smoother.pause === "function") smoother.pause();
+      } else {
+        if (typeof smoother.paused === "function") smoother.paused(false);
+        else if (typeof smoother.resume === "function") smoother.resume();
+      }
+    } catch {
+      // no-op
+    }
+  }, [selectedQuiz]);
   const PAGE_SIZE = 9;
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -519,41 +578,71 @@ const QuizLibrary: React.FC = () => {
       <section className="relative overflow-hidden bg-gradient-to-b from-secondary/30 to-background min-h-screen py-20 px-4">
         <div className="absolute inset-0 -z-10 opacity-5 hidden md:block">
           <ScrollVelocityContainer className="text-6xl md:text-8xl font-bold">
-            <ScrollVelocityRow baseVelocity={40} rowIndex={0}>
+            <ScrollVelocityRow
+              baseVelocity={40}
+              rowIndex={0}
+              paused={!!selectedQuiz}>
               AI Education Smart Learning Intelligent Teaching Digital Classroom
             </ScrollVelocityRow>
-            <ScrollVelocityRow baseVelocity={40} rowIndex={1}>
+            <ScrollVelocityRow
+              baseVelocity={40}
+              rowIndex={1}
+              paused={!!selectedQuiz}>
               Adaptive Assessment Personalized Learning Virtual Teacher
               Cognitive Training
             </ScrollVelocityRow>
-            <ScrollVelocityRow baseVelocity={40} rowIndex={2}>
+            <ScrollVelocityRow
+              baseVelocity={40}
+              rowIndex={2}
+              paused={!!selectedQuiz}>
               Educational Analytics Student Engagement Knowledge Discovery
               Learning Analytics
             </ScrollVelocityRow>
-            <ScrollVelocityRow baseVelocity={40} rowIndex={3}>
+            <ScrollVelocityRow
+              baseVelocity={40}
+              rowIndex={3}
+              paused={!!selectedQuiz}>
               Artificial Intelligence Machine Learning Neural Networks Cognitive
               Computing
             </ScrollVelocityRow>
-            <ScrollVelocityRow baseVelocity={40} rowIndex={4}>
+            <ScrollVelocityRow
+              baseVelocity={40}
+              rowIndex={4}
+              paused={!!selectedQuiz}>
               Interactive Assessment Educational Technology Intelligent Tutoring
               Automated Grading
             </ScrollVelocityRow>
-            <ScrollVelocityRow baseVelocity={40} rowIndex={5}>
+            <ScrollVelocityRow
+              baseVelocity={40}
+              rowIndex={5}
+              paused={!!selectedQuiz}>
               AI Education Smart Learning Intelligent Teaching Digital Classroom
             </ScrollVelocityRow>
-            <ScrollVelocityRow baseVelocity={40} rowIndex={6}>
+            <ScrollVelocityRow
+              baseVelocity={40}
+              rowIndex={6}
+              paused={!!selectedQuiz}>
               Adaptive Assessment Personalized Learning Virtual Teacher
               Cognitive Training
             </ScrollVelocityRow>
-            <ScrollVelocityRow baseVelocity={40} rowIndex={7}>
+            <ScrollVelocityRow
+              baseVelocity={40}
+              rowIndex={7}
+              paused={!!selectedQuiz}>
               Educational Analytics Student Engagement Knowledge Discovery
               Learning Analytics
             </ScrollVelocityRow>
-            <ScrollVelocityRow baseVelocity={40} rowIndex={8}>
+            <ScrollVelocityRow
+              baseVelocity={40}
+              rowIndex={8}
+              paused={!!selectedQuiz}>
               Artificial Intelligence Machine Learning Neural Networks Cognitive
               Computing
             </ScrollVelocityRow>
-            <ScrollVelocityRow baseVelocity={40} rowIndex={9}>
+            <ScrollVelocityRow
+              baseVelocity={40}
+              rowIndex={9}
+              paused={!!selectedQuiz}>
               Interactive Assessment Educational Technology Intelligent Tutoring
               Automated Grading
             </ScrollVelocityRow>
@@ -927,162 +1016,175 @@ const QuizLibrary: React.FC = () => {
         </div>
       </section>
 
-      {/* Selected Quiz Preview Modal */}
-      {selectedQuiz && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="w-full max-w-3xl h-[85vh] flex flex-col">
+      {/* Selected Quiz Preview Modal (Radix Dialog) */}
+      <Dialog
+        open={!!selectedQuiz}
+        onOpenChange={(open) => {
+          if (!open) setSelectedQuiz(null);
+        }}>
+        <DialogContent className="p-0 w-full max-w-3xl">
+          <DialogTitle className="sr-only">
+            {selectedQuiz
+              ? `Xem trước quiz: ${selectedQuiz.title}`
+              : "Xem trước quiz"}
+          </DialogTitle>
+          <div className="h-[85vh] flex flex-col">
             <Card className="w-full h-full border-2 rounded-xl shadow-lg bg-card flex flex-col">
-              <CardHeader className="pb-4 border-b bg-card z-10 flex-shrink-0">
+              <CardHeader className="sticky top-0 pb-4 border-b bg-card z-10 flex-shrink-0">
                 <div className="flex justify-between items-start gap-4">
                   <div className="flex-1">
                     <CardTitle className="text-2xl md:text-3xl font-bold mb-2">
-                      {selectedQuiz.title}
+                      {selectedQuiz?.title}
                     </CardTitle>
-                    {selectedQuiz.description && (
+                    {selectedQuiz?.description && (
                       <CardDescription className="text-base">
                         {selectedQuiz.description}
                       </CardDescription>
                     )}
                     <div className="mt-3">
-                      <QuizCategoryBadge
-                        category={selectedQuiz.category}
-                        difficulty={selectedQuiz.difficulty}
-                        size="md"
-                      />
+                      {selectedQuiz && (
+                        <QuizCategoryBadge
+                          category={selectedQuiz.category}
+                          difficulty={selectedQuiz.difficulty}
+                          size="md"
+                        />
+                      )}
                     </div>
                   </div>
                   <Button
                     variant="outline"
                     size="icon"
                     onClick={() => setSelectedQuiz(null)}
-                    className="rounded-full hover:bg-destructive hover:text-destructive-foreground flex-shrink-0">
+                    className="rounded-full hover:bg-destructive hover:text-destructive-foreground flex-shrink-0"
+                    aria-label="Đóng">
                     ✕
                   </Button>
                 </div>
               </CardHeader>
-              <CardContent className="flex-1 overflow-y-auto">
-                <div className="space-y-6">
-                  <div className="flex flex-wrap gap-3 py-4 border-b">
-                    {/* Tags */}
-                    {selectedQuiz.tags && selectedQuiz.tags.length > 0 && (
-                      <QuizTags tags={selectedQuiz.tags} />
-                    )}
-                    <Badge
-                      variant="secondary"
-                      className="bg-[#B5CC89]/20 text-[#B5CC89]">
-                      {Array.isArray(selectedQuiz.questions)
-                        ? selectedQuiz.questions.length
-                        : 0}{" "}
-                      câu hỏi
-                    </Badge>
-                    <Badge variant="secondary" className="bg-secondary/50">
-                      {formatDate(selectedQuiz.created_at)}
-                    </Badge>
-                  </div>
-                  <div className="space-y-4">
-                    <h3 className="font-semibold text-lg mb-4">
-                      Danh sách câu hỏi:
-                    </h3>
-                    {Array.isArray(selectedQuiz.questions) &&
-                    selectedQuiz.questions.length > 0 ? (
-                      (selectedQuiz.questions as QuizQuestion[]).map(
-                        (q, idx) => (
-                          <div
-                            key={idx}
-                            className="border-2 hover:border-[#B5CC89] rounded-lg p-4 space-y-3 transition-colors duration-300 hover:shadow-md">
-                            <h4 className="font-semibold text-base text-foreground">
-                              {idx + 1}. {q.question || "Không có câu hỏi"}
-                            </h4>
-                            <div className="space-y-2 pl-4">
-                              {Array.isArray(q.options) &&
-                              q.options.length > 0 ? (
-                                q.options.map((opt, optIdx) => (
-                                  <div
-                                    key={optIdx}
-                                    className="text-sm text-muted-foreground">
-                                    <span className="font-medium text-foreground">
-                                      {String.fromCharCode(65 + optIdx)}.
-                                    </span>{" "}
-                                    {opt}
+              <CardContent className="flex-1 overflow-y-auto scroll-touch overscroll-contain scrollbar-stable">
+                {selectedQuiz && (
+                  <div className="space-y-6">
+                    <div className="flex flex-wrap gap-3 py-4 border-b">
+                      {/* Tags */}
+                      {selectedQuiz.tags && selectedQuiz.tags.length > 0 && (
+                        <QuizTags tags={selectedQuiz.tags} />
+                      )}
+                      <Badge
+                        variant="secondary"
+                        className="bg-[#B5CC89]/20 text-[#B5CC89]">
+                        {Array.isArray(selectedQuiz.questions)
+                          ? selectedQuiz.questions.length
+                          : 0}{" "}
+                        câu hỏi
+                      </Badge>
+                      <Badge variant="secondary" className="bg-secondary/50">
+                        {formatDate(selectedQuiz.created_at)}
+                      </Badge>
+                    </div>
+                    <div className="space-y-4">
+                      <h3 className="font-semibold text-lg mb-4">
+                        Danh sách câu hỏi:
+                      </h3>
+                      {Array.isArray(selectedQuiz.questions) &&
+                      selectedQuiz.questions.length > 0 ? (
+                        (selectedQuiz.questions as QuizQuestion[]).map(
+                          (q, idx) => (
+                            <div
+                              key={idx}
+                              className="border-2 hover:border-[#B5CC89] rounded-lg p-4 space-y-3 transition-colors duration-300 hover:shadow-md">
+                              <h4 className="font-semibold text-base text-foreground">
+                                {idx + 1}. {q.question || "Không có câu hỏi"}
+                              </h4>
+                              <div className="space-y-2 pl-4">
+                                {Array.isArray(q.options) &&
+                                q.options.length > 0 ? (
+                                  q.options.map((opt, optIdx) => (
+                                    <div
+                                      key={optIdx}
+                                      className="text-sm text-muted-foreground">
+                                      <span className="font-medium text-foreground">
+                                        {String.fromCharCode(65 + optIdx)}.
+                                      </span>{" "}
+                                      {opt}
+                                    </div>
+                                  ))
+                                ) : (
+                                  <div className="text-sm text-muted-foreground italic">
+                                    Không có đáp án
                                   </div>
-                                ))
-                              ) : (
-                                <div className="text-sm text-muted-foreground italic">
-                                  Không có đáp án
+                                )}
+                              </div>
+                              {q.explanation && (
+                                <div className="text-xs text-muted-foreground pt-3 border-t">
+                                  <span className="font-semibold text-foreground">
+                                    Giải thích:
+                                  </span>{" "}
+                                  {q.explanation}
                                 </div>
                               )}
                             </div>
-                            {q.explanation && (
-                              <div className="text-xs text-muted-foreground pt-3 border-t">
-                                <span className="font-semibold text-foreground">
-                                  Giải thích:
-                                </span>{" "}
-                                {q.explanation}
-                              </div>
-                            )}
-                          </div>
+                          )
                         )
-                      )
-                    ) : (
-                      <div className="text-sm text-muted-foreground text-center py-8">
-                        Không có câu hỏi
-                      </div>
-                    )}
+                      ) : (
+                        <div className="text-sm text-muted-foreground text-center py-8">
+                          Không có câu hỏi
+                        </div>
+                      )}
+                    </div>
+                    <Button
+                      onClick={async () => {
+                        try {
+                          // Increment PDF download count
+                          await supabase.rpc("increment_quiz_pdf_download", {
+                            quiz_id: selectedQuiz.id,
+                          });
+                          const questionsArray: Question[] =
+                            normalizeToQuestions(
+                              Array.isArray(selectedQuiz.questions)
+                                ? selectedQuiz.questions
+                                : JSON.parse(
+                                    String(selectedQuiz.questions || "[]")
+                                  )
+                            );
+                          const title = selectedQuiz.title || "quiz";
+                          const filename = `${
+                            title.replace(/\s+/g, "-").toLowerCase() || "quiz"
+                          }.pdf`;
+                          await warmupPdfWorker().catch(() => {});
+                          await generateAndDownloadPdf({
+                            filename,
+                            title,
+                            description: selectedQuiz.description || "",
+                            questions: questionsArray,
+                            showResults: false,
+                            userAnswers: [],
+                          });
+                          toast({
+                            title: "Đã tải xuống PDF",
+                            description: `Đã lưu ${filename}`,
+                            variant: "success",
+                          });
+                        } catch (e) {
+                          console.error("Download quiz PDF error:", e);
+                          toast({
+                            title: "Lỗi",
+                            description: "Không thể tạo/tải PDF.",
+                            variant: "destructive",
+                          });
+                        }
+                      }}
+                      variant="hero"
+                      className="w-full group hover:bg-black hover:text-white">
+                      <Download className="h-4 w-4 mr-2" />
+                      Tải xuống PDF Quiz
+                    </Button>
                   </div>
-                  <Button
-                    onClick={async () => {
-                      try {
-                        // Increment PDF download count
-                        await supabase.rpc("increment_quiz_pdf_download", {
-                          quiz_id: selectedQuiz.id,
-                        });
-
-                        const questionsArray: Question[] = normalizeToQuestions(
-                          Array.isArray(selectedQuiz.questions)
-                            ? selectedQuiz.questions
-                            : JSON.parse(String(selectedQuiz.questions || "[]"))
-                        );
-
-                        const title = selectedQuiz.title || "quiz";
-                        const filename = `${
-                          title.replace(/\s+/g, "-").toLowerCase() || "quiz"
-                        }.pdf`;
-
-                        await warmupPdfWorker().catch(() => {});
-                        await generateAndDownloadPdf({
-                          filename,
-                          title,
-                          description: selectedQuiz.description || "",
-                          questions: questionsArray,
-                          showResults: false,
-                          userAnswers: [],
-                        });
-
-                        toast({
-                          title: "Đã tải xuống PDF",
-                          description: `Đã lưu ${filename}`,
-                          variant: "success",
-                        });
-                      } catch (e) {
-                        console.error("Download quiz PDF error:", e);
-                        toast({
-                          title: "Lỗi",
-                          description: "Không thể tạo/tải PDF.",
-                          variant: "destructive",
-                        });
-                      }
-                    }}
-                    variant="hero"
-                    className="w-full group hover:bg-black hover:text-white">
-                    <Download className="h-4 w-4 mr-2" />
-                    Tải xuống PDF Quiz
-                  </Button>
-                </div>
+                )}
               </CardContent>
             </Card>
           </div>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
       <AuthModal open={showAuthModal} onOpenChange={setShowAuthModal} />
     </div>
   );

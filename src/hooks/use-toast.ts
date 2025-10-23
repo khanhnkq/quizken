@@ -38,18 +38,22 @@ function renderContent(
   const iconMap: Record<Variant, React.ReactNode> = {
     default: null,
     success: React.createElement(CheckCircle, {
+      key: "icon",
       className: "w-5 h-5 flex-shrink-0 mt-0.5",
       "aria-hidden": "true",
     }),
     destructive: React.createElement(XCircle, {
+      key: "icon",
       className: "w-5 h-5 flex-shrink-0 mt-0.5",
       "aria-hidden": "true",
     }),
     warning: React.createElement(AlertTriangle, {
+      key: "icon",
       className: "w-5 h-5 flex-shrink-0 mt-0.5",
       "aria-hidden": "true",
     }),
     info: React.createElement(Info, {
+      key: "icon",
       className: "w-5 h-5 flex-shrink-0 mt-0.5",
       "aria-hidden": "true",
     }),

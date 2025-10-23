@@ -1,9 +1,9 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { useLocation } from 'react-router-dom';
-import { gsap } from 'gsap';
-import { ScrollSmoother } from 'gsap/dist/ScrollSmoother';
-import { ArrowUp, Sparkles } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import React, { useEffect, useState, useCallback } from "react";
+import { useLocation } from "react-router-dom";
+import { gsap } from "gsap";
+import ScrollSmoother from "gsap/ScrollSmoother";
+import { ArrowUp, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const ScrollToGeneratorButtonWrapper: React.FC = () => {
   const location = useLocation();
@@ -12,14 +12,15 @@ const ScrollToGeneratorButtonWrapper: React.FC = () => {
 
   // Scroll to generator function
   const scrollToSection = useCallback(() => {
-    const element = document.getElementById('generator');
+    const element = document.getElementById("generator");
     if (element) {
       const yOffset = -100;
-      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
-      
+      const y =
+        element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+
       window.scrollTo({
         top: y,
-        behavior: 'smooth',
+        behavior: "smooth",
       });
     }
   }, []);
@@ -29,7 +30,7 @@ const ScrollToGeneratorButtonWrapper: React.FC = () => {
     let rafId: number | undefined;
 
     const checkScrollPosition = () => {
-      const generatorElement = document.getElementById('generator');
+      const generatorElement = document.getElementById("generator");
       if (generatorElement) {
         const rect = generatorElement.getBoundingClientRect();
         const viewportHeight = window.innerHeight;
@@ -46,11 +47,11 @@ const ScrollToGeneratorButtonWrapper: React.FC = () => {
       rafId = requestAnimationFrame(checkScrollPosition);
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener("scroll", handleScroll, { passive: true });
     checkScrollPosition(); // Initial check
 
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener("scroll", handleScroll);
       if (rafId) {
         cancelAnimationFrame(rafId);
       }
@@ -58,7 +59,7 @@ const ScrollToGeneratorButtonWrapper: React.FC = () => {
   }, []);
 
   // Only show on Index page and when scrolled past generator
-  const shouldShow = location.pathname === '/' && isScrolledPast;
+  const shouldShow = location.pathname === "/" && isScrolledPast;
 
   // Update position based on ScrollSmoother
   useEffect(() => {
@@ -95,28 +96,26 @@ const ScrollToGeneratorButtonWrapper: React.FC = () => {
   return (
     <div
       style={{
-        position: 'absolute',
+        position: "absolute",
         top: `${position.top}px`,
         right: `${position.right}px`,
         zIndex: 50,
       }}
-      className="transition-opacity duration-150"
-    >
+      className="transition-opacity duration-150">
       <Button
         onClick={scrollToSection}
         size="lg"
         className="group relative overflow-hidden bg-gradient-to-r from-[#B5CC89] to-[#9BB76A] hover:from-[#9BB76A] hover:to-[#8AA659] text-black hover:text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-full p-4 h-auto min-w-[60px] md:min-w-auto md:px-6"
-        aria-label="Trở về section tạo quiz"
-      >
+        aria-label="Trở về section tạo quiz">
         {/* Background animation */}
         <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity duration-300 rounded-full" />
-        
+
         {/* Mobile: Only icons */}
         <div className="flex items-center gap-2 md:hidden">
           <Sparkles className="w-5 h-5" />
           <ArrowUp className="w-4 h-4" />
         </div>
-        
+
         {/* Desktop: Icons + text */}
         <div className="hidden md:flex items-center gap-2">
           <Sparkles className="w-5 h-5" />

@@ -1,8 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Sparkles, Zap, Brain } from "lucide-react";
-import { useState, useEffect, type MouseEvent } from "react";
+import { useState, useEffect, type MouseEvent, lazy, Suspense } from "react";
 import { gsap } from "gsap";
-import ThreeBackground from "@/components/ThreeBackground";
+const ThreeBackground = lazy(() => import("@/components/ThreeBackground"));
 import { useNavigate } from "react-router-dom";
 
 const Hero = () => {
@@ -94,7 +94,9 @@ const Hero = () => {
     <section
       id="hero"
       className="relative overflow-hidden bg-gradient-to-b from-secondary/30 to-background min-h-[90svh] md:min-h-screen py-16 sm:py-20 md:py-28 px-4">
-      <ThreeBackground />
+      <Suspense fallback={null}>
+        <ThreeBackground />
+      </Suspense>
       <div className="container mx-auto max-w-7xl">
         <div className="max-w-4xl mx-auto text-center space-y-6 md:space-y-8 lg:space-y-10">
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-normal leading-snug md:leading-normal group hover:text-primary transition-all duration-500 hover:drop-shadow-2xl hover:scale-105 cursor-pointer">
