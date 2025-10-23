@@ -186,7 +186,8 @@ const App = () => {
             {/* 👇 Toaster nằm ngoài ScrollSmoother */}
             <HotToaster />
             <ToastBroadcastReceiver />
-            <BrowserRouter>
+            <BrowserRouter
+              future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
               <AnimatedRoutes />
               {/* 👇 ScrollToGeneratorButton renders outside AnimatedRoutes to avoid fixed position issues */}
               <ScrollToGeneratorButtonWrapper />
