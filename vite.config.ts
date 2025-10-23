@@ -11,7 +11,7 @@ export default defineConfig({
   // tính năng SPA fallback (trả về index.html cho mọi đường dẫn).
   // Nếu cách này sửa được lỗi font, nó xác nhận
   // middleware của Vite đang chạy sai thứ tự.
-  appType: "mpa",
+  appType: "spa",
 
   // THÊM DÒNG NÀY (để chỉ định rõ ràng)
   publicDir: "public",
@@ -47,7 +47,7 @@ export default defineConfig({
             if (id.includes("gsap")) return "gsap";
             if (id.includes("three")) return "three";
             if (id.includes("@radix-ui")) return "vendor";
-            if (id.includes("lucide-react")) return "icons";
+            if (id.includes("lucide-react")) return "vendor";
             if (id.includes("date-fns")) return "date-fns";
             if (id.includes("recharts")) return "charts";
             if (id.includes("@supabase/supabase-js")) return "supabase";
@@ -66,8 +66,8 @@ export default defineConfig({
     // Tránh pre-bundle các GSAP plugins nặng vào initial deps
     exclude: ["gsap/ScrollTrigger", "gsap/dist/ScrollSmoother"],
 
-    // THÊM DÒNG NÀY (để buộc Vite pre-bundle file UMD)
-    include: ["jspdf/dist/jspdf.umd.min.js"],
+    // THÊM DÒNG NÀY (để buộc Vite pre-bundle file UMD) và đảm bảo lucide-react được pre-bundle cùng React
+    include: ["jspdf/dist/jspdf.umd.min.js", "lucide-react"],
   },
   worker: {
     format: "es",
