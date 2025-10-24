@@ -28,6 +28,13 @@ export const shopFavorites: ShopFavorite[] = [
     href: "https://s.shopee.vn/6psJM9UzIO",
     image:
       "https://product.hstatic.net/200000420363/product/r1_8747f811-5ede-47a6-8b88-4b992277d196_f8b1eeef02df44a1ae59fc10b58231a7_master.jpg",
-    note: "Dùng khi làm web này",
+    note: "Dùng siêu mượt, siêu bền cho công việc và học tập",
+  },
+  {
+    title: "Giá đỡ laptop",
+    href: "https://s.shopee.vn/4q7HBFs39i",
+    image:
+      "https://laptop360.net/wp-content/uploads/2023/08/Thiet-ke-chua-co-ten-2.png",
+    note: "Siêu cần thiết để giảm đau cổ khi làm việc lâu",
   },
 ];

@@ -16,7 +16,7 @@ import {
   Zap,
   Users,
   MousePointer,
-} from '@/lib/icons';
+} from "@/lib/icons";
 import logo from "@/assets/logo/logo.png";
 import { useEffect, useState, type MouseEvent } from "react";
 import { gsap } from "gsap";
@@ -380,7 +380,7 @@ export const AboutShopFavorites = ({
       <div className="container mx-auto max-w-7xl space-y-6">
         <div className="text-center space-y-3">
           <h2 className="text-3xl md:text-4xl font-bold">
-            Các sản phẩm mình yêu thích & dùng khi làm web này
+            Các sản phẩm mình dùng
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Danh sách những món đồ hỗ trợ mình trong quá trình xây dựng QuizKen.

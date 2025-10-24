@@ -63,11 +63,11 @@ const Index = () => {
                 (document.querySelector("nav") as HTMLElement | null)
                   ?.clientHeight ?? 64;
               const marginCompensation = 8;
-              // Use element target + explicit offset to avoid jerks
+              // Use element target + explicit negative offset to account for sticky navbar
               smoother.scrollTo(
                 quizElement,
                 true,
-                headerHeight + marginCompensation
+                -(headerHeight + marginCompensation)
               );
               return; // Success, exit early
             }
