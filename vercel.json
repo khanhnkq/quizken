@@ -2,11 +2,5 @@
   "version": 2,
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "rewrites": [
-    { "source": "/assets/:match*", "destination": "/assets/:match*" },
-    { "source": "/favicon/:match*", "destination": "/favicon/:match*" },
-    { "source": "/site.webmanifest", "destination": "/site.webmanifest" },
-    { "source": "/:all*(js|css|map|json|png|jpg|jpeg|gif|svg|webp|ico|mp3|wav|webm|woff|woff2|ttf|otf|glb|gltf|bin)", "destination": "/:all*" },
-    { "source": "/(.*)", "destination": "/index.html" }
-  ]
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }

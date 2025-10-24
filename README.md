@@ -34,6 +34,37 @@ Triển khai frontend trên Vercel với SPA fallback và backend bằng Supabas
    - Output Directory: dist
    - Node Version: 20 (hoặc 18+)
 
+### File cấu hình đã thêm cho deploy
+
+Tôi đã tạo và commit các file cấu hình sau để hỗ trợ triển khai:
+
+- [`vercel.json`](vercel.json:1) — cấu hình rewrite SPA và outputDirectory = "dist"
+- [`.env.example`](.env.example:1) — mẫu biến môi trường frontend (VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY)
+- [`.github/workflows/ci.yml`](.github/workflows/ci.yml:1) — CI (lint + build) chạy trên push / PR vào nhánh main
+
+Hướng dẫn triển khai nhanh:
+
+- Trên Vercel (Project): set Env Vars
+
+  - VITE_SUPABASE_URL=https://your-project.supabase.co
+  - VITE_SUPABASE_ANON_KEY=your_anon_key_here
+    (Sau khi thay đổi domain → thực hiện Redeploy với "Clear Build Cache".)
+
+- Trên Supabase (CLI / Dashboard): set secrets cho Edge Function
+  - GEMINI_API_KEY, PROJECT_URL, SERVICE_ROLE_KEY
+
+Lệnh Supabase cơ bản (local, đã login):
+
+```bash
+supabase login
+supabase link --project-ref vjfpjojwpsrqznmifrjj
+supabase secrets set GEMINI_API_KEY=... PROJECT_URL=... SERVICE_ROLE_KEY=...
+supabase db push
+supabase functions deploy generate-quiz
+```
+
+Ghi chú: frontend sử dụng biến VITE\_\* tại [src/integrations/supabase/client.ts:5](src/integrations/supabase/client.ts:5).
+
 ### Bước 3: Biến môi trường
 
 - Trên Vercel (Frontend):
