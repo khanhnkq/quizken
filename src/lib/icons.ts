@@ -1,119 +1,226 @@
 /**
- * Lightweight icon shim to avoid runtime forwardRef/third-party icon bundle race issues
- * Replaces heavy icon imports with a generic placeholder SVG for production/build stability.
+ * Icon bridge — import trực tiếp các icon từ @radix-ui/react-icons
+ * và re-export với tên mà project đã sử dụng.
  *
- * Rationale:
- * - Some icon libs create components using React.forwardRef and can be bundled in a way that
- *   causes `forwardRef` to be undefined at runtime in certain vendor chunk ordering.
- * - To guarantee a stable build for deploy, export lightweight placeholder icons that do not
- *   depend on external icon packages.
- *
- * Note: visually these are placeholders (simple circle). Replace individual icons with
- * proper SVG paths later if you want full fidelity.
+ * Nếu Radix không có icon chính xác, dùng icon tương đương gần nhất.
+ */
+import React from "react";
+import {
+  Cross1Icon,
+  CrossCircledIcon,
+  CheckIcon,
+  CheckCircledIcon,
+  MagnifyingGlassIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  ArrowUpIcon,
+  ArrowDownIcon,
+  HamburgerMenuIcon,
+  PersonIcon,
+  LockClosedIcon,
+  LoopIcon,
+  MagicWandIcon,
+  LightningBoltIcon,
+  DownloadIcon,
+  TrashIcon,
+  ClipboardCopyIcon,
+  PauseIcon,
+  StarIcon,
+  DotIcon,
+  DotsHorizontalIcon,
+  ClockIcon,
+  InfoCircledIcon,
+  ExclamationTriangleIcon,
+  ReaderIcon,
+  EnterIcon,
+  ChatBubbleIcon,
+  ExitIcon,
+  GearIcon,
+  GroupIcon,
+  AlignLeftIcon,
+  CursorArrowIcon,
+  DragHandleVerticalIcon,
+  DoubleArrowUpIcon,
+  FileTextIcon,
+  VideoIcon,
+  SpeakerLoudIcon,
+  ColorWheelIcon,
+  BackpackIcon,
+  PieChartIcon,
+  TextIcon,
+  PinTopIcon,
+  BadgeIcon,
+  TrackNextIcon,
+  LaptopIcon,
+  MixerHorizontalIcon,
+  EyeOpenIcon,
+  EyeClosedIcon,
+  CircleIcon,
+} from "@radix-ui/react-icons";
+
+export type AppIcon = React.ComponentType<
+  React.SVGProps<SVGSVGElement> & { size?: number }
+>;
+export type LucideIcon = AppIcon;
+
+/**
+ * Re-exports: map tên dùng trong project -> Radix icon component
+ * Những tên không tồn tại 1:1 được ánh xạ sang icon gần nhất.
  */
 
-import React from "react";
+export const X = Cross1Icon;
+export const XCircle = CrossCircledIcon;
 
-export type AppIcon = (
-  props: React.SVGProps<SVGSVGElement> & { size?: number }
-) => JSX.Element;
+export const Check = CheckIcon;
+export const CheckCircle = CheckCircledIcon;
+export const CircleCheck = CheckCircledIcon;
+export const Circle = CircleIcon;
 
-const GenericIcon: AppIcon = ({ size = 24, ...props }) =>
-  React.createElement(
-    "svg",
-    {
-      width: size,
-      height: size,
-      viewBox: "0 0 24 24",
-      fill: "none",
-      stroke: "currentColor",
-      strokeWidth: 2,
-      strokeLinecap: "round",
-      strokeLinejoin: "round",
-      ...props,
-    },
-    React.createElement("circle", { cx: 12, cy: 12, r: 8 })
-  );
+export const Search = MagnifyingGlassIcon;
 
-const make = (_name: string): AppIcon => GenericIcon;
+export const ChevronLeft = ChevronLeftIcon;
+export const ChevronRight = ChevronRightIcon;
+export const ChevronDown = ChevronDownIcon;
+export const ChevronUp = ChevronUpIcon;
 
-/* Export the same API surface as before but return the lightweight placeholder */
-export const ArrowUp = make("ArrowUp");
-export const ArrowLeft = make("ArrowLeft");
-export const ArrowRight = make("ArrowRight");
-export const ArrowDown = make("ArrowDown");
-export const ArrowUpDown = make("ArrowUpDown");
+export const ArrowLeft = ArrowLeftIcon;
+export const ArrowRight = ArrowRightIcon;
+export const ArrowUp = ArrowUpIcon;
+export const ArrowDown = ArrowDownIcon;
+export const ArrowUpDown = DoubleArrowUpIcon;
 
-export const Sparkles = make("Sparkles");
-export const Zap = make("Zap");
-export const Brain = make("Brain");
+export const Menu = HamburgerMenuIcon;
+export const LogOut = ExitIcon;
+export const User = PersonIcon;
+export const Settings = GearIcon;
+export const Loader2 = LoopIcon;
+export const Shield = LockClosedIcon;
+export const LogIn = EnterIcon;
+export const Sparkles = MagicWandIcon;
+export const Brain = MagicWandIcon;
+export const Zap = LightningBoltIcon;
+export const Download = DownloadIcon;
+export const FileDown = FileTextIcon;
+export const Trash2 = TrashIcon;
+export const ClipboardPaste = ClipboardCopyIcon;
+export const PauseCircle = PauseIcon;
+export const Star = StarIcon;
+export const Dot = DotIcon;
+export const MoreHorizontal = DotsHorizontalIcon;
+export const Clock = ClockIcon;
+export const Info = InfoCircledIcon;
+export const AlertTriangle = ExclamationTriangleIcon;
+export const Key = LockClosedIcon;
+export const Eye = EyeOpenIcon;
+export const EyeOff = EyeClosedIcon;
+export const Save = DownloadIcon;
+export const MessageSquare = ChatBubbleIcon;
 
-export const Loader2 = make("Loader2");
-export const Shield = make("Shield");
-export const LogIn = make("LogIn");
-export const LogOut = make("LogOut");
+export const Book = ReaderIcon;
+export const BookOpen = ReaderIcon;
+export const GraduationCap = ReaderIcon;
+export const Microscope = MagnifyingGlassIcon;
+export const Film = VideoIcon;
+export const Target = PinTopIcon;
+export const Calculator = PieChartIcon;
+export const Scroll = TextIcon;
+export const MapPin = PinTopIcon;
+export const Laptop = LaptopIcon;
+export const Briefcase = BackpackIcon;
+export const Trophy = BadgeIcon;
+export const Award = BadgeIcon;
+export const FlaskConical = PieChartIcon;
+export const Globe = PinTopIcon;
+export const Heart = StarIcon;
+export const Tag = BadgeIcon;
+export const AlertCircle = InfoCircledIcon;
+export const Palette = ColorWheelIcon;
+export const Music = SpeakerLoudIcon;
+export const Music4 = SpeakerLoudIcon;
+export const FileDownAlt = FileTextIcon;
 
-export const BookOpen = make("BookOpen");
-export const Book = make("Book");
-export const GraduationCap = make("GraduationCap");
-export const Microscope = make("Microscope");
-export const FlaskConical = make("FlaskConical");
-export const Film = make("Film");
-export const Target = make("Target");
-export const Globe = make("Globe");
-export const Calculator = make("Calculator");
-export const Scroll = make("Scroll");
-export const MapPin = make("MapPin");
-export const Laptop = make("Laptop");
-export const Briefcase = make("Briefcase");
-export const Heart = make("Heart");
-export const Trophy = make("Trophy");
-export const Award = make("Award");
-export const Palette = make("Palette");
-export const Music = make("Music");
-export const Music4 = make("Music4");
-export const Tag = make("Tag");
-export const Filter = make("Filter");
-export const TrendingUp = make("TrendingUp");
-export const FileDown = make("FileDown");
+export const TrendingUp = ArrowUpIcon;
 
-export const CircleCheck = make("CircleCheck");
-export const AlertCircle = make("AlertCircle");
-export const AlertTriangle = make("AlertTriangle");
+export const Users = GroupIcon;
+export const Filter = MixerHorizontalIcon;
+export const PanelLeft = AlignLeftIcon;
+export const MousePointer = CursorArrowIcon;
+export const GripVertical = DragHandleVerticalIcon;
 
-export const Menu = make("Menu");
-export const User = make("User");
-export const Users = make("Users");
-export const Settings = make("Settings");
-export const Star = make("Star");
-export const MessageSquare = make("MessageSquare");
-export const X = make("X");
-export const XCircle = make("XCircle");
-export const Download = make("Download");
-export const PauseCircle = make("PauseCircle");
-
-export const ChevronLeft = make("ChevronLeft");
-export const ChevronRight = make("ChevronRight");
-export const ChevronDown = make("ChevronDown");
-export const ChevronUp = make("ChevronUp");
-
-export const Check = make("Check");
-export const Circle = make("Circle");
-export const MoreHorizontal = make("MoreHorizontal");
-export const Search = make("Search");
-export const Clock = make("Clock");
-export const PanelLeft = make("PanelLeft");
-export const GripVertical = make("GripVertical");
-export const Dot = make("Dot");
-export const MousePointer = make("MousePointer");
-export const ClipboardPaste = make("ClipboardPaste");
-
-export const CheckCircle = make("CheckCircle");
-export const Info = make("Info");
-
-export const Key = make("Key");
-export const Eye = make("Eye");
-export const EyeOff = make("EyeOff");
-
-export const Save = make("Save");
-export const Trash2 = make("Trash2");
+/**
+ * Generic maker to get an icon by name if needed.
+ * Returns a React component (may be undefined if Radix has no matching export).
+ */
+export const make = (name: string): AppIcon | undefined => {
+  const map: Record<string, AppIcon> = {
+    X: Cross1Icon,
+    XCircle: CrossCircledIcon,
+    Check: CheckIcon,
+    CheckCircle: CheckCircledIcon,
+    Search: MagnifyingGlassIcon,
+    ChevronLeft: ChevronLeftIcon,
+    ChevronRight: ChevronRightIcon,
+    ChevronDown: ChevronDownIcon,
+    ChevronUp: ChevronUpIcon,
+    ArrowLeft: ArrowLeftIcon,
+    ArrowRight: ArrowRightIcon,
+    ArrowUp: ArrowUpIcon,
+    ArrowDown: ArrowDownIcon,
+    ArrowUpDown: DoubleArrowUpIcon,
+    Menu: HamburgerMenuIcon,
+    LogOut: ExitIcon,
+    User: PersonIcon,
+    Settings: GearIcon,
+    Loader2: LoopIcon,
+    Shield: LockClosedIcon,
+    LogIn: EnterIcon,
+    Sparkles: MagicWandIcon,
+    Zap: LightningBoltIcon,
+    Download: DownloadIcon,
+    Trash2: TrashIcon,
+    ClipboardPaste: ClipboardCopyIcon,
+    PauseCircle: PauseIcon,
+    Star: StarIcon,
+    Dot: DotIcon,
+    MoreHorizontal: DotsHorizontalIcon,
+    Clock: ClockIcon,
+    Info: InfoCircledIcon,
+    AlertTriangle: ExclamationTriangleIcon,
+    Key: LockClosedIcon,
+    Eye: EyeOpenIcon,
+    EyeOff: EyeClosedIcon,
+    Save: DownloadIcon,
+    MessageSquare: ChatBubbleIcon,
+    Book: ReaderIcon,
+    GraduationCap: ReaderIcon,
+    Microscope: MagnifyingGlassIcon,
+    Film: VideoIcon,
+    Target: PinTopIcon,
+    Calculator: PieChartIcon,
+    Scroll: TextIcon,
+    MapPin: PinTopIcon,
+    Laptop: LaptopIcon,
+    Briefcase: BackpackIcon,
+    Trophy: BadgeIcon,
+    Award: BadgeIcon,
+    FlaskConical: PieChartIcon,
+    Globe: PinTopIcon,
+    Heart: StarIcon,
+    Tag: BadgeIcon,
+    AlertCircle: InfoCircledIcon,
+    Palette: ColorWheelIcon,
+    Music: SpeakerLoudIcon,
+    FileDown: FileTextIcon as unknown as AppIcon,
+    TrendingUp: ArrowUpIcon as unknown as AppIcon,
+    Users: GroupIcon,
+    Filter: MixerHorizontalIcon as unknown as AppIcon,
+    PanelLeft: AlignLeftIcon as unknown as AppIcon,
+    MousePointer: CursorArrowIcon as unknown as AppIcon,
+    GripVertical: DragHandleVerticalIcon as unknown as AppIcon,
+  };
+  return map[name];
+};

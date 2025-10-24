@@ -13,6 +13,7 @@ const QuizLibrary = lazy(() => import("./components/library/QuizLibrary"));
 import ScrollToGeneratorButtonWrapper from "./components/ScrollToGeneratorButtonWrapper";
 import { SoundProvider } from "@/contexts/SoundContext";
 import { ChillMusicProvider } from "@/contexts/ChillMusicContext";
+import { Analytics } from "@vercel/analytics/next";
 
 // GSAP plugins are loaded dynamically in useLayoutEffect to reduce initial bundle size
 
