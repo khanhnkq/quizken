@@ -51,8 +51,7 @@ const Footer = () => {
               Bắt đầu tạo các bài kiểm tra tuyệt vời ngay hôm nay
             </h2>
             <p className="text-lg text-muted-foreground">
-              Tham gia cùng các nhà giáo dục trên toàn thế giới đang thay đổi
-              cách họ tạo nội dung giáo dục với AI.
+              Cùng tham gia và chia sẻ kiến thức
             </p>
             <div className="flex justify-center">
               <Button
@@ -85,102 +84,6 @@ const Footer = () => {
       </div>
 
       {/* Footer Links */}
-      <div className="border-t py-12 px-4">
-        <div className="container mx-auto max-w-7xl">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div className="space-y-4">
-              <h3 className="text-xl font-bold">QuizKen</h3>
-              <p className="text-sm text-muted-foreground">
-                Tạo quiz bằng AI cho nhà giáo và người tạo nội dung trên toàn
-                thế giới.
-              </p>
-            </div>
-
-            <div>
-              <h4 className="font-semibold mb-4">Tính năng</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>
-                  <a href="#" className="hover:text-primary transition-colors">
-                    Trình tạo quiz
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-primary transition-colors">
-                    Chủ đề tùy chỉnh
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-primary transition-colors">
-                    Tùy chọn xuất
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-primary transition-colors">
-                    Mô hình AI
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-semibold mb-4">Công ty</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>
-                  <a
-                    href="https://www.facebook.com/qkanengk30825"
-                    className="hover:text-primary transition-colors">
-                    Về chúng tôi
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-primary transition-colors">
-                    Blog
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-primary transition-colors">
-                    Tuyển dụng
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="https://www.facebook.com/qkanengk30825"
-                    target="_blank"
-                    className="hover:text-primary transition-colors">
-                    Liên hệ
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-semibold mb-4">Hỗ trợ</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>
-                  <a href="#" className="hover:text-primary transition-colors">
-                    Trung tâm trợ giúp
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-primary transition-colors">
-                    Chính sách bảo mật
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-primary transition-colors">
-                    Điều khoản dịch vụ
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-primary transition-colors">
-                    Câu hỏi thường gặp
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* Copyright */}
       <div className="border-t py-6 px-4">

@@ -300,14 +300,14 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                       questionRefs.current[idx] = element;
                     }}
                     className="border-2 hover:border-[#B5CC89] transition-colors duration-300 hover:shadow-lg">
-                    <CardContent className="p-8 space-y-4">
+                    <CardContent className="p-4 sm:p-6 md:p-8 space-y-3 sm:space-y-4">
                       <div className="space-y-3">
                         {q.question && (
                           <h3 className="text-lg font-semibold text-foreground">
                             {idx + 1}. {q.question}
                           </h3>
                         )}
-                        <div className="space-y-2">
+                        <div className="flex flex-col gap-2">
                           {q.options && Array.isArray(q.options) ? (
                             q.options.map((option, optIdx) => {
                               const isSelected = userAnswers[idx] === optIdx;
@@ -320,7 +320,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                               return (
                                 <label
                                   key={optIdx}
-                                  className={`flex items-center p-3 rounded-lg border cursor-pointer ${
+                                  className={`flex items-start gap-2 p-2 sm:p-3 rounded-lg border cursor-pointer ${
                                     showResults && isCorrect
                                       ? "bg-green-50 border-green-500"
                                       : userSelectedWrong
@@ -339,12 +339,14 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                                       handleAnswerSelect(idx, optIdx);
                                     }}
                                     disabled={showResults}
-                                    className="mr-3"
+                                    className="h-4 w-4 shrink-0 mr-2 sm:mr-3 mt-0.5"
                                   />
-                                  <span className="font-medium mr-2">
+                                  <span className="font-medium mr-2 select-none mt-0.5">
                                     {String.fromCharCode(65 + optIdx)}.
                                   </span>
-                                  <span className="flex-1">{option}</span>
+                                  <span className="flex-1 whitespace-normal break-words leading-snug text-sm sm:text-base">
+                                    {option}
+                                  </span>
                                   {showResults && isCorrect && (
                                     <span className="ml-2 text-green-600 font-semibold">
                                       ✓ Đáp án đúng
