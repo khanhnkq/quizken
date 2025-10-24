@@ -750,7 +750,7 @@ const QuizGenerator = () => {
         );
       // Debug: log the raw response from Supabase Functions to ensure frontend receives quiz id
       // (Remove these logs after debugging)
-      // eslint-disable-next-line no-console
+       
       console.log("[DEBUG] generate-quiz/start-quiz response:", {
         startResponse,
         startError,

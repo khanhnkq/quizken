@@ -1,4 +1,5 @@
 /// <reference lib="webworker" />
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 // BƯỚC 1: Import toàn bộ module UMD
 import * as jsPDFAll from "jspdf/dist/jspdf.umd.min.js";
@@ -87,7 +88,7 @@ const arrayBufferToBase64 = (buffer: ArrayBuffer) => {
   return btoa(binary);
 };
 
-const ensurePdfVnFont = async (doc: jsPDF) => {
+const ensurePdfVnFont = async (doc: any) => {
   const g = globalThis as unknown as {
     __pdfVnFontDataReg?: string;
     __pdfVnFontDataBold?: string;
@@ -167,7 +168,7 @@ const ensurePdfVnFont = async (doc: jsPDF) => {
  * Tùy chọn nạp theo nhu cầu để giảm tải ban đầu.
  */
 const ensurePdfCjkFonts = async (
-  doc: jsPDF,
+  doc: any,
   opts?: { needSC?: boolean; needJP?: boolean; needKR?: boolean }
 ): Promise<{
   any: boolean;

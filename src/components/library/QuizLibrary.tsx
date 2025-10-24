@@ -1,5 +1,5 @@
 import * as React from "react";
-import {  useState, useEffect, useMemo, useCallback  } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -35,7 +35,7 @@ import {
   X,
   Filter,
   ArrowUpDown,
-} from '@/lib/icons';
+} from "@/lib/icons";
 import { warmupPdfWorker, generateAndDownloadPdf } from "@/lib/pdfWorkerClient";
 import type { Question } from "@/types/quiz";
 import {
@@ -157,7 +157,16 @@ const QuizLibrary: React.FC = () => {
 
   // Pause/Resume GSAP ScrollSmoother khi mở/đóng modal xem trước quiz
   useEffect(() => {
-    const smoother = (ScrollSmoother as any)?.get?.();
+    type ScrollSmootherInterface = {
+      get?: () => {
+        paused?: (v?: boolean) => void;
+        pause?: () => void;
+        resume?: () => void;
+      };
+    };
+    const smoother = (
+      ScrollSmoother as unknown as ScrollSmootherInterface
+    ).get?.();
     if (!smoother) return;
     try {
       if (selectedQuiz) {

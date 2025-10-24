@@ -22,13 +22,24 @@ export const useGenerationPersistence = () => {
     }
   }, []);
 
-  const write = useCallback((partial: GenState) => {
-    try {
-      const current = read() || {};
-      const next = { ...current, ...partial, timestamp: Date.now() } as GenState;
-      localStorage.setItem(KEY, JSON.stringify(next));
-    } catch {}
-  }, [read]);
+  const write = useCallback(
+    (partial: GenState) => {
+      try {
+        const current = read() || {};
+        const next = {
+          ...current,
+          ...partial,
+          timestamp: Date.now(),
+        } as GenState;
+        localStorage.setItem(KEY, JSON.stringify(next));
+      } catch (e) {
+        // Log to help debug storage issues (e.g. quota, privacy settings)
+         
+        console.warn("useGenerationPersistence write error:", e);
+      }
+    },
+    [read]
+  );
 
   const clear = useCallback(() => {
     localStorage.removeItem(KEY);

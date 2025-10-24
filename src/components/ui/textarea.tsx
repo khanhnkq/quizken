@@ -63,7 +63,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         const sanitized = sanitizeVietnameseBadwords(val, maskChar);
         if (sanitized !== val) {
           // debug: log original vs sanitized to help diagnose multi-word cases
-          // eslint-disable-next-line no-console
+           
           console.debug("[Textarea] sanitize", { val, sanitized });
           // For uncontrolled inputs, updating the DOM value is enough.
           e.currentTarget.value = sanitized;

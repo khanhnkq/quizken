@@ -19,7 +19,7 @@ interface StartPollingCallbacks<Quiz> {
   onProgress?: (status: Status, progress: string) => void;
 }
 
-export function useQuizGeneration<Quiz = any>() {
+export function useQuizGeneration<Quiz = unknown>() {
   const [status, setStatus] = useState<Status>(null);
   const [progress, setProgress] = useState<string>("");
   const [isPolling, setIsPolling] = useState(false);
@@ -56,7 +56,7 @@ export function useQuizGeneration<Quiz = any>() {
       setProgress("Đang chuẩn bị...");
 
       // Debug: log when polling starts
-      // eslint-disable-next-line no-console
+       
       console.log(
         `[useQuizGeneration] startPolling called for quizId=${quizId}`
       );
@@ -64,7 +64,7 @@ export function useQuizGeneration<Quiz = any>() {
       const interval = setInterval(async () => {
         try {
           // Debug: log each poll attempt
-          // eslint-disable-next-line no-console
+           
           console.log(`[useQuizGeneration] polling quizId=${quizId}...`);
 
           // Use GET without a body to avoid fetch errors in browsers (some runtimes disallow GET with body)
@@ -79,7 +79,7 @@ export function useQuizGeneration<Quiz = any>() {
             invokeOptions
           );
           if (error) {
-            // eslint-disable-next-line no-console
+             
             console.warn("[useQuizGeneration] polling error:", error);
             throw error;
           }
@@ -105,7 +105,7 @@ export function useQuizGeneration<Quiz = any>() {
           }
         } catch (err) {
           // keep polling; transient errors are ignored
-          // eslint-disable-next-line no-console
+           
           console.debug(
             "[useQuizGeneration] poll caught error (ignored):",
             err
