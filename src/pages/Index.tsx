@@ -59,8 +59,16 @@ const Index = () => {
             const smoother = ScrollSmoother.get();
 
             if (smoother) {
-              // Smooth scroll with animation (true = smooth, false = instant)
-              smoother.scrollTo(quizElement, true, "top 20px");
+              const headerHeight =
+                (document.querySelector("nav") as HTMLElement | null)
+                  ?.clientHeight ?? 64;
+              const marginCompensation = 8;
+              // Use element target + explicit offset to avoid jerks
+              smoother.scrollTo(
+                quizElement,
+                true,
+                headerHeight + marginCompensation
+              );
               return; // Success, exit early
             }
           } catch (e) {
@@ -85,21 +93,11 @@ const Index = () => {
           const offset = headerHeight + marginCompensation;
           const targetY = elementTop - offset;
 
-          // Try both methods
+          // Single method: native smooth scroll with navbar offset
           window.scrollTo({
             top: targetY,
             behavior: "smooth",
           });
-
-          // Also try scrollIntoView as backup
-          setTimeout(() => {
-            quizElement.scrollIntoView({
-              behavior: "smooth",
-              block: "start",
-            });
-            // Ensure the section is fully visible beneath the sticky navbar
-            window.scrollBy({ top: -offset, behavior: "smooth" });
-          }, 100);
         }
       };
 

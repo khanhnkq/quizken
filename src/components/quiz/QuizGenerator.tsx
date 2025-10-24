@@ -120,6 +120,9 @@ const QuizGenerator = () => {
   const [isQuestionCountSelected, setIsQuestionCountSelected] =
     useState<boolean>(false);
   const location = useLocation();
+  const cameFromLibraryRef = React.useRef<boolean>(
+    !!(location.state as { scrollToQuiz?: boolean } | null)?.scrollToQuiz
+  );
   const isMobile = useIsMobile();
   const abortControllerRef = React.useRef<AbortController | null>(null);
   const isMountedRef = React.useRef<boolean>(true);
@@ -237,6 +240,47 @@ const QuizGenerator = () => {
     };
   }, []); // Empty dependency array - only run on unmount
 
+  // Smooth scroll helper with fallback to account for sticky navbar and SPA timing
+  function scrollToWithFallback(sectionId: string) {
+    try {
+      const element = document.getElementById(sectionId);
+      const headerHeight =
+        (document.querySelector("nav") as HTMLElement | null)?.clientHeight ??
+        64;
+      const marginCompensation = 8;
+
+      if (element) {
+        const targetY =
+          element.getBoundingClientRect().top +
+          window.pageYOffset -
+          (headerHeight + marginCompensation);
+
+        window.scrollTo({ top: targetY, behavior: "smooth" });
+
+        // Backup: ensure section sits correctly below sticky navbar
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: "smooth", block: "start" });
+          window.scrollBy({
+            top: -(headerHeight + marginCompensation),
+            behavior: "smooth",
+          });
+        }, 120);
+      } else {
+        // If DOM not ready yet, retry shortly
+        setTimeout(() => {
+          const el = document.getElementById(sectionId);
+          if (!el) return;
+          const y =
+            el.getBoundingClientRect().top +
+            window.pageYOffset -
+            (headerHeight + marginCompensation);
+          window.scrollTo({ top: y, behavior: "smooth" });
+        }, 150);
+      }
+    } catch (e) {
+      console.debug("scrollToWithFallback failed", e);
+    }
+  }
   // If navigation passed a quiz via location.state, preload it into the generator
   React.useEffect(() => {
     type LocationState = { quiz?: Quiz | string } | null;
@@ -250,25 +294,27 @@ const QuizGenerator = () => {
         setUserAnswers([]);
         setShowResults(false);
 
-        // Scroll to quiz section after it renders
-        requestAnimationFrame(() => {
-          const element = document.getElementById("quiz");
-          if (element) {
-            const headerHeight =
-              (document.querySelector("nav") as HTMLElement | null)
-                ?.clientHeight ?? 64;
-            const marginCompensation = 8;
-            const targetY =
-              element.getBoundingClientRect().top +
-              window.pageYOffset -
-              (headerHeight + marginCompensation);
+        // Scroll to quiz section after it renders (skip when navigation already triggers auto-scroll)
+        if (!cameFromLibraryRef.current) {
+          requestAnimationFrame(() => {
+            const element = document.getElementById("quiz");
+            if (element) {
+              const headerHeight =
+                (document.querySelector("nav") as HTMLElement | null)
+                  ?.clientHeight ?? 64;
+              const marginCompensation = 8;
+              const targetY =
+                element.getBoundingClientRect().top +
+                window.pageYOffset -
+                (headerHeight + marginCompensation);
 
-            window.scrollTo({
-              top: targetY,
-              behavior: "smooth",
-            });
-          }
-        });
+              window.scrollTo({
+                top: targetY,
+                behavior: "smooth",
+              });
+            }
+          });
+        }
 
         // Clear history state so navigating back doesn't reopen the quiz unintentionally
         try {
@@ -288,24 +334,26 @@ const QuizGenerator = () => {
   // Tự động cuộn xuống quiz section khi quiz được tạo xong
   useEffect(() => {
     if (quiz) {
-      // Đợi render section điều kiện xong rồi mới scroll
-      requestAnimationFrame(() => {
-        const element = document.getElementById("quiz");
-        if (element) {
-          const headerHeight =
-            (document.querySelector("nav") as HTMLElement | null)
-              ?.clientHeight ?? 64;
-          const marginCompensation = 8;
-          const targetY =
-            element.getBoundingClientRect().top +
-            window.pageYOffset -
-            (headerHeight + marginCompensation);
-          window.scrollTo({
-            top: targetY,
-            behavior: "smooth",
-          });
-        }
-      });
+      // Skip internal auto-scroll if navigation already requested scrolling
+      if (!cameFromLibraryRef.current) {
+        requestAnimationFrame(() => {
+          const element = document.getElementById("quiz");
+          if (element) {
+            const headerHeight =
+              (document.querySelector("nav") as HTMLElement | null)
+                ?.clientHeight ?? 64;
+            const marginCompensation = 8;
+            const targetY =
+              element.getBoundingClientRect().top +
+              window.pageYOffset -
+              (headerHeight + marginCompensation);
+            window.scrollTo({
+              top: targetY,
+              behavior: "smooth",
+            });
+          }
+        });
+      }
     }
   }, [quiz]);
 
@@ -798,6 +846,31 @@ const QuizGenerator = () => {
           setGenerationStatus(null);
           setGenerationProgress("");
           setLoading(false);
+          // Auto-scroll to quiz section after creation (robust for sticky navbar)
+          try {
+            const el = document.getElementById("quiz");
+            const headerHeight =
+              (document.querySelector("nav") as HTMLElement | null)
+                ?.clientHeight ?? 64;
+            const marginCompensation = 8;
+            if (el) {
+              const targetY =
+                el.getBoundingClientRect().top +
+                window.pageYOffset -
+                (headerHeight + marginCompensation);
+              window.scrollTo({ top: targetY, behavior: "smooth" });
+              // Backup to ensure correct resting position under sticky navbar
+              setTimeout(() => {
+                el.scrollIntoView({ behavior: "smooth", block: "start" });
+                window.scrollBy({
+                  top: -(headerHeight + marginCompensation),
+                  behavior: "smooth",
+                });
+              }, 150);
+            }
+          } catch (e) {
+            console.debug("scrollTo quiz fallback failed", e);
+          }
           clearPersist();
 
           toast({

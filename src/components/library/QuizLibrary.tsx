@@ -575,7 +575,8 @@ const QuizLibrary: React.FC = () => {
 
     // Navigate to home and open the quiz generator with selected quiz data
     // Add scrollToQuiz flag to trigger auto-scroll
-    navigate("/", { state: { quiz, scrollToQuiz: true } });
+    // Dùng query param để tránh hành vi auto-scroll mặc định của hash gây giật
+    navigate("/?scrollTo=quiz", { state: { quiz, scrollToQuiz: true } });
 
     // Provide quick confirmation
     toast({

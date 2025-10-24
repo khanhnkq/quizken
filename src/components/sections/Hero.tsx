@@ -7,34 +7,38 @@ import { shouldReduceAnimations } from "@/utils/deviceDetection";
 
 const Hero = () => {
   const navigate = useNavigate();
-  const scrollToGenerator = () => {
-    const element = document.getElementById("generator");
-    if (element) {
-      const headerHeight =
-        (document.querySelector("nav") as HTMLElement | null)?.clientHeight ??
-        64;
-      const marginCompensation = 8;
-      const rect = element.getBoundingClientRect();
-      const scrollTop =
-        window.pageYOffset || document.documentElement.scrollTop;
-      const elementTop = rect.top + scrollTop;
-      const offset = headerHeight + marginCompensation;
-      const targetY = elementTop - offset;
+  const scrollToGenerator = async () => {
+    // Ưu tiên cuộn đến phần làm bài nếu đã có quiz; nếu chưa, cuộn đến trình tạo (generator)
+    const element =
+      document.getElementById("quiz") || document.getElementById("generator");
+    if (!element) return;
 
-      window.scrollTo({
-        top: targetY,
-        behavior: "smooth",
-      });
+    const headerHeight =
+      (document.querySelector("nav") as HTMLElement | null)?.clientHeight ?? 64;
+    const marginCompensation = 8;
 
-      // Backup: ensure section sits correctly below sticky navbar
-      setTimeout(() => {
-        element.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-        window.scrollBy({ top: -offset, behavior: "smooth" });
-      }, 100);
+    const rect = element.getBoundingClientRect();
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const elementTop = rect.top + scrollTop;
+    const targetY = elementTop - (headerHeight + marginCompensation);
+
+    // Thử dùng GSAP ScrollSmoother nếu đang bật cho trang
+    try {
+      const { default: ScrollSmoother } = await import("gsap/ScrollSmoother");
+      const smoother = ScrollSmoother.get();
+      if (smoother) {
+        smoother.scrollTo(targetY, true);
+        return;
+      }
+    } catch {
+      // ScrollSmoother không khả dụng -> fallback
     }
+
+    // Fallback: native scroll với bù header cố định (loại bỏ backup thứ hai để tránh giật)
+    window.scrollTo({
+      top: targetY,
+      behavior: "smooth",
+    });
   };
 
   // Typing effect state
