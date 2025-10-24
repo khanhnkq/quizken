@@ -8,16 +8,21 @@
       name="description"
       content="Generate engaging quizzes instantly with AI. Create educational content, test knowledge, and make learning fun." />
     <meta name="author" content="QuizKen" />
-    <!-- Favicons -->
+    
+    <!-- Resource Hints for Performance -->
+    <link rel="preconnect" href="https://supabase.com" />
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://vercel.com" />
+    
+    <!-- Preload critical font (only Regular weight) -->
     <link
-      rel="icon"
-      type="image/png"
-      sizes="any"
-      href="/favicon/android-chrome-512x512.png" />
-    <link
-      rel="apple-touch-icon"
-      sizes="180x180"
-      href="/favicon/apple-touch-icon.png" />
+      rel="preload"
+      href="/src/assets/fonts/ubuntu-viethoa/Ubuntu.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin />
+    
+    <!-- Favicons (optimized - removed large sizes) -->
     <link
       rel="icon"
       type="image/png"

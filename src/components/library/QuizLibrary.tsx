@@ -59,6 +59,8 @@ import {
   QuizCategoryBadge,
   QuizTags,
 } from "@/components/library/QuizCategoryBadge";
+import { QuizCard } from "@/components/library/QuizCard";
+import { QuizCardSkeleton } from "@/components/library/QuizCardSkeleton";
 import { useAudio } from "@/contexts/SoundContext";
 import ScrollSmoother from "gsap/ScrollSmoother";
 import { Eye } from "lucide-react";
@@ -808,150 +810,71 @@ const QuizLibrary: React.FC = () => {
 
           {/* Quiz List */}
           {loading ? (
-            <div className="flex justify-center items-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <div
+              data-lib-list
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-500">
+              {[...Array(6)].map((_, i) => (
+                <QuizCardSkeleton key={i} />
+              ))}
             </div>
           ) : (
             <div
               data-lib-list
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-500">
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-500 items-start">
               {displayedQuizzes.map((quiz) => (
-                <Card
+                <QuizCard
                   key={quiz.id}
-                  className="border-2 hover:border-[#B5CC89] transition-all duration-300 md:hover:shadow-lg md:hover:scale-105">
-                  <CardHeader className="pb-4">
-                    <div className="flex justify-between items-start">
-                      <CardTitle className="text-lg line-clamp-2 leading-snug">
-                        {quiz.title}
-                      </CardTitle>
-                    </div>
-                    <div>
-                      <Badge
-                        variant="secondary"
-                        className="bg-[#B5CC89]/20 text-[#B5CC89]">
-                        Công khai
-                      </Badge>
-                    </div>
+                  quiz={quiz}
+                  onPreview={() => setSelectedQuiz(quiz)}
+                  onUse={() => handleUseQuiz(quiz)}
+                  onDownload={async () => {
+                    try {
+                      // Increment PDF download count
+                      await supabase.rpc("increment_quiz_pdf_download", {
+                        quiz_id: quiz.id,
+                      });
 
-                    {quiz.description && (
-                      <CardDescription className="line-clamp-2 mt-2">
-                        {quiz.description}
-                      </CardDescription>
-                    )}
-                    <div className="mt-3">
-                      <QuizCategoryBadge
-                        category={quiz.category}
-                        difficulty={quiz.difficulty}
-                        size="sm"
-                      />
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {/* Tags */}
-                    {quiz.tags && quiz.tags.length > 0 && (
-                      <QuizTags tags={quiz.tags} maxTags={3} />
-                    )}
-                    <div className="flex flex-wrap items-center text-sm text-muted-foreground gap-3">
-                      <div
-                        className="flex items-center gap-1"
-                        title="Số lần sử dụng">
-                        <FileDown className="h-3.5 w-3.5 text-[#B5CC89]" />
-                        <span className="font-semibold text-foreground">
-                          {formatNumber(quiz.usage_count || 0)}
-                        </span>
-                      </div>
-                      <div
-                        className="flex items-center gap-1"
-                        title="Số lần tải PDF">
-                        <ArrowDown className="h-3.5 w-3.5 text-blue-500" />
-                        <span className="font-semibold text-foreground">
-                          {formatNumber(quiz.pdf_download_count || 0)}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <BookOpen className="h-3 w-3" />
-                        <span>
-                          {Array.isArray(quiz.questions)
-                            ? quiz.questions.length
-                            : 0}{" "}
-                          câu
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        <span>{formatDate(quiz.created_at)}</span>
-                      </div>
-                    </div>
+                      // Chuẩn hóa về Question[] chặt chẽ
+                      const questionsArray: Question[] =
+                        normalizeToQuestions(
+                          Array.isArray(quiz.questions)
+                            ? quiz.questions
+                            : JSON.parse(String(quiz.questions || "[]"))
+                        );
 
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setSelectedQuiz(quiz)}
-                        className="w-full min-w-0 hover:bg-accent transition-colors">
-                        Xem trước
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleUseQuiz(quiz)}
-                        className="w-full min-w-0 hover:bg-[#B5CC89] hover:text-white transition-colors">
-                        Sử dụng
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={async () => {
-                          try {
-                            // Increment PDF download count
-                            await supabase.rpc("increment_quiz_pdf_download", {
-                              quiz_id: quiz.id,
-                            });
+                      const title = quiz.title || "quiz";
+                      const filename = `${
+                        title.replace(/\s+/g, "-").toLowerCase() || "quiz"
+                      }.pdf`;
 
-                            // Chuẩn hóa về Question[] chặt chẽ
-                            const questionsArray: Question[] =
-                              normalizeToQuestions(
-                                Array.isArray(quiz.questions)
-                                  ? quiz.questions
-                                  : JSON.parse(String(quiz.questions || "[]"))
-                              );
+                      // Warm up worker (no-op if already warmed) then generate in background thread
+                      await warmupPdfWorker().catch(() => {});
+                      await generateAndDownloadPdf({
+                        filename,
+                        title,
+                        description: quiz.description || "",
+                        questions: questionsArray,
+                        showResults: false,
+                        userAnswers: [],
+                      });
 
-                            const title = quiz.title || "quiz";
-                            const filename = `${
-                              title.replace(/\s+/g, "-").toLowerCase() || "quiz"
-                            }.pdf`;
-
-                            // Warm up worker (no-op if already warmed) then generate in background thread
-                            await warmupPdfWorker().catch(() => {});
-                            await generateAndDownloadPdf({
-                              filename,
-                              title,
-                              description: quiz.description || "",
-                              questions: questionsArray,
-                              showResults: false,
-                              userAnswers: [],
-                            });
-
-                            toast({
-                              title: "Đã tải xuống PDF",
-                              description: `Quiz được lưu thành ${filename}`,
-                              variant: "success",
-                            });
-                          } catch (e) {
-                            console.error("Download quiz PDF error:", e);
-                            toast({
-                              title: "Lỗi",
-                              description: "Không thể tạo/tải PDF.",
-                              variant: "destructive",
-                            });
-                          }
-                        }}
-                        className="w-full min-w-0 hover:bg-muted">
-                        <Download className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
+                      toast({
+                        title: "Đã tải xuống PDF",
+                        description: `Quiz được lưu thành ${filename}`,
+                        variant: "success",
+                      });
+                    } catch (e) {
+                      console.error("Download quiz PDF error:", e);
+                      toast({
+                        title: "Lỗi",
+                        description: "Không thể tạo/tải PDF.",
+                        variant: "destructive",
+                      });
+                    }
+                  }}
+                  formatDate={formatDate}
+                  formatNumber={formatNumber}
+                />
               ))}
             </div>
           )}

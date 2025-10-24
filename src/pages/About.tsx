@@ -20,7 +20,7 @@ const About = () => {
       <Navbar />
       <SEOHead />
 
-      <div id="smooth-content" className="relative">
+      <div className="relative">
         <div className="absolute inset-0 -z-10 opacity-5 hidden md:block">
           <ScrollVelocityContainer className="text-6xl md:text-8xl font-bold">
             <ScrollVelocityRow baseVelocity={40} rowIndex={0}>

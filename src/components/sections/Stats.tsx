@@ -9,7 +9,7 @@ const stats = [
 
 const Stats = () => {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-secondary/30 to-background min-h-screen py-20 px-4">
+    <section id="stats" className="relative overflow-hidden bg-gradient-to-b from-secondary/30 to-background min-h-screen py-20 px-4">
       <div className="container mx-auto max-w-7xl">
         <div className="space-y-12">
           <div className="text-center">

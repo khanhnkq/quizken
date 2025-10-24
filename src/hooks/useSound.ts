@@ -1,13 +1,5 @@
 import { useCallback, useState, useEffect } from 'react';
 
-// Import sound files
-import clickSound from '@/assets/sounds/click.wav';
-import successSound from '@/assets/sounds/success.wav';
-import alertSound from '@/assets/sounds/alert.wav';
-import notificationSound from '@/assets/sounds/nofication.wav';
-import popSound from '@/assets/sounds/pop.wav';
-import toggleSound from '@/assets/sounds/toggle.wav';
-
 export type SoundType = 'click' | 'success' | 'alert' | 'notification' | 'pop' | 'toggle';
 
 interface SoundOptions {
@@ -15,14 +7,24 @@ interface SoundOptions {
   playbackRate?: number;
 }
 
-// Sound file mapping
-const SOUNDS: Record<SoundType, string> = {
-  click: clickSound,
-  success: successSound,
-  alert: alertSound,
-  notification: notificationSound,
-  pop: popSound,
-  toggle: toggleSound,
+// Lazy load sound files - only when needed
+const loadSound = async (soundType: SoundType): Promise<string> => {
+  switch (soundType) {
+    case 'click':
+      return (await import('@/assets/sounds/click.wav')).default;
+    case 'success':
+      return (await import('@/assets/sounds/success.wav')).default;
+    case 'alert':
+      return (await import('@/assets/sounds/alert.wav')).default;
+    case 'notification':
+      return (await import('@/assets/sounds/nofication.wav')).default;
+    case 'pop':
+      return (await import('@/assets/sounds/pop.wav')).default;
+    case 'toggle':
+      return (await import('@/assets/sounds/toggle.wav')).default;
+    default:
+      throw new Error(`Unknown sound type: ${soundType}`);
+  }
 };
 
 // Audio pool for better performance - reuse Audio objects
@@ -53,18 +55,7 @@ export const useSound = () => {
     }
   });
 
-  // Preload all sounds on mount
-  useEffect(() => {
-    if (soundEnabled) {
-      Object.entries(SOUNDS).forEach(([name, src]) => {
-        if (!audioPool.has(name)) {
-          const audio = new Audio(src);
-          audio.preload = 'auto';
-          audioPool.set(name, audio);
-        }
-      });
-    }
-  }, [soundEnabled]);
+  // No preloading - sounds will be loaded on first use
 
   /**
    * Play a sound effect
@@ -72,7 +63,7 @@ export const useSound = () => {
    * @param options - Optional volume and playback rate overrides
    */
   const play = useCallback(
-    (soundType: SoundType, options?: SoundOptions) => {
+    async (soundType: SoundType, options?: SoundOptions) => {
       if (!soundEnabled) return;
 
       try {
@@ -80,7 +71,9 @@ export const useSound = () => {
         let audio = audioPool.get(soundType);
         
         if (!audio) {
-          audio = new Audio(SOUNDS[soundType]);
+          // Lazy load the sound file
+          const soundSrc = await loadSound(soundType);
+          audio = new Audio(soundSrc);
           audioPool.set(soundType, audio);
         }
 

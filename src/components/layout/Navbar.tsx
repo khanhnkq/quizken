@@ -41,7 +41,10 @@ const Navbar = () => {
   const scrollToGenerator = () => {
     const element = document.getElementById("generator");
     if (element) {
-      const yOffset = -5; // Khoảng cách từ top (cho header/navbar)
+      const headerHeight =
+        (document.querySelector("nav") as HTMLElement | null)?.clientHeight ??
+        64;
+      const yOffset = -(headerHeight + 8); // bù đúng chiều cao navbar + margin
       const y =
         element.getBoundingClientRect().top + window.pageYOffset + yOffset;
 

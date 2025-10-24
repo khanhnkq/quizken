@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Sparkles } from '@/lib/icons';
+import { Sparkles } from "@/lib/icons";
 import { type MouseEvent } from "react";
 import { gsap } from "gsap";
 
@@ -7,7 +7,9 @@ const Footer = () => {
   const scrollToGenerator = () => {
     const el = document.getElementById("generator");
     if (!el) return;
-    const yOffset = -5; // account for sticky navbar
+    const headerHeight =
+      (document.querySelector("nav") as HTMLElement | null)?.clientHeight ?? 64;
+    const yOffset = -(headerHeight + 8); // account for sticky navbar height + margin
     const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
     window.scrollTo({ top: y, behavior: "smooth" });
   };
@@ -35,7 +37,9 @@ const Footer = () => {
   };
 
   return (
-    <footer id="footer" className="relative overflow-hidden bg-gradient-to-b from-secondary/30 to-background min-h-screen py-20 px-4">
+    <footer
+      id="footer"
+      className="relative overflow-hidden bg-gradient-to-b from-secondary/30 to-background min-h-screen py-20 px-4">
       {/* CTA Section */}
       <div className="py-16 px-4">
         <div className="container mx-auto max-w-7xl">

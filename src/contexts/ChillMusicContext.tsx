@@ -7,7 +7,6 @@ import {
   useRef,
   useState,
  } from "react";
-import lofi2 from "@/assets/audio/lofi-2.mp3";
 
 type ChillStatus = "idle" | "playing" | "paused" | "stopped" | "error";
 
@@ -35,13 +34,29 @@ export function ChillMusicProvider({
   const [status, setStatus] = useState<ChillStatus>("idle");
   const [volume, setVolumeState] = useState(0.35);
 
-  // Khởi tạo 1 lần
+  // Lazy load audio - only when needed
+  const loadAudio = useCallback(async () => {
+    if (audioRef.current) return audioRef.current;
+    
+    try {
+      // Dynamic import for lazy loading
+      const { default: lofi2 } = await import("@/assets/audio/lofi-2.mp3");
+      const audio = new Audio(lofi2);
+      audio.preload = "auto";
+      audio.loop = true;
+      audio.volume = volume;
+      audioRef.current = audio;
+      return audio;
+    } catch (error) {
+      console.error("Failed to load chill music:", error);
+      return null;
+    }
+  }, [volume]);
+
+  // Set up event listeners when audio is loaded
   useEffect(() => {
-    const audio = new Audio(lofi2);
-    audio.preload = "auto";
-    audio.loop = true;
-    audio.volume = volume;
-    audioRef.current = audio;
+    const audio = audioRef.current;
+    if (!audio) return;
 
     const onPlay = () => {
       setIsPlaying(true);
@@ -80,14 +95,8 @@ export function ChillMusicProvider({
       audio.removeEventListener("play", onPlay);
       audio.removeEventListener("pause", onPause);
       document.removeEventListener("play", handleOtherAudioPlay, true);
-      try {
-        audio.pause();
-      } catch {
-        // ignore
-      }
-      audioRef.current = null;
     };
-  }, []);
+  }, [audioRef.current]);
 
   // Đồng bộ thay đổi volume lên phần tử audio khi volume state đổi sau khi init
   useEffect(() => {
@@ -98,8 +107,11 @@ export function ChillMusicProvider({
 
   const play = useCallback(async () => {
     try {
-      if (!audioRef.current) return;
-      await audioRef.current.play();
+      // Load audio if not already loaded
+      const audio = await loadAudio();
+      if (!audio) return;
+      
+      await audio.play();
       setIsPlaying(true);
       setStatus("playing");
     } catch (err) {
@@ -108,7 +120,7 @@ export function ChillMusicProvider({
       setStatus("error");
       throw err;
     }
-  }, []);
+  }, [loadAudio]);
 
   const pause = useCallback(() => {
     try {

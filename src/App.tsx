@@ -6,11 +6,12 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { gsap } from "gsap";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "@/hooks/use-toast";
+import { shouldDisableScrollSmoother } from "@/utils/deviceDetection";
+import { PageSkeleton } from "@/components/ui/loading-skeleton";
 const Index = lazy(() => import("./pages/Index"));
 const About = lazy(() => import("./pages/About"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const QuizLibrary = lazy(() => import("./components/library/QuizLibrary"));
-import ScrollToGeneratorButtonWrapper from "./components/ScrollToGeneratorButtonWrapper";
 import { SoundProvider } from "@/contexts/SoundContext";
 import { ChillMusicProvider } from "@/contexts/ChillMusicContext";
 import { Analytics } from "@vercel/analytics/react";
@@ -72,7 +73,7 @@ const AnimatedRoutes = () => {
         variants={pageVariants}
         transition={pageTransition}
         className="min-h-screen">
-        <Suspense fallback={null}>
+        <Suspense fallback={<PageSkeleton />}>
           <Routes location={location} key={location.pathname}>
             <Route path="/" element={<Index />} />
             <Route path="/about" element={<About />} />
@@ -90,6 +91,12 @@ const queryClient = new QueryClient();
 
 const App = () => {
   useLayoutEffect(() => {
+    // Skip ScrollSmoother on mobile devices for better performance
+    if (shouldDisableScrollSmoother()) {
+      console.log("ScrollSmoother disabled on mobile device");
+      return;
+    }
+
     let isMounted = true;
     (async () => {
       try {
@@ -135,6 +142,11 @@ const App = () => {
   }, []);
 
   useEffect(() => {
+    // Skip toast positioning logic on mobile (uses native scroll)
+    if (shouldDisableScrollSmoother()) {
+      return;
+    }
+
     let isMounted = true;
     type SmootherLike = { scrollTop: () => number };
     let getSmoother: null | (() => SmootherLike | null) = null;
@@ -190,8 +202,6 @@ const App = () => {
             <BrowserRouter
               future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
               <AnimatedRoutes />
-              {/* 👇 ScrollToGeneratorButton renders outside AnimatedRoutes to avoid fixed position issues */}
-              <ScrollToGeneratorButtonWrapper />
             </BrowserRouter>
             <Analytics />
           </ChillMusicProvider>

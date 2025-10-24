@@ -1,11 +1,14 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, lazy, Suspense } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
 import Hero from "@/components/sections/Hero";
 import QuizGenerator from "@/components/quiz/QuizGenerator";
-import Features from "@/components/sections/Features";
 import Footer from "@/components/layout/Footer";
-import ScrollSmoother from "gsap/ScrollSmoother";
+import { shouldDisableScrollSmoother } from "@/utils/deviceDetection";
+import { ComponentSkeleton } from "@/components/ui/loading-skeleton";
+
+// Lazy load heavy components
+const Features = lazy(() => import("@/components/sections/Features"));
 
 const Index = () => {
   const location = useLocation();
@@ -30,7 +33,7 @@ const Index = () => {
       let retryCount = 0;
       const maxRetries = 50; // Increase retries
 
-      const scrollToQuizSection = () => {
+      const scrollToQuizSection = async () => {
         // Try to find quiz section first (where user does the quiz)
         const quizElement =
           document.getElementById("quiz") ||
@@ -47,18 +50,26 @@ const Index = () => {
           return;
         }
 
-        // Try multiple scroll methods for maximum compatibility
-        const smoother = ScrollSmoother.get();
-
-        if (smoother) {
+        // Try ScrollSmoother first (only on desktop)
+        if (!shouldDisableScrollSmoother()) {
           try {
-            // Smooth scroll with animation (true = smooth, false = instant)
-            smoother.scrollTo(quizElement, true, "top 20px");
+            const { default: ScrollSmoother } = await import(
+              "gsap/ScrollSmoother"
+            );
+            const smoother = ScrollSmoother.get();
+
+            if (smoother) {
+              // Smooth scroll with animation (true = smooth, false = instant)
+              smoother.scrollTo(quizElement, true, "top 20px");
+              return; // Success, exit early
+            }
           } catch (e) {
-            // ignore, will fallback below
+            // ScrollSmoother not available, fallback to native scroll
+            console.log("ScrollSmoother not available, using native scroll");
           }
         }
-        // Always run fallback for consistency across environments
+
+        // Fallback to native scroll (mobile or when ScrollSmoother fails)
         fallbackScroll();
 
         function fallbackScroll() {
@@ -67,7 +78,11 @@ const Index = () => {
           const scrollTop =
             window.pageYOffset || document.documentElement.scrollTop;
           const elementTop = rect.top + scrollTop;
-          const offset = 100;
+          const headerHeight =
+            (document.querySelector("nav") as HTMLElement | null)
+              ?.clientHeight ?? 64;
+          const marginCompensation = 8;
+          const offset = headerHeight + marginCompensation;
           const targetY = elementTop - offset;
 
           // Try both methods
@@ -82,6 +97,8 @@ const Index = () => {
               behavior: "smooth",
               block: "start",
             });
+            // Ensure the section is fully visible beneath the sticky navbar
+            window.scrollBy({ top: -offset, behavior: "smooth" });
           }, 100);
         }
       };
@@ -112,7 +129,12 @@ const Index = () => {
       <Navbar />
       <Hero />
       <QuizGenerator />
-      <Features />
+
+      {/* Lazy load heavy components with Intersection Observer */}
+      <Suspense fallback={<ComponentSkeleton className="py-16" />}>
+        <Features />
+      </Suspense>
+
       <Footer />
     </div>
   );

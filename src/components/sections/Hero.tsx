@@ -3,6 +3,7 @@ import { Sparkles, Zap, Brain, Eye } from "@/lib/icons";
 import { useState, useEffect, type MouseEvent } from "react";
 import { gsap } from "gsap";
 import { useNavigate } from "react-router-dom";
+import { shouldReduceAnimations } from "@/utils/deviceDetection";
 
 const Hero = () => {
   const navigate = useNavigate();
@@ -22,12 +23,12 @@ const Hero = () => {
   // Typing effect state
   const [displayText, setDisplayText] = useState("");
   const [showCursor, setShowCursor] = useState(true);
-  const fullText =
-    "Biến đổi mọi chủ đề thành các bài kiểm tra thú vị ngay lập tức. Hoàn hảo cho giáo viên, huấn luyện viên và những người tạo nội dung.";
+  const fullText = "Tạo mọi bài kiểm tra với AI. Phù hợp với tất cả mọi người";
 
   useEffect(() => {
     let currentIndex = 0;
-    const typingSpeed = 120; // milliseconds per character - slower for dramatic effect
+    // Reduce typing speed on mobile/low-end devices for better performance
+    const typingSpeed = shouldReduceAnimations() ? 50 : 120;
     const displayTime = 2000; // 2 seconds before restarting
 
     let typeTimeout;
@@ -68,6 +69,9 @@ const Hero = () => {
   }, []);
 
   const handleHoverEnter = (e: MouseEvent<HTMLButtonElement>) => {
+    // Skip animations on mobile/low-end devices
+    if (shouldReduceAnimations()) return;
+
     const target = e.currentTarget as HTMLButtonElement;
     gsap.to(target, {
       y: -2,
@@ -106,7 +110,7 @@ const Hero = () => {
             </span>{" "}
             trong vài giây
           </h1>
-          <div className="h-auto sm:h-14 md:h-16 lg:h-20 flex items-center justify-center">
+          <div className="h-14 sm:h-14 md:h-16 lg:h-20 flex items-center justify-center">
             {" "}
             {/* Fixed height container */}
             <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto font-sans leading-relaxed">
