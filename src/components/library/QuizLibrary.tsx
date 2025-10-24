@@ -35,6 +35,7 @@ import {
   X,
   Filter,
   ArrowUpDown,
+  ArrowDown,
 } from "@/lib/icons";
 import { warmupPdfWorker, generateAndDownloadPdf } from "@/lib/pdfWorkerClient";
 import type { Question } from "@/types/quiz";
@@ -822,12 +823,15 @@ const QuizLibrary: React.FC = () => {
                       <CardTitle className="text-lg line-clamp-2 leading-snug">
                         {quiz.title}
                       </CardTitle>
+                    </div>
+                    <div>
                       <Badge
                         variant="secondary"
                         className="bg-[#B5CC89]/20 text-[#B5CC89]">
                         Công khai
                       </Badge>
                     </div>
+
                     {quiz.description && (
                       <CardDescription className="line-clamp-2 mt-2">
                         {quiz.description}
@@ -850,7 +854,7 @@ const QuizLibrary: React.FC = () => {
                       <div
                         className="flex items-center gap-1"
                         title="Số lần sử dụng">
-                        <TrendingUp className="h-3.5 w-3.5 text-[#B5CC89]" />
+                        <FileDown className="h-3.5 w-3.5 text-[#B5CC89]" />
                         <span className="font-semibold text-foreground">
                           {formatNumber(quiz.usage_count || 0)}
                         </span>
@@ -858,7 +862,7 @@ const QuizLibrary: React.FC = () => {
                       <div
                         className="flex items-center gap-1"
                         title="Số lần tải PDF">
-                        <FileDown className="h-3.5 w-3.5 text-blue-500" />
+                        <ArrowDown className="h-3.5 w-3.5 text-blue-500" />
                         <span className="font-semibold text-foreground">
                           {formatNumber(quiz.pdf_download_count || 0)}
                         </span>

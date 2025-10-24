@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Sparkles, Zap, Brain } from "@/lib/icons";
+import { Sparkles, Zap, Brain, Eye } from "@/lib/icons";
 import { useState, useEffect, type MouseEvent } from "react";
 import { gsap } from "gsap";
 import { useNavigate } from "react-router-dom";
@@ -174,7 +174,7 @@ const Hero = () => {
             </div>
             <div className="flex items-center gap-2">
               <div className="p-1.5 md:p-2 rounded-full bg-[#B5CC89]/20">
-                <Brain className="w-4 h-4 md:w-5 md:h-5 text-black" />
+                <Eye className="w-4 h-4 md:w-5 md:h-5 text-black" />
               </div>
               <span className="text-xs md:text-sm font-medium">
                 Câu Hỏi Thông Minh

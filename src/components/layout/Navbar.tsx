@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Menu, LogOut, User, Settings } from '@/lib/icons';
+import { Menu, LogOut, User, Settings } from "@/lib/icons";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/auth";
 import { Link } from "react-router-dom";

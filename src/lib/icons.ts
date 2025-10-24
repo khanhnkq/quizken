@@ -1,228 +1,176 @@
 /**
- * Icon bridge — import trực tiếp các icon từ @radix-ui/react-icons
+ * Icon bridge — import trực tiếp các icon từ lucide-react
  * và re-export với tên mà project đã sử dụng.
  *
- * Nếu Radix không có icon chính xác, dùng icon tương đương gần nhất.
+ * Đã thay thế Radix Icons bằng Lucide Icons để đồng nhất hệ thống icon.
  */
 import React from "react";
-import {
-  Cross1Icon,
-  CrossCircledIcon,
-  CheckIcon,
-  CheckCircledIcon,
-  MagnifyingGlassIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  ChevronDownIcon,
-  ChevronUpIcon,
-  ArrowLeftIcon,
-  ArrowRightIcon,
-  ArrowUpIcon,
-  ArrowDownIcon,
-  HamburgerMenuIcon,
-  PersonIcon,
-  LockClosedIcon,
-  LoopIcon,
-  MagicWandIcon,
-  LightningBoltIcon,
-  DownloadIcon,
-  TrashIcon,
-  ClipboardCopyIcon,
-  PauseIcon,
-  StarIcon,
-  DotIcon,
-  DotsHorizontalIcon,
-  ClockIcon,
-  InfoCircledIcon,
-  ExclamationTriangleIcon,
-  ReaderIcon,
-  EnterIcon,
-  ChatBubbleIcon,
-  ExitIcon,
-  GearIcon,
-  GroupIcon,
-  AlignLeftIcon,
-  CursorArrowIcon,
-  DragHandleVerticalIcon,
-  DoubleArrowUpIcon,
-  CaretSortIcon,
-  FileTextIcon,
-  VideoIcon,
-  SpeakerLoudIcon,
-  ColorWheelIcon,
-  BackpackIcon,
-  PieChartIcon,
-  TextIcon,
-  PinTopIcon,
-  BadgeIcon,
-  PlusCircledIcon,
-  TrackNextIcon,
-  LaptopIcon,
-  MixerHorizontalIcon,
-  EyeOpenIcon,
-  EyeClosedIcon,
-  CircleIcon,
-} from "@radix-ui/react-icons";
+import * as L from "lucide-react";
+import type { LucideIcon as LRIcon } from "lucide-react";
 
-export type AppIcon = React.ComponentType<
-  React.SVGProps<SVGSVGElement> & { size?: number }
->;
+export type AppIcon = LRIcon;
 export type LucideIcon = AppIcon;
 
 /**
- * Re-exports: map tên dùng trong project -> Radix icon component
+ * Re-exports: map tên dùng trong project -> Lucide icon component
  * Những tên không tồn tại 1:1 được ánh xạ sang icon gần nhất.
  */
 
-export const X = Cross1Icon;
-export const XCircle = CrossCircledIcon;
+export const X = L.X;
+export const XCircle = L.XCircle;
 
-export const Check = CheckIcon;
-export const CheckCircle = CheckCircledIcon;
-export const CircleCheck = CheckCircledIcon;
-export const Circle = CircleIcon;
+export const Check = L.Check;
+export const CheckCircle = L.CheckCircle;
+export const CircleCheck = L.CheckCircle;
+export const Circle = L.Circle;
 
-export const Search = MagnifyingGlassIcon;
+export const Search = L.Search;
 
-export const ChevronLeft = ChevronLeftIcon;
-export const ChevronRight = ChevronRightIcon;
-export const ChevronDown = ChevronDownIcon;
-export const ChevronUp = ChevronUpIcon;
+export const ChevronLeft = L.ChevronLeft;
+export const ChevronRight = L.ChevronRight;
+export const ChevronDown = L.ChevronDown;
+export const ChevronUp = L.ChevronUp;
 
-export const ArrowLeft = ArrowLeftIcon;
-export const ArrowRight = ArrowRightIcon;
-export const ArrowUp = ArrowUpIcon;
-export const ArrowDown = ArrowDownIcon;
-export const ArrowUpDown = CaretSortIcon;
+export const ArrowLeft = L.ArrowLeft;
+export const ArrowRight = L.ArrowRight;
+export const ArrowUp = L.ArrowUp;
+export const ArrowDown = L.ArrowDown;
+export const ArrowUpDown = L.ArrowUpDown;
 
-export const Menu = HamburgerMenuIcon;
-export const LogOut = ExitIcon;
-export const User = PersonIcon;
-export const Settings = GearIcon;
-export const Loader2 = LoopIcon;
-export const Shield = LockClosedIcon;
-export const LogIn = EnterIcon;
-export const Sparkles = MagicWandIcon;
-export const Brain = MagicWandIcon;
-export const Zap = LightningBoltIcon;
-export const Download = DownloadIcon;
-export const FileDown = FileTextIcon;
-export const Trash2 = TrashIcon;
-export const ClipboardPaste = ClipboardCopyIcon;
-export const PauseCircle = PauseIcon;
-export const Star = StarIcon;
-export const Dot = DotIcon;
-export const MoreHorizontal = DotsHorizontalIcon;
-export const Clock = ClockIcon;
-export const Info = InfoCircledIcon;
-export const AlertTriangle = ExclamationTriangleIcon;
-export const Key = LockClosedIcon;
-export const Eye = EyeOpenIcon;
-export const EyeOff = EyeClosedIcon;
-export const Save = CheckIcon;
-export const MessageSquare = ChatBubbleIcon;
+export const Menu = L.Menu;
+export const LogOut = L.LogOut;
+export const User = L.User;
+export const Settings = L.Settings;
+export const Loader2 = L.Loader2;
+export const Shield = L.Shield;
+export const LogIn = L.LogIn;
+export const Sparkles = L.Sparkles;
+export const Brain = L.Brain;
+export const Zap = L.Zap;
+export const Download = L.Download;
+export const FileDown = L.FileDown;
+export const Trash2 = L.Trash2;
+export const ClipboardPaste = L.ClipboardPaste;
+export const PauseCircle = L.PauseCircle;
+export const Star = L.Star;
+export const Dot = L.Dot;
+export const MoreHorizontal = L.MoreHorizontal;
+export const Clock = L.Clock;
+export const Info = L.Info;
+export const AlertTriangle = L.AlertTriangle;
+export const Key = L.Key;
+export const Eye = L.Eye;
+export const EyeOff = L.EyeOff;
+export const Save = L.Save;
+export const MessageSquare = L.MessageSquare;
 
-export const Book = ReaderIcon;
-export const BookOpen = ReaderIcon;
-export const GraduationCap = BackpackIcon;
-export const Microscope = MagnifyingGlassIcon;
-export const Film = VideoIcon;
-export const Target = DotIcon;
-export const Calculator = PieChartIcon;
-export const Scroll = TextIcon;
-export const MapPin = PinTopIcon;
-export const Laptop = LaptopIcon;
-export const Briefcase = BackpackIcon;
-export const Trophy = BadgeIcon;
-export const Award = BadgeIcon;
-export const FlaskConical = MixerHorizontalIcon;
-export const Globe = ChatBubbleIcon;
-export const Heart = PlusCircledIcon;
-export const Tag = BadgeIcon;
-export const AlertCircle = InfoCircledIcon;
-export const Palette = ColorWheelIcon;
-export const Music = SpeakerLoudIcon;
-export const Music4 = SpeakerLoudIcon;
-export const FileDownAlt = FileTextIcon;
+export const Book = L.Book;
+export const BookOpen = L.BookOpen;
+export const GraduationCap = L.GraduationCap;
+export const Microscope = L.Microscope;
+export const Film = L.Film;
+export const Target = L.Target;
+export const Calculator = L.Calculator;
+export const Scroll = L.Scroll;
+export const MapPin = L.MapPin;
+export const Laptop = L.Laptop;
+export const Briefcase = L.Briefcase;
+export const Trophy = L.Trophy;
+export const Award = L.Award;
+export const FlaskConical = L.FlaskConical;
+export const Globe = L.Globe;
+export const Heart = L.Heart;
+export const Tag = L.Tag;
+export const AlertCircle = L.AlertCircle;
+export const Palette = L.Palette;
+export const Music = L.Music;
+export const Music4 = L.Music;
+export const FileDownAlt = L.FileDown;
 
-export const TrendingUp = ArrowUpIcon;
+export const TrendingUp = L.TrendingUp;
 
-export const Users = GroupIcon;
-export const Filter = MixerHorizontalIcon;
-export const PanelLeft = AlignLeftIcon;
-export const MousePointer = CursorArrowIcon;
-export const GripVertical = DragHandleVerticalIcon;
+export const Users = L.Users;
+export const Filter = L.Filter;
+export const PanelLeft = L.PanelLeft;
+export const MousePointer = L.MousePointer;
+export const GripVertical = L.GripVertical;
 
 /**
  * Generic maker to get an icon by name if needed.
- * Returns a React component (may be undefined if Radix has no matching export).
+ * Returns a React component (may be undefined if Lucide has no matching export).
  */
 export const make = (name: string): AppIcon | undefined => {
   const map: Record<string, AppIcon> = {
-    X: Cross1Icon,
-    XCircle: CrossCircledIcon,
-    Check: CheckIcon,
-    CheckCircle: CheckCircledIcon,
-    Search: MagnifyingGlassIcon,
-    ChevronLeft: ChevronLeftIcon,
-    ChevronRight: ChevronRightIcon,
-    ChevronDown: ChevronDownIcon,
-    ChevronUp: ChevronUpIcon,
-    ArrowLeft: ArrowLeftIcon,
-    ArrowRight: ArrowRightIcon,
-    ArrowUp: ArrowUpIcon,
-    ArrowDown: ArrowDownIcon,
-    ArrowUpDown: CaretSortIcon,
-    Menu: HamburgerMenuIcon,
-    LogOut: ExitIcon,
-    User: PersonIcon,
-    Settings: GearIcon,
-    Loader2: LoopIcon,
-    Shield: LockClosedIcon,
-    LogIn: EnterIcon,
-    Sparkles: MagicWandIcon,
-    Zap: LightningBoltIcon,
-    Download: DownloadIcon,
-    Trash2: TrashIcon,
-    ClipboardPaste: ClipboardCopyIcon,
-    PauseCircle: PauseIcon,
-    Star: StarIcon,
-    Dot: DotIcon,
-    MoreHorizontal: DotsHorizontalIcon,
-    Clock: ClockIcon,
-    Info: InfoCircledIcon,
-    AlertTriangle: ExclamationTriangleIcon,
-    Key: LockClosedIcon,
-    Eye: EyeOpenIcon,
-    EyeOff: EyeClosedIcon,
-    Save: CheckIcon,
-    MessageSquare: ChatBubbleIcon,
-    Book: ReaderIcon,
-    GraduationCap: BackpackIcon,
-    Microscope: MagnifyingGlassIcon,
-    Film: VideoIcon,
-    Target: DotIcon,
-    Calculator: PieChartIcon,
-    Scroll: TextIcon,
-    MapPin: PinTopIcon,
-    Laptop: LaptopIcon,
-    Briefcase: BackpackIcon,
-    Trophy: BadgeIcon,
-    Award: BadgeIcon,
-    FlaskConical: MixerHorizontalIcon,
-    Globe: ChatBubbleIcon,
-    Heart: PlusCircledIcon,
-    Tag: BadgeIcon,
-    AlertCircle: InfoCircledIcon,
-    Palette: ColorWheelIcon,
-    Music: SpeakerLoudIcon,
-    FileDown: FileTextIcon as unknown as AppIcon,
-    TrendingUp: ArrowUpIcon as unknown as AppIcon,
-    Users: GroupIcon,
-    Filter: MixerHorizontalIcon as unknown as AppIcon,
-    PanelLeft: AlignLeftIcon as unknown as AppIcon,
-    MousePointer: CursorArrowIcon as unknown as AppIcon,
-    GripVertical: DragHandleVerticalIcon as unknown as AppIcon,
+    X,
+    XCircle,
+    Check,
+    CheckCircle,
+    CircleCheck,
+    Circle,
+    Search,
+    ChevronLeft,
+    ChevronRight,
+    ChevronDown,
+    ChevronUp,
+    ArrowLeft,
+    ArrowRight,
+    ArrowUp,
+    ArrowDown,
+    ArrowUpDown,
+    Menu,
+    LogOut,
+    User,
+    Settings,
+    Loader2,
+    Shield,
+    LogIn,
+    Sparkles,
+    Brain,
+    Zap,
+    Download,
+    FileDown,
+    Trash2,
+    ClipboardPaste,
+    PauseCircle,
+    Star,
+    Dot,
+    MoreHorizontal,
+    Clock,
+    Info,
+    AlertTriangle,
+    Key,
+    Eye,
+    EyeOff,
+    Save,
+    MessageSquare,
+    Book,
+    BookOpen,
+    GraduationCap,
+    Microscope,
+    Film,
+    Target,
+    Calculator,
+    Scroll,
+    MapPin,
+    Laptop,
+    Briefcase,
+    Trophy,
+    Award,
+    FlaskConical,
+    Globe,
+    Heart,
+    Tag,
+    AlertCircle,
+    Palette,
+    Music,
+    Music4,
+    FileDownAlt,
+    TrendingUp,
+    Users,
+    Filter,
+    PanelLeft,
+    MousePointer,
+    GripVertical,
   };
   return map[name];
 };
