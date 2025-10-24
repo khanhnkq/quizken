@@ -45,6 +45,7 @@ import {
   CursorArrowIcon,
   DragHandleVerticalIcon,
   DoubleArrowUpIcon,
+  CaretSortIcon,
   FileTextIcon,
   VideoIcon,
   SpeakerLoudIcon,
@@ -54,6 +55,7 @@ import {
   TextIcon,
   PinTopIcon,
   BadgeIcon,
+  PlusCircledIcon,
   TrackNextIcon,
   LaptopIcon,
   MixerHorizontalIcon,
@@ -91,7 +93,7 @@ export const ArrowLeft = ArrowLeftIcon;
 export const ArrowRight = ArrowRightIcon;
 export const ArrowUp = ArrowUpIcon;
 export const ArrowDown = ArrowDownIcon;
-export const ArrowUpDown = DoubleArrowUpIcon;
+export const ArrowUpDown = CaretSortIcon;
 
 export const Menu = HamburgerMenuIcon;
 export const LogOut = ExitIcon;
@@ -117,15 +119,15 @@ export const AlertTriangle = ExclamationTriangleIcon;
 export const Key = LockClosedIcon;
 export const Eye = EyeOpenIcon;
 export const EyeOff = EyeClosedIcon;
-export const Save = DownloadIcon;
+export const Save = CheckIcon;
 export const MessageSquare = ChatBubbleIcon;
 
 export const Book = ReaderIcon;
 export const BookOpen = ReaderIcon;
-export const GraduationCap = ReaderIcon;
+export const GraduationCap = BackpackIcon;
 export const Microscope = MagnifyingGlassIcon;
 export const Film = VideoIcon;
-export const Target = PinTopIcon;
+export const Target = DotIcon;
 export const Calculator = PieChartIcon;
 export const Scroll = TextIcon;
 export const MapPin = PinTopIcon;
@@ -133,9 +135,9 @@ export const Laptop = LaptopIcon;
 export const Briefcase = BackpackIcon;
 export const Trophy = BadgeIcon;
 export const Award = BadgeIcon;
-export const FlaskConical = PieChartIcon;
-export const Globe = PinTopIcon;
-export const Heart = StarIcon;
+export const FlaskConical = MixerHorizontalIcon;
+export const Globe = ChatBubbleIcon;
+export const Heart = PlusCircledIcon;
 export const Tag = BadgeIcon;
 export const AlertCircle = InfoCircledIcon;
 export const Palette = ColorWheelIcon;
@@ -170,7 +172,7 @@ export const make = (name: string): AppIcon | undefined => {
     ArrowRight: ArrowRightIcon,
     ArrowUp: ArrowUpIcon,
     ArrowDown: ArrowDownIcon,
-    ArrowUpDown: DoubleArrowUpIcon,
+    ArrowUpDown: CaretSortIcon,
     Menu: HamburgerMenuIcon,
     LogOut: ExitIcon,
     User: PersonIcon,
@@ -193,13 +195,13 @@ export const make = (name: string): AppIcon | undefined => {
     Key: LockClosedIcon,
     Eye: EyeOpenIcon,
     EyeOff: EyeClosedIcon,
-    Save: DownloadIcon,
+    Save: CheckIcon,
     MessageSquare: ChatBubbleIcon,
     Book: ReaderIcon,
-    GraduationCap: ReaderIcon,
+    GraduationCap: BackpackIcon,
     Microscope: MagnifyingGlassIcon,
     Film: VideoIcon,
-    Target: PinTopIcon,
+    Target: DotIcon,
     Calculator: PieChartIcon,
     Scroll: TextIcon,
     MapPin: PinTopIcon,
@@ -207,9 +209,9 @@ export const make = (name: string): AppIcon | undefined => {
     Briefcase: BackpackIcon,
     Trophy: BadgeIcon,
     Award: BadgeIcon,
-    FlaskConical: PieChartIcon,
-    Globe: PinTopIcon,
-    Heart: StarIcon,
+    FlaskConical: MixerHorizontalIcon,
+    Globe: ChatBubbleIcon,
+    Heart: PlusCircledIcon,
     Tag: BadgeIcon,
     AlertCircle: InfoCircledIcon,
     Palette: ColorWheelIcon,
