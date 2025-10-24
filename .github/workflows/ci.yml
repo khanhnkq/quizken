@@ -8,21 +8,48 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - name: Use Node.js
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: "npm"
+
       - name: Install dependencies
         run: npm ci
-      - name: Lint
+
+      # ✅ THÊM: Kiểm tra linting (nếu có ESLint)
+      - name: Lint code
         run: npm run lint
+        continue-on-error: false
+
+      # ✅ THÊM: Chạy tests (nếu có)
+      - name: Run tests
+        run: npm test
+        continue-on-error: false
+
+      # ✅ THÊM: Type checking (nếu dùng TypeScript)
+      - name: Type check
+        run: npm run type-check || npx tsc --noEmit
+        continue-on-error: false
+
       - name: Build
         run: npm run build
+
+      # ✅ THÊM: Kiểm tra kích thước bundle
+      - name: Check bundle size
+        run: |
+          echo "📦 Build size:"
+          du -sh dist
+          find dist -type f -name "*.js" -exec du -h {} \; | sort -rh | head -10
+
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: dist
           path: dist
+          retention-days: 7 # ✅ THÊM: Tự động xóa sau 7 ngày để tiết kiệm storage

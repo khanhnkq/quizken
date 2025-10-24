@@ -1,26 +1,15 @@
-import { defineConfig, splitVendorChunkPlugin } from "vite";
+import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import { fileURLToPath, URL } from "node:url";
 
-// Định nghĩa thư mục root của dự án
 const root = fileURLToPath(new URL(".", import.meta.url));
 
 export default defineConfig({
-  // THAY ĐỔI ĐỂ KIỂM TRA:
-  // Tạm thời chuyển sang 'mpa' (Multi-Page App) để TẮT
-  // tính năng SPA fallback (trả về index.html cho mọi đường dẫn).
-  // Nếu cách này sửa được lỗi font, nó xác nhận
-  // middleware của Vite đang chạy sai thứ tự.
   appType: "spa",
-
-  // THÊM DÒNG NÀY (để chỉ định rõ ràng)
   publicDir: "public",
 
-  // THÊM KHỐI 'server' NÀY
   server: {
     fs: {
-      // Chỉ định rõ ràng rằng server được phép
-      // phục vụ file từ toàn bộ thư mục root
       allow: [root],
     },
   },
@@ -31,35 +20,57 @@ export default defineConfig({
     },
     dedupe: ["react", "react-dom"],
   },
+
   plugins: [react()],
+
   build: {
-    // Tăng ngưỡng cảnh báo chunk lớn (KB)
     chunkSizeWarningLimit: 1200,
     rollupOptions: {
       output: {
-        // Gom các thư viện nặng vào các chunk riêng để giảm initial bundle
+        // ĐƠN GIẢN HÓA: gom tất cả node_modules vào chung "vendor"
+        // để đảm bảo React và các thư viện phụ thuộc được tải cùng lúc,
+        // tránh lỗi runtime undefined (ví dụ `.memo` / `forwardRef`).
         manualChunks(id) {
-          // Disabled manual chunking to simplify debugging — re-enable after fix
-          return undefined;
+          if (!id) return;
+
+          // Local icons - vẫn tách để có thể load sau nếu cần
+          if (
+            id.includes("src/lib/icons") ||
+            id.includes("/lib/icons") ||
+            id.includes("@/lib/icons")
+          ) {
+            return "app-icons";
+          }
+
+          // Gom tất cả package trong node_modules vào vendor duy nhất
+          if (id.includes("node_modules")) {
+            return "vendor";
+          }
+        },
+
+        // Giữ cấu trúc tên tệp tĩnh
+        chunkFileNames: (chunkInfo) => {
+          return "assets/[name]-[hash].js";
         },
       },
     },
+
     commonjsOptions: {
       transformMixedEsModules: true,
     },
   },
+
   optimizeDeps: {
-    // Tránh pre-bundle các GSAP plugins nặng vào initial deps
     exclude: ["gsap/ScrollTrigger", "gsap/dist/ScrollSmoother"],
 
-    // Buộc Vite pre-bundle file UMD của jsPDF
-    include: [
-      "jspdf/dist/jspdf.umd.min.js",
-      "@radix-ui/react-icons",
-      "react",
-      "react-dom",
-    ],
+    // ✅ Chỉ include những gì thực sự cần
+    // Force prebundle local icons cùng với react để tránh race condition khi load forwardRef
+    include: ["react", "react-dom", "react/jsx-runtime", "@/lib/icons"],
+
+    // ✅ THÊM: Force deps được bundle đúng cách
+    force: true,
   },
+
   worker: {
     format: "es",
   },
