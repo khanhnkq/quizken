@@ -125,18 +125,23 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="min-h-screen">
+    <>
+      {/* Navbar outside ScrollSmoother for proper sticky behavior */}
       <Navbar />
-      <Hero />
-      <QuizGenerator />
+      <div className="min-h-screen" id="smooth-wrapper">
+        <div id="smooth-content">
+          <Hero />
+          <QuizGenerator />
 
-      {/* Lazy load heavy components with Intersection Observer */}
-      <Suspense fallback={<ComponentSkeleton className="py-16" />}>
-        <Features />
-      </Suspense>
+          {/* Lazy load heavy components with Intersection Observer */}
+          <Suspense fallback={<ComponentSkeleton className="py-16" />}>
+            <Features />
+          </Suspense>
 
-      <Footer />
-    </div>
+          <Footer />
+        </div>
+      </div>
+    </>
   );
 };
 

@@ -584,12 +584,14 @@ const QuizLibrary: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen">
-      {/* Navbar */}
+    <>
+      {/* Navbar outside ScrollSmoother for proper sticky behavior */}
       <Navbar />
-
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-secondary/30 to-background min-h-screen py-20 px-4">
+      
+      <div className="min-h-screen" id="smooth-wrapper">
+        <div id="smooth-content">
+          {/* Hero Section */}
+          <section className="relative overflow-hidden bg-gradient-to-b from-secondary/30 to-background min-h-screen py-20 px-4">
         <div className="absolute inset-0 -z-10 opacity-5 hidden md:block">
           <ScrollVelocityContainer className="text-6xl md:text-8xl font-bold">
             <ScrollVelocityRow
@@ -1123,7 +1125,9 @@ const QuizLibrary: React.FC = () => {
         </DialogContent>
       </Dialog>
       <AuthModal open={showAuthModal} onOpenChange={setShowAuthModal} />
-    </div>
+        </div>
+      </div>
+    </>
   );
 };
 
