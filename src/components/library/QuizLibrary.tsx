@@ -64,6 +64,7 @@ import { QuizCardSkeleton } from "@/components/library/QuizCardSkeleton";
 import { useAudio } from "@/contexts/SoundContext";
 import ScrollSmoother from "gsap/ScrollSmoother";
 import { Eye } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface PublicQuiz {
   id: string;
@@ -122,6 +123,7 @@ const QuizLibrary: React.FC = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const navigate = useNavigate();
   const { play } = useAudio();
+  const isMobile = useIsMobile();
 
   // Khóa cuộn body/html khi mở preview để không cuộn phía sau Dialog
   useEffect(() => {
@@ -587,520 +589,288 @@ const QuizLibrary: React.FC = () => {
     <>
       {/* Navbar outside ScrollSmoother for proper sticky behavior */}
       <Navbar />
-      
+
       <div className="min-h-screen" id="smooth-wrapper">
         <div id="smooth-content">
           {/* Hero Section */}
           <section className="relative overflow-hidden bg-gradient-to-b from-secondary/30 to-background min-h-screen py-20 px-4">
-        <div className="absolute inset-0 -z-10 opacity-5 hidden md:block">
-          <ScrollVelocityContainer className="text-6xl md:text-8xl font-bold">
-            <ScrollVelocityRow
-              baseVelocity={40}
-              rowIndex={0}
-              paused={!!selectedQuiz}>
-              AI Education Smart Learning Intelligent Teaching Digital Classroom
-            </ScrollVelocityRow>
-            <ScrollVelocityRow
-              baseVelocity={40}
-              rowIndex={1}
-              paused={!!selectedQuiz}>
-              Adaptive Assessment Personalized Learning Virtual Teacher
-              Cognitive Training
-            </ScrollVelocityRow>
-            <ScrollVelocityRow
-              baseVelocity={40}
-              rowIndex={2}
-              paused={!!selectedQuiz}>
-              Educational Analytics Student Engagement Knowledge Discovery
-              Learning Analytics
-            </ScrollVelocityRow>
-            <ScrollVelocityRow
-              baseVelocity={40}
-              rowIndex={3}
-              paused={!!selectedQuiz}>
-              Artificial Intelligence Machine Learning Neural Networks Cognitive
-              Computing
-            </ScrollVelocityRow>
-            <ScrollVelocityRow
-              baseVelocity={40}
-              rowIndex={4}
-              paused={!!selectedQuiz}>
-              Interactive Assessment Educational Technology Intelligent Tutoring
-              Automated Grading
-            </ScrollVelocityRow>
-            <ScrollVelocityRow
-              baseVelocity={40}
-              rowIndex={5}
-              paused={!!selectedQuiz}>
-              AI Education Smart Learning Intelligent Teaching Digital Classroom
-            </ScrollVelocityRow>
-            <ScrollVelocityRow
-              baseVelocity={40}
-              rowIndex={6}
-              paused={!!selectedQuiz}>
-              Adaptive Assessment Personalized Learning Virtual Teacher
-              Cognitive Training
-            </ScrollVelocityRow>
-            <ScrollVelocityRow
-              baseVelocity={40}
-              rowIndex={7}
-              paused={!!selectedQuiz}>
-              Educational Analytics Student Engagement Knowledge Discovery
-              Learning Analytics
-            </ScrollVelocityRow>
-            <ScrollVelocityRow
-              baseVelocity={40}
-              rowIndex={8}
-              paused={!!selectedQuiz}>
-              Artificial Intelligence Machine Learning Neural Networks Cognitive
-              Computing
-            </ScrollVelocityRow>
-            <ScrollVelocityRow
-              baseVelocity={40}
-              rowIndex={9}
-              paused={!!selectedQuiz}>
-              Interactive Assessment Educational Technology Intelligent Tutoring
-              Automated Grading
-            </ScrollVelocityRow>
-          </ScrollVelocityContainer>
-        </div>
+            {!isMobile && (
+              <div className="absolute inset-0 -z-10 opacity-5 hidden md:block">
+                <ScrollVelocityContainer className="text-6xl md:text-8xl font-bold">
+                  <ScrollVelocityRow
+                    baseVelocity={40}
+                    rowIndex={0}
+                    paused={!!selectedQuiz}>
+                    AI Education Smart Learning Intelligent Teaching Digital
+                    Classroom
+                  </ScrollVelocityRow>
+                  <ScrollVelocityRow
+                    baseVelocity={40}
+                    rowIndex={1}
+                    paused={!!selectedQuiz}>
+                    Adaptive Assessment Personalized Learning Virtual Teacher
+                    Cognitive Training
+                  </ScrollVelocityRow>
+                  <ScrollVelocityRow
+                    baseVelocity={40}
+                    rowIndex={2}
+                    paused={!!selectedQuiz}>
+                    Educational Analytics Student Engagement Knowledge Discovery
+                    Learning Analytics
+                  </ScrollVelocityRow>
+                  <ScrollVelocityRow
+                    baseVelocity={40}
+                    rowIndex={3}
+                    paused={!!selectedQuiz}>
+                    Artificial Intelligence Machine Learning Neural Networks
+                    Cognitive Computing
+                  </ScrollVelocityRow>
+                  <ScrollVelocityRow
+                    baseVelocity={40}
+                    rowIndex={4}
+                    paused={!!selectedQuiz}>
+                    Interactive Assessment Educational Technology Intelligent
+                    Tutoring Automated Grading
+                  </ScrollVelocityRow>
+                  <ScrollVelocityRow
+                    baseVelocity={40}
+                    rowIndex={5}
+                    paused={!!selectedQuiz}>
+                    AI Education Smart Learning Intelligent Teaching Digital
+                    Classroom
+                  </ScrollVelocityRow>
+                  <ScrollVelocityRow
+                    baseVelocity={40}
+                    rowIndex={6}
+                    paused={!!selectedQuiz}>
+                    Adaptive Assessment Personalized Learning Virtual Teacher
+                    Cognitive Training
+                  </ScrollVelocityRow>
+                  <ScrollVelocityRow
+                    baseVelocity={40}
+                    rowIndex={7}
+                    paused={!!selectedQuiz}>
+                    Educational Analytics Student Engagement Knowledge Discovery
+                    Learning Analytics
+                  </ScrollVelocityRow>
+                  <ScrollVelocityRow
+                    baseVelocity={40}
+                    rowIndex={8}
+                    paused={!!selectedQuiz}>
+                    Artificial Intelligence Machine Learning Neural Networks
+                    Cognitive Computing
+                  </ScrollVelocityRow>
+                  <ScrollVelocityRow
+                    baseVelocity={40}
+                    rowIndex={9}
+                    paused={!!selectedQuiz}>
+                    Interactive Assessment Educational Technology Intelligent
+                    Tutoring Automated Grading
+                  </ScrollVelocityRow>
+                </ScrollVelocityContainer>
+              </div>
+            )}
 
-        <div className="container mx-auto max-w-4xl text-center">
-          <div className="flex justify-center mb-6">
-            <BookOpen className="w-16 h-16 text-[#B5CC89]" />
-          </div>
-
-          <h1 className="text-4xl md:text-6xl font-bold mb-4">
-            Thư viện Quiz Chung
-          </h1>
-          <p className="text-lg text-muted-foreground mb-8">
-            Khám phá và sử dụng hàng nghìn bài quiz do cộng đồng chia sẻ. Học
-            tập, ôn luyện và mở rộng kiến thức của bạn.
-          </p>
-        </div>
-
-        <div className="container mx-auto max-w-6xl">
-          {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
-            <Card className="rounded-2xl bg-secondary/20 backdrop-blur-sm">
-              <CardContent className="p-6 text-center">
-                <div
-                  ref={totalQuizzesRef}
-                  className="text-4xl md:text-5xl font-bold text-primary mb-2">
-                  0
-                </div>
-                <p className="text-sm md:text-base text-muted-foreground font-medium">
-                  Quiz
-                </p>
-              </CardContent>
-            </Card>
-            <Card className="rounded-2xl bg-secondary/20 backdrop-blur-sm">
-              <CardContent className="p-6 text-center">
-                <div
-                  ref={totalCategoriesRef}
-                  className="text-4xl md:text-5xl font-bold text-primary mb-2">
-                  0
-                </div>
-                <p className="text-sm md:text-base text-muted-foreground font-medium">
-                  Chủ đề
-                </p>
-              </CardContent>
-            </Card>
-            <Card className="rounded-2xl bg-secondary/20 backdrop-blur-sm">
-              <CardContent className="p-6 text-center">
-                <div
-                  ref={totalCreatorsRef}
-                  className="text-4xl md:text-5xl font-bold text-primary mb-2">
-                  0
-                </div>
-                <p className="text-sm md:text-base text-muted-foreground font-medium">
-                  Người tạo
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Search & Filters */}
-          <div className="max-w-4xl mx-auto mb-12 space-y-4">
-            {/* Search Bar */}
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-              <Input
-                ref={searchInputRef}
-                placeholder="Tìm kiếm trong tiêu đề, mô tả, câu hỏi... (⌘K)"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-12 pr-12 text-base py-6 rounded-xl border-2 focus:border-[#B5CC89] transition-all"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery("")}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 p-1 hover:bg-muted rounded-full transition-colors"
-                  aria-label="Xóa tìm kiếm">
-                  <X className="h-4 w-4 text-muted-foreground" />
-                </button>
-              )}
-            </div>
-
-            {/* Filters Row */}
-            <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
-              <div className="flex flex-wrap gap-3 items-center">
-                {/* Sort By */}
-                <div className="flex items-center gap-2">
-                  <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
-                  <Select
-                    value={sortBy}
-                    onValueChange={(v) => {
-                      play("toggle");
-                      setSortBy(v as typeof sortBy);
-                    }}>
-                    <SelectTrigger className="w-full sm:w-[180px] border-2">
-                      <SelectValue placeholder="Sắp xếp theo" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="usage">
-                        Nhiều lượt dùng nhất
-                      </SelectItem>
-                      <SelectItem value="downloads">
-                        Nhiều lượt tải nhất
-                      </SelectItem>
-                      <SelectItem value="date">Mới nhất</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Search In */}
-                <div className="flex items-center gap-2">
-                  <Filter className="h-4 w-4 text-muted-foreground" />
-                  <Select
-                    value={searchIn}
-                    onValueChange={(v) => {
-                      play("toggle");
-                      setSearchIn(v as typeof searchIn);
-                    }}>
-                    <SelectTrigger className="w-full sm:w-[160px] border-2">
-                      <SelectValue placeholder="Tìm trong" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Tất cả</SelectItem>
-                      <SelectItem value="title">Tiêu đề & Mô tả</SelectItem>
-                      <SelectItem value="content">Nội dung câu hỏi</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Category & Difficulty Filters */}
-                <CategoryFilters
-                  selectedCategory={selectedCategory}
-                  selectedDifficulty={selectedDifficulty}
-                  onCategoryChange={setSelectedCategory}
-                  onDifficultyChange={setSelectedDifficulty}
-                  availableCategories={availableCategories}
-                />
+            <div className="container mx-auto max-w-4xl text-center">
+              <div className="flex justify-center mb-6">
+                <BookOpen className="w-16 h-16 text-[#B5CC89]" />
               </div>
 
-              {/* Search Results Count */}
-              {debouncedQuery && (
-                <Badge
-                  variant="secondary"
-                  className="bg-[#B5CC89]/20 text-[#B5CC89] px-4 py-2">
-                  {filteredQuizzes.length} kết quả
-                </Badge>
-              )}
+              <h1 className="text-4xl md:text-6xl font-bold mb-4">
+                Thư viện Quiz Chung
+              </h1>
+              <p className="text-lg text-muted-foreground mb-8">
+                Khám phá và sử dụng hàng nghìn bài quiz do cộng đồng chia sẻ.
+                Học tập, ôn luyện và mở rộng kiến thức của bạn.
+              </p>
             </div>
-          </div>
 
-          {/* Quiz List */}
-          {loading ? (
-            <div
-              data-lib-list
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-500">
-              {[...Array(6)].map((_, i) => (
-                <QuizCardSkeleton key={i} />
-              ))}
-            </div>
-          ) : (
-            <div
-              data-lib-list
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-500 items-start">
-              {displayedQuizzes.map((quiz) => (
-                <QuizCard
-                  key={quiz.id}
-                  quiz={quiz}
-                  onPreview={() => setSelectedQuiz(quiz)}
-                  onUse={() => handleUseQuiz(quiz)}
-                  onDownload={async () => {
-                    try {
-                      // Increment PDF download count
-                      await supabase.rpc("increment_quiz_pdf_download", {
-                        quiz_id: quiz.id,
-                      });
+            <div className="container mx-auto max-w-6xl">
+              {/* Stats */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
+                <Card className="rounded-2xl bg-secondary/20 backdrop-blur-sm">
+                  <CardContent className="p-6 text-center">
+                    <div
+                      ref={totalQuizzesRef}
+                      className="text-4xl md:text-5xl font-bold text-primary mb-2">
+                      0
+                    </div>
+                    <p className="text-sm md:text-base text-muted-foreground font-medium">
+                      Quiz
+                    </p>
+                  </CardContent>
+                </Card>
+                <Card className="rounded-2xl bg-secondary/20 backdrop-blur-sm">
+                  <CardContent className="p-6 text-center">
+                    <div
+                      ref={totalCategoriesRef}
+                      className="text-4xl md:text-5xl font-bold text-primary mb-2">
+                      0
+                    </div>
+                    <p className="text-sm md:text-base text-muted-foreground font-medium">
+                      Chủ đề
+                    </p>
+                  </CardContent>
+                </Card>
+                <Card className="rounded-2xl bg-secondary/20 backdrop-blur-sm">
+                  <CardContent className="p-6 text-center">
+                    <div
+                      ref={totalCreatorsRef}
+                      className="text-4xl md:text-5xl font-bold text-primary mb-2">
+                      0
+                    </div>
+                    <p className="text-sm md:text-base text-muted-foreground font-medium">
+                      Người tạo
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
 
-                      // Chuẩn hóa về Question[] chặt chẽ
-                      const questionsArray: Question[] =
-                        normalizeToQuestions(
-                          Array.isArray(quiz.questions)
-                            ? quiz.questions
-                            : JSON.parse(String(quiz.questions || "[]"))
-                        );
-
-                      const title = quiz.title || "quiz";
-                      const filename = `${
-                        title.replace(/\s+/g, "-").toLowerCase() || "quiz"
-                      }.pdf`;
-
-                      // Warm up worker (no-op if already warmed) then generate in background thread
-                      await warmupPdfWorker().catch(() => {});
-                      await generateAndDownloadPdf({
-                        filename,
-                        title,
-                        description: quiz.description || "",
-                        questions: questionsArray,
-                        showResults: false,
-                        userAnswers: [],
-                      });
-
-                      toast({
-                        title: "Đã tải xuống PDF",
-                        description: `Quiz được lưu thành ${filename}`,
-                        variant: "success",
-                      });
-                    } catch (e) {
-                      console.error("Download quiz PDF error:", e);
-                      toast({
-                        title: "Lỗi",
-                        description: "Không thể tạo/tải PDF.",
-                        variant: "destructive",
-                      });
-                    }
-                  }}
-                  formatDate={formatDate}
-                  formatNumber={formatNumber}
-                />
-              ))}
-            </div>
-          )}
-
-          {(filteredQuizzes.length > PAGE_SIZE ||
-            (hasMore && !debouncedQuery)) && (
-            <div className="flex justify-center gap-3 mt-8">
-              {filteredQuizzes.length > PAGE_SIZE && (
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    if (displayLimit > PAGE_SIZE) {
-                      setDisplayLimit(PAGE_SIZE);
-                    } else {
-                      setDisplayLimit(
-                        Math.max(PAGE_SIZE, filteredQuizzes.length)
-                      );
-                    }
-                  }}
-                  className="min-w-[140px]">
-                  {displayLimit > PAGE_SIZE ? "Thu gọn" : "Hiển thị tất cả"}
-                </Button>
-              )}
-
-              {hasMore && !debouncedQuery && (
-                <Button
-                  variant="outline"
-                  onClick={loadMore}
-                  disabled={loadingMore}
-                  className="min-w-[140px]">
-                  {loadingMore ? (
-                    <span className="flex items-center gap-2">
-                      <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary" />
-                      Đang tải...
-                    </span>
-                  ) : (
-                    "Xem thêm"
-                  )}
-                </Button>
-              )}
-            </div>
-          )}
-
-          {!loading && filteredQuizzes.length === 0 && (
-            <div className="text-center py-16 px-4">
-              <div className="max-w-md mx-auto">
-                <Search className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-2">
-                  {searchQuery ? "Không tìm thấy kết quả" : "Không có quiz"}
-                </h3>
-                <p className="text-muted-foreground mb-4">
-                  {searchQuery
-                    ? `Không tìm thấy quiz nào cho "${searchQuery}"`
-                    : "Hãy tạo một quiz và chia sẻ!"}
-                </p>
-                {searchQuery && (
-                  <div className="space-y-2">
-                    <p className="text-sm text-muted-foreground">Gợi ý:</p>
-                    <ul className="text-sm text-muted-foreground space-y-1">
-                      <li>• Thử từ khóa khác hoặc ngắn gọn hơn</li>
-                      <li>• Kiểm tra chính tả</li>
-                      <li>• Thử thay đổi phạm vi tìm kiếm</li>
-                      <li>• Thử sắp xếp theo tiêu chí khác</li>
-                    </ul>
-                    <Button
-                      variant="outline"
+              {/* Search & Filters */}
+              <div className="max-w-4xl mx-auto mb-12 space-y-4">
+                {/* Search Bar */}
+                <div className="relative">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                  <Input
+                    ref={searchInputRef}
+                    placeholder="Tìm kiếm trong tiêu đề, mô tả, câu hỏi... (⌘K)"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-12 pr-12 text-base py-6 rounded-xl border-2 focus:border-[#B5CC89] transition-all"
+                  />
+                  {searchQuery && (
+                    <button
                       onClick={() => setSearchQuery("")}
-                      className="mt-4">
-                      Xóa bộ lọc
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* Selected Quiz Preview Modal (Radix Dialog) */}
-      <Dialog
-        open={!!selectedQuiz}
-        onOpenChange={(open) => {
-          if (!open) setSelectedQuiz(null);
-        }}>
-        <DialogContent className="p-0 w-full max-w-3xl">
-          <DialogTitle className="sr-only">
-            {selectedQuiz
-              ? `Xem trước quiz: ${selectedQuiz.title}`
-              : "Xem trước quiz"}
-          </DialogTitle>
-          <div className="h-[85vh] flex flex-col">
-            <Card className="w-full h-full border-2 rounded-xl shadow-lg bg-card flex flex-col">
-              <CardHeader className="sticky top-0 pb-4 border-b bg-card z-10 flex-shrink-0">
-                <div className="flex justify-between items-start gap-4">
-                  <div className="flex-1">
-                    <CardTitle className="text-2xl md:text-3xl font-bold mb-2">
-                      {selectedQuiz?.title}
-                    </CardTitle>
-                    {selectedQuiz?.description && (
-                      <CardDescription className="text-base">
-                        {selectedQuiz.description}
-                      </CardDescription>
-                    )}
-                    <div className="mt-3">
-                      {selectedQuiz && (
-                        <QuizCategoryBadge
-                          category={selectedQuiz.category}
-                          difficulty={selectedQuiz.difficulty}
-                          size="md"
-                        />
-                      )}
-                    </div>
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => setSelectedQuiz(null)}
-                    className="rounded-full hover:bg-destructive hover:text-destructive-foreground flex-shrink-0"
-                    aria-label="Đóng">
-                    ✕
-                  </Button>
+                      className="absolute right-4 top-1/2 -translate-y-1/2 p-1 hover:bg-muted rounded-full transition-colors"
+                      aria-label="Xóa tìm kiếm">
+                      <X className="h-4 w-4 text-muted-foreground" />
+                    </button>
+                  )}
                 </div>
-              </CardHeader>
-              <CardContent className="flex-1 overflow-y-auto scroll-touch overscroll-contain scrollbar-stable">
-                {selectedQuiz && (
-                  <div className="space-y-6">
-                    <div className="flex flex-wrap gap-3 py-4 border-b">
-                      {/* Tags */}
-                      {selectedQuiz.tags && selectedQuiz.tags.length > 0 && (
-                        <QuizTags tags={selectedQuiz.tags} />
-                      )}
-                      <Badge
-                        variant="secondary"
-                        className="bg-[#B5CC89]/20 text-[#B5CC89]">
-                        {Array.isArray(selectedQuiz.questions)
-                          ? selectedQuiz.questions.length
-                          : 0}{" "}
-                        câu hỏi
-                      </Badge>
-                      <Badge variant="secondary" className="bg-secondary/50">
-                        {formatDate(selectedQuiz.created_at)}
-                      </Badge>
+
+                {/* Filters Row */}
+                <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
+                  <div className="flex flex-wrap gap-3 items-center">
+                    {/* Sort By */}
+                    <div className="flex items-center gap-2">
+                      <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
+                      <Select
+                        value={sortBy}
+                        onValueChange={(v) => {
+                          play("toggle");
+                          setSortBy(v as typeof sortBy);
+                        }}>
+                        <SelectTrigger className="w-full sm:w-[180px] border-2">
+                          <SelectValue placeholder="Sắp xếp theo" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="usage">
+                            Nhiều lượt dùng nhất
+                          </SelectItem>
+                          <SelectItem value="downloads">
+                            Nhiều lượt tải nhất
+                          </SelectItem>
+                          <SelectItem value="date">Mới nhất</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
-                    <div className="space-y-4">
-                      <h3 className="font-semibold text-lg mb-4">
-                        Danh sách câu hỏi:
-                      </h3>
-                      {Array.isArray(selectedQuiz.questions) &&
-                      selectedQuiz.questions.length > 0 ? (
-                        (selectedQuiz.questions as QuizQuestion[]).map(
-                          (q, idx) => (
-                            <div
-                              key={idx}
-                              className="border-2 hover:border-[#B5CC89] rounded-lg p-4 space-y-3 transition-colors duration-300 hover:shadow-md">
-                              <h4 className="font-semibold text-sm sm:text-base text-foreground">
-                                {idx + 1}. {q.question || "Không có câu hỏi"}
-                              </h4>
-                              <div className="space-y-2 pl-4">
-                                {Array.isArray(q.options) &&
-                                q.options.length > 0 ? (
-                                  q.options.map((opt, optIdx) => (
-                                    <div
-                                      key={optIdx}
-                                      className="text-xs sm:text-sm text-muted-foreground">
-                                      <span className="font-medium text-foreground">
-                                        {String.fromCharCode(65 + optIdx)}.
-                                      </span>{" "}
-                                      {opt}
-                                    </div>
-                                  ))
-                                ) : (
-                                  <div className="text-xs sm:text-sm text-muted-foreground italic">
-                                    Không có đáp án
-                                  </div>
-                                )}
-                              </div>
-                              {q.explanation && (
-                                <div className="text-xs text-muted-foreground pt-3 border-t">
-                                  <span className="font-semibold text-foreground">
-                                    Giải thích:
-                                  </span>{" "}
-                                  {q.explanation}
-                                </div>
-                              )}
-                            </div>
-                          )
-                        )
-                      ) : (
-                        <div className="text-sm text-muted-foreground text-center py-8">
-                          Không có câu hỏi
-                        </div>
-                      )}
+
+                    {/* Search In */}
+                    <div className="flex items-center gap-2">
+                      <Filter className="h-4 w-4 text-muted-foreground" />
+                      <Select
+                        value={searchIn}
+                        onValueChange={(v) => {
+                          play("toggle");
+                          setSearchIn(v as typeof searchIn);
+                        }}>
+                        <SelectTrigger className="w-full sm:w-[160px] border-2">
+                          <SelectValue placeholder="Tìm trong" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Tất cả</SelectItem>
+                          <SelectItem value="title">Tiêu đề & Mô tả</SelectItem>
+                          <SelectItem value="content">
+                            Nội dung câu hỏi
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
-                    <Button
-                      onClick={async () => {
+
+                    {/* Category & Difficulty Filters */}
+                    <CategoryFilters
+                      selectedCategory={selectedCategory}
+                      selectedDifficulty={selectedDifficulty}
+                      onCategoryChange={setSelectedCategory}
+                      onDifficultyChange={setSelectedDifficulty}
+                      availableCategories={availableCategories}
+                    />
+                  </div>
+
+                  {/* Search Results Count */}
+                  {debouncedQuery && (
+                    <Badge
+                      variant="secondary"
+                      className="bg-[#B5CC89]/20 text-[#B5CC89] px-4 py-2">
+                      {filteredQuizzes.length} kết quả
+                    </Badge>
+                  )}
+                </div>
+              </div>
+
+              {/* Quiz List */}
+              {loading ? (
+                <div
+                  data-lib-list
+                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-500">
+                  {[...Array(6)].map((_, i) => (
+                    <QuizCardSkeleton key={i} />
+                  ))}
+                </div>
+              ) : (
+                <div
+                  data-lib-list
+                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-500 items-start">
+                  {displayedQuizzes.map((quiz) => (
+                    <QuizCard
+                      key={quiz.id}
+                      quiz={quiz}
+                      onPreview={() => setSelectedQuiz(quiz)}
+                      onUse={() => handleUseQuiz(quiz)}
+                      onDownload={async () => {
                         try {
                           // Increment PDF download count
                           await supabase.rpc("increment_quiz_pdf_download", {
-                            quiz_id: selectedQuiz.id,
+                            quiz_id: quiz.id,
                           });
+
+                          // Chuẩn hóa về Question[] chặt chẽ
                           const questionsArray: Question[] =
                             normalizeToQuestions(
-                              Array.isArray(selectedQuiz.questions)
-                                ? selectedQuiz.questions
-                                : JSON.parse(
-                                    String(selectedQuiz.questions || "[]")
-                                  )
+                              Array.isArray(quiz.questions)
+                                ? quiz.questions
+                                : JSON.parse(String(quiz.questions || "[]"))
                             );
-                          const title = selectedQuiz.title || "quiz";
+
+                          const title = quiz.title || "quiz";
                           const filename = `${
                             title.replace(/\s+/g, "-").toLowerCase() || "quiz"
                           }.pdf`;
+
+                          // Warm up worker (no-op if already warmed) then generate in background thread
                           await warmupPdfWorker().catch(() => {});
                           await generateAndDownloadPdf({
                             filename,
                             title,
-                            description: selectedQuiz.description || "",
+                            description: quiz.description || "",
                             questions: questionsArray,
                             showResults: false,
                             userAnswers: [],
                           });
+
                           toast({
                             title: "Đã tải xuống PDF",
-                            description: `Đã lưu ${filename}`,
+                            description: `Quiz được lưu thành ${filename}`,
                             variant: "success",
                           });
                         } catch (e) {
@@ -1112,19 +882,265 @@ const QuizLibrary: React.FC = () => {
                           });
                         }
                       }}
-                      variant="hero"
-                      className="w-full group hover:bg-black hover:text-white">
-                      <Download className="h-4 w-4 mr-2" />
-                      Tải xuống PDF Quiz
+                      formatDate={formatDate}
+                      formatNumber={formatNumber}
+                    />
+                  ))}
+                </div>
+              )}
+
+              {(filteredQuizzes.length > PAGE_SIZE ||
+                (hasMore && !debouncedQuery)) && (
+                <div className="flex justify-center gap-3 mt-8">
+                  {filteredQuizzes.length > PAGE_SIZE && (
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        if (displayLimit > PAGE_SIZE) {
+                          setDisplayLimit(PAGE_SIZE);
+                        } else {
+                          setDisplayLimit(
+                            Math.max(PAGE_SIZE, filteredQuizzes.length)
+                          );
+                        }
+                      }}
+                      className="min-w-[140px]">
+                      {displayLimit > PAGE_SIZE ? "Thu gọn" : "Hiển thị tất cả"}
                     </Button>
+                  )}
+
+                  {hasMore && !debouncedQuery && (
+                    <Button
+                      variant="outline"
+                      onClick={loadMore}
+                      disabled={loadingMore}
+                      className="min-w-[140px]">
+                      {loadingMore ? (
+                        <span className="flex items-center gap-2">
+                          <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary" />
+                          Đang tải...
+                        </span>
+                      ) : (
+                        "Xem thêm"
+                      )}
+                    </Button>
+                  )}
+                </div>
+              )}
+
+              {!loading && filteredQuizzes.length === 0 && (
+                <div className="text-center py-16 px-4">
+                  <div className="max-w-md mx-auto">
+                    <Search className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold mb-2">
+                      {searchQuery ? "Không tìm thấy kết quả" : "Không có quiz"}
+                    </h3>
+                    <p className="text-muted-foreground mb-4">
+                      {searchQuery
+                        ? `Không tìm thấy quiz nào cho "${searchQuery}"`
+                        : "Hãy tạo một quiz và chia sẻ!"}
+                    </p>
+                    {searchQuery && (
+                      <div className="space-y-2">
+                        <p className="text-sm text-muted-foreground">Gợi ý:</p>
+                        <ul className="text-sm text-muted-foreground space-y-1">
+                          <li>• Thử từ khóa khác hoặc ngắn gọn hơn</li>
+                          <li>• Kiểm tra chính tả</li>
+                          <li>• Thử thay đổi phạm vi tìm kiếm</li>
+                          <li>• Thử sắp xếp theo tiêu chí khác</li>
+                        </ul>
+                        <Button
+                          variant="outline"
+                          onClick={() => setSearchQuery("")}
+                          className="mt-4">
+                          Xóa bộ lọc
+                        </Button>
+                      </div>
+                    )}
                   </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-        </DialogContent>
-      </Dialog>
-      <AuthModal open={showAuthModal} onOpenChange={setShowAuthModal} />
+                </div>
+              )}
+            </div>
+          </section>
+
+          {/* Selected Quiz Preview Modal (Radix Dialog) */}
+          <Dialog
+            open={!!selectedQuiz}
+            onOpenChange={(open) => {
+              if (!open) setSelectedQuiz(null);
+            }}>
+            <DialogContent className="p-0 w-full max-w-3xl">
+              <DialogTitle className="sr-only">
+                {selectedQuiz
+                  ? `Xem trước quiz: ${selectedQuiz.title}`
+                  : "Xem trước quiz"}
+              </DialogTitle>
+              <div className="h-[85vh] flex flex-col">
+                <Card className="w-full h-full border-2 rounded-xl shadow-lg bg-card flex flex-col">
+                  <CardHeader className="sticky top-0 pb-4 border-b bg-card z-10 flex-shrink-0">
+                    <div className="flex justify-between items-start gap-4">
+                      <div className="flex-1">
+                        <CardTitle className="text-2xl md:text-3xl font-bold mb-2">
+                          {selectedQuiz?.title}
+                        </CardTitle>
+                        {selectedQuiz?.description && (
+                          <CardDescription className="text-base">
+                            {selectedQuiz.description}
+                          </CardDescription>
+                        )}
+                        <div className="mt-3">
+                          {selectedQuiz && (
+                            <QuizCategoryBadge
+                              category={selectedQuiz.category}
+                              difficulty={selectedQuiz.difficulty}
+                              size="md"
+                            />
+                          )}
+                        </div>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => setSelectedQuiz(null)}
+                        className="rounded-full hover:bg-destructive hover:text-destructive-foreground flex-shrink-0"
+                        aria-label="Đóng">
+                        ✕
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="flex-1 overflow-y-auto scroll-touch overscroll-contain scrollbar-stable">
+                    {selectedQuiz && (
+                      <div className="space-y-6">
+                        <div className="flex flex-wrap gap-3 py-4 border-b">
+                          {/* Tags */}
+                          {selectedQuiz.tags &&
+                            selectedQuiz.tags.length > 0 && (
+                              <QuizTags tags={selectedQuiz.tags} />
+                            )}
+                          <Badge
+                            variant="secondary"
+                            className="bg-[#B5CC89]/20 text-[#B5CC89]">
+                            {Array.isArray(selectedQuiz.questions)
+                              ? selectedQuiz.questions.length
+                              : 0}{" "}
+                            câu hỏi
+                          </Badge>
+                          <Badge
+                            variant="secondary"
+                            className="bg-secondary/50">
+                            {formatDate(selectedQuiz.created_at)}
+                          </Badge>
+                        </div>
+                        <div className="space-y-4">
+                          <h3 className="font-semibold text-lg mb-4">
+                            Danh sách câu hỏi:
+                          </h3>
+                          {Array.isArray(selectedQuiz.questions) &&
+                          selectedQuiz.questions.length > 0 ? (
+                            (selectedQuiz.questions as QuizQuestion[]).map(
+                              (q, idx) => (
+                                <div
+                                  key={idx}
+                                  className="border-2 hover:border-[#B5CC89] rounded-lg p-4 space-y-3 transition-colors duration-300 hover:shadow-md">
+                                  <h4 className="font-semibold text-sm sm:text-base text-foreground">
+                                    {idx + 1}.{" "}
+                                    {q.question || "Không có câu hỏi"}
+                                  </h4>
+                                  <div className="space-y-2 pl-4">
+                                    {Array.isArray(q.options) &&
+                                    q.options.length > 0 ? (
+                                      q.options.map((opt, optIdx) => (
+                                        <div
+                                          key={optIdx}
+                                          className="text-xs sm:text-sm text-muted-foreground">
+                                          <span className="font-medium text-foreground">
+                                            {String.fromCharCode(65 + optIdx)}.
+                                          </span>{" "}
+                                          {opt}
+                                        </div>
+                                      ))
+                                    ) : (
+                                      <div className="text-xs sm:text-sm text-muted-foreground italic">
+                                        Không có đáp án
+                                      </div>
+                                    )}
+                                  </div>
+                                  {q.explanation && (
+                                    <div className="text-xs text-muted-foreground pt-3 border-t">
+                                      <span className="font-semibold text-foreground">
+                                        Giải thích:
+                                      </span>{" "}
+                                      {q.explanation}
+                                    </div>
+                                  )}
+                                </div>
+                              )
+                            )
+                          ) : (
+                            <div className="text-sm text-muted-foreground text-center py-8">
+                              Không có câu hỏi
+                            </div>
+                          )}
+                        </div>
+                        <Button
+                          onClick={async () => {
+                            try {
+                              // Increment PDF download count
+                              await supabase.rpc(
+                                "increment_quiz_pdf_download",
+                                {
+                                  quiz_id: selectedQuiz.id,
+                                }
+                              );
+                              const questionsArray: Question[] =
+                                normalizeToQuestions(
+                                  Array.isArray(selectedQuiz.questions)
+                                    ? selectedQuiz.questions
+                                    : JSON.parse(
+                                        String(selectedQuiz.questions || "[]")
+                                      )
+                                );
+                              const title = selectedQuiz.title || "quiz";
+                              const filename = `${
+                                title.replace(/\s+/g, "-").toLowerCase() ||
+                                "quiz"
+                              }.pdf`;
+                              await warmupPdfWorker().catch(() => {});
+                              await generateAndDownloadPdf({
+                                filename,
+                                title,
+                                description: selectedQuiz.description || "",
+                                questions: questionsArray,
+                                showResults: false,
+                                userAnswers: [],
+                              });
+                              toast({
+                                title: "Đã tải xuống PDF",
+                                description: `Đã lưu ${filename}`,
+                                variant: "success",
+                              });
+                            } catch (e) {
+                              console.error("Download quiz PDF error:", e);
+                              toast({
+                                title: "Lỗi",
+                                description: "Không thể tạo/tải PDF.",
+                                variant: "destructive",
+                              });
+                            }
+                          }}
+                          variant="hero"
+                          className="w-full group hover:bg-black hover:text-white">
+                          <Download className="h-4 w-4 mr-2" />
+                          Tải xuống PDF Quiz
+                        </Button>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+            </DialogContent>
+          </Dialog>
+          <AuthModal open={showAuthModal} onOpenChange={setShowAuthModal} />
         </div>
       </div>
     </>

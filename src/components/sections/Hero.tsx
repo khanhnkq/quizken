@@ -10,13 +10,30 @@ const Hero = () => {
   const scrollToGenerator = () => {
     const element = document.getElementById("generator");
     if (element) {
-      const yOffset = 0; // Khoảng cách từ top (cho header/navbar)
-      const y =
-        element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      const headerHeight =
+        (document.querySelector("nav") as HTMLElement | null)?.clientHeight ??
+        64;
+      const marginCompensation = 8;
+      const rect = element.getBoundingClientRect();
+      const scrollTop =
+        window.pageYOffset || document.documentElement.scrollTop;
+      const elementTop = rect.top + scrollTop;
+      const offset = headerHeight + marginCompensation;
+      const targetY = elementTop - offset;
+
       window.scrollTo({
-        top: y,
+        top: targetY,
         behavior: "smooth",
       });
+
+      // Backup: ensure section sits correctly below sticky navbar
+      setTimeout(() => {
+        element.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+        window.scrollBy({ top: -offset, behavior: "smooth" });
+      }, 100);
     }
   };
 

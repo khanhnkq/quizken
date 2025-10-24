@@ -66,6 +66,7 @@ import useQuizGeneration from "@/hooks/useQuizGeneration";
 import { useGenerationPersistence } from "@/hooks/useGenerationPersistence";
 import { useAnonQuota } from "@/hooks/useAnonQuota";
 import useChillMusic from "@/hooks/useChillMusic";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 type TokenUsage = { prompt: number; candidates: number; total: number };
 
@@ -119,6 +120,7 @@ const QuizGenerator = () => {
   const [isQuestionCountSelected, setIsQuestionCountSelected] =
     useState<boolean>(false);
   const location = useLocation();
+  const isMobile = useIsMobile();
   const abortControllerRef = React.useRef<AbortController | null>(null);
   const isMountedRef = React.useRef<boolean>(true);
   const {
@@ -252,13 +254,17 @@ const QuizGenerator = () => {
         requestAnimationFrame(() => {
           const element = document.getElementById("quiz");
           if (element) {
-            const yOffset = -5;
-            const y =
+            const headerHeight =
+              (document.querySelector("nav") as HTMLElement | null)
+                ?.clientHeight ?? 64;
+            const marginCompensation = 8;
+            const targetY =
               element.getBoundingClientRect().top +
-              window.pageYOffset +
-              yOffset;
+              window.pageYOffset -
+              (headerHeight + marginCompensation);
+
             window.scrollTo({
-              top: y,
+              top: targetY,
               behavior: "smooth",
             });
           }
@@ -286,11 +292,16 @@ const QuizGenerator = () => {
       requestAnimationFrame(() => {
         const element = document.getElementById("quiz");
         if (element) {
-          const yOffset = -5; // Khoảng cách từ top (cho header/navbar)
-          const y =
-            element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+          const headerHeight =
+            (document.querySelector("nav") as HTMLElement | null)
+              ?.clientHeight ?? 64;
+          const marginCompensation = 8;
+          const targetY =
+            element.getBoundingClientRect().top +
+            window.pageYOffset -
+            (headerHeight + marginCompensation);
           window.scrollTo({
-            top: y,
+            top: targetY,
             behavior: "smooth",
           });
         }
@@ -1115,51 +1126,53 @@ const QuizGenerator = () => {
         id="generator"
         className="relative overflow-hidden bg-gradient-to-b from-secondary/30 to-background min-h-screen py-20 px-4">
         <div className="container mx-auto max-w-4xl">
-          {/* Background scroll velocity effect - within section container */}
-          <div className="absolute inset-0 -z-10 opacity-5">
-            <ScrollVelocityContainer className="text-6xl md:text-8xl font-bold">
-              <ScrollVelocityRow baseVelocity={40} rowIndex={0}>
-                AI Education Smart Learning Intelligent Teaching Digital
-                Classroom
-              </ScrollVelocityRow>
-              <ScrollVelocityRow baseVelocity={40} rowIndex={1}>
-                Adaptive Assessment Personalized Learning Virtual Teacher
-                Cognitive Training
-              </ScrollVelocityRow>
-              <ScrollVelocityRow baseVelocity={40} rowIndex={2}>
-                Educational Analytics Student Engagement Knowledge Discovery
-                Learning Analytics
-              </ScrollVelocityRow>
-              <ScrollVelocityRow baseVelocity={40} rowIndex={3}>
-                Artificial Intelligence Machine Learning Neural Networks
-                Cognitive Computing
-              </ScrollVelocityRow>
-              <ScrollVelocityRow baseVelocity={40} rowIndex={4}>
-                Interactive Assessment Educational Technology Intelligent
-                Tutoring Automated Grading
-              </ScrollVelocityRow>
-              <ScrollVelocityRow baseVelocity={40} rowIndex={5}>
-                AI Education Smart Learning Intelligent Teaching Digital
-                Classroom
-              </ScrollVelocityRow>
-              <ScrollVelocityRow baseVelocity={40} rowIndex={6}>
-                Adaptive Assessment Personalized Learning Virtual Teacher
-                Cognitive Training
-              </ScrollVelocityRow>
-              <ScrollVelocityRow baseVelocity={40} rowIndex={7}>
-                Educational Analytics Student Engagement Knowledge Discovery
-                Learning Analytics
-              </ScrollVelocityRow>
-              <ScrollVelocityRow baseVelocity={40} rowIndex={8}>
-                Artificial Intelligence Machine Learning Neural Networks
-                Cognitive Computing
-              </ScrollVelocityRow>
-              <ScrollVelocityRow baseVelocity={40} rowIndex={9}>
-                Interactive Assessment Educational Technology Intelligent
-                Tutoring Automated Grading
-              </ScrollVelocityRow>
-            </ScrollVelocityContainer>
-          </div>
+          {/* Background scroll velocity effect - desktop only to optimize mobile */}
+          {!isMobile && (
+            <div className="absolute inset-0 -z-10 opacity-5">
+              <ScrollVelocityContainer className="text-6xl md:text-8xl font-bold">
+                <ScrollVelocityRow baseVelocity={40} rowIndex={0}>
+                  AI Education Smart Learning Intelligent Teaching Digital
+                  Classroom
+                </ScrollVelocityRow>
+                <ScrollVelocityRow baseVelocity={40} rowIndex={1}>
+                  Adaptive Assessment Personalized Learning Virtual Teacher
+                  Cognitive Training
+                </ScrollVelocityRow>
+                <ScrollVelocityRow baseVelocity={40} rowIndex={2}>
+                  Educational Analytics Student Engagement Knowledge Discovery
+                  Learning Analytics
+                </ScrollVelocityRow>
+                <ScrollVelocityRow baseVelocity={40} rowIndex={3}>
+                  Artificial Intelligence Machine Learning Neural Networks
+                  Cognitive Computing
+                </ScrollVelocityRow>
+                <ScrollVelocityRow baseVelocity={40} rowIndex={4}>
+                  Interactive Assessment Educational Technology Intelligent
+                  Tutoring Automated Grading
+                </ScrollVelocityRow>
+                <ScrollVelocityRow baseVelocity={40} rowIndex={5}>
+                  AI Education Smart Learning Intelligent Teaching Digital
+                  Classroom
+                </ScrollVelocityRow>
+                <ScrollVelocityRow baseVelocity={40} rowIndex={6}>
+                  Adaptive Assessment Personalized Learning Virtual Teacher
+                  Cognitive Training
+                </ScrollVelocityRow>
+                <ScrollVelocityRow baseVelocity={40} rowIndex={7}>
+                  Educational Analytics Student Engagement Knowledge Discovery
+                  Learning Analytics
+                </ScrollVelocityRow>
+                <ScrollVelocityRow baseVelocity={40} rowIndex={8}>
+                  Artificial Intelligence Machine Learning Neural Networks
+                  Cognitive Computing
+                </ScrollVelocityRow>
+                <ScrollVelocityRow baseVelocity={40} rowIndex={9}>
+                  Interactive Assessment Educational Technology Intelligent
+                  Tutoring Automated Grading
+                </ScrollVelocityRow>
+              </ScrollVelocityContainer>
+            </div>
+          )}
           <div className="text-center mb-12">
             <div className="flex justify-center mb-6">
               <Sparkles className="w-16 h-16 text-[#B5CC89]" />
@@ -1244,12 +1257,15 @@ const QuizGenerator = () => {
                       setShowConfirmDialog(false);
                       const el = document.getElementById("generator");
                       if (el) {
-                        const yOffset = 0;
-                        const y =
+                        const headerHeight =
+                          (document.querySelector("nav") as HTMLElement | null)
+                            ?.clientHeight ?? 64;
+                        const marginCompensation = 8;
+                        const targetY =
                           el.getBoundingClientRect().top +
-                          window.pageYOffset +
-                          yOffset;
-                        window.scrollTo({ top: y, behavior: "smooth" });
+                          window.pageYOffset -
+                          (headerHeight + marginCompensation);
+                        window.scrollTo({ top: targetY, behavior: "smooth" });
                       }
                       void generateQuiz();
                     }}>

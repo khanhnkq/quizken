@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Menu, LogOut, User, Settings } from "@/lib/icons";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/lib/auth";
 import { Link } from "react-router-dom";
 import AuthModal from "@/components/AuthModal";
@@ -25,9 +25,11 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showApiSettings, setShowApiSettings] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const { user, signOut, loading } = useAuth();
   const { play } = useAudio();
   const playClick = () => play("click");
+  const navRef = useRef<HTMLElement | null>(null);
 
   // Lắng nghe sự kiện toàn cục để mở modal đăng nhập từ bất kỳ nơi nào
   useEffect(() => {
@@ -35,6 +37,24 @@ const Navbar = () => {
     window.addEventListener("open-auth-modal", handleOpenAuth);
     return () => {
       window.removeEventListener("open-auth-modal", handleOpenAuth);
+    };
+  }, []);
+
+  // Theo dõi cuộn để thêm shadow khi trang được cuộn
+  useEffect(() => {
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        setScrolled(window.scrollY > 4);
+        ticking = false;
+      });
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => {
+      window.removeEventListener("scroll", onScroll);
     };
   }, []);
 
@@ -60,8 +80,28 @@ const Navbar = () => {
     signOut();
   };
 
+  // Cập nhật CSS var --navbar-height theo chiều cao thực tế của nav (ảnh hưởng mobile menu)
+  useEffect(() => {
+    const updateVar = () => {
+      const h =
+        navRef.current?.clientHeight ??
+        (document.querySelector("nav") as HTMLElement | null)?.clientHeight ??
+        64;
+      document.documentElement.style.setProperty("--navbar-height", `${h}px`);
+    };
+    updateVar();
+    window.addEventListener("resize", updateVar);
+    return () => {
+      window.removeEventListener("resize", updateVar);
+    };
+  }, [isOpen]);
+
   return (
-    <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
+    <nav
+      ref={navRef}
+      className={`sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b transition-shadow ${
+        scrolled ? "shadow-sm" : ""
+      }`}>
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">

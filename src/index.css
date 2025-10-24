@@ -265,3 +265,18 @@ All colors MUST be HSL.
     scrollbar-gutter: stable;
   }
 }
+
+/* Sticky navbar utilities - global scroll offsets */
+:root {
+  --navbar-height: 64px;
+}
+
+html {
+  scroll-padding-top: calc(var(--navbar-height, 64px) + 8px);
+}
+
+#hero,
+#generator,
+#quiz {
+  scroll-margin-top: calc(var(--navbar-height, 64px) + 8px);
+}
