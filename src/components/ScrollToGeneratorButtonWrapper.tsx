@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useCallback } from "react";
+import * as React from "react";
+import {  useEffect, useState, useCallback  } from "react";
 import { useLocation } from "react-router-dom";
 import { gsap } from "gsap";
 import ScrollSmoother from "gsap/ScrollSmoother";

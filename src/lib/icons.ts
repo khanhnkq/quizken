@@ -1,5 +1,71 @@
 import * as React from "react";
-import * as RadixIcons from "@radix-ui/react-icons";
+import {
+  ArrowUpIcon,
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  ArrowDownIcon,
+  CaretSortIcon,
+  UpdateIcon,
+  MagicWandIcon,
+  StarIcon,
+  LightningBoltIcon,
+  RocketIcon,
+  ReloadIcon,
+  LockClosedIcon,
+  EnterIcon,
+  ExitIcon,
+  ReaderIcon,
+  ActivityLogIcon,
+  MixerVerticalIcon,
+  VideoIcon,
+  PlayIcon,
+  TargetIcon,
+  Crosshair1Icon,
+  GlobeIcon,
+  PlusCircledIcon,
+  PinBottomIcon,
+  PinRightIcon,
+  DesktopIcon,
+  ArchiveIcon,
+  HeartIcon,
+  BookmarkIcon,
+  MixerHorizontalIcon,
+  Pencil2Icon,
+  SpeakerLoudIcon,
+  SpeakerModerateIcon,
+  TriangleUpIcon,
+  FileIcon,
+  DownloadIcon,
+  CheckCircledIcon,
+  CheckIcon,
+  InfoCircledIcon,
+  ExclamationTriangleIcon,
+  HamburgerMenuIcon,
+  PersonIcon,
+  GearIcon,
+  ChatBubbleIcon,
+  Cross2Icon,
+  Cross1Icon,
+  PauseIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  CircleIcon,
+  DotsHorizontalIcon,
+  MagnifyingGlassIcon,
+  ClockIcon,
+  LayoutIcon,
+  DragHandleDots2Icon,
+  DotFilledIcon,
+  CursorArrowIcon,
+  ClipboardCopyIcon,
+  ClipboardIcon,
+  EyeOpenIcon,
+  EyeClosedIcon,
+  TrashIcon,
+  QuestionMarkCircledIcon,
+} from "@radix-ui/react-icons";
 
 export type AppIcon = React.FC<
   React.SVGProps<SVGSVGElement> & { size?: number }
@@ -9,10 +75,75 @@ export type LucideIcon = AppIcon;
 type RadixIconComponent = React.ComponentType<React.SVGProps<SVGSVGElement>>;
 type RadixIconMap = Record<string, RadixIconComponent>;
 
-// Cast module exports to a string-indexed map of icon components
-const ICONS = RadixIcons as unknown as RadixIconMap;
-
 const FALLBACK_ICON = "QuestionMarkCircledIcon";
+
+const ICONS: RadixIconMap = {
+  ArrowUpIcon,
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  ArrowDownIcon,
+  CaretSortIcon,
+  UpdateIcon,
+  MagicWandIcon,
+  StarIcon,
+  LightningBoltIcon,
+  RocketIcon,
+  ReloadIcon,
+  LockClosedIcon,
+  EnterIcon,
+  ExitIcon,
+  ReaderIcon,
+  ActivityLogIcon,
+  MixerVerticalIcon,
+  VideoIcon,
+  PlayIcon,
+  TargetIcon,
+  Crosshair1Icon,
+  GlobeIcon,
+  PlusCircledIcon,
+  PinBottomIcon,
+  PinRightIcon,
+  DesktopIcon,
+  ArchiveIcon,
+  HeartIcon,
+  BookmarkIcon,
+  MixerHorizontalIcon,
+  Pencil2Icon,
+  SpeakerLoudIcon,
+  SpeakerModerateIcon,
+  TriangleUpIcon,
+  FileIcon,
+  DownloadIcon,
+  CheckCircledIcon,
+  CheckIcon,
+  InfoCircledIcon,
+  ExclamationTriangleIcon,
+  HamburgerMenuIcon,
+  PersonIcon,
+  GearIcon,
+  ChatBubbleIcon,
+  Cross2Icon,
+  Cross1Icon,
+  PauseIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  CircleIcon,
+  DotsHorizontalIcon,
+  MagnifyingGlassIcon,
+  ClockIcon,
+  LayoutIcon,
+  DragHandleDots2Icon,
+  DotFilledIcon,
+  CursorArrowIcon,
+  ClipboardCopyIcon,
+  ClipboardIcon,
+  EyeOpenIcon,
+  EyeClosedIcon,
+  TrashIcon,
+  QuestionMarkCircledIcon,
+};
 
 function pick(name: string, alt?: string): AppIcon {
   const Comp: RadixIconComponent =
@@ -34,7 +165,7 @@ export const ArrowUp = pick("ArrowUpIcon");
 export const ArrowLeft = pick("ArrowLeftIcon");
 export const ArrowRight = pick("ArrowRightIcon");
 export const ArrowDown = pick("ArrowDownIcon");
-export const ArrowUpDown = pick("SwitchVerticalIcon", "UpdateIcon");
+export const ArrowUpDown = pick("CaretSortIcon", "UpdateIcon");
 
 export const Sparkles = pick("MagicWandIcon", "StarIcon");
 export const Zap = pick("LightningBoltIcon");
@@ -101,7 +232,7 @@ export const MousePointer = pick("CursorArrowIcon");
 export const ClipboardPaste = pick("ClipboardCopyIcon", "ClipboardIcon");
 
 export const CheckCircle = pick("CheckCircledIcon", "CheckIcon");
-export const Info = pick("InfoCircledIcon", "InfoIcon");
+export const Info = pick("InfoCircledIcon");
 
 export const Key = pick("KeyIcon", "LockClosedIcon");
 export const Eye = pick("EyeOpenIcon", "EyeClosedIcon");

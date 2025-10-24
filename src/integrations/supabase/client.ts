@@ -5,6 +5,24 @@ import type { Database } from "./types";
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
+// Debug: print env values in browser console during dev (DO NOT commit secrets)
+// We trim the anon key when logging to reduce accidental leak in shared screenshots.
+if (typeof window !== "undefined" && import.meta.env.DEV) {
+  try {
+    // eslint-disable-next-line no-console
+    console.log("[env] VITE_SUPABASE_URL =", SUPABASE_URL);
+    // Show only prefix of anon key for safety
+    const keyPreview =
+      typeof SUPABASE_PUBLISHABLE_KEY === "string"
+        ? `${SUPABASE_PUBLISHABLE_KEY.slice(0, 8)}...`
+        : SUPABASE_PUBLISHABLE_KEY;
+    // eslint-disable-next-line no-console
+    console.log("[env] VITE_SUPABASE_ANON_KEY (preview) =", keyPreview);
+  } catch (e) {
+    // ignore logging errors
+  }
+}
+
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 

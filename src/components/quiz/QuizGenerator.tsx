@@ -1,9 +1,10 @@
-import React, {
+import * as React from "react";
+import { 
   useState,
   useEffect,
   useCallback,
   type MouseEvent,
-} from "react";
+ } from "react";
 import { useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -48,7 +49,7 @@ import {
   Shield,
   Music4,
   PauseCircle,
-} from '@/lib/icons';
+} from "@/lib/icons";
 import {
   ScrollVelocityContainer,
   ScrollVelocityRow,
@@ -747,6 +748,13 @@ const QuizGenerator = () => {
             body: startQuizPayload,
           }
         );
+      // Debug: log the raw response from Supabase Functions to ensure frontend receives quiz id
+      // (Remove these logs after debugging)
+      // eslint-disable-next-line no-console
+      console.log("[DEBUG] generate-quiz/start-quiz response:", {
+        startResponse,
+        startError,
+      });
 
       if (startError) {
         console.error("❌ Start quiz error:", startError);

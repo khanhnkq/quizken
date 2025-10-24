@@ -1,11 +1,12 @@
-import React, {
+import * as React from "react";
+import { 
   createContext,
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
-} from "react";
+ } from "react";
 import lofi2 from "@/assets/audio/lofi-2.mp3";
 
 type ChillStatus = "idle" | "playing" | "paused" | "stopped" | "error";

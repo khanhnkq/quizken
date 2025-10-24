@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import { Toaster as HotToaster } from "react-hot-toast";
 /* ScrollSmoother sẽ được nạp động để tránh lỗi ESM export không nhất quán */
 import { gsap } from "gsap";

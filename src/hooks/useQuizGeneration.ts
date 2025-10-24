@@ -55,19 +55,34 @@ export function useQuizGeneration<Quiz = any>() {
       setStatus("pending");
       setProgress("Đang chuẩn bị...");
 
+      // Debug: log when polling starts
+      // eslint-disable-next-line no-console
+      console.log(
+        `[useQuizGeneration] startPolling called for quizId=${quizId}`
+      );
+
       const interval = setInterval(async () => {
         try {
+          // Debug: log each poll attempt
+          // eslint-disable-next-line no-console
+          console.log(`[useQuizGeneration] polling quizId=${quizId}...`);
+
+          // Use GET without a body to avoid fetch errors in browsers (some runtimes disallow GET with body)
+          const invokeOptions: Record<string, unknown> = {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          };
           const { data, error } = await supabase.functions.invoke(
             `generate-quiz/get-quiz-status?quiz_id=${quizId}`,
-            {
-              body: {},
-              method: "GET",
-              headers: {
-                "Content-Type": "application/json",
-              },
-            }
+            invokeOptions
           );
-          if (error) throw error;
+          if (error) {
+            // eslint-disable-next-line no-console
+            console.warn("[useQuizGeneration] polling error:", error);
+            throw error;
+          }
 
           const nextStatus = (data?.status as Status) || null;
           const nextProgress = data?.progress || "Đang xử lý...";
@@ -88,8 +103,13 @@ export function useQuizGeneration<Quiz = any>() {
             stopPolling();
             callbacks.onExpired();
           }
-        } catch (_e) {
+        } catch (err) {
           // keep polling; transient errors are ignored
+          // eslint-disable-next-line no-console
+          console.debug(
+            "[useQuizGeneration] poll caught error (ignored):",
+            err
+          );
         }
       }, 2000);
       pollIntervalRef.current = interval;

@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import * as React from "react";
+import {  useState  } from "react";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import {

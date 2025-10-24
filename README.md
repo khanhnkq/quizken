@@ -313,7 +313,7 @@ Vị trí mã liên quan
 - Hook polling và reset: [src/hooks/useQuizGeneration.ts](src/hooks/useQuizGeneration.ts)
 - Trình khởi tạo quiz và UI tiến trình: [src/components/quiz/QuizGenerator.tsx](src/components/quiz/QuizGenerator.tsx)
 
-## Troubleshooting: lucide-react forwardRef undefined trên Vercel
+## Troubleshooting: @/lib/icons forwardRef undefined trên Vercel
 
 Triệu chứng
 
@@ -322,24 +322,24 @@ Triệu chứng
 
 Nguyên nhân gốc
 
-- Do chia nhỏ bundle (manualChunks) khiến chunk icon từ lucide-react được nạp trước khi React được khởi tạo, dẫn tới `forwardRef` chưa sẵn sàng. Ngoài ra, nếu lucide-react không được pre-bundle chung với React trong giai đoạn optimizeDeps, có thể tạo ra thứ tự nạp không ổn định.
+- Do chia nhỏ bundle (manualChunks) khiến chunk icon từ @/lib/icons được nạp trước khi React được khởi tạo, dẫn tới `forwardRef` chưa sẵn sàng. Ngoài ra, nếu @/lib/icons không được pre-bundle chung với React trong giai đoạn optimizeDeps, có thể tạo ra thứ tự nạp không ổn định.
 
 Sửa lỗi đã áp dụng
 
 - Đảm bảo chạy ở chế độ SPA chuẩn (ổn định thứ tự nạp):
   - appType: "spa" trong [vite.config.ts](vite.config.ts:14)
-- Gom lucide-react về chung “vendor” thay vì tách riêng “icons”:
+- Gom @/lib/icons về chung “vendor” thay vì tách riêng “icons”:
   - Điều chỉnh manualChunks (khối output.manualChunks) trong [vite.config.ts](vite.config.ts:41)
-  - Ghi chú: dòng đánh dấu xử lý lucide-react trong vendor tại [vite.config.ts](vite.config.ts:50)
-- Buộc pre-bundle lucide-react cùng pha với deps khác:
-  - Thêm vào optimizeDeps.include: "lucide-react" tại [vite.config.ts](vite.config.ts:70)
+  - Ghi chú: dòng đánh dấu xử lý @/lib/icons trong vendor tại [vite.config.ts](vite.config.ts:50)
+- Buộc pre-bundle @/lib/icons cùng pha với deps khác:
+  - Thêm vào optimizeDeps.include: "@/lib/icons" tại [vite.config.ts](vite.config.ts:70)
 
 Các bước bạn cần làm trên Vercel
 
 1. Rebuild sạch cache
    - Trên Vercel → Project → Deployments → Redeploy → bật “Clear Build Cache” → Redeploy
 2. Xác nhận phiên bản dependencies
-   - lucide-react đang ghim tại [package.json](package.json:58)
+   - @/lib/icons đang ghim tại [package.json](package.json:58)
    - react/react-dom đang ghim tại [package.json](package.json:60)
 3. Xác minh sau deploy
    - Mở console trên production → ensure không còn lỗi `forwardRef`
@@ -354,4 +354,4 @@ Phương án dự phòng (nếu lỗi vẫn còn trên một số môi trường
 
 Ghi chú
 
-- Dự án đã thống nhất cách import lucide-react (named/type) và có chunk “vendor” ổn định để tránh race condition nạp module.
+- Dự án đã thống nhất cách import @/lib/icons (named/type) và có chunk “vendor” ổn định để tránh race condition nạp module.

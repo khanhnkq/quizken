@@ -29,8 +29,9 @@ export default defineConfig({
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
+    dedupe: ["react", "react-dom"],
   },
-  plugins: [react(), splitVendorChunkPlugin()],
+  plugins: [react()],
   build: {
     // Tăng ngưỡng cảnh báo chunk lớn (KB)
     chunkSizeWarningLimit: 1200,
@@ -38,36 +39,26 @@ export default defineConfig({
       output: {
         // Gom các thư viện nặng vào các chunk riêng để giảm initial bundle
         manualChunks(id) {
-          if (id.includes("node_modules")) {
-            if (id.includes("/react/")) return "vendor";
-            if (id.includes("react-dom")) return "vendor";
-            if (id.includes("@tanstack/")) return "react-query";
-            if (id.includes("react-router")) return "router";
-            if (id.includes("framer-motion")) return "framer";
-            if (id.includes("gsap")) return "gsap";
-            if (id.includes("three")) return "three";
-            if (id.includes("@radix-ui")) return "vendor";
-            if (id.includes("lucide-react")) return "vendor";
-            if (id.includes("date-fns")) return "date-fns";
-            if (id.includes("recharts")) return "charts";
-            if (id.includes("@supabase/supabase-js")) return "supabase";
-          }
-          // Nhóm theo khu vực mã nguồn để chunk rõ ràng hơn
-          if (id.includes("/src/components/ui/")) return "ui-kit";
-          if (id.includes("/src/components/library/")) return "library";
-          if (id.includes("/src/components/sections/")) return "sections";
-          if (id.includes("/src/workers/")) return "workers";
+          // Disabled manual chunking to simplify debugging — re-enable after fix
           return undefined;
         },
       },
+    },
+    commonjsOptions: {
+      transformMixedEsModules: true,
     },
   },
   optimizeDeps: {
     // Tránh pre-bundle các GSAP plugins nặng vào initial deps
     exclude: ["gsap/ScrollTrigger", "gsap/dist/ScrollSmoother"],
 
-    // Buộc Vite pre-bundle file UMD của jsPDF (không đụng tới lucide-react để tránh chọn sai bản UMD/CJS/UMD)
-    include: ["jspdf/dist/jspdf.umd.min.js"],
+    // Buộc Vite pre-bundle file UMD của jsPDF
+    include: [
+      "jspdf/dist/jspdf.umd.min.js",
+      "@radix-ui/react-icons",
+      "react",
+      "react-dom",
+    ],
   },
   worker: {
     format: "es",
