@@ -61,6 +61,7 @@ import {
 } from "@/components/library/QuizCategoryBadge";
 import { useAudio } from "@/contexts/SoundContext";
 import ScrollSmoother from "gsap/ScrollSmoother";
+import { Eye } from "lucide-react";
 
 interface PublicQuiz {
   id: string;
@@ -749,7 +750,7 @@ const QuizLibrary: React.FC = () => {
                       play("toggle");
                       setSortBy(v as typeof sortBy);
                     }}>
-                    <SelectTrigger className="w-[180px] border-2">
+                    <SelectTrigger className="w-full sm:w-[180px] border-2">
                       <SelectValue placeholder="Sắp xếp theo" />
                     </SelectTrigger>
                     <SelectContent>
@@ -773,7 +774,7 @@ const QuizLibrary: React.FC = () => {
                       play("toggle");
                       setSearchIn(v as typeof searchIn);
                     }}>
-                    <SelectTrigger className="w-[160px] border-2">
+                    <SelectTrigger className="w-full sm:w-[160px] border-2">
                       <SelectValue placeholder="Tìm trong" />
                     </SelectTrigger>
                     <SelectContent>
@@ -813,11 +814,11 @@ const QuizLibrary: React.FC = () => {
           ) : (
             <div
               data-lib-list
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-500">
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-500">
               {displayedQuizzes.map((quiz) => (
                 <Card
                   key={quiz.id}
-                  className="border-2 hover:border-[#B5CC89] transition-all duration-300 hover:shadow-lg hover:scale-105">
+                  className="border-2 hover:border-[#B5CC89] transition-all duration-300 md:hover:shadow-lg md:hover:scale-105">
                   <CardHeader className="pb-4">
                     <div className="flex justify-between items-start">
                       <CardTitle className="text-lg line-clamp-2 leading-snug">
@@ -882,20 +883,19 @@ const QuizLibrary: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="flex gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => setSelectedQuiz(quiz)}
-                        className="flex-1 hover:bg-accent transition-colors">
+                        className="w-full min-w-0 hover:bg-accent transition-colors">
                         Xem trước
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => handleUseQuiz(quiz)}
-                        className="flex-1 hover:bg-[#B5CC89] hover:text-white transition-colors">
-                        <Star className="h-4 w-4 mr-2" />
+                        className="w-full min-w-0 hover:bg-[#B5CC89] hover:text-white transition-colors">
                         Sử dụng
                       </Button>
                       <Button
@@ -946,7 +946,7 @@ const QuizLibrary: React.FC = () => {
                             });
                           }
                         }}
-                        className="hover:bg-muted">
+                        className="w-full min-w-0 hover:bg-muted">
                         <Download className="h-4 w-4" />
                       </Button>
                     </div>
@@ -1106,7 +1106,7 @@ const QuizLibrary: React.FC = () => {
                             <div
                               key={idx}
                               className="border-2 hover:border-[#B5CC89] rounded-lg p-4 space-y-3 transition-colors duration-300 hover:shadow-md">
-                              <h4 className="font-semibold text-base text-foreground">
+                              <h4 className="font-semibold text-sm sm:text-base text-foreground">
                                 {idx + 1}. {q.question || "Không có câu hỏi"}
                               </h4>
                               <div className="space-y-2 pl-4">
@@ -1115,7 +1115,7 @@ const QuizLibrary: React.FC = () => {
                                   q.options.map((opt, optIdx) => (
                                     <div
                                       key={optIdx}
-                                      className="text-sm text-muted-foreground">
+                                      className="text-xs sm:text-sm text-muted-foreground">
                                       <span className="font-medium text-foreground">
                                         {String.fromCharCode(65 + optIdx)}.
                                       </span>{" "}
@@ -1123,7 +1123,7 @@ const QuizLibrary: React.FC = () => {
                                     </div>
                                   ))
                                 ) : (
-                                  <div className="text-sm text-muted-foreground italic">
+                                  <div className="text-xs sm:text-sm text-muted-foreground italic">
                                     Không có đáp án
                                   </div>
                                 )}

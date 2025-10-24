@@ -161,7 +161,7 @@ const Hero = () => {
                 <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-black" />
               </div>
               <span className="text-xs md:text-sm font-medium">
-                Được Power Bởi AI
+                Được tạo bởi AI
               </span>
             </div>
             <div className="flex items-center gap-2">
@@ -174,7 +174,7 @@ const Hero = () => {
             </div>
             <div className="flex items-center gap-2">
               <div className="p-1.5 md:p-2 rounded-full bg-[#B5CC89]/20">
-                <Eye className="w-4 h-4 md:w-5 md:h-5 text-black" />
+                <Brain className="w-4 h-4 md:w-5 md:h-5 text-black" />
               </div>
               <span className="text-xs md:text-sm font-medium">
                 Câu Hỏi Thông Minh
@@ -189,9 +189,7 @@ const Hero = () => {
       </div>
 
       <div className="absolute inset-x-0 bottom-0 h-16">
-        <div className="container mx-auto max-w-7xl h-full">
-          <div className="h-px bg-border/60" />
-        </div>
+        <div className="container mx-auto max-w-7xl h-full"></div>
       </div>
     </section>
   );

@@ -14,7 +14,7 @@ import {
   type QuizCategory,
   type QuizDifficulty,
 } from "@/lib/constants/quizCategories";
-import { BookOpen } from '@/lib/icons';
+import { BookOpen } from "@/lib/icons";
 import { useAudio } from "@/contexts/SoundContext";
 
 interface CategoryFiltersProps {
@@ -50,7 +50,7 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
           play("toggle");
           onCategoryChange(v as QuizCategory | "all");
         }}>
-        <SelectTrigger className="w-[180px] border-2">
+        <SelectTrigger className="w-full sm:w-[180px] border-2">
           <SelectValue placeholder="Chủ đề" />
         </SelectTrigger>
         <SelectContent>
@@ -106,7 +106,7 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
           play("toggle");
           onDifficultyChange(v as QuizDifficulty | "all");
         }}>
-        <SelectTrigger className="w-[150px] border-2">
+        <SelectTrigger className="w-full sm:w-[150px] border-2">
           <SelectValue placeholder="Độ khó" />
         </SelectTrigger>
         <SelectContent>

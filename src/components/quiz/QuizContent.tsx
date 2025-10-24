@@ -2,7 +2,7 @@ import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Download, Sparkles } from '@/lib/icons';
+import { Download, Sparkles } from "@/lib/icons";
 import {
   Card,
   CardContent,
@@ -407,7 +407,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                 variant="outline"
                 size="lg"
                 sound="success"
-                className="text-base w-full sm:w-auto hover:bg-primary hover:text-primary-foreground hover:border-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                className="w-full sm:w-auto text-sm sm:text-base !h-auto min-h-[2.75rem] py-3 !whitespace-normal break-words leading-snug hover:bg-primary hover:text-primary-foreground hover:border-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                 {answeredCount !== quiz.questions.length
                   ? `Vui lòng trả lời hết tất cả ${quiz.questions.length} câu hỏi (${answeredCount}/${quiz.questions.length} đã trả lời)`
                   : "Chấm điểm"}

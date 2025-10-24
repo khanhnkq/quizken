@@ -1,10 +1,5 @@
 import * as React from "react";
-import { 
-  useState,
-  useEffect,
-  useCallback,
-  type MouseEvent,
- } from "react";
+import { useState, useEffect, useCallback, type MouseEvent } from "react";
 import { useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -750,7 +745,7 @@ const QuizGenerator = () => {
         );
       // Debug: log the raw response from Supabase Functions to ensure frontend receives quiz id
       // (Remove these logs after debugging)
-       
+
       console.log("[DEBUG] generate-quiz/start-quiz response:", {
         startResponse,
         startError,
