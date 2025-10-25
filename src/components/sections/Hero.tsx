@@ -2,43 +2,17 @@ import { Button } from "@/components/ui/button";
 import { Sparkles, Zap, Brain, Eye } from "@/lib/icons";
 import { useState, useEffect, type MouseEvent } from "react";
 import { gsap } from "gsap";
+import { killActiveScroll, scrollToTarget } from "@/lib/scroll";
 import { useNavigate } from "react-router-dom";
 import { shouldReduceAnimations } from "@/utils/deviceDetection";
 
 const Hero = () => {
   const navigate = useNavigate();
   const scrollToGenerator = async () => {
-    // Ưu tiên cuộn đến phần làm bài nếu đã có quiz; nếu chưa, cuộn đến trình tạo (generator)
-    const element =
-      document.getElementById("quiz") || document.getElementById("generator");
-    if (!element) return;
-
-    const headerHeight =
-      (document.querySelector("nav") as HTMLElement | null)?.clientHeight ?? 64;
-    const marginCompensation = 8;
-
-    const rect = element.getBoundingClientRect();
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    const elementTop = rect.top + scrollTop;
-    const targetY = elementTop - (headerHeight + marginCompensation);
-
-    // Thử dùng GSAP ScrollSmoother nếu đang bật cho trang
-    try {
-      const { default: ScrollSmoother } = await import("gsap/ScrollSmoother");
-      const smoother = ScrollSmoother.get();
-      if (smoother) {
-        smoother.scrollTo(targetY, true);
-        return;
-      }
-    } catch {
-      // ScrollSmoother không khả dụng -> fallback
-    }
-
-    // Fallback: native scroll với bù header cố định (loại bỏ backup thứ hai để tránh giật)
-    window.scrollTo({
-      top: targetY,
-      behavior: "smooth",
-    });
+    // Chuẩn hóa cuộn bằng tiện ích thống nhất, ưu tiên ScrollSmoother nếu khả dụng
+    killActiveScroll();
+    const targetId = document.getElementById("quiz") ? "quiz" : "generator";
+    scrollToTarget(targetId, { align: "top" });
   };
 
   // Typing effect state

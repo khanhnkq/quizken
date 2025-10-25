@@ -67,6 +67,7 @@ import { useGenerationPersistence } from "@/hooks/useGenerationPersistence";
 import { useAnonQuota } from "@/hooks/useAnonQuota";
 import useChillMusic from "@/hooks/useChillMusic";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { killActiveScroll, scrollToTarget } from "@/lib/scroll";
 
 type TokenUsage = { prompt: number; candidates: number; total: number };
 
@@ -243,40 +244,10 @@ const QuizGenerator = () => {
   // Smooth scroll helper with fallback to account for sticky navbar and SPA timing
   function scrollToWithFallback(sectionId: string) {
     try {
-      const element = document.getElementById(sectionId);
-      const headerHeight =
-        (document.querySelector("nav") as HTMLElement | null)?.clientHeight ??
-        64;
-      const marginCompensation = 8;
-
-      if (element) {
-        const targetY =
-          element.getBoundingClientRect().top +
-          window.pageYOffset -
-          (headerHeight + marginCompensation);
-
-        window.scrollTo({ top: targetY, behavior: "smooth" });
-
-        // Backup: ensure section sits correctly below sticky navbar
-        setTimeout(() => {
-          element.scrollIntoView({ behavior: "smooth", block: "start" });
-          window.scrollBy({
-            top: -(headerHeight + marginCompensation),
-            behavior: "smooth",
-          });
-        }, 120);
-      } else {
-        // If DOM not ready yet, retry shortly
-        setTimeout(() => {
-          const el = document.getElementById(sectionId);
-          if (!el) return;
-          const y =
-            el.getBoundingClientRect().top +
-            window.pageYOffset -
-            (headerHeight + marginCompensation);
-          window.scrollTo({ top: y, behavior: "smooth" });
-        }, 150);
-      }
+      killActiveScroll();
+      const el = document.getElementById(sectionId);
+      const targetArg: HTMLElement | string = el ?? sectionId;
+      scrollToTarget(targetArg, { align: "top" });
     } catch (e) {
       console.debug("scrollToWithFallback failed", e);
     }
@@ -299,19 +270,8 @@ const QuizGenerator = () => {
           requestAnimationFrame(() => {
             const element = document.getElementById("quiz");
             if (element) {
-              const headerHeight =
-                (document.querySelector("nav") as HTMLElement | null)
-                  ?.clientHeight ?? 64;
-              const marginCompensation = 8;
-              const targetY =
-                element.getBoundingClientRect().top +
-                window.pageYOffset -
-                (headerHeight + marginCompensation);
-
-              window.scrollTo({
-                top: targetY,
-                behavior: "smooth",
-              });
+              killActiveScroll();
+              scrollToTarget("quiz", { align: "top" });
             }
           });
         }
@@ -339,18 +299,8 @@ const QuizGenerator = () => {
         requestAnimationFrame(() => {
           const element = document.getElementById("quiz");
           if (element) {
-            const headerHeight =
-              (document.querySelector("nav") as HTMLElement | null)
-                ?.clientHeight ?? 64;
-            const marginCompensation = 8;
-            const targetY =
-              element.getBoundingClientRect().top +
-              window.pageYOffset -
-              (headerHeight + marginCompensation);
-            window.scrollTo({
-              top: targetY,
-              behavior: "smooth",
-            });
+            killActiveScroll();
+            scrollToTarget("quiz", { align: "top" });
           }
         });
       }
@@ -849,24 +799,9 @@ const QuizGenerator = () => {
           // Auto-scroll to quiz section after creation (robust for sticky navbar)
           try {
             const el = document.getElementById("quiz");
-            const headerHeight =
-              (document.querySelector("nav") as HTMLElement | null)
-                ?.clientHeight ?? 64;
-            const marginCompensation = 8;
             if (el) {
-              const targetY =
-                el.getBoundingClientRect().top +
-                window.pageYOffset -
-                (headerHeight + marginCompensation);
-              window.scrollTo({ top: targetY, behavior: "smooth" });
-              // Backup to ensure correct resting position under sticky navbar
-              setTimeout(() => {
-                el.scrollIntoView({ behavior: "smooth", block: "start" });
-                window.scrollBy({
-                  top: -(headerHeight + marginCompensation),
-                  behavior: "smooth",
-                });
-              }, 150);
+              killActiveScroll();
+              scrollToTarget(el, { align: "top" });
             }
           } catch (e) {
             console.debug("scrollTo quiz fallback failed", e);
@@ -1330,15 +1265,8 @@ const QuizGenerator = () => {
                       setShowConfirmDialog(false);
                       const el = document.getElementById("generator");
                       if (el) {
-                        const headerHeight =
-                          (document.querySelector("nav") as HTMLElement | null)
-                            ?.clientHeight ?? 64;
-                        const marginCompensation = 8;
-                        const targetY =
-                          el.getBoundingClientRect().top +
-                          window.pageYOffset -
-                          (headerHeight + marginCompensation);
-                        window.scrollTo({ top: targetY, behavior: "smooth" });
+                        killActiveScroll();
+                        scrollToTarget(el, { align: "top" });
                       }
                       void generateQuiz();
                     }}>

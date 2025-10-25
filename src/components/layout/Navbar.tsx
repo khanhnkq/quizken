@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/dialog";
 import { useAudio } from "@/contexts/SoundContext";
 import logo from "@/assets/logo/logo.png";
+import { killActiveScroll, scrollToTarget } from "@/lib/scroll";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -59,20 +60,8 @@ const Navbar = () => {
   }, []);
 
   const scrollToGenerator = () => {
-    const element = document.getElementById("generator");
-    if (element) {
-      const headerHeight =
-        (document.querySelector("nav") as HTMLElement | null)?.clientHeight ??
-        64;
-      const yOffset = -(headerHeight + 8); // bù đúng chiều cao navbar + margin
-      const y =
-        element.getBoundingClientRect().top + window.pageYOffset + yOffset;
-
-      window.scrollTo({
-        top: y,
-        behavior: "smooth",
-      });
-    }
+    killActiveScroll();
+    scrollToTarget("generator", { align: "top" });
     setIsOpen(false);
   };
 

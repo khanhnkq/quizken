@@ -12,11 +12,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import type { Quiz, Question } from "@/types/quiz";
-import { gsap } from "gsap";
-import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import { useAudio } from "@/contexts/SoundContext";
-
-gsap.registerPlugin(ScrollToPlugin);
+import { killActiveScroll, scrollToTarget } from "@/lib/scroll";
+import { isIOSSafari } from "@/utils/deviceDetection";
 
 interface TokenUsage {
   prompt: number;
@@ -65,16 +63,10 @@ export const QuizContent: React.FC<QuizContentProps> = ({
   const handleNavigateQuestion = (index: number, highlight: boolean = true) => {
     const target = questionRefs.current[index];
     if (target) {
-      const elementTop =
-        target.getBoundingClientRect().top + window.pageYOffset;
-      const offsetPosition =
-        elementTop - window.innerHeight / 2 + target.offsetHeight / 2;
-
-      gsap.to(window, {
-        duration: 0.6,
-        scrollTo: { y: offsetPosition, autoKill: true },
-        ease: "power2.out",
-      });
+      // Kill any active scroll animation to avoid competing tweens
+      killActiveScroll();
+      // Use unified scroll utility (center alignment for better focus)
+      scrollToTarget(target, { align: "center" });
 
       if (highlight) {
         target.classList.add("ring", "ring-[#B5CC89]", "ring-offset-2");
@@ -86,53 +78,48 @@ export const QuizContent: React.FC<QuizContentProps> = ({
   };
 
   const scrollToGenerator = () => {
-    const el = document.getElementById("generator");
-    if (!el) return;
-    const yOffset = -5; // account for sticky navbar
-    const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
-    window.scrollTo({ top: y, behavior: "smooth" });
+    killActiveScroll();
+    scrollToTarget("generator", { align: "top" });
   };
 
-  const handleAnswerSelect = (questionIndex: number, answerIndex: number) => {
+  const handleAnswerSelect = (
+    questionIndex: number,
+    answerIndex: number,
+    inputEl?: HTMLInputElement
+  ) => {
     onAnswerSelect(questionIndex, answerIndex);
 
     // Auto-scroll to next question if not the last one
     if (questionIndex < quiz.questions.length - 1) {
+      // On iOS Safari, blur radio to prevent native focus-induced scrolling
+      if (inputEl && isIOSSafari()) {
+        requestAnimationFrame(() => {
+          try {
+            inputEl.blur();
+          } catch {}
+        });
+      }
+      // Cancel any active scroll tween and perform unified scroll
+      killActiveScroll();
       setTimeout(() => {
         handleNavigateQuestion(questionIndex + 1, false);
-      }, 300);
+      }, 250);
     }
   };
 
   const scrollToTop = () => {
     setTimeout(() => {
-      // Try to find score display first
+      killActiveScroll();
+      // Try to center the score display if present
       const scoreElement = document.querySelector(
         "[data-score-display]"
-      ) as HTMLElement;
+      ) as HTMLElement | null;
       if (scoreElement) {
-        const elementTop =
-          scoreElement.getBoundingClientRect().top + window.pageYOffset;
-        const offsetPosition =
-          elementTop - window.innerHeight / 2 + scoreElement.offsetHeight / 2;
-
-        gsap.to(window, {
-          duration: 0.8,
-          scrollTo: { y: offsetPosition, autoKill: true },
-          ease: "power2.inOut",
-        });
+        scrollToTarget(scoreElement, { align: "center" });
         return;
       }
-
-      // Fallback to section
-      const quizSection = document.getElementById("quiz");
-      if (quizSection) {
-        gsap.to(window, {
-          duration: 0.8,
-          scrollTo: { y: quizSection, autoKill: true },
-          ease: "power2.inOut",
-        });
-      }
+      // Fallback: scroll to quiz section top
+      scrollToTarget("quiz", { align: "top" });
     }, 150);
   };
 
@@ -299,7 +286,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                     ref={(element) => {
                       questionRefs.current[idx] = element;
                     }}
-                    className="border-2 hover:border-[#B5CC89] transition-colors duration-300 hover:shadow-lg">
+                    className="border-2 hover:border-[#B5CC89] transition-colors duration-300 hover:shadow-lg scroll-mt-[var(--navbar-height,64px)]">
                     <CardContent className="p-4 sm:p-6 md:p-8 space-y-3 sm:space-y-4">
                       <div className="space-y-3">
                         {q.question && (
@@ -334,9 +321,13 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                                     name={`question-${idx}`}
                                     value={optIdx}
                                     checked={isSelected}
-                                    onChange={() => {
+                                    onChange={(e) => {
                                       play("pop");
-                                      handleAnswerSelect(idx, optIdx);
+                                      handleAnswerSelect(
+                                        idx,
+                                        optIdx,
+                                        e.currentTarget
+                                      );
                                     }}
                                     disabled={showResults}
                                     className="h-4 w-4 shrink-0 mr-2 sm:mr-3 mt-0.5"
