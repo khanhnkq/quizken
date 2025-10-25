@@ -537,7 +537,7 @@ export const AboutSocialLinks = () => {
   type LinkItem = { label: string; href: string; disabled?: boolean };
   const links: LinkItem[] = [
     { label: "Facebook", href: "https://www.facebook.com/qkanengk30825" },
-    { label: "GitHub", href: "https://github.com/" },
+    { label: "GitHub", href: "https://github.com/khanhnkq" },
     { label: "CV", href: "https://" },
   ];
   return (
@@ -545,7 +545,9 @@ export const AboutSocialLinks = () => {
       <div className="container mx-auto max-w-7xl text-center">
         <div className="inline-flex items-center gap-2 mb-6">
           <Sparkles className="w-5 h-5 text-[#B5CC89]" />
-          <span className="text-sm text-muted-foreground">Kết nối với tôi</span>
+          <span className="text-sm text-muted-foreground">
+            Kết nối với mình
+          </span>
         </div>
         <div className="flex flex-wrap gap-4 justify-center">
           {links.map((l, i) =>
