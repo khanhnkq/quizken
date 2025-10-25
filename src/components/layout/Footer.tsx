@@ -89,7 +89,7 @@ const Footer = () => {
       <div className="border-t py-6 px-4">
         <div className="container mx-auto max-w-7xl">
           <p className="text-center text-sm text-muted-foreground">
-            © 2025 QuizKen. Bảo lưu mọi quyền.
+          "Grow, learn, and share — from Quizken with love"
           </p>
         </div>
       </div>
