@@ -96,7 +96,12 @@ export const QuizContent: React.FC<QuizContentProps> = ({
         requestAnimationFrame(() => {
           try {
             inputEl.blur();
-          } catch {}
+          } catch (err) {
+            console.debug(
+              "iOS Safari blur failed to prevent focus-induced scrolling",
+              err
+            );
+          }
         });
       }
       // Cancel any active scroll tween and perform unified scroll
@@ -127,8 +132,8 @@ export const QuizContent: React.FC<QuizContentProps> = ({
     <section
       ref={sectionRef}
       id="quiz"
-      className="relative overflow-hidden bg-gradient-to-b from-background to-secondary/20 py-20 px-4">
-      <div className="container mx-auto max-w-4xl">
+      className="relative overflow-hidden bg-gradient-to-b from-background to-secondary/20 py-20 px-0 sm:px-4">
+      <div className="mx-auto max-w-4xl px-2 sm:px-4">
         {/* Quiz Section Header */}
         <div className="text-center mb-12">
           <div className="flex justify-center mb-6">
@@ -140,7 +145,9 @@ export const QuizContent: React.FC<QuizContentProps> = ({
               "Trả lời các câu hỏi bên dưới và xem giải thích sau khi chấm điểm"}
           </p>
         </div>
-        <Card ref={cardRef} className="border-2 rounded-xl shadow-lg bg-card">
+        <Card
+          ref={cardRef}
+          className="border-2 rounded-none md:rounded-xl shadow-lg bg-card">
           <CardHeader className="pb-6">
             <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
               <div className="flex-1">
