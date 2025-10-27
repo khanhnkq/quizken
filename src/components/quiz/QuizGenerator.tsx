@@ -753,14 +753,14 @@ const QuizGenerator = () => {
     try {
       setLoading(true);
 
-      // Generate idempotency key to prevent duplicate requests
-      const idempotencyKey = generateIdempotencyKey(prompt, questionCount, user?.id);
+      // TEMPORARY: Disable idempotency key to fix immediate issue
+      // const idempotencyKey = generateIdempotencyKey(prompt, questionCount, user?.id);
 
       const startQuizPayload = {
         prompt,
         device: deviceInfo,
         questionCount: parseInt(questionCount),
-        idempotencyKey,
+        // idempotencyKey,
       };
 
       console.log("▶️ Starting quiz generation request...");

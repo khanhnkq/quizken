@@ -28,47 +28,56 @@ export function useQuizGeneration<Quiz = unknown>() {
   const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const currentQuizIdRef = useRef<string | null>(null);
 
-  // Set up leader election for polling coordination
-  const { isLeader } = useLeaderElection({
-    channelName: "quiz-polling-leader",
-    onLeaderChange: (isLeader) => {
-      if (isLeader) {
-        console.log("This tab is now the leader for quiz polling");
-      } else {
-        console.log("This tab is no longer the leader for quiz polling");
-        // Stop polling if we're no longer the leader
-        stopPolling();
-      }
-    },
-  });
+  // TEMPORARY: Disable leader election for polling to fix immediate issue
+  // TODO: Re-enable after testing multi-tab coordination
+  // const { isLeader } = useLeaderElection({
+  //   channelName: "quiz-polling-leader",
+  //   onLeaderChange: (isLeader) => {
+  //     if (isLeader) {
+  //       console.log("This tab is now the leader for quiz polling");
+  //     } else {
+  //       console.log("This tab is no longer the leader for quiz polling");
+  //       // Stop polling if we're no longer the leader
+  //       stopPolling();
+  //     }
+  //   },
+  // });
+  
+  // Temporary fallback - always allow polling
+  const isLeader = true;
 
-  // Set up BroadcastChannel for cross-tab communication
-  const { postMessage, isSupported } = useBroadcastChannel({
-    channelName: "quiz-polling-coordination",
-    onMessage: (message: BroadcastMessage) => {
-      if (message.type === "polling-status") {
-        const data = message.data as { quizId: string; status: Status; progress: string };
-        if (data && data.quizId === currentQuizIdRef.current) {
-          setStatus(data.status);
-          setProgress(data.progress);
-          setIsPolling(data.status !== "completed" && data.status !== "failed" && data.status !== "expired");
-        }
-      } else if (message.type === "polling-start") {
-        const data = message.data as { quizId: string };
-        if (data && data.quizId !== currentQuizIdRef.current) {
-          // Another tab started polling for a different quiz
-          console.log("Another tab started polling for quiz:", data.quizId);
-        }
-      } else if (message.type === "polling-stop") {
-        const data = message.data as { quizId: string };
-        if (data && data.quizId === currentQuizIdRef.current) {
-          // Polling was stopped by another tab
-          console.log("Polling stopped by another tab for quiz:", data.quizId);
-          stopPolling();
-        }
-      }
-    },
-  });
+  // TEMPORARY: Disable BroadcastChannel for polling to fix immediate issue
+  // TODO: Re-enable after testing multi-tab coordination
+  // const { postMessage, isSupported } = useBroadcastChannel({
+  //   channelName: "quiz-polling-coordination",
+  //   onMessage: (message: BroadcastMessage) => {
+  //     if (message.type === "polling-status") {
+  //       const data = message.data as { quizId: string; status: Status; progress: string };
+  //       if (data && data.quizId === currentQuizIdRef.current) {
+  //         setStatus(data.status);
+  //         setProgress(data.progress);
+  //         setIsPolling(data.status !== "completed" && data.status !== "failed" && data.status !== "expired");
+  //       }
+  //     } else if (message.type === "polling-start") {
+  //       const data = message.data as { quizId: string };
+  //       if (data && data.quizId !== currentQuizIdRef.current) {
+  //         // Another tab started polling for a different quiz
+  //         console.log("Another tab started polling for quiz:", data.quizId);
+  //       }
+  //     } else if (message.type === "polling-stop") {
+  //       const data = message.data as { quizId: string };
+  //       if (data && data.quizId === currentQuizIdRef.current) {
+  //         // Polling was stopped by another tab
+  //         console.log("Polling stopped by another tab for quiz:", data.quizId);
+  //         stopPolling();
+  //       }
+  //     }
+  //   },
+  // });
+  
+  // Temporary fallback - disable cross-tab coordination
+  const postMessage = () => {};
+  const isSupported = false;
 
   const stopPolling = useCallback(() => {
     if (pollIntervalRef.current) {
@@ -99,11 +108,12 @@ export function useQuizGeneration<Quiz = unknown>() {
     async (quizId: string, callbacks: StartPollingCallbacks<Quiz>) => {
       if (!quizId) return;
 
-      // Only start polling if we're the leader
-      if (!isLeader) {
-        console.log("Not the leader, not starting polling");
-        return;
-      }
+      // TEMPORARY: Disable leader election for polling to fix immediate issue
+      // TODO: Re-enable after testing multi-tab coordination
+      // if (isSupported && !isLeader) {
+      //   console.log("Not the leader and BroadcastChannel supported, not starting polling");
+      //   return;
+      // }
 
       // Ensure any previous polling is stopped before starting a new one
       stopPolling();
@@ -188,7 +198,7 @@ export function useQuizGeneration<Quiz = unknown>() {
       }, 2000);
       pollIntervalRef.current = interval;
     },
-    [stopPolling, isLeader, isSupported, postMessage]
+    [stopPolling]
   );
 
   return {
