@@ -417,6 +417,7 @@ interface QuizGenerationPayload {
   fingerprint?: string;
   questionCount?: number;
   apiKey?: string;
+  idempotencyKey?: string;
 }
 
 function getClientIp(req: Request): string {
@@ -502,6 +503,8 @@ async function processQuizGeneration(
       typeof payload.questionCount === "number"
         ? payload.questionCount
         : QUESTIONS_COUNT;
+    const idempotencyKey = 
+      typeof payload.idempotencyKey === "string" ? payload.idempotencyKey : undefined;
 
     const ip = getClientIp(req);
     const userAgent =
@@ -606,41 +609,35 @@ async function processQuizGeneration(
     const DAILY_LIMIT = 3;
     if (!skipUsageLimit && !isAuthenticated && adminClient) {
       const day = todayDate();
-      const { data: rows, error: usageErr } = await adminClient
-        .from("anonymous_usage")
-        .select("*")
-        .eq("ip", ip)
-        .eq("fingerprint", fingerprint)
-        .eq("day_date", day)
-        .limit(1);
-
-      if (!usageErr && rows && rows.length > 0) {
-        const row = rows[0];
-        if ((row.count ?? 0) >= DAILY_LIMIT) {
-          await updateQuizStatus(
-            quizId,
-            QUIZ_STATUS.FAILED,
-            "Anonymous quota exceeded"
-          );
-          return;
-        }
-        await adminClient
-          .from("anonymous_usage")
-          .update({
-            count: (row.count ?? 0) + 1,
-            last_used_at: new Date().toISOString(),
-            user_agent: userAgent,
-          })
-          .eq("id", row.id);
-      } else {
-        await adminClient.from("anonymous_usage").insert({
-          ip,
-          fingerprint,
-          user_agent: userAgent,
-          day_date: day,
-          count: 1,
-          last_used_at: new Date().toISOString(),
+      
+      // Use atomic UPSERT to prevent race conditions
+      // This ensures only one request can increment the counter at a time
+      const { data: upsertResult, error: usageErr } = await adminClient
+        .rpc('increment_anonymous_usage', {
+          p_ip: ip,
+          p_fingerprint: fingerprint,
+          p_day_date: day,
+          p_user_agent: userAgent
         });
+
+      if (usageErr) {
+        console.error("Error incrementing anonymous usage:", usageErr);
+        await updateQuizStatus(
+          quizId,
+          QUIZ_STATUS.FAILED,
+          "Failed to check usage quota"
+        );
+        return;
+      }
+
+      // Check if quota exceeded after atomic increment
+      if (upsertResult && upsertResult.count > DAILY_LIMIT) {
+        await updateQuizStatus(
+          quizId,
+          QUIZ_STATUS.FAILED,
+          "Anonymous quota exceeded"
+        );
+        return;
       }
     }
 
@@ -1054,6 +1051,36 @@ async function handleStartQuiz(req: Request) {
   try {
     const payload = await req.json().catch(() => ({}));
 
+    // Check for duplicate request using idempotency key
+    const idempotencyKey = 
+      typeof payload.idempotencyKey === "string" ? payload.idempotencyKey : undefined;
+    
+    if (idempotencyKey && adminClient) {
+      const { data: duplicateCheck, error: duplicateError } = await adminClient
+        .rpc('check_duplicate_quiz_request', {
+          p_idempotency_key: idempotencyKey,
+          p_minutes_threshold: 5
+        });
+
+      if (duplicateError) {
+        console.warn("Error checking for duplicate request:", duplicateError);
+        // Continue with request if check fails (fail open)
+      } else if (duplicateCheck && duplicateCheck.length > 0) {
+        // Return existing quiz if found within 5 minutes
+        const existingQuiz = duplicateCheck[0];
+        console.log(`Duplicate request detected, returning existing quiz: ${existingQuiz.quiz_id}`);
+        
+        return new Response(JSON.stringify({
+          id: existingQuiz.quiz_id,
+          status: QUIZ_STATUS.PENDING,
+          duplicate: true,
+          message: "Request already processed"
+        }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
     // Get user_id
     const authHeader =
       req.headers.get("Authorization") ||
@@ -1096,6 +1123,7 @@ async function handleStartQuiz(req: Request) {
       user_id: userId,
       progress: "Initializing...",
       question_count: payload.questionCount || 15,
+      idempotency_key: idempotencyKey, // ✅ Prevent duplicate requests
     });
 
     // Check if insert failed

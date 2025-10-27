@@ -12,6 +12,11 @@ CREATE INDEX IF NOT EXISTS idx_quizzes_usage_count ON public.quizzes(usage_count
 CREATE INDEX IF NOT EXISTS idx_quizzes_pdf_download_count ON public.quizzes(pdf_download_count DESC);
 
 -- Function to increment usage count
+-- ATOMICITY NOTE: This function is safe for concurrent access because:
+-- 1. PostgreSQL UPDATE statements are atomic within a single transaction
+-- 2. The expression "usage_count = usage_count + 1" is evaluated atomically
+-- 3. Multiple concurrent calls will each increment the counter by exactly 1
+-- 4. No race conditions or lost updates can occur
 CREATE OR REPLACE FUNCTION increment_quiz_usage(quiz_id UUID)
 RETURNS void AS $$
 BEGIN
@@ -22,6 +27,8 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Function to increment PDF download count
+-- ATOMICITY NOTE: This function is also safe for concurrent access for the same reasons
+-- as increment_quiz_usage. PostgreSQL guarantees atomicity of UPDATE operations.
 CREATE OR REPLACE FUNCTION increment_quiz_pdf_download(quiz_id UUID)
 RETURNS void AS $$
 BEGIN

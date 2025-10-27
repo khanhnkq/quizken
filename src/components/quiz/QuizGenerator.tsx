@@ -662,6 +662,21 @@ const QuizGenerator = () => {
 
   // Progress UI moved to GenerationProgress component
 
+  // Generate idempotency key to prevent duplicate requests
+  const generateIdempotencyKey = (prompt: string, questionCount: string, userId?: string) => {
+    const timestamp = Math.floor(Date.now() / (1000 * 60)); // Round to minute for 5-minute window
+    const data = `${userId || 'anonymous'}-${prompt}-${questionCount}-${timestamp}`;
+    
+    // Simple hash function for idempotency key
+    let hash = 0;
+    for (let i = 0; i < data.length; i++) {
+      const char = data.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+    return `quiz_${Math.abs(hash).toString(36)}_${timestamp}`;
+  };
+
   const generateQuiz = async () => {
     if (!user && hasReachedLimit) {
       setShowQuotaDialog(true);
@@ -738,15 +753,19 @@ const QuizGenerator = () => {
     try {
       setLoading(true);
 
+      // Generate idempotency key to prevent duplicate requests
+      const idempotencyKey = generateIdempotencyKey(prompt, questionCount, user?.id);
+
       const startQuizPayload = {
         prompt,
         device: deviceInfo,
         questionCount: parseInt(questionCount),
+        idempotencyKey,
       };
 
       console.log("▶️ Starting quiz generation request...");
       const { data: startResponse, error: startError } =
-        await supabase.functions.invoke<{ id: string }>(
+        await supabase.functions.invoke<{ id: string; duplicate?: boolean; message?: string }>(
           "generate-quiz/start-quiz",
           {
             body: startQuizPayload,
@@ -776,6 +795,16 @@ const QuizGenerator = () => {
 
       const quizId = startResponse.id;
       console.log(`✅ Quiz started with ID: ${quizId}`);
+
+      // Handle duplicate request response
+      if (startResponse.duplicate) {
+        console.log("🔄 Duplicate request detected, using existing quiz");
+        toast({
+          title: "Yêu cầu đã được xử lý",
+          description: "Quiz này đang được tạo từ yêu cầu trước đó",
+          variant: "info",
+        });
+      }
 
       // Step 2: Save generation state to localStorage for navigation persistence
       const generationState = {
@@ -1138,43 +1167,43 @@ const QuizGenerator = () => {
           {!isMobile && (
             <div className="absolute inset-0 -z-10 opacity-5">
               <ScrollVelocityContainer className="text-6xl md:text-8xl font-bold">
-                <ScrollVelocityRow baseVelocity={40} rowIndex={0}>
+                <ScrollVelocityRow baseVelocity={75} rowIndex={0}>
                   AI Education Smart Learning Intelligent Teaching Digital
                   Classroom
                 </ScrollVelocityRow>
-                <ScrollVelocityRow baseVelocity={40} rowIndex={1}>
+                <ScrollVelocityRow baseVelocity={75} rowIndex={1}>
                   Adaptive Assessment Personalized Learning Virtual Teacher
                   Cognitive Training
                 </ScrollVelocityRow>
-                <ScrollVelocityRow baseVelocity={40} rowIndex={2}>
+                <ScrollVelocityRow baseVelocity={75} rowIndex={2}>
                   Educational Analytics Student Engagement Knowledge Discovery
                   Learning Analytics
                 </ScrollVelocityRow>
-                <ScrollVelocityRow baseVelocity={40} rowIndex={3}>
+                <ScrollVelocityRow baseVelocity={75} rowIndex={3}>
                   Artificial Intelligence Machine Learning Neural Networks
                   Cognitive Computing
                 </ScrollVelocityRow>
-                <ScrollVelocityRow baseVelocity={40} rowIndex={4}>
+                <ScrollVelocityRow baseVelocity={75} rowIndex={4}>
                   Interactive Assessment Educational Technology Intelligent
                   Tutoring Automated Grading
                 </ScrollVelocityRow>
-                <ScrollVelocityRow baseVelocity={40} rowIndex={5}>
+                <ScrollVelocityRow baseVelocity={75} rowIndex={5}>
                   AI Education Smart Learning Intelligent Teaching Digital
                   Classroom
                 </ScrollVelocityRow>
-                <ScrollVelocityRow baseVelocity={40} rowIndex={6}>
+                <ScrollVelocityRow baseVelocity={75} rowIndex={6}>
                   Adaptive Assessment Personalized Learning Virtual Teacher
                   Cognitive Training
                 </ScrollVelocityRow>
-                <ScrollVelocityRow baseVelocity={40} rowIndex={7}>
+                <ScrollVelocityRow baseVelocity={75} rowIndex={7}>
                   Educational Analytics Student Engagement Knowledge Discovery
                   Learning Analytics
                 </ScrollVelocityRow>
-                <ScrollVelocityRow baseVelocity={40} rowIndex={8}>
+                <ScrollVelocityRow baseVelocity={75} rowIndex={8}>
                   Artificial Intelligence Machine Learning Neural Networks
                   Cognitive Computing
                 </ScrollVelocityRow>
-                <ScrollVelocityRow baseVelocity={40} rowIndex={9}>
+                <ScrollVelocityRow baseVelocity={75} rowIndex={9}>
                   Interactive Assessment Educational Technology Intelligent
                   Tutoring Automated Grading
                 </ScrollVelocityRow>
