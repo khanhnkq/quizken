@@ -159,6 +159,13 @@ export const SeoMeta = ({
       ogConfig.title
     );
     
+    // Fallback: itemprop image for Schema.org compatibility
+    ensureMetaTag(
+      "meta[itemprop='image']",
+      { itemprop: "image" },
+      ogConfig.image
+    );
+    
     ensureMetaTag("meta[property='og:locale']", { property: "og:locale" }, ogConfig.locale);
     ensureMetaTag(
       "meta[property='og:site_name']",
