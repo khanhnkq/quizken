@@ -90,14 +90,53 @@ function normalizeForCompare(s: string): string {
 export function containsVietnameseBadwords(text: string): boolean {
   if (!text) return false;
 
-  // Quick whitelist: normalized phrases that should NOT be considered profane
-  // Add more entries here as needed (normalized using normalizeForCompare)
-  // Include both expected normalized forms (observed and ideal)
-  const WHITELIST = new Set(["dung do", "ung o"]); // whitelist for "đụng độ"
-  const normalizedForWhitelist = normalizeForCompare(text);
-  if (normalizedForWhitelist) {
-    for (const w of WHITELIST) {
-      if (normalizedForWhitelist.includes(w)) return false;
+  // Comprehensive whitelist: legitimate Vietnamese words that should NOT be flagged as profane
+  // These are words that either:
+  // 1. Are common, innocent words that happen to match badword substrings
+  // 2. Are context-specific (e.g., "con" meaning child, not as an insult)
+  // 3. Are words in educational context (e.g., "tạo" = create for quiz generation)
+  const WHITELIST = new Set([
+    // Original entries
+    "dung do",           // "đụng độ" - collide/encounter
+    "ung o",             // variant
+    
+    // Educational context - Common in quiz generation
+    "tao",               // "tạo" after normalization - create/make
+    "tao bai",           // "tạo bài" - create exercise
+    "tao bai kiem tra",  // "tạo bài kiểm tra" - create quiz
+    "tao quiz",          // create quiz (mixed language)
+    "tao",               // create (verb)
+    
+    // Family/Animal context - Not offensive
+    "con",               // child / animal (innocent noun)
+    "con cho",           // dog
+    "con meo",           // cat
+    "con nguoi",         // human/person
+    "bo me",             // parents (family context)
+    "bo",                // father (innocent family term)
+    "me",                // mother (innocent family term)
+    
+    // Common words that might trigger patterns
+    "may",               // machine/possibly
+    "gai",               // girl/female (innocent)
+    "trai",              // boy/male (innocent)
+    
+    // Additional educational terms
+    "thang",             // [month] - common in dates
+    "nam",               // year/male
+  ]);
+
+  const normalizedForWhitelist = normalizeForCompare(text.trim());
+  
+  // Check exact match against whitelist first
+  if (WHITELIST.has(normalizedForWhitelist)) {
+    return false;
+  }
+
+  // Check if normalized text contains any whitelisted phrases
+  for (const w of WHITELIST) {
+    if (normalizedForWhitelist === w) {
+      return false;
     }
   }
 
@@ -117,7 +156,14 @@ export function containsVietnameseBadwords(text: string): boolean {
     const parts = normalizedWord.split(" ");
     if (parts.length === 1) {
       // single-word badword: require whole-word match
-      if (normalizedWords.includes(parts[0])) return true;
+      // BUT: skip if the single word is short and in whitelist variants
+      if (normalizedWords.includes(parts[0])) {
+        // Double-check against whitelist for single words
+        if (WHITELIST.has(parts[0])) {
+          return false;
+        }
+        return true;
+      }
     } else {
       // multi-word badword: require contiguous sequence of words
       for (let i = 0; i <= normalizedWords.length - parts.length; i++) {
