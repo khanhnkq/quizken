@@ -6,6 +6,7 @@
 ---
 
 ## 📋 Mục Lục
+
 1. [Local Testing](#local-testing)
 2. [Online SEO Audit Tools](#online-seo-audit-tools)
 3. [Google Search Console Setup](#google-search-console-setup)
@@ -32,8 +33,9 @@ curl https://quizken.vercel.app/robots.txt
 ```
 
 **Kết quả mong đợi:**
+
 ```
-HTTP/2 200 
+HTTP/2 200
 content-type: text/xml
 content-length: 500+
 ```
@@ -45,23 +47,24 @@ content-length: 500+
 **Bước 1:** Mở browser → F12 (DevTools)
 
 **Bước 2:** Kiểm tra:
+
 ```html
 <!-- Mở quizken.vercel.app → DevTools → Elements → Head -->
 
-✅ <title>QuizKen - Tạo Bài Kiểm Tra AI...</title>
-✅ <meta name="description" content="QuizKen giúp giáo viên...">
-✅ <meta name="keywords" content="...">
-✅ <meta property="og:title" content="...">
-✅ <meta property="og:image" content="...">
-✅ <link rel="canonical" href="...">
-✅ <link rel="sitemap" href="/sitemap.xml">
+✅ <title>QuizKen - Tạo Bài Kiểm Tra AI...</title> ✅
+<meta name="description" content="QuizKen giúp giáo viên..." /> ✅
+<meta name="keywords" content="..." /> ✅
+<meta property="og:title" content="..." /> ✅
+<meta property="og:image" content="..." /> ✅
+<link rel="canonical" href="..." /> ✅
+<link rel="sitemap" href="/sitemap.xml" />
 ```
 
 **Bước 3:** Kiểm tra Schema Markup
+
 ```html
 <!-- Tìm <script type="application/ld+json"> -->
-✅ Phải có Organization Schema
-✅ Phải có SoftwareApplication Schema
+✅ Phải có Organization Schema ✅ Phải có SoftwareApplication Schema
 ```
 
 ---
@@ -75,6 +78,7 @@ content-length: 500+
 **Bước 3:** Click vào request đầu tiên (index.html)
 
 **Bước 4:** Xem Response Headers:
+
 ```
 ✅ content-type: text/html
 ✅ x-powered-by: (nếu có)
@@ -86,9 +90,11 @@ content-length: 500+
 ## 🌐 Online SEO Audit Tools
 
 ### 📌 **Tool 1: Google Mobile-Friendly Test**
+
 **Url:** https://search.google.com/test/mobile-friendly
 
 **Bước:**
+
 1. Nhập: `https://quizken.vercel.app`
 2. Click "Test URL"
 3. Kiểm tra:
@@ -100,9 +106,11 @@ content-length: 500+
 ---
 
 ### 📌 **Tool 2: Google PageSpeed Insights**
+
 **Url:** https://pagespeed.web.dev/
 
 **Bước:**
+
 1. Nhập: `https://quizken.vercel.app`
 2. Click "Analyze"
 3. Kiểm tra scores:
@@ -112,6 +120,7 @@ content-length: 500+
    - **SEO:** > 90 ✅
 
 **Yếu tố quan trọng:**
+
 - Largest Contentful Paint (LCP): < 2.5s
 - First Input Delay (FID): < 100ms
 - Cumulative Layout Shift (CLS): < 0.1
@@ -119,14 +128,17 @@ content-length: 500+
 ---
 
 ### 📌 **Tool 3: Screaming Frog SEO Spider (Free Version)**
+
 **Download:** https://www.screamingfrog.co.uk/seo-spider/
 
 **Setup:**
+
 1. Download & Install
 2. Start > Enter URL: `https://quizken.vercel.app`
 3. Click "Start"
 
 **Kiểm tra:**
+
 - **Sitemaps:** Crawl → Sitemaps → Check sitemap.xml
 - **Meta Tags:** Click trang > View Response > Meta data
 - **Crawl errors:** Filters > Status codes > 404s (should be 0)
@@ -136,14 +148,17 @@ content-length: 500+
 ---
 
 ### 📌 **Tool 4: Ahrefs Free SEO Tools**
+
 **Url:** https://ahrefs.com/tools
 
 **Các tools hữu ích:**
+
 - **SEO Toolbar:** Browser extension
 - **Website Authority Checker:** Check domain authority
 - **Backlink Checker:** Check backlinks
 
 **Kiểm tra:**
+
 ```
 https://ahrefs.com/website-authority-checker
 → Nhập: quizken.vercel.app
@@ -153,9 +168,11 @@ https://ahrefs.com/website-authority-checker
 ---
 
 ### 📌 **Tool 5: Semrush Free Tools**
+
 **Url:** https://www.semrush.com/
 
 **Kiểm tra:**
+
 1. **Site Audit (Free):** Check 100 pages
 2. **SEO Dashboard:** Ranking keywords
 3. **Backlink Checker:** Competitor analysis
@@ -175,16 +192,19 @@ https://ahrefs.com/website-authority-checker
 ### **Step 2: Verify Ownership**
 
 **Option A: HTML file (Recommended)**
+
 1. Download HTML verification file
 2. Upload to `public/` folder
 3. Verify
 
 **Option B: Meta tag**
+
 1. Copy meta tag
 2. Add to `index.html` head
 3. Verify
 
 **Option C: Domain name provider**
+
 1. Add TXT record tại registrar
 2. Verify
 
@@ -196,6 +216,7 @@ https://ahrefs.com/website-authority-checker
 4. Click "Submit"
 
 **Xem kết quả sau 2-3 ngày:**
+
 - Sitemaps > sitemap.xml
 - Xem: Indexed URLs, Errors, Warnings
 
@@ -220,32 +241,25 @@ curl -s https://quizken.vercel.app | grep -A 5 "<title>"
 ```
 
 **Kiểm tra:**
+
 ```html
-✅ Title: "QuizKen - Tạo Bài Kiểm Tra AI Miễn Phí | Quiz Generator"
-✅ Length: 65 characters (Good - 50-60 chars optimal)
-
-✅ Meta Description: "QuizKen giúp giáo viên và học sinh tạo đề kiểm tra..."
-✅ Length: 155 characters (Good - 150-160 optimal)
-
-✅ Keywords: "tạo đề kiểm tra, quiz generator, ..."
-
-✅ og:title: "QuizKen - Tạo Bài Kiểm Tra AI Miễn Phí"
-✅ og:description: "Tạo đề kiểm tra chất lượng cao với AI..."
-✅ og:image: "https://quizken.vercel.app/image/seo.jpg"
-
-✅ twitter:card: "summary_large_image"
-✅ twitter:title: "QuizKen - AI Quiz Generator"
-
-✅ canonical: "https://quizken.vercel.app/"
+✅ Title: "QuizKen - Tạo Bài Kiểm Tra AI Miễn Phí | Quiz Generator" ✅ Length:
+65 characters (Good - 50-60 chars optimal) ✅ Meta Description: "QuizKen giúp
+giáo viên và học sinh tạo đề kiểm tra..." ✅ Length: 155 characters (Good -
+150-160 optimal) ✅ Keywords: "tạo đề kiểm tra, quiz generator, ..." ✅
+og:title: "QuizKen - Tạo Bài Kiểm Tra AI Miễn Phí" ✅ og:description: "Tạo đề
+kiểm tra chất lượng cao với AI..." ✅ og:image:
+"https://quizken.vercel.app/image/seo.jpg" ✅ twitter:card:
+"summary_large_image" ✅ twitter:title: "QuizKen - AI Quiz Generator" ✅
+canonical: "https://quizken.vercel.app/"
 ```
 
 ### **Trang About**
 
 ```html
-✅ Title: "Về QuizKen - Nền Tảng Quiz AI Hàng Đầu Việt Nam"
-✅ Meta Description: "Tìm hiểu về QuizKen, sứ mệnh cung cấp công cụ..."
-✅ Keywords: "về quizken, giới thiệu, quiz ai..."
-✅ Canonical: "https://quizken.vercel.app/about"
+✅ Title: "Về QuizKen - Nền Tảng Quiz AI Hàng Đầu Việt Nam" ✅ Meta Description:
+"Tìm hiểu về QuizKen, sứ mệnh cung cấp công cụ..." ✅ Keywords: "về quizken,
+giới thiệu, quiz ai..." ✅ Canonical: "https://quizken.vercel.app/about"
 ```
 
 ---
@@ -253,9 +267,11 @@ curl -s https://quizken.vercel.app | grep -A 5 "<title>"
 ## 🔗 Schema Markup Validation
 
 ### **Tool: Google Rich Results Test**
+
 **Url:** https://search.google.com/test/rich-results
 
 **Bước:**
+
 1. Nhập: `https://quizken.vercel.app`
 2. Click "Test URL"
 3. Kiểm tra:
@@ -264,6 +280,7 @@ curl -s https://quizken.vercel.app | grep -A 5 "<title>"
    - ✅ WebPage schema
 
 **Kết quả mong đợi:**
+
 ```
 ✅ No errors
 ✅ 3-5 rich result types detected
@@ -272,9 +289,11 @@ curl -s https://quizken.vercel.app | grep -A 5 "<title>"
 ---
 
 ### **Tool: Schema.org Validator**
+
 **Url:** https://validator.schema.org/
 
 **Bước:**
+
 1. Copy HTML source của trang
 2. Paste vào validator
 3. Kiểm tra errors & warnings
@@ -285,13 +304,14 @@ curl -s https://quizken.vercel.app | grep -A 5 "<title>"
 
 ### **Metrics Quan Trọng (Core Web Vitals)**
 
-| Metric | Target | Tool |
-|--------|--------|------|
-| LCP (Largest Contentful Paint) | < 2.5s | PageSpeed Insights |
-| FID (First Input Delay) | < 100ms | PageSpeed Insights |
-| CLS (Cumulative Layout Shift) | < 0.1 | PageSpeed Insights |
+| Metric                         | Target  | Tool               |
+| ------------------------------ | ------- | ------------------ |
+| LCP (Largest Contentful Paint) | < 2.5s  | PageSpeed Insights |
+| FID (First Input Delay)        | < 100ms | PageSpeed Insights |
+| CLS (Cumulative Layout Shift)  | < 0.1   | PageSpeed Insights |
 
 ### **Test:**
+
 1. Truy cập: https://pagespeed.web.dev/
 2. Nhập URL
 3. Xem "Web Vitals" section
@@ -310,6 +330,7 @@ copy(JSON.stringify(JSON.parse(document.querySelector('script[type="application/
 ```
 
 **Kiểm tra:**
+
 ```json
 ✅ Organization schema:
 {
@@ -340,6 +361,7 @@ copy(JSON.stringify(JSON.parse(document.querySelector('script[type="application/
 ### **Ngay Bây Giờ (5 phút)**
 
 - [ ] **Local Check:**
+
   - [ ] Mở F12 → kiểm tra `<title>`, `<meta description>`
   - [ ] Kiểm tra `<script type="application/ld+json">`
   - [ ] Kiểm tra `<link rel="canonical">`
@@ -353,11 +375,13 @@ copy(JSON.stringify(JSON.parse(document.querySelector('script[type="application/
 ### **Hôm Nay (30 phút)**
 
 - [ ] **Google Mobile-Friendly Test:**
+
   - [ ] Truy cập: https://search.google.com/test/mobile-friendly
   - [ ] Test: `https://quizken.vercel.app`
   - [ ] Result: PASS
 
 - [ ] **PageSpeed Insights:**
+
   - [ ] Truy cập: https://pagespeed.web.dev/
   - [ ] Test: `https://quizken.vercel.app`
   - [ ] Scores: SEO > 90
@@ -372,6 +396,7 @@ copy(JSON.stringify(JSON.parse(document.querySelector('script[type="application/
 ### **Tuần Này (1-2 giờ)**
 
 - [ ] **Google Search Console:**
+
   - [ ] Verify property
   - [ ] Submit sitemap.xml
   - [ ] Monitor crawl errors
@@ -388,6 +413,7 @@ copy(JSON.stringify(JSON.parse(document.querySelector('script[type="application/
 ## 📈 Kỳ Vọng Kết Quả
 
 ### **Ngay Lập Tức (1 tuần)**
+
 - ✅ Sitemap được Google crawl
 - ✅ Meta tags đúng trên tất cả trang
 - ✅ Schema markup valid
@@ -395,11 +421,13 @@ copy(JSON.stringify(JSON.parse(document.querySelector('script[type="application/
 - ✅ Page Speed: 80+
 
 ### **2-4 Tuần**
+
 - ✅ Pages bắt đầu appear trong Google Search
 - ✅ 1-2 keywords ranking top 100
 - ✅ CTR từ search console > 0
 
 ### **2-3 Tháng**
+
 - ✅ 5-10 keywords ranking top 50
 - ✅ 50-100 organic sessions/month
 - ✅ Improved CTR & impressions
@@ -409,6 +437,7 @@ copy(JSON.stringify(JSON.parse(document.querySelector('script[type="application/
 ## 🔴 Troubleshooting
 
 ### **Vấn đề: Sitemap không xuất hiện**
+
 ```
 Solution:
 1. Kiểm tra curl: curl https://quizken.vercel.app/sitemap.xml
@@ -418,6 +447,7 @@ Solution:
 ```
 
 ### **Vấn đề: Meta tags không cập nhật**
+
 ```
 Solution:
 1. Hard refresh: Ctrl+Shift+R (Windows) hoặc Cmd+Shift+R (Mac)
@@ -427,6 +457,7 @@ Solution:
 ```
 
 ### **Vấn đề: Schema markup không validate**
+
 ```
 Solution:
 1. Copy exact JSON từ console
@@ -439,14 +470,14 @@ Solution:
 
 ## 📞 Tools Summary
 
-| Tool | Purpose | Free | Time |
-|------|---------|------|------|
-| Google Mobile-Friendly | Mobile optimization | ✅ | 2 min |
-| PageSpeed Insights | Core Web Vitals | ✅ | 5 min |
-| Rich Results Test | Schema validation | ✅ | 3 min |
-| Search Console | Google integration | ✅ | 10 min |
-| Screaming Frog | SEO audit | ✅ | 10 min |
-| Google Lighthouse | Performance audit | ✅ | 3 min |
+| Tool                   | Purpose             | Free | Time   |
+| ---------------------- | ------------------- | ---- | ------ |
+| Google Mobile-Friendly | Mobile optimization | ✅   | 2 min  |
+| PageSpeed Insights     | Core Web Vitals     | ✅   | 5 min  |
+| Rich Results Test      | Schema validation   | ✅   | 3 min  |
+| Search Console         | Google integration  | ✅   | 10 min |
+| Screaming Frog         | SEO audit           | ✅   | 10 min |
+| Google Lighthouse      | Performance audit   | ✅   | 3 min  |
 
 ---
 

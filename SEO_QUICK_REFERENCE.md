@@ -24,12 +24,12 @@
 
 ### **Google Tools Testing (20 minutes)**
 
-| Tool | URL | Enter | Expected |
-|------|-----|-------|----------|
-| 📱 **Mobile** | search.google.com/test/mobile-friendly | quizken.vercel.app | PASS ✅ |
-| 🚀 **Speed** | pagespeed.web.dev | quizken.vercel.app | SEO > 90 ✅ |
-| 🏆 **Rich Results** | search.google.com/test/rich-results | quizken.vercel.app | No errors ✅ |
-| 💡 **Lighthouse** | F12 → Lighthouse | Run audit | SEO > 90 ✅ |
+| Tool                | URL                                    | Enter              | Expected     |
+| ------------------- | -------------------------------------- | ------------------ | ------------ |
+| 📱 **Mobile**       | search.google.com/test/mobile-friendly | quizken.vercel.app | PASS ✅      |
+| 🚀 **Speed**        | pagespeed.web.dev                      | quizken.vercel.app | SEO > 90 ✅  |
+| 🏆 **Rich Results** | search.google.com/test/rich-results    | quizken.vercel.app | No errors ✅ |
+| 💡 **Lighthouse**   | F12 → Lighthouse                       | Run audit          | SEO > 90 ✅  |
 
 ---
 
@@ -151,15 +151,15 @@ Step 3: Monitor
 
 ## 📈 What to Track Weekly
 
-| Metric | Tool | Goal |
-|--------|------|------|
-| Indexed Pages | Search Console → Coverage | All pages indexed |
-| Impressions | Search Console → Performance | 10-50/day |
-| Clicks | Search Console → Performance | 1-10/week |
-| CTR | Search Console → Performance | 1-3% |
-| Rankings | Search Console → Performance | Track position |
-| Page Speed | PageSpeed Insights | SEO > 90 |
-| Mobile | Mobile-Friendly Test | PASS |
+| Metric        | Tool                         | Goal              |
+| ------------- | ---------------------------- | ----------------- |
+| Indexed Pages | Search Console → Coverage    | All pages indexed |
+| Impressions   | Search Console → Performance | 10-50/day         |
+| Clicks        | Search Console → Performance | 1-10/week         |
+| CTR           | Search Console → Performance | 1-3%              |
+| Rankings      | Search Console → Performance | Track position    |
+| Page Speed    | PageSpeed Insights           | SEO > 90          |
+| Mobile        | Mobile-Friendly Test         | PASS              |
 
 ---
 
@@ -251,15 +251,18 @@ Step 3: Monitor
 ## 💡 Pro Tips
 
 1. **Check different pages:**
+
    - Homepage, About, Blog (when ready)
    - Each should have unique meta tags
 
 2. **Test regularly:**
+
    - Weekly: PageSpeed Insights
    - Weekly: Search Console Performance
    - Monthly: Full site audit
 
 3. **Monitor competitors:**
+
    - Check their title tags
    - Check their meta descriptions
    - Inspiration for your strategy

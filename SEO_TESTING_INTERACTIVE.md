@@ -43,6 +43,7 @@ QuizKen là một **React SPA (Single Page Application)**. Điều này có ý n
 ### **Phương Pháp 1: Test Trong Browser (CHÍNH XÁCNHẤT)**
 
 #### Step 1: Mở Homepage
+
 ```
 1. Truy cập: https://quizken.vercel.app
 2. Nhấn F12 (mở DevTools)
@@ -51,19 +52,20 @@ QuizKen là một **React SPA (Single Page Application)**. Điều này có ý n
 ```
 
 #### Step 2: Kiểm Tra Meta Tags
+
 ```html
 ✅ Phải thấy:
 
 <title>QuizKen - Tạo Bài Kiểm Tra AI...</title>
 
-<meta name="description" content="QuizKen giúp giáo viên...">
-<meta name="keywords" content="tạo đề kiểm tra, quiz generator...">
+<meta name="description" content="QuizKen giúp giáo viên..." />
+<meta name="keywords" content="tạo đề kiểm tra, quiz generator..." />
 
-<meta property="og:title" content="QuizKen - Tạo Bài Kiểm Tra AI...">
-<meta property="og:description" content="...">
-<meta property="og:image" content="https://quizken.vercel.app/image/seo.jpg">
+<meta property="og:title" content="QuizKen - Tạo Bài Kiểm Tra AI..." />
+<meta property="og:description" content="..." />
+<meta property="og:image" content="https://quizken.vercel.app/image/seo.jpg" />
 
-<link rel="canonical" href="https://quizken.vercel.app/">
+<link rel="canonical" href="https://quizken.vercel.app/" />
 
 <script type="application/ld+json">
   {...Organization Schema...}
@@ -71,6 +73,7 @@ QuizKen là một **React SPA (Single Page Application)**. Điều này có ý n
 ```
 
 #### Step 3: Kiểm Tra View Page Source
+
 ```
 Ctrl+U (Windows) hoặc Cmd+U (Mac) để xem source code
 → Scroll đến <head>
@@ -83,6 +86,7 @@ Ctrl+U (Windows) hoặc Cmd+U (Mac) để xem source code
 ### **Phương Pháp 2: Test Với Google Tools (RECOMMENDED)**
 
 #### 📱 Google Mobile-Friendly Test
+
 ```
 URL: https://search.google.com/test/mobile-friendly
 Nhập: https://quizken.vercel.app
@@ -90,6 +94,7 @@ Nhập: https://quizken.vercel.app
 ```
 
 #### 🚀 Google PageSpeed Insights
+
 ```
 URL: https://pagespeed.web.dev/
 Nhập: https://quizken.vercel.app
@@ -100,6 +105,7 @@ Xem kết quả:
 ```
 
 #### 🏆 Google Rich Results Test
+
 ```
 URL: https://search.google.com/test/rich-results
 Nhập: https://quizken.vercel.app
@@ -152,6 +158,7 @@ After 2-3 days, check:
 ### **Now (5 minutes)**
 
 - [ ] **Open in Browser:**
+
   ```
   1. Go to: https://quizken.vercel.app
   2. Press F12
@@ -162,9 +169,10 @@ After 2-3 days, check:
   ```
 
 - [ ] **View Page Source:**
+
   ```
   1. Ctrl+U (Windows) or Cmd+U (Mac)
-  2. Search: "og:" 
+  2. Search: "og:"
   3. ✅ Should find OG meta tags
   ```
 
@@ -181,18 +189,21 @@ After 2-3 days, check:
 ### **Today (30 minutes)**
 
 - [ ] **Google Mobile-Friendly:**
+
   ```
   https://search.google.com/test/mobile-friendly
   → Result: PASS ✅
   ```
 
 - [ ] **PageSpeed Insights:**
+
   ```
   https://pagespeed.web.dev/
   → SEO Score: > 90 ✅
   ```
 
 - [ ] **Rich Results Test:**
+
   ```
   https://search.google.com/test/rich-results
   → No errors ✅
@@ -209,6 +220,7 @@ After 2-3 days, check:
 ### **This Week (1-2 hours)**
 
 - [ ] **Google Search Console Setup:**
+
   ```
   1. Go: https://search.google.com/search-console
   2. Add: https://quizken.vercel.app
@@ -218,6 +230,7 @@ After 2-3 days, check:
   ```
 
 - [ ] **Check Indexing:**
+
   ```
   Search Console → Coverage
   ✅ Should show: Pages indexed, submitted
@@ -325,11 +338,13 @@ Solution:
 ### **If All Tests Pass ✅**
 
 1. **Setup Google Search Console**
+
    - Verify property
    - Submit sitemap
    - Monitor for 2-3 weeks
 
 2. **Monitor Rankings**
+
    - Use: Google Search Console
    - Track: Keyword positions
    - Adjust: Meta descriptions if needed
@@ -342,11 +357,13 @@ Solution:
 ### **If Tests Fail ❌**
 
 1. **Identify Issue:**
+
    - Use validator tools
    - Check error messages
    - Review code
 
 2. **Fix Issues:**
+
    - Update: SeoMeta component
    - Update: seoSchemas.ts
    - Rebuild: `npm run build`
@@ -382,16 +399,19 @@ curl -s https://quizken.vercel.app/ | grep -i "og:" | head -5
 ## 📌 Key Points
 
 ✅ **React SPA + SEO:**
+
 - Static meta tags: HTML (static) ✅
 - Dynamic meta tags: React component (client-side) ✅
 - Both work for modern Google crawler
 
 ✅ **Testing Priority:**
+
 1. Browser DevTools (immediate)
 2. Google Tools (verify)
 3. Search Console (long-term tracking)
 
 ✅ **Expected Timeline:**
+
 - Setup: 1 day
 - Initial indexing: 2-3 days
 - Noticeable results: 2-4 weeks

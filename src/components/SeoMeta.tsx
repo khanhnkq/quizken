@@ -128,12 +128,37 @@ export const SeoMeta = ({
     );
     ensureMetaTag("meta[property='og:url']", { property: "og:url" }, ogConfig.url);
     ensureMetaTag("meta[property='og:type']", { property: "og:type" }, ogConfig.type);
+    
+    // PRIMARY og:image - EXPLICITLY REQUIRED
     ensureMetaTag("meta[property='og:image']", { property: "og:image" }, ogConfig.image);
+    
+    // SECONDARY og:image attributes for clarity
     ensureMetaTag(
       "meta[property='og:image:secure_url']",
       { property: "og:image:secure_url" },
       ogConfig.image
     );
+    ensureMetaTag(
+      "meta[property='og:image:type']",
+      { property: "og:image:type" },
+      "image/jpeg"
+    );
+    ensureMetaTag(
+      "meta[property='og:image:width']",
+      { property: "og:image:width" },
+      "1200"
+    );
+    ensureMetaTag(
+      "meta[property='og:image:height']",
+      { property: "og:image:height" },
+      "630"
+    );
+    ensureMetaTag(
+      "meta[property='og:image:alt']",
+      { property: "og:image:alt" },
+      ogConfig.title
+    );
+    
     ensureMetaTag("meta[property='og:locale']", { property: "og:locale" }, ogConfig.locale);
     ensureMetaTag(
       "meta[property='og:site_name']",
