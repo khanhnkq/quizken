@@ -21,36 +21,6 @@ import logo from "@/assets/logo/logo.png";
 import { useEffect, useState, type MouseEvent } from "react";
 import { gsap } from "gsap";
 
-export const SEOHead = () => {
-  useEffect(() => {
-    const title = "Giới thiệu QuizKen - Nguyễn Khánh";
-    const description =
-      "Nền tảng tạo bài kiểm tra bằng AI cho giáo viên, học sinh, sinh viên, creator. Mình xây dựng QuizKen để giúp tạo đề chất lượng trong vài phút.";
-    document.title = title;
-    const ensureMeta = (attr: string, key: string, value: string) => {
-      let el = document.querySelector(
-        `meta[${attr}='${key}']`
-      ) as HTMLMetaElement | null;
-      if (!el) {
-        el = document.createElement("meta");
-        el.setAttribute(attr, key);
-        document.head.appendChild(el);
-      }
-      el.setAttribute("content", value);
-    };
-    ensureMeta("name", "description", description);
-    ensureMeta("property", "og:title", title);
-    ensureMeta("property", "og:description", description);
-    ensureMeta("property", "og:type", "website");
-    ensureMeta("property", "og:url", window.location.href);
-    ensureMeta("property", "og:image", "/favicon/android-chrome-512x512.png");
-    ensureMeta("name", "twitter:card", "summary_large_image");
-    ensureMeta("name", "twitter:title", title);
-    ensureMeta("name", "twitter:description", description);
-  }, []);
-  return null;
-};
-
 type Cta = {
   label: string;
   onClick?: () => void;

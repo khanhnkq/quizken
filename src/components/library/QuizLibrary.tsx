@@ -64,6 +64,7 @@ import { QuizCardSkeleton } from "@/components/library/QuizCardSkeleton";
 import { useAudio } from "@/contexts/SoundContext";
 import ScrollSmoother from "gsap/ScrollSmoother";
 import { Eye } from "lucide-react";
+import SeoMeta from "@/components/SeoMeta";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface PublicQuiz {
@@ -588,7 +589,12 @@ const QuizLibrary: React.FC = () => {
 
   return (
     <>
-      {/* Navbar outside ScrollSmoother for proper sticky behavior */}
+      <SeoMeta
+        title="Thư viện các bài tập trắc nghiệm miễn phí"
+        description="Khám phá hàng trăm quiz trắc nghiệm được tạo bằng AI trên QuizKen, lọc theo chủ đề và độ khó để luyện tập hiệu quả."
+        canonical="/library"
+        keywords={["thư viện quiz", "quiz ai", "quiz miễn phí", "trắc nghiệm" ]}
+      />
       <Navbar />
 
       <div className="min-h-screen" id="smooth-wrapper">

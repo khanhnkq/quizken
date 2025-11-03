@@ -4,7 +4,9 @@ import Navbar from "@/components/layout/Navbar";
 import Hero from "@/components/sections/Hero";
 import QuizGenerator from "@/components/quiz/QuizGenerator";
 import Footer from "@/components/layout/Footer";
+import SeoMeta from "@/components/SeoMeta";
 import { shouldDisableScrollSmoother } from "@/utils/deviceDetection";
+import { generateHomepageSchema } from "@/lib/seoSchemas";
 import { ComponentSkeleton } from "@/components/ui/loading-skeleton";
 
 // Lazy load heavy components
@@ -124,6 +126,31 @@ const Index = () => {
 
   return (
     <>
+      <SeoMeta
+        title="Tạo Bài Kiểm Tra AI Miễn Phí - QuizKen"
+        description="QuizKen giúp giáo viên và học sinh tạo bài kiểm tra trắc nghiệm với AI trong vài giây. Hỗ trợ 100+ chủ đề, tự động chấm điểm, xuất PDF."
+        canonical="/"
+        keywords={[
+          "tạo bài kiểm tra AI",
+          "quiz generator",
+          "trắc nghiệm online",
+          "generator quiz",
+          "bài kiểm tra tự động",
+          "học tập trực tuyến",
+        ]}
+        openGraph={{
+          title: "QuizKen - Tạo Bài Kiểm Tra AI Miễn Phí",
+          description: "Tạo bài kiểm tra chất lượng cao với AI.",
+          url: "/",
+          type: "website",
+        }}
+        twitter={{
+          card: "summary_large_image",
+          title: "QuizKen - AI Quiz Generator",
+          description: "Tạo bài kiểm tra AI miễn phí",
+        }}
+        structuredData={generateHomepageSchema()}
+      />
       {/* Navbar outside ScrollSmoother for proper sticky behavior */}
       <Navbar />
       <div className="min-h-screen" id="smooth-wrapper">
