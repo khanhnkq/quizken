@@ -41,6 +41,7 @@ const About = () => {
         openGraph={{
           title: "Về QuizKen - AI Quiz Generator",
           description: "Tìm hiểu hành trình và sứ mệnh của QuizKen",
+          image: "https://quizken.vercel.app/image/seo.jpg",
           url: "/about",
           type: "website",
         }}

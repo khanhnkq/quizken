@@ -141,6 +141,7 @@ const Index = () => {
         openGraph={{
           title: "QuizKen - Tạo Bài Kiểm Tra AI Miễn Phí",
           description: "Tạo bài kiểm tra chất lượng cao với AI.",
+          image: "https://quizken.vercel.app/image/seo.jpg",
           url: "/",
           type: "website",
         }}
