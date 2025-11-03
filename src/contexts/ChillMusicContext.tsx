@@ -39,8 +39,8 @@ export function ChillMusicProvider({
     if (audioRef.current) return audioRef.current;
     
     try {
-      // Dynamic import for lazy loading
-      const { default: lofi2 } = await import("@/assets/audio/lofi-2.mp3");
+      // Dynamic import for lazy loading - using compressed version (71% smaller: 2MB instead of 7.3MB)
+      const { default: lofi2 } = await import("@/assets/audio/lofi-2-compressed.mp3");
       const audio = new Audio(lofi2);
       audio.preload = "auto";
       audio.loop = true;
