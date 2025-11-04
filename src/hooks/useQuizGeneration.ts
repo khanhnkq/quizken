@@ -28,56 +28,58 @@ export function useQuizGeneration<Quiz = unknown>() {
   const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const currentQuizIdRef = useRef<string | null>(null);
 
-  // TEMPORARY: Disable leader election for polling to fix immediate issue
-  // TODO: Re-enable after testing multi-tab coordination
-  // const { isLeader } = useLeaderElection({
-  //   channelName: "quiz-polling-leader",
-  //   onLeaderChange: (isLeader) => {
-  //     if (isLeader) {
-  //       console.log("This tab is now the leader for quiz polling");
-  //     } else {
-  //       console.log("This tab is no longer the leader for quiz polling");
-  //       // Stop polling if we're no longer the leader
-  //       stopPolling();
-  //     }
-  //   },
-  // });
-  
-  // Temporary fallback - always allow polling
-  const isLeader = true;
+  // Leader election for polling coordination
+  const { isLeader } = useLeaderElection({
+    channelName: "quiz-polling-leader",
+    onLeaderChange: (isLeader) => {
+      if (isLeader) {
+        console.log("✅ This tab is now the leader for quiz polling");
+      } else {
+        console.log("⏸️ This tab is no longer the leader for quiz polling");
+        // Stop polling if we're no longer the leader
+        stopPolling();
+      }
+    },
+  });
 
-  // TEMPORARY: Disable BroadcastChannel for polling to fix immediate issue
-  // TODO: Re-enable after testing multi-tab coordination
-  // const { postMessage, isSupported } = useBroadcastChannel({
-  //   channelName: "quiz-polling-coordination",
-  //   onMessage: (message: BroadcastMessage) => {
-  //     if (message.type === "polling-status") {
-  //       const data = message.data as { quizId: string; status: Status; progress: string };
-  //       if (data && data.quizId === currentQuizIdRef.current) {
-  //         setStatus(data.status);
-  //         setProgress(data.progress);
-  //         setIsPolling(data.status !== "completed" && data.status !== "failed" && data.status !== "expired");
-  //       }
-  //     } else if (message.type === "polling-start") {
-  //       const data = message.data as { quizId: string };
-  //       if (data && data.quizId !== currentQuizIdRef.current) {
-  //         // Another tab started polling for a different quiz
-  //         console.log("Another tab started polling for quiz:", data.quizId);
-  //       }
-  //     } else if (message.type === "polling-stop") {
-  //       const data = message.data as { quizId: string };
-  //       if (data && data.quizId === currentQuizIdRef.current) {
-  //         // Polling was stopped by another tab
-  //         console.log("Polling stopped by another tab for quiz:", data.quizId);
-  //         stopPolling();
-  //       }
-  //     }
-  //   },
-  // });
-  
-  // Temporary fallback - disable cross-tab coordination
-  const postMessage = () => {};
-  const isSupported = false;
+  // BroadcastChannel for cross-tab coordination
+  const { postMessage, isSupported } = useBroadcastChannel({
+    channelName: "quiz-polling-coordination",
+    onMessage: (message: BroadcastMessage) => {
+      if (message.type === "polling-status") {
+        const data = message.data as {
+          quizId: string;
+          status: Status;
+          progress: string;
+        };
+        if (data && data.quizId === currentQuizIdRef.current) {
+          setStatus(data.status);
+          setProgress(data.progress);
+          setIsPolling(
+            data.status !== "completed" &&
+              data.status !== "failed" &&
+              data.status !== "expired"
+          );
+        }
+      } else if (message.type === "polling-start") {
+        const data = message.data as { quizId: string };
+        if (data && data.quizId !== currentQuizIdRef.current) {
+          // Another tab started polling for a different quiz
+          console.log("📡 Another tab started polling for quiz:", data.quizId);
+        }
+      } else if (message.type === "polling-stop") {
+        const data = message.data as { quizId: string };
+        if (data && data.quizId === currentQuizIdRef.current) {
+          // Polling was stopped by another tab
+          console.log(
+            "📡 Polling stopped by another tab for quiz:",
+            data.quizId
+          );
+          stopPolling();
+        }
+      }
+    },
+  });
 
   const stopPolling = useCallback(() => {
     if (pollIntervalRef.current) {
@@ -85,12 +87,12 @@ export function useQuizGeneration<Quiz = unknown>() {
       pollIntervalRef.current = null;
     }
     setIsPolling(false);
-    
+
     // Broadcast that polling has stopped
     if (currentQuizIdRef.current && isSupported) {
       postMessage("polling-stop", { quizId: currentQuizIdRef.current });
     }
-    
+
     currentQuizIdRef.current = null;
   }, [isSupported, postMessage]);
 
@@ -108,13 +110,6 @@ export function useQuizGeneration<Quiz = unknown>() {
     async (quizId: string, callbacks: StartPollingCallbacks<Quiz>) => {
       if (!quizId) return;
 
-      // TEMPORARY: Disable leader election for polling to fix immediate issue
-      // TODO: Re-enable after testing multi-tab coordination
-      // if (isSupported && !isLeader) {
-      //   console.log("Not the leader and BroadcastChannel supported, not starting polling");
-      //   return;
-      // }
-
       // Ensure any previous polling is stopped before starting a new one
       stopPolling();
 
@@ -126,21 +121,32 @@ export function useQuizGeneration<Quiz = unknown>() {
       setStatus("pending");
       setProgress("Đang chuẩn bị...");
 
-      // Broadcast that polling has started
-      if (isSupported) {
+      // Broadcast that polling has started (only if leader)
+      if (isSupported && isLeader) {
         postMessage("polling-start", { quizId });
       }
 
       // Debug: log when polling starts
       console.log(
-        `[useQuizGeneration] startPolling called for quizId=${quizId}`
+        `[useQuizGeneration] startPolling called for quizId=${quizId}, isLeader=${isLeader}`
       );
 
-      const interval = setInterval(async () => {
+      // Exponential backoff configuration
+      const MAX_BACKOFF_MS = 30000; // Max 30s between polls
+      const INITIAL_INTERVAL_MS = 2000;
+      let currentIntervalMs = INITIAL_INTERVAL_MS;
+
+      const sleep = (ms: number) =>
+        new Promise((resolve) => setTimeout(resolve, ms));
+
+      // Perform first poll immediately, don't wait for interval
+      let hasPolledOnce = false;
+
+      const performPoll = async () => {
         try {
-          // Debug: log each poll attempt
-           
-          console.log(`[useQuizGeneration] polling quizId=${quizId}...`);
+          console.log(
+            `[useQuizGeneration] polling quizId=${quizId}, interval=${currentIntervalMs}ms`
+          );
 
           // Use GET without a body to avoid fetch errors in browsers (some runtimes disallow GET with body)
           const invokeOptions: Record<string, unknown> = {
@@ -154,10 +160,20 @@ export function useQuizGeneration<Quiz = unknown>() {
             invokeOptions
           );
           if (error) {
-             
-            console.warn("[useQuizGeneration] polling error:", error);
+            // Error → increase backoff
+            currentIntervalMs = Math.min(
+              currentIntervalMs * 1.5,
+              MAX_BACKOFF_MS
+            );
+            console.warn(
+              `[useQuizGeneration] poll error, backing off to ${currentIntervalMs}ms:`,
+              error
+            );
             throw error;
           }
+
+          // Success → reset to initial interval
+          currentIntervalMs = INITIAL_INTERVAL_MS;
 
           const nextStatus = (data?.status as Status) || null;
           const nextProgress = data?.progress || "Đang xử lý...";
@@ -165,8 +181,8 @@ export function useQuizGeneration<Quiz = unknown>() {
           setProgress(nextProgress);
           callbacks.onProgress?.(nextStatus, nextProgress);
 
-          // Broadcast status update to other tabs
-          if (isSupported) {
+          // Broadcast status update to other tabs (only leader broadcasts)
+          if (isSupported && isLeader) {
             postMessage("polling-status", {
               quizId,
               status: nextStatus,
@@ -189,16 +205,21 @@ export function useQuizGeneration<Quiz = unknown>() {
           }
         } catch (err) {
           // keep polling; transient errors are ignored
-           
           console.debug(
             "[useQuizGeneration] poll caught error (ignored):",
             err
           );
         }
-      }, 2000);
+      };
+
+      // Poll immediately on start
+      performPoll();
+      hasPolledOnce = true;
+
+      const interval = setInterval(performPoll, currentIntervalMs);
       pollIntervalRef.current = interval;
     },
-    [stopPolling]
+    [stopPolling, isLeader, isSupported, postMessage]
   );
 
   return {

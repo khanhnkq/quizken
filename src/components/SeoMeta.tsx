@@ -89,7 +89,11 @@ export const SeoMeta = ({
     const pageTitle = `${title} | ${SITE_NAME}`.trim();
     document.title = pageTitle;
 
-    ensureMetaTag("meta[name='description']", { name: "description" }, description);
+    ensureMetaTag(
+      "meta[name='description']",
+      { name: "description" },
+      description
+    );
 
     if (keywords?.length) {
       ensureMetaTag(
@@ -120,18 +124,34 @@ export const SeoMeta = ({
       siteName: openGraph?.siteName ?? SITE_NAME,
     };
 
-    ensureMetaTag("meta[property='og:title']", { property: "og:title" }, ogConfig.title);
+    ensureMetaTag(
+      "meta[property='og:title']",
+      { property: "og:title" },
+      ogConfig.title
+    );
     ensureMetaTag(
       "meta[property='og:description']",
       { property: "og:description" },
       ogConfig.description
     );
-    ensureMetaTag("meta[property='og:url']", { property: "og:url" }, ogConfig.url);
-    ensureMetaTag("meta[property='og:type']", { property: "og:type" }, ogConfig.type);
-    
+    ensureMetaTag(
+      "meta[property='og:url']",
+      { property: "og:url" },
+      ogConfig.url
+    );
+    ensureMetaTag(
+      "meta[property='og:type']",
+      { property: "og:type" },
+      ogConfig.type
+    );
+
     // PRIMARY og:image - EXPLICITLY REQUIRED
-    ensureMetaTag("meta[property='og:image']", { property: "og:image" }, ogConfig.image);
-    
+    ensureMetaTag(
+      "meta[property='og:image']",
+      { property: "og:image" },
+      ogConfig.image
+    );
+
     // SECONDARY og:image attributes for clarity
     ensureMetaTag(
       "meta[property='og:image:secure_url']",
@@ -158,15 +178,19 @@ export const SeoMeta = ({
       { property: "og:image:alt" },
       ogConfig.title
     );
-    
+
     // Fallback: itemprop image for Schema.org compatibility
     ensureMetaTag(
       "meta[itemprop='image']",
       { itemprop: "image" },
       ogConfig.image
     );
-    
-    ensureMetaTag("meta[property='og:locale']", { property: "og:locale" }, ogConfig.locale);
+
+    ensureMetaTag(
+      "meta[property='og:locale']",
+      { property: "og:locale" },
+      ogConfig.locale
+    );
     ensureMetaTag(
       "meta[property='og:site_name']",
       { property: "og:site_name" },
@@ -202,7 +226,11 @@ export const SeoMeta = ({
       { name: "twitter:image" },
       twitterConfig.image
     );
-    ensureMetaTag("meta[name='twitter:site']", { name: "twitter:site" }, twitterConfig.site);
+    ensureMetaTag(
+      "meta[name='twitter:site']",
+      { name: "twitter:site" },
+      twitterConfig.site
+    );
     ensureMetaTag(
       "meta[name='twitter:creator']",
       { name: "twitter:creator" },

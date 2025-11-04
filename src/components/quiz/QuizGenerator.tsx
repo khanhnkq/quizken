@@ -127,6 +127,9 @@ const QuizGenerator = () => {
   const isMobile = useIsMobile();
   const abortControllerRef = React.useRef<AbortController | null>(null);
   const isMountedRef = React.useRef<boolean>(true);
+  // Double-submit protection refs
+  const isSubmittingRef = React.useRef<boolean>(false);
+  const lastSubmitTimeRef = React.useRef<number>(0);
   const {
     status: genStatus,
     progress: genProgress,
@@ -663,15 +666,21 @@ const QuizGenerator = () => {
   // Progress UI moved to GenerationProgress component
 
   // Generate idempotency key to prevent duplicate requests
-  const generateIdempotencyKey = (prompt: string, questionCount: string, userId?: string) => {
+  const generateIdempotencyKey = (
+    prompt: string,
+    questionCount: string,
+    userId?: string
+  ) => {
     const timestamp = Math.floor(Date.now() / (1000 * 60)); // Round to minute for 5-minute window
-    const data = `${userId || 'anonymous'}-${prompt}-${questionCount}-${timestamp}`;
-    
+    const data = `${
+      userId || "anonymous"
+    }-${prompt}-${questionCount}-${timestamp}`;
+
     // Simple hash function for idempotency key
     let hash = 0;
     for (let i = 0; i < data.length; i++) {
       const char = data.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash; // Convert to 32-bit integer
     }
     return `quiz_${Math.abs(hash).toString(36)}_${timestamp}`;
@@ -753,24 +762,29 @@ const QuizGenerator = () => {
     try {
       setLoading(true);
 
-      // TEMPORARY: Disable idempotency key to fix immediate issue
-      // const idempotencyKey = generateIdempotencyKey(prompt, questionCount, user?.id);
+      // Generate idempotency key to prevent duplicate requests
+      const idempotencyKey = generateIdempotencyKey(
+        prompt,
+        questionCount,
+        user?.id
+      );
 
       const startQuizPayload = {
         prompt,
         device: deviceInfo,
         questionCount: parseInt(questionCount),
-        // idempotencyKey,
+        idempotencyKey,
       };
 
       console.log("▶️ Starting quiz generation request...");
       const { data: startResponse, error: startError } =
-        await supabase.functions.invoke<{ id: string; duplicate?: boolean; message?: string }>(
-          "generate-quiz/start-quiz",
-          {
-            body: startQuizPayload,
-          }
-        );
+        await supabase.functions.invoke<{
+          id: string;
+          duplicate?: boolean;
+          message?: string;
+        }>("generate-quiz/start-quiz", {
+          body: startQuizPayload,
+        });
       // Debug: log the raw response from Supabase Functions to ensure frontend receives quiz id
       // (Remove these logs after debugging)
 
@@ -820,6 +834,7 @@ const QuizGenerator = () => {
       // Step 3: Start polling for status via hook
       startPollingHook(quizId, {
         onCompleted: ({ quiz, tokenUsage }) => {
+          isSubmittingRef.current = false;
           setQuiz(quiz);
           if (tokenUsage) setTokenUsage(tokenUsage as TokenUsage);
           setGenerationStatus(null);
@@ -853,6 +868,7 @@ const QuizGenerator = () => {
           channel.close();
         },
         onFailed: (errorMessage?: string) => {
+          isSubmittingRef.current = false;
           setGenerationStatus(null);
           setGenerationProgress("");
           setLoading(false);
@@ -891,6 +907,7 @@ const QuizGenerator = () => {
           channel.close();
         },
         onExpired: () => {
+          isSubmittingRef.current = false;
           setGenerationStatus(null);
           setGenerationProgress("");
           setLoading(false);
@@ -929,6 +946,7 @@ const QuizGenerator = () => {
     } catch (error) {
       console.error("❌ Error starting quiz:", error);
 
+      isSubmittingRef.current = false;
       setLoading(false);
 
       const errorMessage =
@@ -964,11 +982,29 @@ const QuizGenerator = () => {
   };
 
   const handleGenerateClick = (e: MouseEvent<HTMLButtonElement>) => {
+    // Double-submit protection check
+    const now = Date.now();
+    if (isSubmittingRef.current || now - lastSubmitTimeRef.current < 5000) {
+      console.log(
+        "⏱️ Submission in progress or too soon after last submission"
+      );
+      toast({
+        title: "Vui chờ",
+        description:
+          "Yêu cầu trước đó đang được xử lý. Vui lòng đợi và thử lại.",
+        variant: "warning",
+      });
+      return;
+    }
+
     // Nếu đang có quiz hiển thị hoặc đang có tiến trình tạo dở, yêu cầu xác nhận
     if (quiz || loading || genStatus || generationStatus) {
       setShowConfirmDialog(true);
       return;
     }
+
+    isSubmittingRef.current = true;
+    lastSubmitTimeRef.current = now;
     void generateQuiz();
   };
 

@@ -25,12 +25,13 @@ export default defineConfig({
   plugins: [
     react(),
     // Bundle analyzer - only in analyze mode
-    process.env.NODE_ENV === 'analyze' && visualizer({
-      filename: 'dist/bundle-analysis.html',
-      open: true,
-      gzipSize: true,
-      brotliSize: true,
-    })
+    process.env.NODE_ENV === "analyze" &&
+      visualizer({
+        filename: "dist/bundle-analysis.html",
+        open: true,
+        gzipSize: true,
+        brotliSize: true,
+      }),
   ].filter(Boolean),
 
   build: {
@@ -93,7 +94,7 @@ export default defineConfig({
     },
 
     // Enable compression
-    minify: 'terser',
+    minify: "terser",
     terserOptions: {
       compress: {
         drop_console: true,
@@ -103,15 +104,19 @@ export default defineConfig({
   },
 
   optimizeDeps: {
-    exclude: ["gsap/ScrollTrigger", "gsap/dist/ScrollSmoother"],
+    exclude: [
+      "gsap/ScrollTrigger",
+      "gsap/dist/ScrollSmoother",
+      "jspdf/dist/jspdf.umd.min.js", // Exclude jspdf to prevent optimizer conflicts
+    ],
 
     // Only include critical dependencies for initial load
     include: [
-      "react", 
-      "react-dom", 
-      "react/jsx-runtime", 
+      "react",
+      "react-dom",
+      "react/jsx-runtime",
       "@/lib/icons",
-      "@tanstack/react-query"
+      "@tanstack/react-query",
     ],
 
     // Force deps to be bundled correctly

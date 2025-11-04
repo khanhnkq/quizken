@@ -1,12 +1,12 @@
 import * as React from "react";
-import { 
+import {
   createContext,
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
- } from "react";
+} from "react";
 
 type ChillStatus = "idle" | "playing" | "paused" | "stopped" | "error";
 
@@ -37,10 +37,12 @@ export function ChillMusicProvider({
   // Lazy load audio - only when needed
   const loadAudio = useCallback(async () => {
     if (audioRef.current) return audioRef.current;
-    
+
     try {
       // Dynamic import for lazy loading - using compressed version (71% smaller: 2MB instead of 7.3MB)
-      const { default: lofi2 } = await import("@/assets/audio/lofi-2-compressed.mp3");
+      const { default: lofi2 } = await import(
+        "@/assets/audio/lofi-2-compressed.mp3"
+      );
       const audio = new Audio(lofi2);
       audio.preload = "auto";
       audio.loop = true;
@@ -110,7 +112,7 @@ export function ChillMusicProvider({
       // Load audio if not already loaded
       const audio = await loadAudio();
       if (!audio) return;
-      
+
       await audio.play();
       setIsPlaying(true);
       setStatus("playing");

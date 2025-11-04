@@ -14,6 +14,7 @@
 4. Xem kết quả
 
 **Kiểm tra:**
+
 - ✅ og:image: Có xuất hiện không?
 - ✅ Image URL: Accessible không?
 - ✅ Image size: Đủ lớn không? (1200x630px minimum)
@@ -24,6 +25,7 @@
 ## 🖼️ Image Requirements (Facebook)
 
 ### **Kích Thước Tối Ưu**
+
 ```
 Minimum:   1200 x 630 px
 Optimal:   1200 x 630 px (16:9)
@@ -33,6 +35,7 @@ Size:      < 8 MB (recommended < 300KB)
 ```
 
 ### **Hiện Tại**
+
 File: `public/image/seo.jpg`
 Cần kiểm tra kích thước
 
@@ -53,6 +56,7 @@ curl -I https://quizken.vercel.app/image/seo.jpg
 ```
 
 **Fix nếu 404:**
+
 1. Kiểm tra file tồn tại: `public/image/seo.jpg`
 2. Đúng path trong index.html: `og:image` = `/image/seo.jpg`
 3. Rebuild & deploy
@@ -64,6 +68,7 @@ curl -I https://quizken.vercel.app/image/seo.jpg
 Facebook yêu cầu **minimum 1200x630px**
 
 **Check size:**
+
 ```bash
 # macOS
 sips -g pixelWidth -g pixelHeight public/image/seo.jpg
@@ -76,6 +81,7 @@ https://www.imagesize.org/
 ```
 
 **Fix nếu quá nhỏ:**
+
 - Resize to 1200x630px
 - Use tool: Canva, Photoshop, or online resize
 
@@ -89,6 +95,7 @@ https://www.imagesize.org/
 ```
 
 **Fix:**
+
 - Convert to JPG if needed
 - Keep as PNG (lossless)
 - Recommend: **JPG 1200x630px, ~50-100KB**
@@ -98,6 +105,7 @@ https://www.imagesize.org/
 ## ✅ Solution Checklist
 
 ### **Check 1: File Exists**
+
 ```bash
 # Should return file info
 ls -lh public/image/seo.jpg
@@ -107,12 +115,14 @@ ls -lh public/image/seo.jpg
 ```
 
 ### **Check 2: URL Accessible**
+
 ```bash
 curl -I https://quizken.vercel.app/image/seo.jpg
 # HTTP/2 200 ✅
 ```
 
 ### **Check 3: Image Size**
+
 ```
 Current:   ? px (need to check)
 Required:  1200 x 630 px
@@ -120,6 +130,7 @@ Status:    ❓
 ```
 
 ### **Check 4: OG Tags in HTML**
+
 ```html
 ✅ Present in index.html:
 <meta property="og:image" content="https://quizken.vercel.app/image/seo.jpg" />
@@ -128,6 +139,7 @@ Status:    ❓
 ```
 
 ### **Check 5: Facebook Debugger**
+
 ```
 Status:  Need to test
 URL:     https://developers.facebook.com/tools/debug/og/object/
@@ -143,11 +155,13 @@ Steps:   Enter URL → Click "Scrape Again"
 But still not showing on Facebook:
 
 1. **Clear Facebook Cache**
+
    - https://developers.facebook.com/tools/debug/og/object/
    - Click "Fetch new shares information"
    - Wait 5-10 minutes
 
 2. **Share Again**
+
    - Go to: https://quizken.vercel.app/
    - Copy full URL
    - Paste in Facebook post
@@ -222,6 +236,7 @@ Error: "SSL certificate issue"
 ### **What Works Best for Facebook**
 
 ✅ **Optimal Image**
+
 - Size: 1200 x 630 px
 - Format: JPG (quality 80-90)
 - File size: 50-150 KB
@@ -229,6 +244,7 @@ Error: "SSL certificate issue"
 - Color: Vibrant, eye-catching
 
 ✅ **Example Specs**
+
 ```
 Image: Quiz screenshot + logo + text
 Size: 1200x630px
@@ -239,6 +255,7 @@ Logo: Bottom right corner
 ```
 
 ### **Tools to Create**
+
 - Canva (free, easy): canva.com
 - Photoshop (paid, professional)
 - GIMP (free, open-source)
@@ -253,7 +270,9 @@ Logo: Bottom right corner
 ```html
 <!-- Image (Main) -->
 <meta property="og:image" content="https://quizken.vercel.app/image/seo.jpg" />
-<meta property="og:image:secure_url" content="https://quizken.vercel.app/image/seo.jpg" />
+<meta
+  property="og:image:secure_url"
+  content="https://quizken.vercel.app/image/seo.jpg" />
 <meta property="og:image:type" content="image/jpeg" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
@@ -283,16 +302,19 @@ Logo: Bottom right corner
 ### **Right Now (5 min)**
 
 - [ ] Check image file exists
+
   ```bash
   ls -lh public/image/seo.jpg
   ```
 
 - [ ] Check image size (pixels)
+
   ```bash
   sips -g pixelWidth -g pixelHeight public/image/seo.jpg
   ```
 
 - [ ] Check file size (bytes)
+
   ```bash
   ls -lh public/image/seo.jpg | awk '{print $5}'
   ```
@@ -305,11 +327,13 @@ Logo: Bottom right corner
 ### **Today (10 min)**
 
 - [ ] Test on Facebook Debugger
+
   - URL: https://developers.facebook.com/tools/debug/og/object/
   - Enter: https://quizken.vercel.app/
   - Check results
 
 - [ ] Manual Facebook share test
+
   - Open: https://quizken.vercel.app/
   - Right-click → Share to Facebook
   - Check preview
@@ -349,19 +373,23 @@ When you share on Facebook:
 ## 💡 Pro Tips
 
 1. **Test Multiple URLs**
+
    - Homepage: /
    - About: /about
    - Each page needs og:image
 
 2. **Use og:image:secure_url**
+
    - Always use HTTPS
    - Include both http and https versions
 
 3. **Multiple Images**
+
    - Can have multiple og:image tags
    - Facebook will try them in order
 
 4. **Cache Clearing**
+
    - Facebook caches previews
    - "Scrape Again" in debugger refreshes cache
    - May take 5-24 hours to update
@@ -376,16 +404,19 @@ When you share on Facebook:
 ## 🔗 Resources
 
 **Facebook Tools:**
+
 - OG Debugger: https://developers.facebook.com/tools/debug/og/object/
 - Share Dialog: https://developers.facebook.com/docs/sharing/web
 - OG Documentation: https://ogp.me/
 
 **Image Tools:**
+
 - Canva: https://www.canva.com/
 - TinyPNG: https://tinypng.com/
 - ImageResizer: https://imageresizer.com/
 
 **Verification:**
+
 - cURL: `curl -I [url]`
 - Online tools: https://www.curl.se/
 
@@ -404,8 +435,8 @@ When you share on Facebook:
 ---
 
 **Need specific help?**
+
 - Share the error from Facebook Debugger
 - Tell me image pixel size
 - Tell me file size
 - Then I can give specific fix! ✅
-
