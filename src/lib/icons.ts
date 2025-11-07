@@ -41,6 +41,7 @@ export const Menu = L.Menu;
 export const LogOut = L.LogOut;
 export const User = L.User;
 export const Settings = L.Settings;
+export const LayoutDashboard = L.LayoutDashboard;
 export const Loader2 = L.Loader2;
 export const Shield = L.Shield;
 export const LogIn = L.LogIn;
@@ -121,6 +122,7 @@ export const make = (name: string): AppIcon | undefined => {
     LogOut,
     User,
     Settings,
+    LayoutDashboard,
     Loader2,
     Shield,
     LogIn,

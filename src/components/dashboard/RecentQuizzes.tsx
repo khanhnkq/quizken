@@ -53,23 +53,25 @@ export function RecentQuizzes({
 
   if (isLoading) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Quiz gần đây</CardTitle>
+      <Card className="shadow-md">
+        <CardHeader className="border-b bg-gradient-to-r from-blue-50 to-indigo-50">
+          <CardTitle className="flex items-center gap-2 text-indigo-900">
+            <ClockIcon className="h-5 w-5" />
+            Quiz gần đây
+          </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           <div className="space-y-4">
             {[1, 2, 3, 4, 5].map((i) => (
               <div
                 key={i}
-                className="flex items-center space-x-4 p-4 border rounded-lg">
-                <Skeleton className="h-8 w-8 rounded" />
+                className="flex items-center space-x-4 p-4 border-2 border-gray-100 rounded-xl">
+                <Skeleton className="h-10 w-10 rounded-lg" />
                 <div className="flex-1 space-y-2">
-                  <Skeleton className="h-4 w-48" />
-                  <Skeleton className="h-3 w-24" />
+                  <Skeleton className="h-5 w-48" />
+                  <Skeleton className="h-4 w-32" />
                 </div>
-                <Skeleton className="h-6 w-16 rounded" />
-                <Skeleton className="h-3 w-20" />
+                <Skeleton className="h-8 w-20 rounded-lg" />
               </div>
             ))}
           </div>
@@ -80,14 +82,21 @@ export function RecentQuizzes({
 
   if (!recentAttempts || recentAttempts.length === 0) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Quiz gần đây</CardTitle>
+      <Card className="shadow-md border-2 border-dashed border-gray-200">
+        <CardHeader className="border-b bg-gradient-to-r from-blue-50 to-indigo-50">
+          <CardTitle className="flex items-center gap-2 text-indigo-900">
+            <ClockIcon className="h-5 w-5" />
+            Quiz gần đây
+          </CardTitle>
         </CardHeader>
-        <CardContent className="flex items-center justify-center h-64">
-          <p className="text-gray-500 text-center">
-            Bạn chưa làm quiz nào.
-            <br />
+        <CardContent className="flex flex-col items-center justify-center h-64 text-center">
+          <div className="p-4 rounded-full bg-indigo-100 mb-4">
+            <ClockIcon className="h-12 w-12 text-indigo-600" />
+          </div>
+          <p className="text-gray-700 font-semibold mb-2">
+            Bạn chưa làm quiz nào
+          </p>
+          <p className="text-gray-500 text-sm">
             Hãy bắt đầu với một quiz để xem kết quả của bạn!
           </p>
         </CardContent>
@@ -96,55 +105,81 @@ export function RecentQuizzes({
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Quiz gần đây</CardTitle>
+    <Card className="shadow-md hover:shadow-lg transition-shadow">
+      <CardHeader className="border-b bg-gradient-to-r from-blue-50 to-indigo-50">
+        <CardTitle className="flex items-center gap-2 text-indigo-900">
+          <ClockIcon className="h-5 w-5" />
+          Quiz gần đây
+        </CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="rounded-md border">
+      <CardContent className="pt-6">
+        <div className="rounded-xl border-2 border-gray-100 overflow-hidden">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>Quiz</TableHead>
-                <TableHead className="text-center">Điểm</TableHead>
-                <TableHead className="text-center">Kết quả</TableHead>
-                <TableHead className="text-center">Thời gian</TableHead>
-                <TableHead className="text-center">Ngày làm</TableHead>
-                <TableHead className="text-center">Hành động</TableHead>
+              <TableRow className="bg-gray-50 hover:bg-gray-50">
+                <TableHead className="font-bold text-gray-700">Quiz</TableHead>
+                <TableHead className="text-center font-bold text-gray-700">
+                  Điểm
+                </TableHead>
+                <TableHead className="text-center font-bold text-gray-700">
+                  Kết quả
+                </TableHead>
+                <TableHead className="text-center font-bold text-gray-700">
+                  Thời gian
+                </TableHead>
+                <TableHead className="text-center font-bold text-gray-700">
+                  Ngày làm
+                </TableHead>
+                <TableHead className="text-center font-bold text-gray-700">
+                  Hành động
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {recentAttempts.map((attempt) => (
-                <TableRow key={attempt.attempt_id}>
+              {recentAttempts.map((attempt, index) => (
+                <TableRow
+                  key={attempt.attempt_id}
+                  className={`hover:bg-indigo-50/50 transition-colors ${
+                    index % 2 === 0 ? "bg-white" : "bg-gray-50/50"
+                  }`}>
                   <TableCell className="font-medium">
                     <div>
-                      <p className="font-semibold">{attempt.quiz_title}</p>
-                      <p className="text-sm text-gray-500">
+                      <p className="font-bold text-gray-900">
+                        {attempt.quiz_title}
+                      </p>
+                      <p className="text-sm text-gray-500 mt-0.5">
                         {attempt.correct_answers}/{attempt.total_questions} câu
                         đúng
                       </p>
                     </div>
                   </TableCell>
                   <TableCell className="text-center">
-                    <div className="flex flex-col items-center">
-                      <span className="font-bold text-lg">
+                    <div className="flex flex-col items-center gap-1.5">
+                      <span className="font-bold text-xl text-indigo-600">
                         {attempt.score.toFixed(1)}%
                       </span>
-                      <Badge className={`mt-1 ${getScoreColor(attempt.score)}`}>
+                      <Badge
+                        className={`${getScoreColor(
+                          attempt.score
+                        )} font-semibold`}>
                         {getScoreLabel(attempt.score)}
                       </Badge>
                     </div>
                   </TableCell>
                   <TableCell className="text-center">
-                    <CheckCircleIcon className="h-5 w-5 text-green-600 mx-auto" />
+                    <div className="flex justify-center">
+                      <div className="p-2 rounded-full bg-green-100">
+                        <CheckCircleIcon className="h-5 w-5 text-green-600" />
+                      </div>
+                    </div>
                   </TableCell>
                   <TableCell className="text-center">
-                    <div className="flex items-center justify-center text-sm text-gray-600">
-                      <ClockIcon className="h-4 w-4 mr-1" />
+                    <div className="flex items-center justify-center text-sm font-medium text-gray-700 gap-1.5">
+                      <ClockIcon className="h-4 w-4 text-gray-500" />
                       {formatTime(attempt.time_taken_seconds)}
                     </div>
                   </TableCell>
-                  <TableCell className="text-center text-sm text-gray-600">
+                  <TableCell className="text-center text-sm text-gray-600 font-medium">
                     {formatDate(attempt.completed_at)}
                   </TableCell>
                   <TableCell className="text-center">
@@ -154,8 +189,9 @@ export function RecentQuizzes({
                       onClick={() => {
                         // TODO: Navigate to quiz details
                         console.log("Navigate to quiz:", attempt.quiz_id);
-                      }}>
-                      <ExternalLinkIcon className="h-4 w-4 mr-1" />
+                      }}
+                      className="border-indigo-200 text-indigo-600 hover:bg-indigo-50 hover:border-indigo-300 font-semibold">
+                      <ExternalLinkIcon className="h-4 w-4 mr-1.5" />
                       Xem
                     </Button>
                   </TableCell>

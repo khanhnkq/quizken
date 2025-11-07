@@ -27,24 +27,24 @@ export function StatisticsCards({
     {
       title: "Quiz đã tạo",
       icon: FileTextIcon,
-      color: "text-blue-600",
-      bgColor: "bg-blue-50",
+      gradient: "from-violet-500 to-purple-600",
+      iconColor: "text-white",
       description: "Tổng số quiz bạn đã tạo",
       ref: totalCreatedRef,
     },
     {
       title: "Quiz đã làm",
       icon: CheckCircleIcon,
-      color: "text-green-600",
-      bgColor: "bg-green-50",
+      gradient: "from-pink-500 to-rose-600",
+      iconColor: "text-white",
       description: "Tổng số quiz bạn đã hoàn thành",
       ref: totalTakenRef,
     },
     {
       title: "Điểm cao nhất",
       icon: TrophyIcon,
-      color: "text-yellow-600",
-      bgColor: "bg-yellow-50",
+      gradient: "from-amber-500 to-orange-600",
+      iconColor: "text-white",
       description: "Điểm cao nhất bạn đạt được",
       ref: highestScoreRef,
       suffix: "%",
@@ -78,23 +78,28 @@ export function StatisticsCards({
         return (
           <Card
             key={index}
-            className="hover:shadow-lg transition-shadow duration-200">
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-4">
-                <div className={`p-3 rounded-lg ${card.bgColor}`}>
-                  <Icon className={`h-6 w-6 ${card.color}`} />
+            className="group relative overflow-hidden border-0 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div
+              className={`absolute inset-0 bg-gradient-to-br ${card.gradient} opacity-90`}
+            />
+            <CardContent className="relative p-6 text-white">
+              <div className="flex flex-col space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="p-3 rounded-xl bg-white/20 backdrop-blur-sm group-hover:scale-110 transition-transform duration-300">
+                    <Icon className={`h-8 w-8 ${card.iconColor}`} />
+                  </div>
+                  <div className="text-right">
+                    <p className="text-3xl font-bold tracking-tight">
+                      <span ref={card.ref}>0</span>
+                      {card.suffix}
+                    </p>
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-600 mb-1">
+                <div>
+                  <p className="text-sm font-semibold text-white/90 mb-1">
                     {card.title}
                   </p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    <span ref={card.ref}>0</span>
-                    {card.suffix}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    {card.description}
-                  </p>
+                  <p className="text-xs text-white/75">{card.description}</p>
                 </div>
               </div>
             </CardContent>

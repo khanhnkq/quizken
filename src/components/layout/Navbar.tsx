@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Menu, LogOut, User, Settings } from "@/lib/icons";
+import { Menu, LogOut, User, Settings, LayoutDashboard } from "@/lib/icons";
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/lib/auth";
 import { Link } from "react-router-dom";
@@ -114,14 +114,6 @@ const Navbar = () => {
               onPointerDown={playClick}>
               Thư viện
             </Link>
-            {user && (
-              <Link
-                to="/dashboard"
-                className="text-foreground hover:text-primary transition-colors flex items-center gap-1"
-                onPointerDown={playClick}>
-                Dashboard
-              </Link>
-            )}
             <Link
               to="/about"
               className="text-foreground hover:text-primary transition-colors"
@@ -148,6 +140,15 @@ const Navbar = () => {
                         Đã đăng nhập với {user.email}
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link
+                          to="/dashboard"
+                          className="cursor-pointer"
+                          onPointerDown={playClick}>
+                          <LayoutDashboard className="h-4 w-4 mr-2" />
+                          Dashboard
+                        </Link>
+                      </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => setShowApiSettings(true)}
                         onSelect={playClick}
@@ -202,15 +203,6 @@ const Navbar = () => {
               onClick={() => setIsOpen(false)}>
               Thư viện
             </Link>
-            {user && (
-              <Link
-                to="/dashboard"
-                className="block text-foreground hover:text-primary transition-colors flex items-center gap-2"
-                onPointerDown={playClick}
-                onClick={() => setIsOpen(false)}>
-                Dashboard
-              </Link>
-            )}
             <Link
               to="/about"
               className="block text-foreground hover:text-primary transition-colors"
@@ -226,10 +218,20 @@ const Navbar = () => {
                       <p className="text-sm text-muted-foreground">
                         Đã đăng nhập với {user.email}
                       </p>
+                      <Link to="/dashboard" onClick={() => setIsOpen(false)}>
+                        <Button
+                          variant="outline"
+                          className="w-full justify-start"
+                          onPointerDown={playClick}>
+                          <LayoutDashboard className="h-4 w-4 mr-2" />
+                          Dashboard
+                        </Button>
+                      </Link>
                       <Button
                         variant="outline"
                         onClick={() => setShowApiSettings(true)}
-                        className="w-full justify-start">
+                        className="w-full justify-start"
+                        onPointerDown={playClick}>
                         <Settings className="h-4 w-4 mr-2" />
                         Cài đặt API
                       </Button>
