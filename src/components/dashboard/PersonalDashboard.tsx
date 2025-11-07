@@ -119,7 +119,7 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
             onClick={handleRefreshAll}
             disabled={isRefreshing || isLoading}
             size="lg"
-            className="bg-[#B5CC89] hover:bg-black hover:text-white text-black font-semibold transition-colors"
+            className="bg-[#B5CC89] hover:bg-black hover:text-white text-black border-2 border-transparent hover:border-[#B5CC89] font-semibold shadow-lg transition-colors"
             onMouseEnter={handleHoverEnter}
             onMouseLeave={handleHoverLeave}>
             <RefreshCwIcon
