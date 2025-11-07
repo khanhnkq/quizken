@@ -141,10 +141,10 @@ export function RecentQuizzes({
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-6">
-        <div className="rounded-xl border-2 border-gray-100 overflow-hidden">
-          <div className="overflow-x-auto">
+        <div className="rounded-xl border-2 border-gray-100 overflow-x-auto">
+          <div className="min-w-[800px]">
             <Table>
-              <TableHeader className="bg-[#B5CC89]/10">
+              <TableHeader className="bg-[#B5CC89]/10 sticky top-0 z-10">
                 <TableRow className="hover:bg-[#B5CC89]/10">
                   <TableHead className="font-bold text-gray-900 whitespace-nowrap">
                     Quiz
@@ -167,9 +167,7 @@ export function RecentQuizzes({
                 </TableRow>
               </TableHeader>
             </Table>
-          </div>
-          <ScrollArea className="h-[400px] md:h-[600px]">
-            <div className="overflow-x-auto">
+            <ScrollArea className="h-[400px] md:h-[600px]">
               <Table>
                 <TableBody>
                   {recentAttempts.map((attempt, index) => (
@@ -237,8 +235,8 @@ export function RecentQuizzes({
                   ))}
                 </TableBody>
               </Table>
-            </div>
-          </ScrollArea>
+            </ScrollArea>
+          </div>
         </div>
       </CardContent>
     </Card>
