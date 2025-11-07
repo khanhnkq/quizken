@@ -38,24 +38,28 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen bg-gradient-to-b from-secondary/30 to-background flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#B5CC89]"></div>
       </div>
     );
   }
 
   if (!userId) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto p-6">
-          <UserIcon className="h-16 w-16 mx-auto text-gray-400 mb-4" />
+      <div className="min-h-screen bg-gradient-to-b from-secondary/30 to-background flex items-center justify-center px-4">
+        <div className="text-center max-w-md mx-auto p-8 border-2 border-[#B5CC89]/30 rounded-2xl bg-white/50 backdrop-blur-sm">
+          <div className="inline-flex p-4 bg-[#B5CC89]/20 rounded-2xl mb-4">
+            <UserIcon className="h-16 w-16 text-black" />
+          </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
             Yêu cầu đăng nhập
           </h2>
-          <p className="text-gray-600 mb-6">
+          <p className="text-muted-foreground mb-6">
             Bạn cần đăng nhập để xem dashboard cá nhân.
           </p>
-          <Button onClick={() => navigate("/")} className="w-full">
+          <Button
+            onClick={() => navigate("/")}
+            className="w-full bg-[#B5CC89] hover:bg-black hover:text-white text-black font-semibold transition-colors">
             <LogInIcon className="h-4 w-4 mr-2" />
             Về trang chủ
           </Button>
@@ -64,5 +68,9 @@ export default function Dashboard() {
     );
   }
 
-  return <PersonalDashboard userId={userId} />;
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-secondary/30 to-background">
+      <PersonalDashboard userId={userId} />
+    </div>
+  );
 }

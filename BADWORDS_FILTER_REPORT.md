@@ -9,14 +9,17 @@
 ## 📊 Executive Summary
 
 ### Problem Identified
+
 The Vietnamese badwords filter was too aggressive, blocking legitimate words like "tạo" (create) that are essential for the QuizKen application.
 
 ### Root Cause
+
 - Badwords list contains single-character and short words like "tao" (slang for "I/me")
 - Unicode normalization removes diacritics: "tạo" → "tao"
 - Word boundary logic wasn't strict enough for short words
 
 ### Solution Implemented
+
 - Added comprehensive whitelist with 20+ legitimate Vietnamese words
 - Improved matching logic to check whitelist first
 - Deployed immediately with Phase 1 Quick Fix
@@ -30,15 +33,16 @@ The Vietnamese badwords filter was too aggressive, blocking legitimate words lik
 #### 1. `src/lib/vnBadwordsFilter.ts` (PRIMARY CHANGE)
 
 **Changes made:**
+
 ```typescript
 // Added comprehensive whitelist
 const WHITELIST = new Set([
-  "tao",               // create
-  "tao bai",           // create exercise
-  "tao bai kiem tra",  // create quiz
-  "con",               // child
-  "con cho",           // dog
-  "bo me",             // parents
+  "tao", // create
+  "tao bai", // create exercise
+  "tao bai kiem tra", // create quiz
+  "con", // child
+  "con cho", // dog
+  "bo me", // parents
   // ... 14 more entries
 ]);
 
@@ -47,12 +51,14 @@ const WHITELIST = new Set([
 ```
 
 **Logic flow:**
+
 1. Check exact match in whitelist → ALLOW
 2. Run regex-based match → FLAG if found
 3. Run normalized substring check → FLAG if found
 4. Otherwise → ALLOW
 
 **Files affected by change:**
+
 - Quiz Generator (can now use "tạo" in text fields)
 - Quiz titles and descriptions
 - Teacher feedback/comments
@@ -68,22 +74,24 @@ const WHITELIST = new Set([
 ## ✅ What Works Now
 
 ### Previously Blocked (Now Allowed)
-| Word/Phrase | Use Case | Status |
-|-------------|----------|--------|
-| "tạo" | Create quiz | ✅ FIXED |
-| "tạo bài kiểm tra" | Create exercise | ✅ FIXED |
-| "con chó" | Animal reference | ✅ FIXED |
-| "con trai" | Boy | ✅ FIXED |
-| "bố mẹ" | Parents | ✅ FIXED |
-| "con gái" | Girl | ✅ FIXED |
+
+| Word/Phrase        | Use Case         | Status   |
+| ------------------ | ---------------- | -------- |
+| "tạo"              | Create quiz      | ✅ FIXED |
+| "tạo bài kiểm tra" | Create exercise  | ✅ FIXED |
+| "con chó"          | Animal reference | ✅ FIXED |
+| "con trai"         | Boy              | ✅ FIXED |
+| "bố mẹ"            | Parents          | ✅ FIXED |
+| "con gái"          | Girl             | ✅ FIXED |
 
 ### Still Blocked (As Intended)
-| Word | Status |
-|------|--------|
-| "địt mẹ" (curse) | ✅ BLOCKED |
-| "đồ ngu" (insult) | ✅ BLOCKED |
+
+| Word                 | Status     |
+| -------------------- | ---------- |
+| "địt mẹ" (curse)     | ✅ BLOCKED |
+| "đồ ngu" (insult)    | ✅ BLOCKED |
 | "vcl" (abbreviation) | ✅ BLOCKED |
-| "vãi lồn" (vulgar) | ✅ BLOCKED |
+| "vãi lồn" (vulgar)   | ✅ BLOCKED |
 
 ---
 
@@ -92,26 +100,31 @@ const WHITELIST = new Set([
 The whitelist covers several important categories:
 
 ### 1. Educational Context (Quiz Generation)
+
 ```
 tao, tao bai, tao bai kiem tra, tao quiz
 ```
 
 ### 2. Family Terms (Innocent)
+
 ```
 bo me, bo, me, con
 ```
 
 ### 3. Animal References
+
 ```
 con cho, con meo
 ```
 
 ### 4. Person/Human
+
 ```
 con nguoi
 ```
 
 ### 5. Common Adjectives/Descriptors
+
 ```
 may (machine), gai (girl), trai (boy)
 ```
@@ -121,6 +134,7 @@ may (machine), gai (girl), trai (boy)
 ## 🔄 Implementation Timeline
 
 ### Phase 1: Quick Fix ✅ COMPLETED (This Session)
+
 - [x] Identify false positives
 - [x] Add comprehensive whitelist
 - [x] Improve single-word matching
@@ -131,11 +145,13 @@ may (machine), gai (girl), trai (boy)
 **Risk:** LOW - Additive changes only
 
 ### Phase 2: Data Collection ⏳ PLANNED
+
 - Collect false positive reports from users
 - Build comprehensive whitelist of real-world issues
 - Monitor which words are frequently flagged
 
 ### Phase 3: Refactor ⏳ PLANNED
+
 - Reorganize `badwords_vi.json`
 - Add severity levels (HIGH, MEDIUM, LOW)
 - Implement context-aware filtering
@@ -146,6 +162,7 @@ may (machine), gai (girl), trai (boy)
 ## 🧪 Testing Results
 
 ### Build Test ✅ PASSED
+
 ```
 ✓ built in 13.63s
 No TypeScript errors
@@ -153,6 +170,7 @@ No linting issues
 ```
 
 ### Deployment ✅ SUCCESSFUL
+
 ```
 Git: 2f336cd committed and pushed
 Branch: main
@@ -161,7 +179,9 @@ Expected deployment time: 2-3 minutes
 ```
 
 ### Functional Tests (Manual)
+
 Ready to test on live site:
+
 - Text field input with "tạo"
 - Quiz generation with whitelisted words
 - Badwords still block offensive content
@@ -171,16 +191,19 @@ Ready to test on live site:
 ## 📈 Impact Assessment
 
 ### User Experience
+
 - ✅ Users can now type "tạo" without false positives
 - ✅ Educational content works without interference
 - ✅ App feels less restrictive/more natural
 - ✅ Teacher feedback can use family terms naturally
 
 ### Performance
+
 - ➡️ No performance impact (lookup is O(1) set check)
 - ✅ Whitelist check happens before regex (faster)
 
 ### Code Quality
+
 - ✅ Backward compatible
 - ✅ Non-breaking change
 - ✅ Comments document intent
@@ -191,12 +214,14 @@ Ready to test on live site:
 ## 🔐 Security Considerations
 
 ### Remains Protected Against
+
 - Direct insults ✅
 - Profanity ✅
 - Threats/violence ✅
 - Discriminatory language ✅
 
 ### Whitelist Doesn't Reduce Safety
+
 - Only adds innocent words
 - Core badwords detection unchanged
 - Can always remove whitelist entry if abused
@@ -206,13 +231,14 @@ Ready to test on live site:
 ## 📝 How to Extend This Solution
 
 ### Adding More Whitelisted Words
+
 When you find a false positive:
 
 ```typescript
 // 1. Edit src/lib/vnBadwordsFilter.ts
 const WHITELIST = new Set([
   // ... existing entries ...
-  "new word here",  // reason/context
+  "new word here", // reason/context
 ]);
 
 // 2. Test locally (npm run build)
@@ -221,7 +247,9 @@ const WHITELIST = new Set([
 ```
 
 ### Creating a Permanent List
+
 **For Phase 3 refactor**, maintain a spreadsheet:
+
 - Column 1: Vietnamese word/phrase
 - Column 2: Reason (false positive / legitimate)
 - Column 3: Category (educational, family, animal, etc.)
@@ -232,16 +260,19 @@ const WHITELIST = new Set([
 ## 🛣️ Future Roadmap
 
 ### Short-term (Week 1-2)
+
 - Monitor for additional false positives
 - Collect user feedback
 - Expand whitelist as needed
 
 ### Medium-term (Week 3-4)
+
 - Reorganize badwords_vi.json with metadata
 - Implement severity levels
 - Create better documentation
 
 ### Long-term (Month 2+)
+
 - Context-aware filtering
 - Machine learning-based detection
 - Language-specific rule engine
@@ -253,6 +284,7 @@ const WHITELIST = new Set([
 ### If Users Report Issues
 
 **False Positive (legitimate word blocked):**
+
 ```
 1. Note the exact word
 2. Determine context
@@ -262,6 +294,7 @@ const WHITELIST = new Set([
 ```
 
 **False Negative (bad word not blocked):**
+
 ```
 1. Note the exact word
 2. Verify it's actually offensive
@@ -277,15 +310,18 @@ const WHITELIST = new Set([
 ### What We Learned
 
 1. **Unicode normalization complexity**
+
    - Diacritics can cause unexpected matches
    - "tạo" (with diacritic) ≠ "tao" (without)
    - But normalized, they're the same
 
 2. **Short words are problematic**
+
    - Single letters/syllables match too broadly
    - Better to whitelist known innocents
 
 3. **Context matters**
+
    - Same word can be innocent or offensive depending on context
    - Full context-aware filtering is complex but valuable
 
@@ -314,6 +350,7 @@ const WHITELIST = new Set([
 ## 🎯 Next Actions
 
 **For User (You):**
+
 1. Wait 2-3 minutes for Vercel deployment
 2. Visit https://quizken.vercel.app
 3. Test entering "tạo" in text fields
@@ -321,6 +358,7 @@ const WHITELIST = new Set([
 5. Report any remaining issues
 
 **For Developer (Auto):**
+
 1. Monitor deployment progress
 2. Ready to add more whitelist entries as needed
 3. Ready to refactor in Phase 2 based on data
@@ -330,13 +368,14 @@ const WHITELIST = new Set([
 ## 📞 Contact & Questions
 
 **Related Files:**
+
 - `src/lib/vnBadwordsFilter.ts` - Main implementation
 - `src/assets/filter/badwords_vi.json` - Badwords list
 - `BADWORDS_FILTER_IMPROVEMENT_PLAN.md` - Strategy
 - `BADWORDS_FILTER_TESTING_GUIDE.md` - How to test
 
 **Process:**
+
 - Report false positives via this interface
 - Include exact word and context
 - Will fix and deploy within hours
-

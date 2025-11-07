@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, type MouseEvent } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -10,6 +10,8 @@ import { useProgressTrend } from "@/hooks/useProgressTrend";
 import { useRecentQuizzes } from "@/hooks/useRecentQuizzes";
 import { supabase } from "@/integrations/supabase/client";
 import { BarChart3Icon, RefreshCwIcon, UserIcon } from "lucide-react";
+import { gsap } from "gsap";
+import { shouldReduceAnimations } from "@/utils/deviceDetection";
 
 interface PersonalDashboardProps {
   userId?: string;
@@ -17,6 +19,30 @@ interface PersonalDashboardProps {
 
 export function PersonalDashboard({ userId }: PersonalDashboardProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // GSAP hover effects like homepage
+  const handleHoverEnter = (e: MouseEvent<HTMLButtonElement>) => {
+    if (shouldReduceAnimations()) return;
+    const target = e.currentTarget as HTMLButtonElement;
+    gsap.to(target, {
+      y: -2,
+      scale: 1.04,
+      boxShadow: "0 12px 30px rgba(0,0,0,0.45)",
+      duration: 0.18,
+      ease: "power3.out",
+    });
+  };
+
+  const handleHoverLeave = (e: MouseEvent<HTMLButtonElement>) => {
+    const target = e.currentTarget as HTMLButtonElement;
+    gsap.to(target, {
+      y: 0,
+      scale: 1,
+      boxShadow: "0 0 0 rgba(0,0,0,0)",
+      duration: 0.22,
+      ease: "power3.inOut",
+    });
+  };
 
   // Fetch data using hooks
   const {
@@ -73,19 +99,18 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
 
   return (
     <div className="container mx-auto py-8 px-4 space-y-8">
-      {/* Enhanced Header with Gradient Background */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700 p-8 shadow-xl">
-        <div className="absolute inset-0 bg-black/10" />
-        <div className="relative flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      {/* Enhanced Header with Brand Color */}
+      <div className="rounded-2xl bg-[#B5CC89]/10 border-2 border-[#B5CC89]/30 p-8 shadow-lg hover:shadow-xl transition-shadow">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="p-4 rounded-2xl bg-white/20 backdrop-blur-sm">
-              <UserIcon className="h-10 w-10 text-white" />
+            <div className="p-4 rounded-2xl bg-[#B5CC89]">
+              <UserIcon className="h-10 w-10 text-black" />
             </div>
-            <div className="text-white">
-              <h1 className="text-3xl md:text-4xl font-bold mb-2">
+            <div>
+              <h1 className="text-3xl md:text-4xl font-bold mb-2 text-gray-900">
                 Dashboard Cá Nhân
               </h1>
-              <p className="text-white/90 text-sm md:text-base">
+              <p className="text-muted-foreground text-sm md:text-base">
                 Theo dõi tiến trình học tập và thành tích của bạn
               </p>
             </div>
@@ -93,9 +118,10 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
           <Button
             onClick={handleRefreshAll}
             disabled={isRefreshing || isLoading}
-            variant="secondary"
             size="lg"
-            className="bg-white/20 hover:bg-white/30 text-white border-white/30 backdrop-blur-sm">
+            className="bg-[#B5CC89] hover:bg-black hover:text-white text-black font-semibold transition-colors"
+            onMouseEnter={handleHoverEnter}
+            onMouseLeave={handleHoverLeave}>
             <RefreshCwIcon
               className={`h-5 w-5 mr-2 ${isRefreshing ? "animate-spin" : ""}`}
             />
@@ -106,31 +132,34 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
 
       {/* Welcome message for new users */}
       {hasNoData && (
-        <Card className="relative overflow-hidden border-0 shadow-xl">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 opacity-90" />
-          <CardContent className="relative p-8 md:p-12 text-center text-white">
-            <div className="p-4 rounded-2xl bg-white/20 backdrop-blur-sm w-fit mx-auto mb-6">
-              <BarChart3Icon className="h-16 w-16" />
+        <Card className="border-2 border-[#B5CC89]/30 bg-[#B5CC89]/5 shadow-lg">
+          <CardContent className="p-8 md:p-12 text-center">
+            <div className="p-4 rounded-2xl bg-[#B5CC89] w-fit mx-auto mb-6">
+              <BarChart3Icon className="h-16 w-16 text-black" />
             </div>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">
               Chào mừng đến với Dashboard!
             </h2>
-            <p className="text-white/90 text-lg mb-8 max-w-2xl mx-auto">
+            <p className="text-muted-foreground text-lg mb-8 max-w-2xl mx-auto">
               Bạn chưa có dữ liệu học tập nào. Hãy bắt đầu bằng cách tạo quiz
               mới hoặc làm các quiz có sẵn để theo dõi tiến trình của bạn.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
                 size="lg"
-                onClick={() => (window.location.href = "#quiz-generator")}
-                className="bg-white text-indigo-600 hover:bg-white/90 font-semibold">
+                onClick={() => (window.location.href = "/#quiz-generator")}
+                className="bg-[#B5CC89] hover:bg-black hover:text-white text-black font-semibold transition-colors"
+                onMouseEnter={handleHoverEnter}
+                onMouseLeave={handleHoverLeave}>
                 Tạo Quiz Mới
               </Button>
               <Button
                 size="lg"
                 variant="outline"
-                onClick={() => (window.location.href = "#quiz-library")}
-                className="border-white/50 text-white hover:bg-white/20 font-semibold">
+                onClick={() => (window.location.href = "/#quiz-library")}
+                className="border-2 hover:bg-primary hover:text-primary-foreground transition-colors font-semibold"
+                onMouseEnter={handleHoverEnter}
+                onMouseLeave={handleHoverLeave}>
                 Khám Phá Quiz Library
               </Button>
             </div>
@@ -156,41 +185,6 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
           />
         </div>
       </div>
-
-      {/* Quick Actions */}
-      {!hasNoData && (
-        <Card className="border-2 border-dashed border-gray-200 hover:border-violet-300 transition-colors">
-          <CardHeader>
-            <CardTitle className="text-xl font-bold text-gray-900">
-              🚀 Thao tác nhanh
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Button
-                onClick={() => (window.location.href = "#quiz-generator")}
-                size="lg"
-                className="w-full bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 font-semibold shadow-md hover:shadow-lg transition-all">
-                ✨ Tạo Quiz Mới
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={() => (window.location.href = "#quiz-library")}
-                className="w-full border-2 border-violet-200 hover:border-violet-400 hover:bg-violet-50 font-semibold transition-all">
-                📚 Xem Quiz Library
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={() => (window.location.href = "#about")}
-                className="w-full border-2 border-gray-200 hover:border-gray-400 hover:bg-gray-50 font-semibold transition-all">
-                💡 Tìm hiểu thêm
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 }

@@ -48,11 +48,13 @@
 ## 🔍 Where to Check
 
 ### In the UI:
+
 - Look for text input fields in Quiz Generator
 - Previously they would show: 🔴 "Nội dung chứa từ không phù hợp"
 - Now they should: ✅ Allow these words
 
 ### In Browser Console (DevTools):
+
 ```javascript
 // If you want to test the function directly in console
 // You can check the filter logic via the built component
@@ -62,13 +64,13 @@
 
 ## 📋 Known Changes
 
-| Word/Phrase | Before | After | Reason |
-|-------------|--------|-------|--------|
-| "tạo" | ❌ Blocked | ✅ Allowed | Common in "create quiz" context |
-| "con chó" | ❌ Blocked | ✅ Allowed | Animal reference, not insult |
-| "bố mẹ" | ❌ Blocked | ✅ Allowed | Family term, not offensive |
-| "địt mẹ" | ❌ Blocked | ❌ Still Blocked | Real profanity |
-| "đồ ngu" | ❌ Blocked | ❌ Still Blocked | Real insult |
+| Word/Phrase | Before     | After            | Reason                          |
+| ----------- | ---------- | ---------------- | ------------------------------- |
+| "tạo"       | ❌ Blocked | ✅ Allowed       | Common in "create quiz" context |
+| "con chó"   | ❌ Blocked | ✅ Allowed       | Animal reference, not insult    |
+| "bố mẹ"     | ❌ Blocked | ✅ Allowed       | Family term, not offensive      |
+| "địt mẹ"    | ❌ Blocked | ❌ Still Blocked | Real profanity                  |
+| "đồ ngu"    | ❌ Blocked | ❌ Still Blocked | Real insult                     |
 
 ---
 
@@ -77,11 +79,13 @@
 **File:** `src/lib/vnBadwordsFilter.ts`
 
 **Added:**
+
 - Comprehensive whitelist with 20+ legitimate words
 - Better handling of single-word badwords
 - Double-check against whitelist before flagging
 
 **Logic:**
+
 1. Check if text is in whitelist → Allow
 2. Run regex badwords check → Flag if found
 3. Run normalized substring check → Flag if found
@@ -102,6 +106,7 @@ If you find any issues:
    - Example: "I entered 'tạo bài' and it was blocked, but it should be allowed"
 
 ### Example False Positive Report:
+
 ```
 Text: "Bài tập về tạo thành từ"
 Result: ❌ Blocked
@@ -110,6 +115,7 @@ Reason: Contains legitimate Vietnamese phrase
 ```
 
 ### Example Missing Badword Report:
+
 ```
 Text: "Bạn là [profanity]"
 Result: ✅ Allowed
@@ -122,11 +128,13 @@ Reason: This is offensive and should be caught
 ## 🔄 Future Improvements
 
 **Phase 2 (When you collect more data):**
+
 - Add more words to whitelist as you discover false positives
 - Reorganize badwords_vi.json to separate by severity
 - Implement context-aware filtering
 
 **How to help:**
+
 - Use the app and report false positives
 - Send list of words that should/shouldn't be blocked
 - Suggest context rules (e.g., "tao" is only bad in confrontational phrases)
@@ -151,4 +159,3 @@ Reason: This is offensive and should be caught
 3. **Let me know results!**
 
 If there are issues, send me the exact text and what happened. 📸
-

@@ -27,24 +27,27 @@ export function StatisticsCards({
     {
       title: "Quiz đã tạo",
       icon: FileTextIcon,
-      gradient: "from-violet-500 to-purple-600",
-      iconColor: "text-white",
+      bgColor: "bg-[#B5CC89]/20",
+      iconBg: "bg-[#B5CC89]",
+      iconColor: "text-black",
       description: "Tổng số quiz bạn đã tạo",
       ref: totalCreatedRef,
     },
     {
       title: "Quiz đã làm",
       icon: CheckCircleIcon,
-      gradient: "from-pink-500 to-rose-600",
-      iconColor: "text-white",
+      bgColor: "bg-[#B5CC89]/20",
+      iconBg: "bg-[#B5CC89]",
+      iconColor: "text-black",
       description: "Tổng số quiz bạn đã hoàn thành",
       ref: totalTakenRef,
     },
     {
       title: "Điểm cao nhất",
       icon: TrophyIcon,
-      gradient: "from-amber-500 to-orange-600",
-      iconColor: "text-white",
+      bgColor: "bg-[#B5CC89]/20",
+      iconBg: "bg-[#B5CC89]",
+      iconColor: "text-black",
       description: "Điểm cao nhất bạn đạt được",
       ref: highestScoreRef,
       suffix: "%",
@@ -78,29 +81,22 @@ export function StatisticsCards({
         return (
           <Card
             key={index}
-            className="group relative overflow-hidden border-0 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-            <div
-              className={`absolute inset-0 bg-gradient-to-br ${card.gradient} opacity-90`}
-            />
-            <CardContent className="relative p-6 text-white">
-              <div className="flex flex-col space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="p-3 rounded-xl bg-white/20 backdrop-blur-sm group-hover:scale-110 transition-transform duration-300">
-                    <Icon className={`h-8 w-8 ${card.iconColor}`} />
-                  </div>
-                  <div className="text-right">
-                    <p className="text-3xl font-bold tracking-tight">
-                      <span ref={card.ref}>0</span>
-                      {card.suffix}
-                    </p>
-                  </div>
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-white/90 mb-1">
-                    {card.title}
-                  </p>
-                  <p className="text-xs text-white/75">{card.description}</p>
-                </div>
+            className={`border-2 hover:border-[#B5CC89] transition-colors duration-300 hover:shadow-lg ${card.bgColor}`}>
+            <CardContent className="p-8 text-center space-y-4">
+              <div className={`inline-flex p-4 ${card.iconBg} rounded-2xl`}>
+                <Icon className={`w-8 h-8 ${card.iconColor}`} />
+              </div>
+              <div>
+                <p className="text-3xl font-bold text-gray-900 mb-2">
+                  <span ref={card.ref}>0</span>
+                  {card.suffix}
+                </p>
+                <h3 className="text-lg font-bold text-gray-900 mb-1">
+                  {card.title}
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  {card.description}
+                </p>
               </div>
             </CardContent>
           </Card>

@@ -53,9 +53,9 @@ export function RecentQuizzes({
 
   if (isLoading) {
     return (
-      <Card className="shadow-md">
-        <CardHeader className="border-b bg-gradient-to-r from-blue-50 to-indigo-50">
-          <CardTitle className="flex items-center gap-2 text-indigo-900">
+      <Card className="border-2 hover:border-[#B5CC89] transition-colors">
+        <CardHeader className="border-b bg-[#B5CC89]/5">
+          <CardTitle className="flex items-center gap-2 text-gray-900">
             <ClockIcon className="h-5 w-5" />
             Quiz gần đây
           </CardTitle>
@@ -82,16 +82,16 @@ export function RecentQuizzes({
 
   if (!recentAttempts || recentAttempts.length === 0) {
     return (
-      <Card className="shadow-md border-2 border-dashed border-gray-200">
-        <CardHeader className="border-b bg-gradient-to-r from-blue-50 to-indigo-50">
-          <CardTitle className="flex items-center gap-2 text-indigo-900">
+      <Card className="border-2 border-dashed hover:border-[#B5CC89] transition-colors">
+        <CardHeader className="border-b bg-[#B5CC89]/5">
+          <CardTitle className="flex items-center gap-2 text-gray-900">
             <ClockIcon className="h-5 w-5" />
             Quiz gần đây
           </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col items-center justify-center h-64 text-center">
-          <div className="p-4 rounded-full bg-indigo-100 mb-4">
-            <ClockIcon className="h-12 w-12 text-indigo-600" />
+          <div className="p-4 rounded-full bg-[#B5CC89]/20 mb-4">
+            <ClockIcon className="h-12 w-12 text-[#B5CC89]" />
           </div>
           <p className="text-gray-700 font-semibold mb-2">
             Bạn chưa làm quiz nào
@@ -105,9 +105,9 @@ export function RecentQuizzes({
   }
 
   return (
-    <Card className="shadow-md hover:shadow-lg transition-shadow">
-      <CardHeader className="border-b bg-gradient-to-r from-blue-50 to-indigo-50">
-        <CardTitle className="flex items-center gap-2 text-indigo-900">
+    <Card className="border-2 hover:border-[#B5CC89] transition-colors hover:shadow-lg">
+      <CardHeader className="border-b bg-[#B5CC89]/5">
+        <CardTitle className="flex items-center gap-2 text-gray-900">
           <ClockIcon className="h-5 w-5" />
           Quiz gần đây
         </CardTitle>
@@ -116,21 +116,21 @@ export function RecentQuizzes({
         <div className="rounded-xl border-2 border-gray-100 overflow-hidden">
           <Table>
             <TableHeader>
-              <TableRow className="bg-gray-50 hover:bg-gray-50">
-                <TableHead className="font-bold text-gray-700">Quiz</TableHead>
-                <TableHead className="text-center font-bold text-gray-700">
+              <TableRow className="bg-[#B5CC89]/10 hover:bg-[#B5CC89]/10">
+                <TableHead className="font-bold text-gray-900">Quiz</TableHead>
+                <TableHead className="text-center font-bold text-gray-900">
                   Điểm
                 </TableHead>
-                <TableHead className="text-center font-bold text-gray-700">
+                <TableHead className="text-center font-bold text-gray-900">
                   Kết quả
                 </TableHead>
-                <TableHead className="text-center font-bold text-gray-700">
+                <TableHead className="text-center font-bold text-gray-900">
                   Thời gian
                 </TableHead>
-                <TableHead className="text-center font-bold text-gray-700">
+                <TableHead className="text-center font-bold text-gray-900">
                   Ngày làm
                 </TableHead>
-                <TableHead className="text-center font-bold text-gray-700">
+                <TableHead className="text-center font-bold text-gray-900">
                   Hành động
                 </TableHead>
               </TableRow>
@@ -139,7 +139,7 @@ export function RecentQuizzes({
               {recentAttempts.map((attempt, index) => (
                 <TableRow
                   key={attempt.attempt_id}
-                  className={`hover:bg-indigo-50/50 transition-colors ${
+                  className={`hover:bg-[#B5CC89]/5 transition-colors ${
                     index % 2 === 0 ? "bg-white" : "bg-gray-50/50"
                   }`}>
                   <TableCell className="font-medium">
@@ -155,7 +155,7 @@ export function RecentQuizzes({
                   </TableCell>
                   <TableCell className="text-center">
                     <div className="flex flex-col items-center gap-1.5">
-                      <span className="font-bold text-xl text-indigo-600">
+                      <span className="font-bold text-xl text-gray-900">
                         {attempt.score.toFixed(1)}%
                       </span>
                       <Badge
@@ -190,7 +190,7 @@ export function RecentQuizzes({
                         // TODO: Navigate to quiz details
                         console.log("Navigate to quiz:", attempt.quiz_id);
                       }}
-                      className="border-indigo-200 text-indigo-600 hover:bg-indigo-50 hover:border-indigo-300 font-semibold">
+                      className="border-2 border-[#B5CC89] text-gray-900 hover:bg-[#B5CC89]/10 font-semibold">
                       <ExternalLinkIcon className="h-4 w-4 mr-1.5" />
                       Xem
                     </Button>

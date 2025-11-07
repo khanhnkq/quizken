@@ -23,9 +23,9 @@ export function ProgressTrendline({
 }: ProgressTrendlineProps) {
   if (isLoading) {
     return (
-      <Card className="shadow-md">
-        <CardHeader className="border-b bg-gradient-to-r from-violet-50 to-purple-50">
-          <CardTitle className="flex items-center gap-2 text-violet-900">
+      <Card className="border-2 hover:border-[#B5CC89] transition-colors">
+        <CardHeader className="border-b bg-[#B5CC89]/5">
+          <CardTitle className="flex items-center gap-2 text-gray-900">
             <TrendingUpIcon className="h-5 w-5" />
             Xu hướng tiến bộ (30 ngày)
           </CardTitle>
@@ -39,16 +39,16 @@ export function ProgressTrendline({
 
   if (!trendData || trendData.length === 0) {
     return (
-      <Card className="shadow-md border-2 border-dashed border-gray-200">
-        <CardHeader className="border-b bg-gradient-to-r from-violet-50 to-purple-50">
-          <CardTitle className="flex items-center gap-2 text-violet-900">
+      <Card className="border-2 border-dashed hover:border-[#B5CC89] transition-colors">
+        <CardHeader className="border-b bg-[#B5CC89]/5">
+          <CardTitle className="flex items-center gap-2 text-gray-900">
             <TrendingUpIcon className="h-5 w-5" />
             Xu hướng tiến bộ (30 ngày)
           </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col items-center justify-center h-64 text-center">
-          <div className="p-4 rounded-full bg-violet-100 mb-4">
-            <TrendingUpIcon className="h-12 w-12 text-violet-600" />
+          <div className="p-4 rounded-full bg-[#B5CC89]/20 mb-4">
+            <TrendingUpIcon className="h-12 w-12 text-[#B5CC89]" />
           </div>
           <p className="text-gray-700 font-semibold mb-2">
             Chưa có dữ liệu tiến bộ
@@ -82,15 +82,15 @@ export function ProgressTrendline({
   }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white p-4 border-2 border-violet-200 rounded-xl shadow-xl backdrop-blur-sm">
+        <div className="bg-white p-4 border-2 border-[#B5CC89] rounded-xl shadow-xl">
           <p className="font-bold text-gray-900 mb-2 text-sm">{label}</p>
           <div className="space-y-1">
-            <p className="text-sm font-semibold text-violet-600 flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-violet-500"></span>
+            <p className="text-sm font-semibold text-[#B5CC89] flex items-center gap-2">
+              <span className="w-3 h-3 rounded-full bg-[#B5CC89]"></span>
               Điểm TB: {payload[0]?.value?.toFixed(1)}%
             </p>
-            <p className="text-sm font-semibold text-pink-600 flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-pink-500"></span>
+            <p className="text-sm font-semibold text-gray-600 flex items-center gap-2">
+              <span className="w-3 h-3 rounded-full bg-gray-500"></span>
               Số quiz: {payload[1]?.value}
             </p>
           </div>
@@ -101,9 +101,9 @@ export function ProgressTrendline({
   };
 
   return (
-    <Card className="shadow-md hover:shadow-lg transition-shadow">
-      <CardHeader className="border-b bg-gradient-to-r from-violet-50 to-purple-50">
-        <CardTitle className="flex items-center gap-2 text-violet-900">
+    <Card className="border-2 hover:border-[#B5CC89] transition-colors hover:shadow-lg">
+      <CardHeader className="border-b bg-[#B5CC89]/5">
+        <CardTitle className="flex items-center gap-2 text-gray-900">
           <TrendingUpIcon className="h-5 w-5" />
           Xu hướng tiến bộ (30 ngày)
         </CardTitle>
@@ -113,12 +113,12 @@ export function ProgressTrendline({
           <LineChart data={chartData}>
             <defs>
               <linearGradient id="scoreGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
+                <stop offset="5%" stopColor="#B5CC89" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="#B5CC89" stopOpacity={0} />
               </linearGradient>
               <linearGradient id="countGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#ec4899" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#ec4899" stopOpacity={0} />
+                <stop offset="5%" stopColor="#6b7280" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="#6b7280" stopOpacity={0} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -137,7 +137,7 @@ export function ProgressTrendline({
                 value: "Điểm (%)",
                 angle: -90,
                 position: "insideLeft",
-                fill: "#8b5cf6",
+                fill: "#B5CC89",
                 fontWeight: 600,
               }}
               stroke="#d1d5db"
@@ -150,7 +150,7 @@ export function ProgressTrendline({
                 value: "Số quiz",
                 angle: 90,
                 position: "insideRight",
-                fill: "#ec4899",
+                fill: "#6b7280",
                 fontWeight: 600,
               }}
               stroke="#d1d5db"
@@ -160,20 +160,20 @@ export function ProgressTrendline({
               yAxisId="score"
               type="monotone"
               dataKey="điểm"
-              stroke="#8b5cf6"
+              stroke="#B5CC89"
               strokeWidth={3}
-              dot={{ fill: "#8b5cf6", strokeWidth: 2, r: 5 }}
-              activeDot={{ r: 7, fill: "#7c3aed" }}
+              dot={{ fill: "#B5CC89", strokeWidth: 2, r: 5 }}
+              activeDot={{ r: 7, fill: "#A0B878" }}
               fill="url(#scoreGradient)"
             />
             <Line
               yAxisId="count"
               type="monotone"
               dataKey="Số quiz"
-              stroke="#ec4899"
+              stroke="#6b7280"
               strokeWidth={3}
-              dot={{ fill: "#ec4899", strokeWidth: 2, r: 4 }}
-              activeDot={{ r: 6, fill: "#db2777" }}
+              dot={{ fill: "#6b7280", strokeWidth: 2, r: 4 }}
+              activeDot={{ r: 6, fill: "#4b5563" }}
               fill="url(#countGradient)"
             />
           </LineChart>
