@@ -9,7 +9,7 @@ import { useDashboardStats } from "@/hooks/useDashboardStats";
 import { useProgressTrend } from "@/hooks/useProgressTrend";
 import { useRecentQuizzes } from "@/hooks/useRecentQuizzes";
 import { supabase } from "@/integrations/supabase/client";
-import { BarChart3Icon, RefreshCwIcon, UserIcon } from "lucide-react";
+import { BarChart3Icon, PlusCircleIcon, UserIcon } from "lucide-react";
 import { gsap } from "gsap";
 import { shouldReduceAnimations } from "@/utils/deviceDetection";
 
@@ -18,8 +18,6 @@ interface PersonalDashboardProps {
 }
 
 export function PersonalDashboard({ userId }: PersonalDashboardProps) {
-  const [isRefreshing, setIsRefreshing] = useState(false);
-
   // GSAP hover effects like homepage
   const handleHoverEnter = (e: MouseEvent<HTMLButtonElement>) => {
     if (shouldReduceAnimations()) return;
@@ -49,34 +47,20 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
     statistics,
     isLoading: statsLoading,
     error: statsError,
-    refetch: refetchStats,
   } = useDashboardStats(userId);
   const {
     trendData,
     isLoading: trendLoading,
     error: trendError,
-    refetch: refetchTrend,
   } = useProgressTrend(userId);
   const {
     recentAttempts,
     isLoading: recentLoading,
     error: recentError,
-    refetch: refetchRecent,
   } = useRecentQuizzes(userId);
 
   const isLoading = statsLoading || trendLoading || recentLoading;
   const hasError = statsError || trendError || recentError;
-
-  const handleRefreshAll = async () => {
-    setIsRefreshing(true);
-    try {
-      await Promise.all([refetchStats(), refetchTrend(), refetchRecent()]);
-    } catch (error) {
-      console.error("Error refreshing dashboard data:", error);
-    } finally {
-      setIsRefreshing(false);
-    }
-  };
 
   // Check if user has any data
   const hasNoData =
@@ -116,16 +100,13 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
             </div>
           </div>
           <Button
-            onClick={handleRefreshAll}
-            disabled={isRefreshing || isLoading}
+            onClick={() => (window.location.href = "/#quiz-generator")}
             size="lg"
             className="bg-[#B5CC89] hover:bg-black hover:text-white text-black border-2 border-transparent hover:border-[#B5CC89] font-semibold shadow-lg transition-colors"
             onMouseEnter={handleHoverEnter}
             onMouseLeave={handleHoverLeave}>
-            <RefreshCwIcon
-              className={`h-5 w-5 mr-2 ${isRefreshing ? "animate-spin" : ""}`}
-            />
-            {isRefreshing ? "Đang tải..." : "Làm mới"}
+            <PlusCircleIcon className="h-5 w-5 mr-2" />
+            Tạo Quiz Mới
           </Button>
         </div>
       </div>
