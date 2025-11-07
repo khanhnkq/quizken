@@ -12,12 +12,26 @@ import { supabase } from "@/integrations/supabase/client";
 import { BarChart3Icon, PlusCircleIcon, UserIcon } from "lucide-react";
 import { gsap } from "gsap";
 import { shouldReduceAnimations } from "@/utils/deviceDetection";
+import { useNavigate } from "react-router-dom";
+import { killActiveScroll, scrollToTarget } from "@/lib/scroll";
 
 interface PersonalDashboardProps {
   userId?: string;
 }
 
 export function PersonalDashboard({ userId }: PersonalDashboardProps) {
+  const navigate = useNavigate();
+
+  // Navigate to homepage and scroll to quiz generator
+  const handleCreateQuiz = () => {
+    navigate("/");
+    // Wait for navigation to complete, then scroll
+    setTimeout(() => {
+      killActiveScroll();
+      scrollToTarget("quiz-generator", { align: "top" });
+    }, 100);
+  };
+
   // GSAP hover effects like homepage
   const handleHoverEnter = (e: MouseEvent<HTMLButtonElement>) => {
     if (shouldReduceAnimations()) return;
@@ -100,7 +114,7 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
             </div>
           </div>
           <Button
-            onClick={() => (window.location.href = "/#quiz-generator")}
+            onClick={handleCreateQuiz}
             size="lg"
             className="bg-[#B5CC89] hover:bg-black hover:text-white text-black border-2 border-transparent hover:border-[#B5CC89] font-semibold shadow-lg transition-colors"
             onMouseEnter={handleHoverEnter}
