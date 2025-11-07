@@ -68,6 +68,11 @@ import { useAnonQuota } from "@/hooks/useAnonQuota";
 import useChillMusic from "@/hooks/useChillMusic";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { killActiveScroll, scrollToTarget } from "@/lib/scroll";
+import {
+  createShuffledQuiz,
+  computeScoreFromShuffled,
+  type ShuffledQuizData,
+} from "@/lib/quizShuffle";
 
 type TokenUsage = { prompt: number; candidates: number; total: number };
 
@@ -120,6 +125,9 @@ const QuizGenerator = () => {
   const [questionCount, setQuestionCount] = useState<string>("");
   const [isQuestionCountSelected, setIsQuestionCountSelected] =
     useState<boolean>(false);
+  const [shuffledData, setShuffledData] = useState<ShuffledQuizData | null>(
+    null
+  );
   const location = useLocation();
   const cameFromLibraryRef = React.useRef<boolean>(
     !!(location.state as { scrollToQuiz?: boolean } | null)?.scrollToQuiz
@@ -393,7 +401,9 @@ const QuizGenerator = () => {
         // Resume polling via hook
         startPollingHook(quizId, {
           onCompleted: ({ quiz, tokenUsage }) => {
-            setQuiz(quiz);
+            // 🔧 FIX: Ensure quiz has ID from backend
+            const quizWithId = { ...quiz, id: quizId };
+            setQuiz(quizWithId);
             if (tokenUsage) setTokenUsage(tokenUsage as TokenUsage);
             setGenerationStatus(null);
             setGenerationProgress("");
@@ -522,7 +532,9 @@ const QuizGenerator = () => {
 
           if (status === "completed") {
             // Quiz already completed, load it directly
-            setQuiz(data.quiz);
+            // 🔧 FIX: Ensure quiz has ID
+            const quizWithId = { ...data.quiz, id: savedQuizId };
+            setQuiz(quizWithId);
             clearPersist();
             toast({
               title: "Đã khôi phục quiz",
@@ -546,7 +558,9 @@ const QuizGenerator = () => {
             setQuizId(savedQuizId);
             startPollingHook(savedQuizId, {
               onCompleted: ({ quiz, tokenUsage }) => {
-                setQuiz(quiz);
+                // 🔧 FIX: Ensure quiz has ID from backend
+                const quizWithId = { ...quiz, id: savedQuizId };
+                setQuiz(quizWithId);
                 if (tokenUsage) setTokenUsage(tokenUsage as TokenUsage);
                 setGenerationStatus(null);
                 setGenerationProgress("");
@@ -835,7 +849,9 @@ const QuizGenerator = () => {
       startPollingHook(quizId, {
         onCompleted: ({ quiz, tokenUsage }) => {
           isSubmittingRef.current = false;
-          setQuiz(quiz);
+          // 🔧 FIX: Ensure quiz has ID from backend
+          const quizWithId = { ...quiz, id: quizId };
+          setQuiz(quizWithId);
           if (tokenUsage) setTokenUsage(tokenUsage as TokenUsage);
           setGenerationStatus(null);
           setGenerationProgress("");
@@ -1083,6 +1099,11 @@ const QuizGenerator = () => {
   };
 
   const resetQuiz = () => {
+    if (quiz) {
+      const data = createShuffledQuiz(quiz);
+      setShuffledData(data);
+      setQuiz(data.shuffledQuiz);
+    }
     setUserAnswers([]);
     setShowResults(false);
   };
@@ -1119,6 +1140,9 @@ const QuizGenerator = () => {
 
   const calculateScore = () => {
     if (!quiz) return 0;
+    if (shuffledData) {
+      return computeScoreFromShuffled(shuffledData, userAnswers);
+    }
     let correct = 0;
     userAnswers.forEach((answer, index) => {
       if (answer === quiz.questions[index].correctAnswer) {
@@ -1580,6 +1604,7 @@ const QuizGenerator = () => {
           onReset={resetQuiz}
           calculateScore={calculateScore}
           onDownload={downloadQuiz}
+          userId={user?.id}
         />
       )}
     </>

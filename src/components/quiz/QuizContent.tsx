@@ -15,6 +15,7 @@ import type { Quiz, Question } from "@/types/quiz";
 import { useAudio } from "@/contexts/SoundContext";
 import { killActiveScroll, scrollToTarget } from "@/lib/scroll";
 import { isIOSSafari } from "@/utils/deviceDetection";
+import { supabase } from "@/integrations/supabase/client";
 
 interface TokenUsage {
   prompt: number;
@@ -32,6 +33,44 @@ interface QuizContentProps {
   onReset: () => void;
   calculateScore: () => number;
   onDownload: () => Promise<void> | void;
+  userId?: string;
+}
+
+// Function to save quiz attempt to database
+async function saveQuizAttempt(
+  quizId: string,
+  userId: string,
+  score: number,
+  totalQuestions: number,
+  correctAnswers: number,
+  answers: number[],
+  timeTakenSeconds: number
+) {
+  try {
+    const { data, error } = await supabase.from("quiz_attempts").insert([
+      {
+        quiz_id: quizId,
+        user_id: userId,
+        score: Math.round((correctAnswers / totalQuestions) * 100), // Convert to percentage 0-100
+        total_questions: totalQuestions,
+        correct_answers: correctAnswers,
+        answers: answers, // JSON array of user answers
+        time_taken_seconds: timeTakenSeconds,
+        completed_at: new Date().toISOString(),
+      },
+    ]);
+
+    if (error) {
+      console.error("Error saving quiz attempt:", error);
+      return false;
+    }
+
+    console.log("Quiz attempt saved:", data);
+    return true;
+  } catch (err) {
+    console.error("Unexpected error:", err);
+    return false;
+  }
 }
 
 export const QuizContent: React.FC<QuizContentProps> = ({
@@ -44,6 +83,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
   onReset,
   calculateScore,
   onDownload,
+  userId,
 }) => {
   const questionRefs = React.useRef<(HTMLDivElement | null)[]>([]);
   const cardRef = React.useRef<HTMLDivElement | null>(null);
@@ -323,28 +363,30 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                                       ? "bg-green-50 border-green-500"
                                       : "bg-muted/50 border-gray-200 hover:bg-muted/80"
                                   }`}>
-                                  <input
-                                    type="radio"
-                                    name={`question-${idx}`}
-                                    value={optIdx}
-                                    checked={isSelected}
-                                    onChange={(e) => {
-                                      play("pop");
-                                      handleAnswerSelect(
-                                        idx,
-                                        optIdx,
-                                        e.currentTarget
-                                      );
-                                    }}
-                                    disabled={showResults}
-                                    className="h-4 w-4 shrink-0 mr-2 sm:mr-3 mt-0.5"
-                                  />
-                                  <span className="font-medium mr-2 select-none mt-0.5">
-                                    {String.fromCharCode(65 + optIdx)}.
-                                  </span>
-                                  <span className="flex-1 whitespace-normal break-words leading-snug text-sm sm:text-base">
-                                    {option}
-                                  </span>
+                                  <div className="flex items-center gap-2 w-full">
+                                    <input
+                                      type="radio"
+                                      name={`question-${idx}`}
+                                      value={optIdx}
+                                      checked={isSelected}
+                                      onChange={(e) => {
+                                        play("pop");
+                                        handleAnswerSelect(
+                                          idx,
+                                          optIdx,
+                                          e.currentTarget
+                                        );
+                                      }}
+                                      disabled={showResults}
+                                      className="h-4 w-4 shrink-0"
+                                    />
+                                    <span className="font-medium mr-2 select-none whitespace-nowrap flex-shrink-0">
+                                      {String.fromCharCode(65 + optIdx)}.
+                                    </span>
+                                    <span className="flex-1 whitespace-normal break-words leading-snug text-sm sm:text-base">
+                                      {option}
+                                    </span>
+                                  </div>
                                   {showResults && isCorrect && (
                                     <span className="ml-2 text-green-600 font-semibold">
                                       ✓ Đáp án đúng
@@ -399,7 +441,47 @@ export const QuizContent: React.FC<QuizContentProps> = ({
           <CardFooter className="flex justify-center gap-4 pt-2">
             {!showResults ? (
               <Button
-                onClick={() => {
+                onClick={async () => {
+                  // Save quiz attempt before grading
+                  if (userId && answeredCount === quiz.questions.length) {
+                    const score = calculateScore();
+                    const correctAnswers = userAnswers.reduce(
+                      (count, answer, idx) => {
+                        const question = quiz.questions[idx];
+                        return (
+                          count + (answer === question.correctAnswer ? 1 : 0)
+                        );
+                      },
+                      0
+                    );
+
+                    const timeTaken = Math.floor(Math.random() * 300) + 60; // Mock time taken (60-360 seconds)
+
+                    // Validate quiz.id exists before saving
+                    if (!quiz.id) {
+                      console.error(
+                        "Error: quiz.id is missing! Cannot save quiz attempt."
+                      );
+                      return;
+                    }
+
+                    const saved = await saveQuizAttempt(
+                      quiz.id,
+                      userId,
+                      score,
+                      quiz.questions.length,
+                      correctAnswers,
+                      userAnswers,
+                      timeTaken
+                    );
+
+                    if (saved) {
+                      console.log("✅ Quiz attempt saved successfully");
+                    } else {
+                      console.log("❌ Failed to save quiz attempt");
+                    }
+                  }
+
                   onGrade();
                   scrollToTop();
                 }}
