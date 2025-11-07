@@ -6,8 +6,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.47.6?target
  * Embedded badwords list to avoid importing project files at deploy time.
  * Deploy environments (Edge/Deno) cannot resolve file:/// paths to repo files.
  * Keep this list relatively small — it's derived from src/assets/filter/badwords_vi.json.
- */
-const badwordsData = {
+ */ const badwordsData = {
   tuc_tieu: [
     "địt mẹ",
     "đụ mẹ",
@@ -334,100 +333,64 @@ const badwordsData = {
     "chính phủ",
   ],
 };
-
 // Build a simple sanitizer from the JSON list (case-insensitive, unicode-aware)
-function escapeRegExp(s: string) {
+function escapeRegExp(s) {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
-
-const rawWords: string[] = Object.values(badwordsData)
+const rawWords = Object.values(badwordsData)
   .flat()
   .filter(Boolean)
-  .map((w: unknown) => String(w).trim())
+  .map((w) => String(w).trim())
   .filter(Boolean);
-
 const sortedEscaped = Array.from(new Set(rawWords))
   .sort((a, b) => b.length - a.length)
   .map((w) => escapeRegExp(w));
-
 const BADWORDS_REGEX =
   sortedEscaped.length > 0 ? new RegExp(sortedEscaped.join("|"), "giu") : /a^/;
-
-function sanitizeVietnameseBadwords(
-  text: string,
-  maskChar = "[removed]"
-): string {
+function sanitizeVietnameseBadwords(text, maskChar = "[removed]") {
   if (!text) return text;
   return text.replace(BADWORDS_REGEX, () => maskChar);
 }
-
-function containsVietnameseBadwords(text: string): boolean {
+function containsVietnameseBadwords(text) {
   if (!text) return false;
   return BADWORDS_REGEX.test(text);
 }
-
 /**
  * Replace badwords with a safe placeholder for sending to AI.
  * Avoid using '*' masking because it confuses AI output (shows as **** in generated text).
  * Use a bracketed placeholder like "[removed]" which is clearer and won't break JSON.
- */
-function replaceBadwordsForAi(text: string, placeholder = "[removed]"): string {
+ */ function replaceBadwordsForAi(text, placeholder = "[removed]") {
   if (!text) return text;
   return text.replace(BADWORDS_REGEX, placeholder);
 }
-
-declare global {
-  const Deno: {
-    env: {
-      get(key: string): string | undefined;
-    };
-  };
-}
-
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
 };
-
 const SUPABASE_URL = Deno.env.get("PROJECT_URL");
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SERVICE_ROLE_KEY");
 const adminClient =
   SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY
     ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
     : null;
-
 // CẤU HÌNH: Số câu hỏi mặc định
 const QUESTIONS_COUNT = 10;
-
 const QUIZ_STATUS = {
   PENDING: "pending",
   PROCESSING: "processing",
   COMPLETED: "completed",
   FAILED: "failed",
   EXPIRED: "expired",
-} as const;
-
-type QuizStatus = (typeof QUIZ_STATUS)[keyof typeof QUIZ_STATUS];
-
-interface QuizGenerationPayload {
-  prompt?: string;
-  device?: DeviceInfo;
-  fingerprint?: string;
-  questionCount?: number;
-  apiKey?: string;
-  idempotencyKey?: string;
-}
-
-function getClientIp(req: Request): string {
+};
+function getClientIp(req) {
   const fwd = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim();
   const real = (req.headers.get("x-real-ip") || "").trim();
   const cf = (req.headers.get("cf-connecting-ip") || "").trim();
   return fwd || real || cf || "unknown";
 }
-
-function simpleHash(input: string): string {
+function simpleHash(input) {
   let h = 0;
   for (let i = 0; i < input.length; i++) {
     h = (h << 5) - h + input.charCodeAt(i);
@@ -435,25 +398,7 @@ function simpleHash(input: string): string {
   }
   return `fp_${Math.abs(h).toString(36)}`;
 }
-
-interface DeviceInfo {
-  language?: string;
-  platform?: string;
-  timezone?: string;
-  userAgent?: string;
-  screen?: {
-    width?: number;
-    height?: number;
-    colorDepth?: number;
-  };
-}
-
-function buildFingerprint(
-  fingerprint: string | undefined,
-  device: DeviceInfo | undefined,
-  ip: string,
-  ua: string
-): string {
+function buildFingerprint(fingerprint, device, ip, ua) {
   if (fingerprint && fingerprint.length > 0) return fingerprint;
   const lang = device?.language || "";
   const platform = device?.platform || "";
@@ -465,27 +410,19 @@ function buildFingerprint(
     : "";
   return simpleHash([ua || "", lang, platform, tz, screen, ip || ""].join("|"));
 }
-
 function todayDate() {
   const d = new Date();
   return new Date(d.getFullYear(), d.getMonth(), d.getDate())
     .toISOString()
     .slice(0, 10);
 }
-
 // Background processing function
-async function processQuizGeneration(
-  quizId: string,
-  payload: Record<string, unknown>,
-  req: Request
-) {
+async function processQuizGeneration(quizId, payload, req) {
   console.log(`🚀 [BACKEND] Starting async quiz generation for ID: ${quizId}`);
-
   if (!adminClient) {
     console.error("No database client available");
     return;
   }
-
   try {
     // Update status to processing immediately
     await adminClient
@@ -495,17 +432,17 @@ async function processQuizGeneration(
         progress: "Starting generation...",
       })
       .eq("id", quizId);
-
     const providedFingerprint =
       typeof payload.fingerprint === "string" ? payload.fingerprint : undefined;
-    const device = payload.device as DeviceInfo | undefined;
+    const device = payload.device;
     const questionCount =
       typeof payload.questionCount === "number"
         ? payload.questionCount
         : QUESTIONS_COUNT;
-    const idempotencyKey = 
-      typeof payload.idempotencyKey === "string" ? payload.idempotencyKey : undefined;
-
+    const idempotencyKey =
+      typeof payload.idempotencyKey === "string"
+        ? payload.idempotencyKey
+        : undefined;
     const ip = getClientIp(req);
     const userAgent =
       req.headers.get("user-agent") || device?.userAgent || "unknown";
@@ -515,16 +452,15 @@ async function processQuizGeneration(
       ip,
       userAgent
     );
-
     const apiKey =
       typeof payload.apiKey === "string" ? payload.apiKey : undefined;
-
     // Update progress
     await adminClient
       .from("quizzes")
-      .update({ progress: "Authenticating..." })
+      .update({
+        progress: "Authenticating...",
+      })
       .eq("id", quizId);
-
     // Check authentication
     const authHeader =
       req.headers.get("Authorization") ||
@@ -534,7 +470,6 @@ async function processQuizGeneration(
       ? authHeader.slice(7)
       : null;
     let isAuthenticated = false;
-
     if (adminClient && accessToken) {
       try {
         const { data, error } = await adminClient.auth.getUser(accessToken);
@@ -543,7 +478,6 @@ async function processQuizGeneration(
         isAuthenticated = false;
       }
     }
-
     // API Key setup and authentication
     const SERVER_GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
     // Allow anonymous users to generate with SERVER key even if they provided an apiKey field
@@ -554,15 +488,15 @@ async function processQuizGeneration(
       // Provide clearer progress for frontend UI, but do NOT fail
       await adminClient
         .from("quizzes")
-        .update({ progress: "Authenticating... Using server key" })
+        .update({
+          progress: "Authenticating... Using server key",
+        })
         .eq("id", quizId);
       // Continue using server key; do not set usingUserKey/skipUsageLimit
     }
-
     let apiKeyToUse = SERVER_GEMINI_API_KEY;
     let usingUserKey = false;
     let skipUsageLimit = false;
-
     if (apiKey && apiKey.trim().length > 0 && isAuthenticated) {
       try {
         const testResponse = await fetch(
@@ -581,12 +515,10 @@ async function processQuizGeneration(
         // fallback to server key
       }
     }
-
     if (!apiKeyToUse) {
       console.error("❌ No valid Gemini API key found!");
       console.error("SERVER_GEMINI_API_KEY exists:", !!SERVER_GEMINI_API_KEY);
       console.error("User provided key:", !!apiKey);
-
       // Provide clearer failure details to frontend with guidance links
       const detailedMsg =
         "No valid Gemini API key available (server or user). " +
@@ -594,32 +526,31 @@ async function processQuizGeneration(
         "`supabase secrets set GEMINI_API_KEY=your_server_key`. " +
         "If you are a user, verify your personal key and permissions. " +
         "Docs: https://makersuite.google.com/app/apikey and https://developers.generativeai.google/docs/";
-
       await updateQuizStatus(quizId, QUIZ_STATUS.FAILED, detailedMsg);
       return;
     }
-
     // Update progress
     await adminClient
       .from("quizzes")
-      .update({ progress: "Checking rate limits..." })
+      .update({
+        progress: "Checking rate limits...",
+      })
       .eq("id", quizId);
-
     // Anonymous usage limiting (skip if using user key)
     const DAILY_LIMIT = 3;
     if (!skipUsageLimit && !isAuthenticated && adminClient) {
       const day = todayDate();
-      
       // Use atomic UPSERT to prevent race conditions
       // This ensures only one request can increment the counter at a time
-      const { data: upsertResult, error: usageErr } = await adminClient
-        .rpc('increment_anonymous_usage', {
+      const { data: upsertResult, error: usageErr } = await adminClient.rpc(
+        "increment_anonymous_usage",
+        {
           p_ip: ip,
           p_fingerprint: fingerprint,
           p_day_date: day,
-          p_user_agent: userAgent
-        });
-
+          p_user_agent: userAgent,
+        }
+      );
       if (usageErr) {
         console.error("Error incrementing anonymous usage:", usageErr);
         await updateQuizStatus(
@@ -629,7 +560,6 @@ async function processQuizGeneration(
         );
         return;
       }
-
       // Check if quota exceeded after atomic increment
       if (upsertResult && upsertResult.count > DAILY_LIMIT) {
         await updateQuizStatus(
@@ -640,18 +570,18 @@ async function processQuizGeneration(
         return;
       }
     }
-
     // Update progress
     await adminClient
       .from("quizzes")
-      .update({ progress: "Generating with AI..." })
+      .update({
+        progress: "Generating with AI...",
+      })
       .eq("id", quizId);
-
     // Generate quiz with detailed prompt
     const createPrompt = (
-      topic: string,
-      count: number
-    ): string => `ạo một JSON duy nhất, không có văn bản hay markdown, về chủ đề "${topic}".
+      topic,
+      count
+    ) => `ạo một JSON duy nhất, không có văn bản hay markdown, về chủ đề "${topic}".
 
 **QUY TẮC NGHIÊM NGẶT:**
 1.  **Định dạng:** Chỉ trả về JSON hợp lệ.
@@ -667,7 +597,7 @@ async function processQuizGeneration(
   "title": "tiêu đề tiếng Việt về ${topic}",
   "description": "mô tả ngắn gọn về bài kiểm tra và độ khó của nó",
   "category": "Tự do đặt tên category phù hợp nhất (1-2 từ, lowercase, tiếng Anh hoặc Việt không dấu). VD: history, technology, science, art, music, cooking, gaming, anime, fashion, fitness, literature, math, psychology, philosophy, economics, law, architecture, photography, film, etc. Bạn có thể sáng tạo category mới nếu chủ đề đặc biệt.",
-  "difficulty": "chọn 1 trong: easy, medium, hard - dựa vào độ khó trung bình của các câu hỏi",
+  "difficulty": "chọn 1 trong: easy, medium, hard - dựa vào độ khó của các câu hỏi",
   "tags": ["từ khóa 1", "từ khóa 2", "từ khóa 3"] - 3-5 tags ngắn gọn phù hợp với chủ đề (viết thường, không dấu hoặc có dấu),
   "questions": [
     {
@@ -678,44 +608,41 @@ async function processQuizGeneration(
     }
   ]
 }`;
-
-    const generateQuiz = async (
-      promptText: string,
-      apiKey: string
-    ): Promise<Response> =>
+    const generateQuiz = async (promptText, apiKey) =>
       await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify({
-            contents: [{ parts: [{ text: promptText }] }],
+            contents: [
+              {
+                parts: [
+                  {
+                    text: promptText,
+                  },
+                ],
+              },
+            ],
             generationConfig: {
-              temperature: 0.7,
+              temperature: 0.4,
               topK: 40,
               topP: 0.95,
-              maxOutputTokens: 8192,
+              maxOutputTokens: 41000,
             },
           }),
         }
       );
-
-    let data: unknown,
-      quizData: unknown,
-      tokenUsage: {
-        prompt: number;
-        candidates: number;
-        total: number;
-      } | null = null;
-
+    let data,
+      quizData,
+      tokenUsage = null;
     // Improved retry/backoff and logging metrics
     let retryCount = 0;
     const maxRetries = 5; // increase retries for transient errors
     const baseDelayMs = 1000;
-
-    const sleep = (ms: number) =>
-      new Promise((resolve) => setTimeout(resolve, ms));
-
+    const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
     for (retryCount = 0; retryCount <= maxRetries; retryCount++) {
       const attempt = retryCount + 1;
       try {
@@ -724,7 +651,6 @@ async function processQuizGeneration(
             maxRetries + 1
           } for quiz ${quizId}`
         );
-
         // Persist attempt count & progress to DB for observability
         try {
           await adminClient
@@ -742,24 +668,20 @@ async function processQuizGeneration(
             e instanceof Error ? e.message : e
           );
         }
-
         const topicForAI =
           typeof payload.prompt === "string"
             ? replaceBadwordsForAi(payload.prompt, "[removed]")
             : "Default quiz topic";
-
         const response = await generateQuiz(
           createPrompt(topicForAI, questionCount),
           apiKeyToUse
         );
-
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
           console.error(
             `❌ Gemini API Error (${response.status}) on attempt ${attempt}:`,
             errorData
           );
-
           // Handle non-retriable status codes immediately
           if (response.status === 429) {
             const msg429 =
@@ -785,7 +707,6 @@ async function processQuizGeneration(
             await updateQuizStatus(quizId, QUIZ_STATUS.FAILED, msg403);
             return;
           }
-
           // For 5xx and other transient errors, retry with backoff
           if (response.status >= 500 && retryCount < maxRetries) {
             const jitter = 0.5 + Math.random() * 0.5;
@@ -798,45 +719,40 @@ async function processQuizGeneration(
             await sleep(delay);
             continue;
           }
-
           const errorMsg =
             errorData?.error?.message ||
             `Gemini API request failed: ${response.status}`;
           throw new Error(errorMsg);
         }
-
         // Parse response JSON safely
         data = await response.json().catch((e) => {
           throw new Error(`Failed to parse Gemini JSON response: ${e}`);
         });
-
         // Normalize parsed 'data' to a record for safe property access
-        const parsedData = (data as Record<string, unknown>) || {};
-
+        const parsedData = data || {};
         // Capture token usage from Gemini API response (if available)
-        const usageMetadata = parsedData["usageMetadata"] as
-          | Record<string, unknown>
-          | undefined;
+        const usageMetadata = parsedData["usageMetadata"];
         tokenUsage = usageMetadata
           ? {
               prompt: Number(usageMetadata["promptTokenCount"] ?? 0),
               candidates: Number(usageMetadata["candidatesTokenCount"] ?? 0),
               total: Number(usageMetadata["totalTokenCount"] ?? 0),
             }
-          : { prompt: 0, candidates: 0, total: 0 };
-
+          : {
+              prompt: 0,
+              candidates: 0,
+              total: 0,
+            };
         // Extract generated text safely from nested structure
-        let text: string | undefined;
+        let text;
         try {
-          const candidates = parsedData["candidates"] as unknown;
+          const candidates = parsedData["candidates"];
           if (Array.isArray(candidates) && candidates.length > 0) {
-            const first = candidates[0] as Record<string, unknown>;
-            const content = first["content"] as
-              | Record<string, unknown>
-              | undefined;
-            const parts = content?.["parts"] as unknown;
+            const first = candidates[0];
+            const content = first["content"];
+            const parts = content?.["parts"];
             if (Array.isArray(parts) && parts.length > 0) {
-              const part0 = parts[0] as Record<string, unknown>;
+              const part0 = parts[0];
               const maybeText = part0["text"];
               if (typeof maybeText === "string") text = maybeText;
             }
@@ -844,12 +760,10 @@ async function processQuizGeneration(
         } catch {
           text = undefined;
         }
-
         if (!text) {
           const msg = "No quiz data generated";
           throw new Error(msg);
         }
-
         // Parse JSON from AI output robustly
         let jsonText = text.trim();
         if (jsonText.startsWith("```")) {
@@ -858,7 +772,6 @@ async function processQuizGeneration(
         }
         const jsonObjectMatch = jsonText.match(/\{[\s\S]*\}/);
         if (jsonObjectMatch) jsonText = jsonObjectMatch[0];
-
         // Parse quiz JSON and compute actual question count safely
         try {
           const parsedQuiz = JSON.parse(jsonText);
@@ -881,10 +794,9 @@ async function processQuizGeneration(
           }
           throw new Error("Invalid JSON from AI");
         }
-
-        const quizDataObj = (quizData as Record<string, unknown>) || {};
+        const quizDataObj = quizData || {};
         const questionsArr = Array.isArray(quizDataObj["questions"])
-          ? (quizDataObj["questions"] as unknown[])
+          ? quizDataObj["questions"]
           : [];
         const actualCount = questionsArr.length;
         if (actualCount !== questionCount) {
@@ -906,7 +818,6 @@ async function processQuizGeneration(
             throw new Error(msg);
           }
         }
-
         // Success: break out of retry loop
         console.log(
           `✅ [BACKEND] Successfully generated quiz on attempt ${attempt} for ${quizId}`
@@ -917,7 +828,6 @@ async function processQuizGeneration(
           `❌ [BACKEND] Attempt ${attempt} failed for quiz ${quizId}:`,
           err instanceof Error ? err.message : err
         );
-
         // If last attempt, rethrow to be handled by outer catch
         if (retryCount >= maxRetries) {
           console.error(
@@ -925,7 +835,6 @@ async function processQuizGeneration(
           );
           throw err;
         }
-
         // Backoff before next retry
         const jitter = 0.5 + Math.random() * 0.5;
         const delay = Math.round(
@@ -936,32 +845,26 @@ async function processQuizGeneration(
         continue;
       }
     }
-
     // Success! Use original AI output for DB so frontend shows original words.
     // We still produce a sanitized copy if needed (not saved by default).
-    const quizObj = (quizData as Record<string, unknown>) || {};
+    const quizObj = quizData || {};
     const rawTitle = String(quizObj.title ?? "");
     const rawDescription = String(quizObj.description ?? "");
     const rawCategory = String(quizObj.category ?? "general");
     const rawDifficulty = String(quizObj.difficulty ?? "medium");
-    const rawTags: string[] = Array.isArray(quizObj.tags)
-      ? (quizObj.tags as string[]).slice(0, 5).map(t => String(t ?? "").toLowerCase())
+    const rawTags = Array.isArray(quizObj.tags)
+      ? quizObj.tags.slice(0, 5).map((t) => String(t ?? "").toLowerCase())
       : [];
-
-    const rawQuestions: unknown[] = Array.isArray(quizObj.questions)
-      ? (quizObj.questions as unknown[])
+    const rawQuestions = Array.isArray(quizObj.questions)
+      ? quizObj.questions
       : [];
-
     // Keep sanitizedQuestions locally (not saved) in case needed for logging/debug
     const sanitizedQuestions = rawQuestions.map((q) => {
-      const qq = q as Record<string, unknown>;
-      const optionsRaw = Array.isArray(qq.options)
-        ? (qq.options as unknown[])
-        : [];
+      const qq = q;
+      const optionsRaw = Array.isArray(qq.options) ? qq.options : [];
       const safeOptions = optionsRaw.map((o) =>
         sanitizeVietnameseBadwords(String(o ?? ""), "[censored]")
       );
-
       return {
         question: sanitizeVietnameseBadwords(
           String(qq.question ?? ""),
@@ -976,7 +879,6 @@ async function processQuizGeneration(
         ),
       };
     });
-
     // Save original AI output to DB so the UI shows the quiz as generated by AI
     await adminClient
       .from("quizzes")
@@ -989,17 +891,30 @@ async function processQuizGeneration(
         tags: rawTags,
         status: QUIZ_STATUS.COMPLETED,
         progress: "Completed!",
-        prompt_tokens: (tokenUsage ?? { prompt: 0, candidates: 0, total: 0 })
-          .prompt,
+        prompt_tokens: (
+          tokenUsage ?? {
+            prompt: 0,
+            candidates: 0,
+            total: 0,
+          }
+        ).prompt,
         candidates_tokens: (
-          tokenUsage ?? { prompt: 0, candidates: 0, total: 0 }
+          tokenUsage ?? {
+            prompt: 0,
+            candidates: 0,
+            total: 0,
+          }
         ).candidates,
-        total_tokens: (tokenUsage ?? { prompt: 0, candidates: 0, total: 0 })
-          .total,
-        is_public: true, // Always set completed quizzes as public
+        total_tokens: (
+          tokenUsage ?? {
+            prompt: 0,
+            candidates: 0,
+            total: 0,
+          }
+        ).total,
+        is_public: true,
       })
       .eq("id", quizId);
-
     console.log(`✅ [BACKEND] Quiz generation completed for ID: ${quizId}`);
   } catch (error) {
     console.error(
@@ -1013,24 +928,22 @@ async function processQuizGeneration(
     );
   }
 }
-
 // Helper function to update quiz status
-async function updateQuizStatus(
-  quizId: string,
-  status: QuizStatus,
-  progress: string
-) {
+async function updateQuizStatus(quizId, status, progress) {
   await adminClient
     .from("quizzes")
-    .update({ status, progress })
+    .update({
+      status,
+      progress,
+    })
     .eq("id", quizId);
 }
-
 // API Endpoints
-async function handleStartQuiz(req: Request) {
+async function handleStartQuiz(req) {
   if (req.method === "OPTIONS")
-    return new Response(null, { headers: corsHeaders });
-
+    return new Response(null, {
+      headers: corsHeaders,
+    });
   // Check database connection first
   if (!adminClient) {
     console.error(
@@ -1043,44 +956,51 @@ async function handleStartQuiz(req: Request) {
       }),
       {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "application/json",
+        },
       }
     );
   }
-
   try {
     const payload = await req.json().catch(() => ({}));
-
     // Check for duplicate request using idempotency key
-    const idempotencyKey = 
-      typeof payload.idempotencyKey === "string" ? payload.idempotencyKey : undefined;
-    
+    const idempotencyKey =
+      typeof payload.idempotencyKey === "string"
+        ? payload.idempotencyKey
+        : undefined;
     if (idempotencyKey && adminClient) {
-      const { data: duplicateCheck, error: duplicateError } = await adminClient
-        .rpc('check_duplicate_quiz_request', {
+      const { data: duplicateCheck, error: duplicateError } =
+        await adminClient.rpc("check_duplicate_quiz_request", {
           p_idempotency_key: idempotencyKey,
-          p_minutes_threshold: 5
+          p_minutes_threshold: 5,
         });
-
       if (duplicateError) {
         console.warn("Error checking for duplicate request:", duplicateError);
         // Continue with request if check fails (fail open)
       } else if (duplicateCheck && duplicateCheck.length > 0) {
         // Return existing quiz if found within 5 minutes
         const existingQuiz = duplicateCheck[0];
-        console.log(`Duplicate request detected, returning existing quiz: ${existingQuiz.quiz_id}`);
-        
-        return new Response(JSON.stringify({
-          id: existingQuiz.quiz_id,
-          status: QUIZ_STATUS.PENDING,
-          duplicate: true,
-          message: "Request already processed"
-        }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
+        console.log(
+          `Duplicate request detected, returning existing quiz: ${existingQuiz.quiz_id}`
+        );
+        return new Response(
+          JSON.stringify({
+            id: existingQuiz.quiz_id,
+            status: QUIZ_STATUS.PENDING,
+            duplicate: true,
+            message: "Request already processed",
+          }),
+          {
+            headers: {
+              ...corsHeaders,
+              "Content-Type": "application/json",
+            },
+          }
+        );
       }
     }
-
     // Get user_id
     const authHeader =
       req.headers.get("Authorization") ||
@@ -1090,18 +1010,14 @@ async function handleStartQuiz(req: Request) {
       ? authHeader.slice(7)
       : null;
     let userId = null;
-
     if (adminClient && accessToken) {
       const { data } = await adminClient.auth.getUser(accessToken);
       userId = data?.user?.id || null;
     }
-
     // Create quiz record
     const quizId = crypto.randomUUID();
     const sessionId = crypto.randomUUID();
-
     console.log(`[START-QUIZ] Attempting to insert quiz record: ${quizId}`);
-
     const rawPromptForInsert =
       typeof payload.prompt === "string" ? payload.prompt : "Custom quiz topic";
     const sanitizedPromptForInsert = sanitizeVietnameseBadwords(
@@ -1112,20 +1028,18 @@ async function handleStartQuiz(req: Request) {
       sanitizedPromptForInsert && sanitizedPromptForInsert.length > 0
         ? sanitizedPromptForInsert
         : "Custom Quiz";
-
-    const insertResult = await adminClient!.from("quizzes").insert({
+    const insertResult = await adminClient.from("quizzes").insert({
       id: quizId,
       status: QUIZ_STATUS.PENDING,
       prompt: sanitizedPromptForInsert,
-      title: insertTitle, // ✅ Required title
-      questions: [], // ✅ Required questions - empty array initially
+      title: insertTitle,
+      questions: [],
       session_id: sessionId,
       user_id: userId,
       progress: "Initializing...",
       question_count: payload.questionCount || 15,
-      idempotency_key: idempotencyKey, // ✅ Prevent duplicate requests
+      idempotency_key: idempotencyKey,
     });
-
     // Check if insert failed
     if (insertResult.error) {
       console.error(`[START-QUIZ] Database insert failed:`, insertResult.error);
@@ -1136,58 +1050,72 @@ async function handleStartQuiz(req: Request) {
         }),
         {
           status: 500,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: {
+            ...corsHeaders,
+            "Content-Type": "application/json",
+          },
         }
       );
     }
-
     console.log(
       `[START-QUIZ] Insert successful, starting background processing for: ${quizId}`
     );
-
     // Start background processing - only if insert succeeded
     processQuizGeneration(quizId, payload, req);
-
     // Always respond immediately (don't wait for background processing)
     const responseObject = {
       id: quizId,
       status: QUIZ_STATUS.PENDING,
     };
-
     console.log(`[START-QUIZ] Sending response:`, responseObject);
-
     return new Response(JSON.stringify(responseObject), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: {
+        ...corsHeaders,
+        "Content-Type": "application/json",
+      },
     });
   } catch (error) {
-    return new Response(JSON.stringify({ error: "Failed to start quiz" }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({
+        error: "Failed to start quiz",
+      }),
+      {
+        status: 500,
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "application/json",
+        },
+      }
+    );
   }
 }
-
-async function handleGetQuizStatus(req: Request) {
+async function handleGetQuizStatus(req) {
   if (req.method === "OPTIONS")
-    return new Response(null, { headers: corsHeaders });
-
+    return new Response(null, {
+      headers: corsHeaders,
+    });
   try {
     const url = new URL(req.url);
     const quizId = url.searchParams.get("quiz_id");
-
     if (!adminClient || !quizId) {
-      return new Response(JSON.stringify({ error: "Invalid request" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return new Response(
+        JSON.stringify({
+          error: "Invalid request",
+        }),
+        {
+          status: 400,
+          headers: {
+            ...corsHeaders,
+            "Content-Type": "application/json",
+          },
+        }
+      );
     }
-
     const { data: quiz } = await adminClient
       .from("quizzes")
       .select("*")
       .eq("id", quizId)
       .single();
-
     if (!quiz) {
       return new Response(
         JSON.stringify({
@@ -1196,11 +1124,13 @@ async function handleGetQuizStatus(req: Request) {
         }),
         {
           status: 404,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: {
+            ...corsHeaders,
+            "Content-Type": "application/json",
+          },
         }
       );
     }
-
     return new Response(
       JSON.stringify({
         status: quiz.status,
@@ -1222,34 +1152,53 @@ async function handleGetQuizStatus(req: Request) {
             : null,
         progress: quiz.progress || "Processing...",
       }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      {
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "application/json",
+        },
+      }
     );
   } catch (error) {
-    return new Response(JSON.stringify({ error: "Failed to get status" }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({
+        error: "Failed to get status",
+      }),
+      {
+        status: 500,
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "application/json",
+        },
+      }
+    );
   }
 }
-
 // Main server function
-serve(async (req: Request) => {
+serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, {
+      headers: corsHeaders,
+    });
   }
-
   const url = new URL(req.url);
   const path = url.pathname.split("/").pop();
-
   if (path === "start-quiz") {
     return handleStartQuiz(req);
   } else if (path === "get-quiz-status") {
     return handleGetQuizStatus(req);
   }
-
   // Default blocking endpoint for backwards compatibility
-  return new Response(JSON.stringify({ error: "Endpoint not found" }), {
-    status: 404,
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
-  });
+  return new Response(
+    JSON.stringify({
+      error: "Endpoint not found",
+    }),
+    {
+      status: 404,
+      headers: {
+        ...corsHeaders,
+        "Content-Type": "application/json",
+      },
+    }
+  );
 });

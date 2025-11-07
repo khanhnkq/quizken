@@ -114,6 +114,14 @@ const Navbar = () => {
               onPointerDown={playClick}>
               Thư viện
             </Link>
+            {user && (
+              <Link
+                to="/dashboard"
+                className="text-foreground hover:text-primary transition-colors flex items-center gap-1"
+                onPointerDown={playClick}>
+                Dashboard
+              </Link>
+            )}
             <Link
               to="/about"
               className="text-foreground hover:text-primary transition-colors"
@@ -194,6 +202,15 @@ const Navbar = () => {
               onClick={() => setIsOpen(false)}>
               Thư viện
             </Link>
+            {user && (
+              <Link
+                to="/dashboard"
+                className="block text-foreground hover:text-primary transition-colors flex items-center gap-2"
+                onPointerDown={playClick}
+                onClick={() => setIsOpen(false)}>
+                Dashboard
+              </Link>
+            )}
             <Link
               to="/about"
               className="block text-foreground hover:text-primary transition-colors"
