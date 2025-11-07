@@ -12,6 +12,9 @@ import {
 } from "@/components/ui/table";
 import type { RecentQuizAttempt } from "@/types/dashboard";
 import { ClockIcon, ExternalLinkIcon, CheckCircleIcon } from "lucide-react";
+import { gsap } from "gsap";
+import { shouldReduceAnimations } from "@/utils/deviceDetection";
+import type { MouseEvent } from "react";
 
 interface RecentQuizzesProps {
   recentAttempts: RecentQuizAttempt[];
@@ -49,6 +52,30 @@ export function RecentQuizzes({
     if (score >= 80) return "Xuất sắc";
     if (score >= 60) return "Khá tốt";
     return "Cần cải thiện";
+  };
+
+  // GSAP hover effects like homepage
+  const handleHoverEnter = (e: MouseEvent<HTMLButtonElement>) => {
+    if (shouldReduceAnimations()) return;
+    const target = e.currentTarget as HTMLButtonElement;
+    gsap.to(target, {
+      y: -2,
+      scale: 1.04,
+      boxShadow: "0 12px 30px rgba(0,0,0,0.45)",
+      duration: 0.18,
+      ease: "power3.out",
+    });
+  };
+
+  const handleHoverLeave = (e: MouseEvent<HTMLButtonElement>) => {
+    const target = e.currentTarget as HTMLButtonElement;
+    gsap.to(target, {
+      y: 0,
+      scale: 1,
+      boxShadow: "0 0 0 rgba(0,0,0,0)",
+      duration: 0.22,
+      ease: "power3.inOut",
+    });
   };
 
   if (isLoading) {
@@ -190,7 +217,9 @@ export function RecentQuizzes({
                         // TODO: Navigate to quiz details
                         console.log("Navigate to quiz:", attempt.quiz_id);
                       }}
-                      className="border-2 border-[#B5CC89] text-gray-900 hover:bg-[#B5CC89]/10 font-semibold">
+                      className="border-2 hover:bg-primary hover:text-primary-foreground transition-colors font-semibold"
+                      onMouseEnter={handleHoverEnter}
+                      onMouseLeave={handleHoverLeave}>
                       <ExternalLinkIcon className="h-4 w-4 mr-1.5" />
                       Xem
                     </Button>
