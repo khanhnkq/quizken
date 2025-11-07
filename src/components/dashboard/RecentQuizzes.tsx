@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Table,
   TableBody,
@@ -141,93 +142,97 @@ export function RecentQuizzes({
       </CardHeader>
       <CardContent className="pt-6">
         <div className="rounded-xl border-2 border-gray-100 overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-[#B5CC89]/10 hover:bg-[#B5CC89]/10">
-                <TableHead className="font-bold text-gray-900">Quiz</TableHead>
-                <TableHead className="text-center font-bold text-gray-900">
-                  Điểm
-                </TableHead>
-                <TableHead className="text-center font-bold text-gray-900">
-                  Kết quả
-                </TableHead>
-                <TableHead className="text-center font-bold text-gray-900">
-                  Thời gian
-                </TableHead>
-                <TableHead className="text-center font-bold text-gray-900">
-                  Ngày làm
-                </TableHead>
-                <TableHead className="text-center font-bold text-gray-900">
-                  Hành động
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {recentAttempts.map((attempt, index) => (
-                <TableRow
-                  key={attempt.attempt_id}
-                  className={`hover:bg-[#B5CC89]/5 transition-colors ${
-                    index % 2 === 0 ? "bg-white" : "bg-gray-50/50"
-                  }`}>
-                  <TableCell className="font-medium">
-                    <div>
-                      <p className="font-bold text-gray-900">
-                        {attempt.quiz_title}
-                      </p>
-                      <p className="text-sm text-gray-500 mt-0.5">
-                        {attempt.correct_answers}/{attempt.total_questions} câu
-                        đúng
-                      </p>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <div className="flex flex-col items-center gap-1.5">
-                      <span className="font-bold text-xl text-gray-900">
-                        {attempt.score.toFixed(1)}%
-                      </span>
-                      <Badge
-                        className={`${getScoreColor(
-                          attempt.score
-                        )} font-semibold`}>
-                        {getScoreLabel(attempt.score)}
-                      </Badge>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <div className="flex justify-center">
-                      <div className="p-2 rounded-full bg-green-100">
-                        <CheckCircleIcon className="h-5 w-5 text-green-600" />
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <div className="flex items-center justify-center text-sm font-medium text-gray-700 gap-1.5">
-                      <ClockIcon className="h-4 w-4 text-gray-500" />
-                      {formatTime(attempt.time_taken_seconds)}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-center text-sm text-gray-600 font-medium">
-                    {formatDate(attempt.completed_at)}
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        // TODO: Navigate to quiz details
-                        console.log("Navigate to quiz:", attempt.quiz_id);
-                      }}
-                      className="border-2 hover:bg-primary hover:text-primary-foreground transition-colors font-semibold"
-                      onMouseEnter={handleHoverEnter}
-                      onMouseLeave={handleHoverLeave}>
-                      <ExternalLinkIcon className="h-4 w-4 mr-1.5" />
-                      Xem
-                    </Button>
-                  </TableCell>
+          <ScrollArea className="h-[400px] md:h-[600px]">
+            <Table>
+              <TableHeader className="sticky top-0 z-10 bg-white shadow-sm">
+                <TableRow className="bg-[#B5CC89]/10 hover:bg-[#B5CC89]/10">
+                  <TableHead className="font-bold text-gray-900">
+                    Quiz
+                  </TableHead>
+                  <TableHead className="text-center font-bold text-gray-900">
+                    Điểm
+                  </TableHead>
+                  <TableHead className="text-center font-bold text-gray-900">
+                    Kết quả
+                  </TableHead>
+                  <TableHead className="text-center font-bold text-gray-900">
+                    Thời gian
+                  </TableHead>
+                  <TableHead className="text-center font-bold text-gray-900">
+                    Ngày làm
+                  </TableHead>
+                  <TableHead className="text-center font-bold text-gray-900">
+                    Hành động
+                  </TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {recentAttempts.map((attempt, index) => (
+                  <TableRow
+                    key={attempt.attempt_id}
+                    className={`hover:bg-[#B5CC89]/5 transition-colors ${
+                      index % 2 === 0 ? "bg-white" : "bg-gray-50/50"
+                    }`}>
+                    <TableCell className="font-medium">
+                      <div>
+                        <p className="font-bold text-gray-900">
+                          {attempt.quiz_title}
+                        </p>
+                        <p className="text-sm text-gray-500 mt-0.5">
+                          {attempt.correct_answers}/{attempt.total_questions}{" "}
+                          câu đúng
+                        </p>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <div className="flex flex-col items-center gap-1.5">
+                        <span className="font-bold text-xl text-gray-900">
+                          {attempt.score.toFixed(1)}%
+                        </span>
+                        <Badge
+                          className={`${getScoreColor(
+                            attempt.score
+                          )} font-semibold`}>
+                          {getScoreLabel(attempt.score)}
+                        </Badge>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <div className="flex justify-center">
+                        <div className="p-2 rounded-full bg-green-100">
+                          <CheckCircleIcon className="h-5 w-5 text-green-600" />
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <div className="flex items-center justify-center text-sm font-medium text-gray-700 gap-1.5">
+                        <ClockIcon className="h-4 w-4 text-gray-500" />
+                        {formatTime(attempt.time_taken_seconds)}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-center text-sm text-gray-600 font-medium">
+                      {formatDate(attempt.completed_at)}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          // TODO: Navigate to quiz details
+                          console.log("Navigate to quiz:", attempt.quiz_id);
+                        }}
+                        className="border-2 hover:bg-primary hover:text-primary-foreground transition-colors font-semibold"
+                        onMouseEnter={handleHoverEnter}
+                        onMouseLeave={handleHoverLeave}>
+                        <ExternalLinkIcon className="h-4 w-4 mr-1.5" />
+                        Xem
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </ScrollArea>
         </div>
       </CardContent>
     </Card>
