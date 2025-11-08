@@ -28,6 +28,11 @@ export interface FlipCardProps {
    * and will grow/shrink to fit its content (used for expandable flashcard back).
    */
   autoHeight?: boolean;
+  /**
+   * When isImagePreloaded is true, the component will skip internal image loading
+   * and assume images are already preloaded by an external preloader.
+   */
+  isImagePreloaded?: boolean;
   "aria-label"?: string;
 }
 
@@ -53,6 +58,7 @@ export const FlipCard: React.FC<FlipCardProps> = ({
   backContent,
   showSubtitle = true,
   autoHeight = false,
+  isImagePreloaded = false,
   ...rest
 }) => {
   const [localFlip, setLocalFlip] = useState(false);
@@ -60,8 +66,14 @@ export const FlipCard: React.FC<FlipCardProps> = ({
   const [frontImageLoaded, setFrontImageLoaded] = useState(false);
   const [backImageLoaded, setBackImageLoaded] = useState(false);
 
-  // Preload images when component mounts or images change
+  // Skip internal image loading if images are preloaded externally
   useEffect(() => {
+    if (isImagePreloaded) {
+      setFrontImageLoaded(true);
+      setBackImageLoaded(true);
+      return;
+    }
+
     if (image) {
       const img = new Image();
       img.onload = () => setFrontImageLoaded(true);
@@ -70,9 +82,14 @@ export const FlipCard: React.FC<FlipCardProps> = ({
     } else {
       setFrontImageLoaded(true);
     }
-  }, [image]);
+  }, [image, isImagePreloaded]);
 
   useEffect(() => {
+    if (isImagePreloaded) {
+      setBackImageLoaded(true);
+      return;
+    }
+
     if (backImage) {
       const img = new Image();
       img.onload = () => setBackImageLoaded(true);
@@ -81,7 +98,7 @@ export const FlipCard: React.FC<FlipCardProps> = ({
     } else {
       setBackImageLoaded(true);
     }
-  }, [backImage]);
+  }, [backImage, isImagePreloaded]);
 
   const flipped = typeof isFlipped === "boolean" ? isFlipped : localFlip;
 

@@ -17,6 +17,7 @@ export const FlashcardCard: React.FC<FlashcardCardProps> = ({
   onFlip,
   currentIndex,
   totalCards,
+  isImagePreloaded = false,
 }) => {
   // Delegate flip handling to FlipCard while keeping keyboard accessibility
   const handleFlip = () => {
@@ -88,6 +89,7 @@ export const FlashcardCard: React.FC<FlashcardCardProps> = ({
         aria-label={`Flashcard ${currentIndex + 1}`}
         className="mx-auto w-full h-full"
         autoHeight={true}
+        isImagePreloaded={isImagePreloaded}
       />
     </div>
   );

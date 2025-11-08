@@ -42,6 +42,7 @@ export interface FlashcardCardProps {
   onFlip: () => void;
   currentIndex: number;
   totalCards: number;
+  isImagePreloaded?: boolean;
 }
 
 export interface FlashcardViewProps {

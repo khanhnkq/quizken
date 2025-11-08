@@ -158,6 +158,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
             onFlip={toggleFlip}
             currentIndex={currentIndex}
             totalCards={totalCards}
+            isImagePreloaded={isCurrentImageLoaded}
           />
         </CardContent>
 
