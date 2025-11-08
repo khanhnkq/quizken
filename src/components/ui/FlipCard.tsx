@@ -7,6 +7,7 @@ export interface FlipCardProps {
   title?: string;
   subtitle?: string;
   image?: string;
+  backImage?: string;
   price?: number | string;
   tags?: string[];
   isDark?: boolean;
@@ -39,6 +40,7 @@ export const FlipCard: React.FC<FlipCardProps> = ({
   title,
   subtitle,
   image,
+  backImage,
   price,
   tags = [],
   isDark = false,
@@ -125,12 +127,14 @@ export const FlipCard: React.FC<FlipCardProps> = ({
           {image && <div className={cn("absolute inset-0")} />}
 
           <div className="p-4 flex-1 flex flex-col justify-between relative z-10">
-            <div className="mb-8">
+            <div className="pt-24 mb-8 flex items-center justify-center">
               {title && (
                 <h3
                   className={cn(
-                    "text-base font-semibold mb-1 mt-20 whitespace-pre-line break-words",
-                    isDark ? "text-white" : "text-foreground"
+                    "text-base font-bold text-center whitespace-pre-line break-words leading-relaxed tracking-wide",
+                    isDark
+                      ? "text-white drop-shadow-lg"
+                      : "text-foreground drop-shadow-md"
                   )}>
                   {title}
                 </h3>
@@ -138,7 +142,7 @@ export const FlipCard: React.FC<FlipCardProps> = ({
               {subtitle && (
                 <p
                   className={cn(
-                    "text-sm",
+                    "text-sm absolute bottom-2 left-4 right-4",
                     isDark ? "text-white/70" : "text-muted-foreground"
                   )}>
                   {subtitle}
@@ -181,10 +185,20 @@ export const FlipCard: React.FC<FlipCardProps> = ({
           className={cn(
             "absolute inset-0 rounded-lg overflow-hidden backface-hidden rotate-y-180 p-4 flex flex-col border-4 border-gray-300 shadow-xl",
             isDark
-              ? "bg-gradient-to-br from-black/45 via-black/35 to-black/65 border-card/40 text-card-foreground"
-              : "bg-gradient-to-br from-white/95 to-[#ECF2F7] text-foreground border-border/60"
-          )}>
-          <div className="flex-1">
+              ? "bg-gradient-to-br from-black/45 via-black/35 to-black/65 border-card text-card-foreground"
+              : "bg-gradient-to-br from-white/95 to-[#ECF2F7] text-foreground border-border"
+          )}
+          style={
+            backImage
+              ? {
+                  backgroundImage: `url(${backImage})`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                  backgroundRepeat: "no-repeat",
+                }
+              : undefined
+          }>
+          <div className="relative z-10 flex-1">
             {backContent ? (
               backContent
             ) : (
@@ -200,21 +214,6 @@ export const FlipCard: React.FC<FlipCardProps> = ({
                 </div>
               </>
             )}
-          </div>
-
-          <div className="mt-3 flex items-center justify-between">
-            <div className="text-xs text-muted-foreground">More details</div>
-            <div className="flex items-center gap-2">
-              <Button
-                onClick={(e: React.MouseEvent) => {
-                  e.stopPropagation();
-                  handleToggleFlip();
-                }}
-                variant="ghost"
-                className="h-8 px-3 text-sm">
-                Close
-              </Button>
-            </div>
           </div>
         </div>
       </div>
