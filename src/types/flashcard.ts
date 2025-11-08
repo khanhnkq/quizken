@@ -43,6 +43,9 @@ export interface FlashcardCardProps {
   currentIndex: number;
   totalCards: number;
   isImagePreloaded?: boolean;
+  // Optional CSS entry/exit classes applied to incoming/outgoing card during slide animations
+  entryClass?: string;
+  exitClass?: string;
 }
 
 export interface FlashcardViewProps {

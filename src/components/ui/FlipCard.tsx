@@ -65,6 +65,11 @@ export const FlipCard: React.FC<FlipCardProps> = ({
   const [favorite, setFavorite] = useState(false);
   const [frontImageLoaded, setFrontImageLoaded] = useState(false);
   const [backImageLoaded, setBackImageLoaded] = useState(false);
+  // Queue flip when target side image isn't loaded yet
+  const [pendingFlip, setPendingFlip] = useState(false);
+  const [pendingFlipTarget, setPendingFlipTarget] = useState<boolean | null>(
+    null
+  );
 
   // Skip internal image loading if images are preloaded externally
   useEffect(() => {
@@ -105,9 +110,43 @@ export const FlipCard: React.FC<FlipCardProps> = ({
   const handleToggleFlip = (e?: React.SyntheticEvent) => {
     e?.stopPropagation();
     const next = !flipped;
+    // If the target side's image isn't loaded, queue the flip
+    const needsLoaded = next ? backImageLoaded : frontImageLoaded;
+    if (!needsLoaded) {
+      // Queue flip and wait for image to load
+      // eslint-disable-next-line no-console
+      console.log("FlipCard: queuing flip until image loaded", {
+        current: flipped,
+        target: next,
+      });
+      setPendingFlip(true);
+      setPendingFlipTarget(next);
+      return;
+    }
     if (typeof isFlipped !== "boolean") setLocalFlip(next);
     onFlip?.();
   };
+
+  // Process a queued flip once the required images are loaded
+  useEffect(() => {
+    if (!pendingFlip) return;
+    const target = pendingFlipTarget;
+    if (target === null) return;
+    const requiredLoaded = target ? backImageLoaded : frontImageLoaded;
+    if (requiredLoaded) {
+      if (typeof isFlipped !== "boolean") setLocalFlip(target);
+      onFlip?.();
+      setPendingFlip(false);
+      setPendingFlipTarget(null);
+    }
+  }, [
+    pendingFlip,
+    pendingFlipTarget,
+    frontImageLoaded,
+    backImageLoaded,
+    isFlipped,
+    onFlip,
+  ]);
 
   const handleFavorite = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -142,10 +181,10 @@ export const FlipCard: React.FC<FlipCardProps> = ({
       aria-label={rest["aria-label"] ?? title ?? "Flip card"}>
       <div
         className={cn(
-          "relative w-full h-full transition-transform duration-700 transform-style-preserve-3d",
+          "relative w-full h-full transition-transform duration-1000 transform-style-preserve-3d",
           flipped && "rotate-y-180"
         )}
-        style={{ transformStyle: "preserve-3d" }}>
+        style={{ transformStyle: "preserve-3d", transitionDuration: "1000ms" }}>
         {/* Front */}
         <div
           className={cn(

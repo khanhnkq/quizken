@@ -37,7 +37,17 @@ export const FlashcardControls: React.FC<FlashcardControlsProps> = ({
                 size="icon"
                 className={`relative w-8 h-8 sm:w-10 sm:h-10 rounded-full transition-colors duration-300 ${stateClasses}`}
                 onClick={() => {
-                  const event = new CustomEvent("goToCard", { detail: index });
+                  // Use the same event but include direction so view can animate slide
+                  const direction =
+                    index > currentIndex
+                      ? "left"
+                      : index < currentIndex
+                      ? "right"
+                      : null;
+                  const event = new CustomEvent("goToCard", {
+                    detail: index,
+                    direction,
+                  });
                   window.dispatchEvent(event);
                 }}
                 title={`Thẻ ${index + 1}: ${

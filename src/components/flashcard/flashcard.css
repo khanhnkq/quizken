@@ -328,3 +328,87 @@
   overflow-y: visible;
   overflow-x: hidden;
 }
+
+/* Slide animations used while waiting for preload (added for smoother UX)
+   - Increased distance and duration for a more relaxed, visible motion */
+@keyframes slideOutLeft {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-30%);
+    opacity: 0;
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(30%);
+    opacity: 0;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(30%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(-30%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Classes applied to the outgoing card during preload navigation */
+.flashcard-slide-out-left {
+  animation: slideOutLeft 2500ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: transform, opacity;
+  pointer-events: none;
+}
+
+.flashcard-slide-out-right {
+  animation: slideOutRight 2500ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: transform, opacity;
+  pointer-events: none;
+}
+
+/* Entry classes for the incoming card (applied when mount) */
+.flashcard-slide-in-left {
+  animation: slideInLeft 2500ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: transform, opacity;
+}
+
+.flashcard-slide-in-right {
+  animation: slideInRight 2500ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: transform, opacity;
+}
+
+/* Soft fade for non-sliding transitions (longer duration to match slide) */
+@keyframes flashcardFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.flashcard-fade-in {
+  animation: flashcardFade 2500ms ease-out;
+}

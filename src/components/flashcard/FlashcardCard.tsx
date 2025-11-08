@@ -18,6 +18,7 @@ export const FlashcardCard: React.FC<FlashcardCardProps> = ({
   currentIndex,
   totalCards,
   isImagePreloaded = false,
+  entryClass,
 }) => {
   // Delegate flip handling to FlipCard while keeping keyboard accessibility
   const handleFlip = () => {
@@ -73,6 +74,22 @@ export const FlashcardCard: React.FC<FlashcardCardProps> = ({
   const backBackgroundImageIndex = (currentIndex % 30) + 1;
   const backBackgroundImagePath = `/image/flashcard-back-background/${backBackgroundImageIndex}.jpg`;
 
+  // Debug log after image path calculation to avoid referencing uninitialized variables
+  React.useEffect(() => {
+    // eslint-disable-next-line no-console
+    console.log("card: render", {
+      currentIndex,
+      isImagePreloaded,
+      backgroundImagePath,
+      backBackgroundImagePath,
+    });
+  }, [
+    currentIndex,
+    isImagePreloaded,
+    backgroundImagePath,
+    backBackgroundImagePath,
+  ]);
+
   return (
     <div className="relative w-full">
       <FlipCard
@@ -87,7 +104,7 @@ export const FlashcardCard: React.FC<FlashcardCardProps> = ({
         }
         showSubtitle={false}
         aria-label={`Flashcard ${currentIndex + 1}`}
-        className="mx-auto w-full h-full"
+        className={cn("mx-auto w-full h-full", entryClass)}
         autoHeight={true}
         isImagePreloaded={isImagePreloaded}
       />
