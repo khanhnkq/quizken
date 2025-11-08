@@ -2,7 +2,7 @@ import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Download, Sparkles } from "@/lib/icons";
+import { Download, Sparkles, BookOpen } from "@/lib/icons";
 import {
   Card,
   CardContent,
@@ -16,6 +16,7 @@ import { useAudio } from "@/contexts/SoundContext";
 import { killActiveScroll, scrollToTarget } from "@/lib/scroll";
 import { isIOSSafari } from "@/utils/deviceDetection";
 import { supabase } from "@/integrations/supabase/client";
+import FlashcardView from "@/components/flashcard/FlashcardView";
 
 interface TokenUsage {
   prompt: number;
@@ -36,7 +37,7 @@ interface QuizContentProps {
   userId?: string;
 }
 
-// Function to save quiz attempt to database
+// Move saveQuizAttempt outside component
 async function saveQuizAttempt(
   quizId: string,
   userId: string,
@@ -51,10 +52,10 @@ async function saveQuizAttempt(
       {
         quiz_id: quizId,
         user_id: userId,
-        score: Math.round((correctAnswers / totalQuestions) * 100), // Convert to percentage 0-100
+        score: Math.round((correctAnswers / totalQuestions) * 100),
         total_questions: totalQuestions,
         correct_answers: correctAnswers,
-        answers: answers, // JSON array of user answers
+        answers: answers,
         time_taken_seconds: timeTakenSeconds,
         completed_at: new Date().toISOString(),
       },
@@ -85,14 +86,17 @@ export const QuizContent: React.FC<QuizContentProps> = ({
   onDownload,
   userId,
 }) => {
+  const [showFlashcard, setShowFlashcard] = React.useState(false);
   const questionRefs = React.useRef<(HTMLDivElement | null)[]>([]);
   const cardRef = React.useRef<HTMLDivElement | null>(null);
   const sectionRef = React.useRef<HTMLElement | null>(null);
   const scoreRef = React.useRef<HTMLDivElement | null>(null);
+
   const answeredCount = React.useMemo(
     () => userAnswers.filter((ans) => ans !== undefined).length,
     [userAnswers]
   );
+
   const completionPercent = React.useMemo(() => {
     if (!quiz.questions.length) return 0;
     return Math.round((answeredCount / quiz.questions.length) * 100);
@@ -100,12 +104,15 @@ export const QuizContent: React.FC<QuizContentProps> = ({
 
   const { play } = useAudio();
 
+  // Check flashcard view first - before any other rendering
+  if (showFlashcard) {
+    return <FlashcardView quiz={quiz} onBack={() => setShowFlashcard(false)} />;
+  }
+
   const handleNavigateQuestion = (index: number, highlight: boolean = true) => {
     const target = questionRefs.current[index];
     if (target) {
-      // Kill any active scroll animation to avoid competing tweens
       killActiveScroll();
-      // Use unified scroll utility (center alignment for better focus)
       scrollToTarget(target, { align: "center" });
 
       if (highlight) {
@@ -129,9 +136,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
   ) => {
     onAnswerSelect(questionIndex, answerIndex);
 
-    // Auto-scroll to next question if not the last one
     if (questionIndex < quiz.questions.length - 1) {
-      // On iOS Safari, blur radio to prevent native focus-induced scrolling
       if (inputEl && isIOSSafari()) {
         requestAnimationFrame(() => {
           try {
@@ -144,7 +149,6 @@ export const QuizContent: React.FC<QuizContentProps> = ({
           }
         });
       }
-      // Cancel any active scroll tween and perform unified scroll
       killActiveScroll();
       setTimeout(() => {
         handleNavigateQuestion(questionIndex + 1, false);
@@ -155,7 +159,6 @@ export const QuizContent: React.FC<QuizContentProps> = ({
   const scrollToTop = () => {
     setTimeout(() => {
       killActiveScroll();
-      // Try to center the score display if present
       const scoreElement = document.querySelector(
         "[data-score-display]"
       ) as HTMLElement | null;
@@ -163,7 +166,6 @@ export const QuizContent: React.FC<QuizContentProps> = ({
         scrollToTarget(scoreElement, { align: "center" });
         return;
       }
-      // Fallback: scroll to quiz section top
       scrollToTarget("quiz", { align: "top" });
     }, 150);
   };
@@ -174,7 +176,6 @@ export const QuizContent: React.FC<QuizContentProps> = ({
       id="quiz"
       className="relative overflow-hidden bg-gradient-to-b from-background to-secondary/20 py-20 px-0 sm:px-4">
       <div className="mx-auto max-w-4xl px-2 sm:px-4">
-        {/* Quiz Section Header */}
         <div className="text-center mb-12">
           <div className="flex justify-center mb-6">
             <Sparkles className="w-12 h-12 text-[#B5CC89]" />
@@ -223,6 +224,16 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                     Làm lại
                   </Button>
                 )}
+                <Button
+                  onClick={() => setShowFlashcard(true)}
+                  variant="outline"
+                  size="sm"
+                  sound="success"
+                  className="flex-1 lg:flex-initial">
+                  <BookOpen className="mr-2 h-4 w-4" />
+                  <span className="hidden xs:inline">Flashcard</span>
+                  <span className="xs:hidden">Card</span>
+                </Button>
                 <Button
                   onClick={onDownload}
                   variant="outline"
@@ -442,7 +453,6 @@ export const QuizContent: React.FC<QuizContentProps> = ({
             {!showResults ? (
               <Button
                 onClick={async () => {
-                  // Save quiz attempt before grading
                   if (userId && answeredCount === quiz.questions.length) {
                     const score = calculateScore();
                     const correctAnswers = userAnswers.reduce(
@@ -455,30 +465,28 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                       0
                     );
 
-                    const timeTaken = Math.floor(Math.random() * 300) + 60; // Mock time taken (60-360 seconds)
+                    const timeTaken = Math.floor(Math.random() * 300) + 60;
 
-                    // Validate quiz.id exists before saving
                     if (!quiz.id) {
                       console.error(
                         "Error: quiz.id is missing! Cannot save quiz attempt."
                       );
-                      return;
-                    }
-
-                    const saved = await saveQuizAttempt(
-                      quiz.id,
-                      userId,
-                      score,
-                      quiz.questions.length,
-                      correctAnswers,
-                      userAnswers,
-                      timeTaken
-                    );
-
-                    if (saved) {
-                      console.log("✅ Quiz attempt saved successfully");
                     } else {
-                      console.log("❌ Failed to save quiz attempt");
+                      const saved = await saveQuizAttempt(
+                        quiz.id,
+                        userId,
+                        score,
+                        quiz.questions.length,
+                        correctAnswers,
+                        userAnswers,
+                        timeTaken
+                      );
+
+                      if (saved) {
+                        console.log("✅ Quiz attempt saved successfully");
+                      } else {
+                        console.log("❌ Failed to save quiz attempt");
+                      }
                     }
                   }
 

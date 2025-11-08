@@ -1,0 +1,164 @@
+/* Flashcard 3D Flip Animation */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.transform-style-preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+/* Smooth transitions for flashcard */
+.flashcard-container {
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.flashcard-front,
+.flashcard-back {
+  transition: all 0.3s ease-in-out;
+}
+
+/* Hover effects */
+.flashcard-container:hover {
+  transform: scale(1.02);
+}
+
+.flashcard-front:hover,
+.flashcard-back:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Focus styles for accessibility */
+.flashcard-container:focus {
+  outline: 2px solid #b5cc89;
+  outline-offset: 2px;
+}
+
+/* Animation keyframes for entrance */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.flashcard-enter {
+  animation: slideInUp 0.5s ease-out;
+}
+
+.flashcard-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Progress bar animation */
+@keyframes progressGrow {
+  from {
+    width: 0%;
+  }
+}
+
+.progress-animate {
+  animation: progressGrow 0.5s ease-out;
+}
+
+/* Button hover effects */
+.flashcard-button {
+  transition: all 0.2s ease-in-out;
+}
+
+.flashcard-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.flashcard-button:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Navigation dots animation */
+.nav-dot {
+  transition: all 0.2s ease-in-out;
+}
+
+.nav-dot:hover {
+  transform: scale(1.1);
+}
+
+.nav-dot.active {
+  transform: scale(1.15);
+}
+
+/* Loading spinner */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-spinner {
+  animation: spin 1s linear infinite;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .flashcard-container {
+    perspective: 800px;
+  }
+
+  .flashcard-front,
+  .flashcard-back {
+    padding: 1.5rem;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .flashcard-front {
+    background: linear-gradient(to bottom right, #1a1a1a, #2d2d2d);
+  }
+
+  .flashcard-back {
+    background: linear-gradient(to bottom right, #0f2e0a, #1a3d1a);
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .flashcard-container,
+  .flashcard-front,
+  .flashcard-back,
+  .flashcard-button,
+  .nav-dot {
+    transition: none;
+  }
+
+  .flashcard-enter {
+    animation: none;
+  }
+
+  .flashcard-fade-in {
+    animation: none;
+  }
+}

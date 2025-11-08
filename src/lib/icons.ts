@@ -87,6 +87,7 @@ export const Palette = L.Palette;
 export const Music = L.Music;
 export const Music4 = L.Music;
 export const FileDownAlt = L.FileDown;
+export const RefreshCw = L.RefreshCw;
 
 export const TrendingUp = L.TrendingUp;
 
@@ -167,6 +168,7 @@ export const make = (name: string): AppIcon | undefined => {
     Music,
     Music4,
     FileDownAlt,
+    RefreshCw,
     TrendingUp,
     Users,
     Filter,
