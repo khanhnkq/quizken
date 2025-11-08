@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 interface Question {
   question: string;
@@ -35,28 +36,41 @@ interface QuizState {
   reset: () => void;
 }
 
-export const useQuizStore = create<QuizState>((set) => ({
-  prompt: "",
-  questionCount: "",
-  quiz: null,
-  userAnswers: [],
-  showResults: false,
-  tokenUsage: null,
-  setPrompt: (v) => set({ prompt: v }),
-  setQuestionCount: (v) => set({ questionCount: v }),
-  setQuiz: (q) => set({ quiz: q }),
-  setUserAnswers: (a) => set({ userAnswers: a }),
-  setShowResults: (v) => set({ showResults: v }),
-  setTokenUsage: (t) => set({ tokenUsage: t }),
-  reset: () =>
-    set({ prompt: "", questionCount: "", quiz: null, userAnswers: [], showResults: false, tokenUsage: null }),
-}));
+export const useQuizStore = create<QuizState>()(
+  persist(
+    (set) => ({
+      prompt: "",
+      questionCount: "",
+      quiz: null,
+      userAnswers: [],
+      showResults: false,
+      tokenUsage: null,
+      setPrompt: (v) => set({ prompt: v }),
+      setQuestionCount: (v) => set({ questionCount: v }),
+      setQuiz: (q) => set({ quiz: q }),
+      setUserAnswers: (a) => set({ userAnswers: a }),
+      setShowResults: (v) => set({ showResults: v }),
+      setTokenUsage: (t) => set({ tokenUsage: t }),
+      reset: () =>
+        set({
+          prompt: "",
+          questionCount: "",
+          quiz: null,
+          userAnswers: [],
+          showResults: false,
+          tokenUsage: null,
+        }),
+    }),
+    {
+      name: "quiz-storage",
+      partialize: (state) => ({
+        quiz: state.quiz,
+        userAnswers: state.userAnswers,
+        showResults: state.showResults,
+        tokenUsage: state.tokenUsage,
+      }),
+    }
+  )
+);
 
 export default useQuizStore;
-
-
-
-
-
-
-

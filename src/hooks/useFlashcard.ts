@@ -23,7 +23,7 @@ export const useFlashcard = (quiz: Quiz | null) => {
     error: null,
   });
 
-  // Initialize flashcard session from quiz
+  // Initialize flashcard session from quiz - NO dependencies on state
   const initializeSession = useCallback((quizData: Quiz) => {
     try {
       setState((prev) => ({ ...prev, isLoading: true, error: null }));
@@ -111,142 +111,162 @@ export const useFlashcard = (quiz: Quiz | null) => {
             : "Failed to initialize flashcard session",
       });
     }
-  }, []);
+  }, []); // ✅ Empty dependencies - stable function
 
-  // Navigate to previous card
+  // Navigate to previous card - Use functional setState
   const goToPrevious = useCallback(() => {
-    if (!state.session) return;
+    setState((prev) => {
+      if (!prev.session) return prev;
 
-    const newIndex = Math.max(0, state.session.currentIndex - 1);
-    const updatedSession = {
-      ...state.session,
-      currentIndex: newIndex,
-      isFlipped: false, // Reset flip state when navigating
-    };
-
-    setState((prev) => ({ ...prev, session: updatedSession }));
-
-    // Save to localStorage
-    localStorage.setItem(
-      FLASHCARD_STORAGE_KEYS.SESSION(state.session.quizId),
-      JSON.stringify(updatedSession)
-    );
-  }, [state.session]);
-
-  // Navigate to next card
-  const goToNext = useCallback(() => {
-    if (!state.session) return;
-
-    const newIndex = Math.min(
-      state.session.totalCards - 1,
-      state.session.currentIndex + 1
-    );
-    const updatedSession = {
-      ...state.session,
-      currentIndex: newIndex,
-      isFlipped: false, // Reset flip state when navigating
-    };
-
-    setState((prev) => ({ ...prev, session: updatedSession }));
-
-    // Save to localStorage
-    localStorage.setItem(
-      FLASHCARD_STORAGE_KEYS.SESSION(state.session.quizId),
-      JSON.stringify(updatedSession)
-    );
-  }, [state.session]);
-
-  // Jump to specific card
-  const goToCard = useCallback(
-    (index: number) => {
-      if (!state.session) return;
-
-      const validIndex = Math.max(
-        0,
-        Math.min(state.session.totalCards - 1, index)
-      );
+      const newIndex = Math.max(0, prev.session.currentIndex - 1);
       const updatedSession = {
-        ...state.session,
-        currentIndex: validIndex,
-        isFlipped: false, // Reset flip state when navigating
+        ...prev.session,
+        currentIndex: newIndex,
+        isFlipped: false,
       };
-
-      setState((prev) => ({ ...prev, session: updatedSession }));
 
       // Save to localStorage
       localStorage.setItem(
-        FLASHCARD_STORAGE_KEYS.SESSION(state.session.quizId),
+        FLASHCARD_STORAGE_KEYS.SESSION(prev.session.quizId),
         JSON.stringify(updatedSession)
       );
-    },
-    [state.session]
-  );
 
-  // Toggle flip state
-  const toggleFlip = useCallback(() => {
-    if (!state.session) return;
-
-    const updatedSession = {
-      ...state.session,
-      isFlipped: !state.session.isFlipped,
-    };
-
-    setState((prev) => ({ ...prev, session: updatedSession }));
-
-    // Save to localStorage
-    localStorage.setItem(
-      FLASHCARD_STORAGE_KEYS.SESSION(state.session.quizId),
-      JSON.stringify(updatedSession)
-    );
-  }, [state.session]);
-
-  // Reset session
-  const resetSession = useCallback(() => {
-    if (!state.session) return;
-
-    const updatedSession = {
-      ...state.session,
-      currentIndex: 0,
-      isFlipped: false,
-    };
-
-    setState((prev) => ({ ...prev, session: updatedSession }));
-
-    // Save to localStorage
-    localStorage.setItem(
-      FLASHCARD_STORAGE_KEYS.SESSION(state.session.quizId),
-      JSON.stringify(updatedSession)
-    );
-  }, [state.session]);
-
-  // Clear session data
-  const clearSession = useCallback(() => {
-    if (state.session) {
-      localStorage.removeItem(
-        FLASHCARD_STORAGE_KEYS.SESSION(state.session.quizId)
-      );
-    }
-
-    setState({
-      session: null,
-      isLoading: false,
-      error: null,
+      return { ...prev, session: updatedSession };
     });
-  }, [state.session]);
+  }, []); // ✅ Empty dependencies - stable function
 
-  // Initialize when quiz is provided
+  // Navigate to next card - Use functional setState
+  const goToNext = useCallback(() => {
+    setState((prev) => {
+      if (!prev.session) return prev;
+
+      const newIndex = Math.min(
+        prev.session.totalCards - 1,
+        prev.session.currentIndex + 1
+      );
+      const updatedSession = {
+        ...prev.session,
+        currentIndex: newIndex,
+        isFlipped: false,
+      };
+
+      // Save to localStorage
+      localStorage.setItem(
+        FLASHCARD_STORAGE_KEYS.SESSION(prev.session.quizId),
+        JSON.stringify(updatedSession)
+      );
+
+      return { ...prev, session: updatedSession };
+    });
+  }, []); // ✅ Empty dependencies - stable function
+
+  // Jump to specific card - Use functional setState
+  const goToCard = useCallback((index: number) => {
+    setState((prev) => {
+      if (!prev.session) return prev;
+
+      const validIndex = Math.max(
+        0,
+        Math.min(prev.session.totalCards - 1, index)
+      );
+      const updatedSession = {
+        ...prev.session,
+        currentIndex: validIndex,
+        isFlipped: false,
+      };
+
+      // Save to localStorage
+      localStorage.setItem(
+        FLASHCARD_STORAGE_KEYS.SESSION(prev.session.quizId),
+        JSON.stringify(updatedSession)
+      );
+
+      return { ...prev, session: updatedSession };
+    });
+  }, []); // ✅ Empty dependencies - stable function
+
+  // Toggle flip state - Use functional setState
+  const toggleFlip = useCallback(() => {
+    setState((prev) => {
+      if (!prev.session) return prev;
+
+      const updatedSession = {
+        ...prev.session,
+        isFlipped: !prev.session.isFlipped,
+      };
+
+      // Save to localStorage
+      localStorage.setItem(
+        FLASHCARD_STORAGE_KEYS.SESSION(prev.session.quizId),
+        JSON.stringify(updatedSession)
+      );
+
+      return { ...prev, session: updatedSession };
+    });
+  }, []); // ✅ Empty dependencies - stable function
+
+  // Reset session - Use functional setState
+  const resetSession = useCallback(() => {
+    setState((prev) => {
+      if (!prev.session) return prev;
+
+      const updatedSession = {
+        ...prev.session,
+        currentIndex: 0,
+        isFlipped: false,
+      };
+
+      // Save to localStorage
+      localStorage.setItem(
+        FLASHCARD_STORAGE_KEYS.SESSION(prev.session.quizId),
+        JSON.stringify(updatedSession)
+      );
+
+      return { ...prev, session: updatedSession };
+    });
+  }, []); // ✅ Empty dependencies - stable function
+
+  // Clear session data - Use functional setState
+  const clearSession = useCallback(() => {
+    setState((prev) => {
+      if (prev.session) {
+        localStorage.removeItem(
+          FLASHCARD_STORAGE_KEYS.SESSION(prev.session.quizId)
+        );
+      }
+
+      return {
+        session: null,
+        isLoading: false,
+        error: null,
+      };
+    });
+  }, []); // ✅ Empty dependencies - stable function
+
+  // Initialize when quiz is provided - Only depends on quiz ID change
   useEffect(() => {
     if (quiz) {
       initializeSession(quiz);
     } else {
       clearSession();
     }
+    // ✅ Only quiz as dependency - initializeSession and clearSession are now stable
   }, [quiz, initializeSession, clearSession]);
 
-  // Keyboard navigation
+  // Keyboard navigation - Only active when session exists
   useEffect(() => {
+    // Only setup keyboard if there's a session
+    if (!state.session) return;
+
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (!state.session) return;
+      // Don't interfere with input fields
+      const target = event.target as HTMLElement;
+      if (target.tagName === "INPUT" || target.tagName === "TEXTAREA") {
+        return;
+      }
+
+      // Allow normal browser navigation with Alt+Arrow keys
+      if (event.altKey) return;
 
       switch (event.key) {
         case "ArrowLeft":
@@ -271,6 +291,7 @@ export const useFlashcard = (quiz: Quiz | null) => {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
+    // ✅ Setup/cleanup when session changes
   }, [state.session, goToPrevious, goToNext, toggleFlip, clearSession]);
 
   return {

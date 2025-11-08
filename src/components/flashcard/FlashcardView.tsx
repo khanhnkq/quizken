@@ -1,5 +1,13 @@
 import * as React from "react";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { ArrowLeft, BookOpen } from "@/lib/icons";
 import FlashcardCard from "./FlashcardCard";
 import FlashcardControls from "./FlashcardControls";
@@ -26,7 +34,11 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
     error,
   } = useFlashcard(quiz);
 
-  // Handle custom event for quick navigation
+  // Calculate progress percentage
+  const progressPercent =
+    totalCards > 0 ? ((currentIndex + 1) / totalCards) * 100 : 0;
+
+  // Handle custom event for quick navigation - goToCard is now stable
   React.useEffect(() => {
     const handleGoToCard = (event: CustomEvent) => {
       goToCard(event.detail);
@@ -36,118 +48,126 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
     return () => {
       window.removeEventListener("goToCard", handleGoToCard as EventListener);
     };
+    // ✅ goToCard is now stable (empty dependencies), so this effect only runs once
   }, [goToCard]);
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20 flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="loading-spinner rounded-full h-12 w-12 border-b-2 border-[#B5CC89] mx-auto"></div>
-          <p className="text-muted-foreground">Đang tải flashcards...</p>
-        </div>
+      <div className="text-center space-y-4 py-12">
+        <div className="loading-spinner rounded-full h-12 w-12 border-b-2 border-[#B5CC89] mx-auto"></div>
+        <p className="text-muted-foreground">Đang tải flashcards...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20 flex items-center justify-center">
-        <div className="text-center space-y-4 max-w-md mx-auto p-6">
-          <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto">
-            <span className="text-2xl">⚠️</span>
-          </div>
-          <h2 className="text-xl font-semibold text-foreground">
-            Có lỗi xảy ra
-          </h2>
-          <p className="text-muted-foreground">{error}</p>
-          <Button onClick={onBack} variant="outline">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Quay lại
-          </Button>
+      <div className="text-center space-y-4 max-w-md mx-auto p-6 py-12">
+        <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto">
+          <span className="text-2xl">⚠️</span>
         </div>
+        <h2 className="text-xl font-semibold text-foreground">Có lỗi xảy ra</h2>
+        <p className="text-muted-foreground">{error}</p>
+        <Button onClick={onBack} variant="outline">
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Quay lại
+        </Button>
       </div>
     );
   }
 
   if (!currentFlashcard) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20 flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <BookOpen className="w-16 h-16 text-[#B5CC89] mx-auto" />
-          <h2 className="text-xl font-semibold text-foreground">
-            Không có flashcard
-          </h2>
-          <p className="text-muted-foreground">
-            Quiz này không có câu hỏi để hiển thị flashcard.
-          </p>
-          <Button onClick={onBack} variant="outline">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Quay lại
-          </Button>
-        </div>
+      <div className="text-center space-y-4 py-12">
+        <BookOpen className="w-16 h-16 text-[#B5CC89] mx-auto" />
+        <h2 className="text-xl font-semibold text-foreground">
+          Không có flashcard
+        </h2>
+        <p className="text-muted-foreground">
+          Quiz này không có câu hỏi để hiển thị flashcard.
+        </p>
+        <Button onClick={onBack} variant="outline">
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Quay lại
+        </Button>
       </div>
     );
   }
 
   return (
-    <section className="min-h-screen bg-gradient-to-b from-background to-secondary/20 py-8 px-4">
-      {/* Header */}
-      <div className="max-w-4xl mx-auto mb-8">
-        <div className="flex items-center justify-between">
-          <Button
-            onClick={onBack}
-            variant="outline"
-            size="sm"
-            className="flex items-center gap-2">
-            <ArrowLeft className="w-4 h-4" />
-            <span className="hidden sm:inline">Quay lại Quiz</span>
-            <span className="sm:hidden">Quay lại</span>
-          </Button>
-          <div className="text-center">
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground">
-              Chế độ Flashcard
-            </h1>
-            <p className="text-muted-foreground mt-1">{quiz?.title}</p>
+    <>
+      <Card className="border-2 rounded-none md:rounded-xl shadow-lg bg-card">
+        <CardHeader className="pb-6">
+          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+            <div className="flex-1">
+              <div className="flex flex-wrap items-center gap-2 mb-2">
+                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[#B5CC89]/10 text-[#B5CC89]">
+                  Flashcard
+                </span>
+                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-secondary text-secondary-foreground">
+                  {totalCards} thẻ
+                </span>
+              </div>
+              <CardTitle className="text-xl md:text-2xl">
+                Chế độ Flashcard
+              </CardTitle>
+              <CardDescription className="mt-1">{quiz?.title}</CardDescription>
+            </div>
+            <div className="flex gap-2 w-full lg:w-auto">
+              <Button
+                onClick={onBack}
+                variant="outline"
+                size="sm"
+                className="flex-1 lg:flex-initial">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                <span className="hidden xs:inline">Quay lại Quiz</span>
+                <span className="xs:hidden">Quay lại</span>
+              </Button>
+            </div>
           </div>
-          <div className="w-[100px] sm:w-[120px]"></div>{" "}
-          {/* Spacer for centering */}
-        </div>
-      </div>
 
-      {/* Flashcard Content */}
-      <div className="max-w-4xl mx-auto space-y-8">
-        {/* Flashcard */}
-        <FlashcardCard
-          flashcard={currentFlashcard}
-          isFlipped={isFlipped}
-          onFlip={toggleFlip}
-          currentIndex={currentIndex}
-          totalCards={totalCards}
-        />
+          <div className="mt-4">
+            <div className="flex items-center justify-between mb-2 text-sm text-muted-foreground">
+              <span>Tiến độ</span>
+              <span>
+                {currentIndex + 1}/{totalCards}
+              </span>
+            </div>
+            <div className="w-full bg-secondary rounded-full h-2">
+              <div
+                className="bg-[#B5CC89] h-2 rounded-full transition-all duration-300"
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
+          </div>
+        </CardHeader>
 
-        {/* Controls */}
-        <FlashcardControls
-          currentIndex={currentIndex}
-          totalCards={totalCards}
-          onPrevious={goToPrevious}
-          onNext={goToNext}
-          onFlip={toggleFlip}
-          isFlipped={isFlipped}
-          canGoPrevious={canGoPrevious}
-          canGoNext={canGoNext}
-        />
-      </div>
+        <CardContent className="space-y-4">
+          {/* Flashcard */}
+          <FlashcardCard
+            flashcard={currentFlashcard}
+            isFlipped={isFlipped}
+            onFlip={toggleFlip}
+            currentIndex={currentIndex}
+            totalCards={totalCards}
+          />
+        </CardContent>
 
-      {/* Footer Instructions */}
-      <div className="max-w-4xl mx-auto mt-12 text-center">
-        <div className="inline-flex items-center gap-4 px-4 py-2 bg-muted/50 rounded-lg border">
-          <span className="text-sm text-muted-foreground">Mẹo:</span>
-          <span className="text-sm font-medium">
-            Click thẻ hoặc nhấn Space để lật • Dùng mũi tên để điều hướng
-          </span>
-        </div>
-      </div>
-    </section>
+        <CardFooter className="flex flex-col space-y-4 pt-2">
+          {/* Controls */}
+          <FlashcardControls
+            currentIndex={currentIndex}
+            totalCards={totalCards}
+            onPrevious={goToPrevious}
+            onNext={goToNext}
+            onFlip={toggleFlip}
+            isFlipped={isFlipped}
+            canGoPrevious={canGoPrevious}
+            canGoNext={canGoNext}
+          />
+        </CardFooter>
+      </Card>
+    </>
   );
 };
 

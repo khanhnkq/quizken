@@ -1,4 +1,12 @@
-/* Flashcard 3D Flip Animation */
+/* Flashcard 3D Flip Animation - Tối ưu */
+.perspective-600 {
+  perspective: 600px;
+}
+
+.perspective-800 {
+  perspective: 800px;
+}
+
 .perspective-1000 {
   perspective: 1000px;
 }
@@ -15,25 +23,53 @@
   transform: rotateY(180deg);
 }
 
-/* Smooth transitions for flashcard */
+/* Fix z-index cho 3D flip */
+.flashcard-3d-container {
+  position: relative;
+  z-index: 1;
+  transform-style: preserve-3d;
+}
+
+.flashcard-3d-inner {
+  position: relative;
+  z-index: 2;
+  transform-style: preserve-3d;
+  transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.flashcard-3d-front,
+.flashcard-3d-back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  z-index: 3;
+}
+
+.flashcard-3d-back {
+  transform: rotateY(180deg);
+}
+
+/* Flashcard container - Giảm animation */
 .flashcard-container {
-  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .flashcard-front,
 .flashcard-back {
-  transition: all 0.3s ease-in-out;
+  transition: all 0.2s ease-in-out;
 }
 
-/* Hover effects */
+/* Hover effects - Đơn giản hơn */
 .flashcard-container:hover {
-  transform: scale(1.02);
+  transform: scale(1.01);
 }
 
 .flashcard-front:hover,
 .flashcard-back:hover {
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
 /* Focus styles for accessibility */
@@ -46,7 +82,7 @@
 @keyframes slideInUp {
   from {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
@@ -64,14 +100,14 @@
 }
 
 .flashcard-enter {
-  animation: slideInUp 0.5s ease-out;
+  animation: slideInUp 0.3s ease-out;
 }
 
 .flashcard-fade-in {
-  animation: fadeIn 0.3s ease-out;
+  animation: fadeIn 0.2s ease-out;
 }
 
-/* Progress bar animation */
+/* Progress animation - Tối ưu */
 @keyframes progressGrow {
   from {
     width: 0%;
@@ -79,35 +115,35 @@
 }
 
 .progress-animate {
-  animation: progressGrow 0.5s ease-out;
+  animation: progressGrow 0.3s ease-out;
 }
 
-/* Button hover effects */
+/* Button effects - Tối ưu */
 .flashcard-button {
-  transition: all 0.2s ease-in-out;
+  transition: all 0.15s ease-in-out;
 }
 
 .flashcard-button:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .flashcard-button:active:not(:disabled) {
   transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
-/* Navigation dots animation */
+/* Navigation dots - Giảm kích thước */
 .nav-dot {
-  transition: all 0.2s ease-in-out;
+  transition: all 0.15s ease-in-out;
 }
 
 .nav-dot:hover {
-  transform: scale(1.1);
+  transform: scale(1.05);
 }
 
 .nav-dot.active {
-  transform: scale(1.15);
+  transform: scale(1.1);
 }
 
 /* Loading spinner */
@@ -121,8 +157,48 @@
   animation: spin 1s linear infinite;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
+/* Compact utilities */
+.flashcard-compact {
+  max-width: 90%;
+  margin: 0 auto;
+}
+
+.flashcard-sm {
+  height: 16rem; /* 256px */
+}
+
+.flashcard-md {
+  height: 20rem; /* 320px */
+}
+
+.controls-compact {
+  padding: 0.5rem 0;
+}
+
+.nav-dots-compact {
+  gap: 0.25rem; /* Giảm từ 0.5rem */
+}
+
+.nav-dot-compact {
+  width: 1.5rem; /* 24px */
+  height: 1.5rem; /* 24px */
+  font-size: 0.75rem; /* 12px */
+}
+
+/* Responsive improvements */
+@media (max-width: 640px) {
+  .flashcard-container {
+    perspective: 600px;
+  }
+
+  .flashcard-front,
+  .flashcard-back {
+    padding: 1rem;
+    border-radius: 0.75rem;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1024px) {
   .flashcard-container {
     perspective: 800px;
   }
@@ -130,35 +206,92 @@
   .flashcard-front,
   .flashcard-back {
     padding: 1.5rem;
+    border-radius: 1rem;
   }
 }
 
-/* Dark mode support */
+@media (min-width: 1024px) {
+  .flashcard-container {
+    perspective: 1000px;
+  }
+
+  .flashcard-front,
+  .flashcard-back {
+    padding: 2rem;
+    border-radius: 1.25rem;
+  }
+}
+
+/* Touch-friendly targets */
+@media (pointer: coarse) {
+  .flashcard-button {
+    min-height: 44px; /* iOS recommendation */
+    min-width: 44px;
+  }
+
+  .nav-dot {
+    min-width: 36px;
+    min-height: 36px;
+  }
+}
+
+/* Small mobile adjustments */
+@media (max-width: 380px) {
+  .flashcard-controls {
+    padding: 0.5rem;
+  }
+
+  .nav-dot {
+    width: 1.25rem;
+    height: 1.25rem;
+    font-size: 0.625rem;
+  }
+}
+
+/* Dark mode - Đơn giản hơn */
 @media (prefers-color-scheme: dark) {
   .flashcard-front {
     background: linear-gradient(to bottom right, #1a1a1a, #2d2d2d);
+    border-color: #b5cc89;
   }
 
   .flashcard-back {
     background: linear-gradient(to bottom right, #0f2e0a, #1a3d1a);
+    border-color: #b5cc89;
   }
 }
 
-/* Reduced motion support */
+/* Reduced motion - Tối ưu hơn */
 @media (prefers-reduced-motion: reduce) {
   .flashcard-container,
   .flashcard-front,
   .flashcard-back,
   .flashcard-button,
   .nav-dot {
-    transition: none;
+    transition: none !important;
   }
 
-  .flashcard-enter {
-    animation: none;
-  }
-
+  .flashcard-enter,
   .flashcard-fade-in {
-    animation: none;
+    animation: none !important;
   }
+}
+
+/* Flashcard wrapper styles - khi render như một section bình thường */
+.flashcard-wrapper {
+  position: relative;
+  overflow: visible;
+  width: 100%;
+  min-height: auto;
+  height: auto;
+}
+
+.flashcard-content {
+  position: relative;
+  width: 100%;
+  min-height: auto;
+  height: auto;
+  /* Cho phép nội dung mở rộng theo chiều cao thay vì cuộn bên trong */
+  overflow-y: visible;
+  overflow-x: hidden;
 }

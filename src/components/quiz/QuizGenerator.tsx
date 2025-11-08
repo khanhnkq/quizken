@@ -56,6 +56,7 @@ import { GenerationProgress } from "@/components/quiz/GenerationProgress";
 import { QuotaLimitDialog } from "@/components/quiz/QuotaLimitDialog";
 import { ApiKeyErrorDialog } from "@/components/quiz/ApiKeyErrorDialog";
 import { QuizContent } from "@/components/quiz/QuizContent";
+import { useQuizStore } from "@/hooks/useQuizStore";
 import {
   Tooltip,
   TooltipTrigger,
@@ -89,15 +90,17 @@ const QuizGenerator = () => {
     containsVietnameseBadwords(String(input || ""));
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
-  const [quiz, setQuiz] = useState<Quiz | null>(null);
-  const [userAnswers, setUserAnswers] = useState<number[]>([]);
-  const [showResults, setShowResults] = useState(false);
   const [debugData, setDebugData] = useState<unknown>(null);
-  const [tokenUsage, setTokenUsage] = useState<{
-    prompt: number;
-    candidates: number;
-    total: number;
-  } | null>(null);
+  const {
+    quiz,
+    userAnswers,
+    showResults,
+    tokenUsage,
+    setQuiz,
+    setUserAnswers,
+    setShowResults,
+    setTokenUsage,
+  } = useQuizStore();
   const [loadingMessage, setLoadingMessage] = useState<string>("");
   const [loadingProgress, setLoadingProgress] = useState<number>(0);
   const [promptError, setPromptError] = useState<string>("");
