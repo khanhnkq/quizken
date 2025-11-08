@@ -12,6 +12,7 @@ import { ArrowLeft, BookOpen } from "@/lib/icons";
 import FlashcardCard from "./FlashcardCard";
 import FlashcardControls from "./FlashcardControls";
 import { useFlashcard } from "@/hooks/useFlashcard";
+import { useFlashcardImagePreloader } from "@/hooks/useFlashcardImagePreloader";
 import type { FlashcardViewProps } from "@/types/flashcard";
 import "./flashcard.css";
 
@@ -33,6 +34,13 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
     isLoading,
     error,
   } = useFlashcard(quiz);
+
+  // Preload images for better performance
+  const { isCurrentImageLoaded } = useFlashcardImagePreloader({
+    currentIndex,
+    totalCards,
+    preloadCount: 2, // Preload 2 ảnh tiếp theo
+  });
 
   // Calculate progress percentage
   const progressPercent =

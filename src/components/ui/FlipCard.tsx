@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -55,8 +55,33 @@ export const FlipCard: React.FC<FlipCardProps> = ({
   autoHeight = false,
   ...rest
 }) => {
-  const [localFlip, setLocalFlip] = React.useState(false);
-  const [favorite, setFavorite] = React.useState(false);
+  const [localFlip, setLocalFlip] = useState(false);
+  const [favorite, setFavorite] = useState(false);
+  const [frontImageLoaded, setFrontImageLoaded] = useState(false);
+  const [backImageLoaded, setBackImageLoaded] = useState(false);
+
+  // Preload images when component mounts or images change
+  useEffect(() => {
+    if (image) {
+      const img = new Image();
+      img.onload = () => setFrontImageLoaded(true);
+      img.onerror = () => setFrontImageLoaded(true); // Set true even on error to avoid infinite loading
+      img.src = image;
+    } else {
+      setFrontImageLoaded(true);
+    }
+  }, [image]);
+
+  useEffect(() => {
+    if (backImage) {
+      const img = new Image();
+      img.onload = () => setBackImageLoaded(true);
+      img.onerror = () => setBackImageLoaded(true); // Set true even on error to avoid infinite loading
+      img.src = backImage;
+    } else {
+      setBackImageLoaded(true);
+    }
+  }, [backImage]);
 
   const flipped = typeof isFlipped === "boolean" ? isFlipped : localFlip;
 
@@ -114,16 +139,22 @@ export const FlipCard: React.FC<FlipCardProps> = ({
               ? "bg-gradient-to-br from-black/45 via-black/35 to-black/65 border-card text-card-foreground"
               : "bg-gradient-to-br from-white/95 to-[#ECF2F7] text-foreground border-border"
           )}
-          style={
-            image
+          style={{
+            willChange: "transform",
+            backfaceVisibility: "hidden",
+            ...(image && frontImageLoaded
               ? {
                   backgroundImage: `url(${image})`,
                   backgroundSize: "cover",
                   backgroundPosition: "center",
                   backgroundRepeat: "no-repeat",
                 }
-              : undefined
-          }>
+              : {}),
+          }}>
+          {/* Loading placeholder for front image */}
+          {image && !frontImageLoaded && (
+            <div className="absolute inset-0 bg-gradient-to-br from-gray-200 via-gray-100 to-gray-200 animate-pulse" />
+          )}
           {image && <div className={cn("absolute inset-0")} />}
 
           <div className="p-4 flex-1 flex flex-col justify-between relative z-10">
@@ -188,16 +219,22 @@ export const FlipCard: React.FC<FlipCardProps> = ({
               ? "bg-gradient-to-br from-black/45 via-black/35 to-black/65 border-card text-card-foreground"
               : "bg-gradient-to-br from-white/95 to-[#ECF2F7] text-foreground border-border"
           )}
-          style={
-            backImage
+          style={{
+            willChange: "transform",
+            backfaceVisibility: "hidden",
+            ...(backImage && backImageLoaded
               ? {
                   backgroundImage: `url(${backImage})`,
                   backgroundSize: "cover",
                   backgroundPosition: "center",
                   backgroundRepeat: "no-repeat",
                 }
-              : undefined
-          }>
+              : {}),
+          }}>
+          {/* Loading placeholder for back image */}
+          {backImage && !backImageLoaded && (
+            <div className="absolute inset-0 bg-gradient-to-br from-gray-200 via-gray-100 to-gray-200 animate-pulse" />
+          )}
           <div className="relative z-10 flex-1">
             {backContent ? (
               backContent

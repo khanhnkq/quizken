@@ -1,4 +1,4 @@
-/* Flashcard 3D Flip Animation - Tối ưu */
+/* Flashcard 3D Flip Animation - Tối ưu với GPU acceleration */
 .perspective-600 {
   perspective: 600px;
 }
@@ -17,10 +17,43 @@
 
 .backface-hidden {
   backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .rotate-y-180 {
   transform: rotateY(180deg);
+}
+
+/* GPU Acceleration cho performance tốt hơn */
+.gpu-accelerated {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  -webkit-transform: translateZ(0);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Preload placeholder animation */
+@keyframes shimmer {
+  0% {
+    background-position: -468px 0;
+  }
+  100% {
+    background-position: 468px 0;
+  }
+}
+
+.image-loading-placeholder {
+  background: linear-gradient(to right, #f0f0f0 8%, #f8f8f8 18%, #f0f0f0 33%);
+  background-size: 800px 104px;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+@media (prefers-color-scheme: dark) {
+  .image-loading-placeholder {
+    background: linear-gradient(to right, #2a2a2a 8%, #3a3a3a 18%, #2a2a2a 33%);
+  }
 }
 
 /* Fix z-index cho 3D flip */
