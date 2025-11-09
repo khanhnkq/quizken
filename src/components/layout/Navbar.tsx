@@ -93,9 +93,9 @@ const Navbar = () => {
       }`}>
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <div className="flex items-center">
-            <img src={logo} alt="QuizKen logo" className="w-16 h-16" />
-            <span className="text-2xl font-bold -ml-3 mt-1.5">
+          <div className="flex items-center gap-x-1.5">
+            <img src={logo} alt="QuizKen logo" className="max-w-8 max-h-8" />
+            <span className="text-2xl font-bold mt-0.5">
               Quiz<span className="text-primary">Ken</span>
             </span>
           </div>

@@ -66,12 +66,14 @@ export const AboutHero = () => {
     <section className="relative overflow-hidden bg-gradient-to-b from-secondary/30 to-background pt-20 px-4">
       <div className="container mx-auto max-w-7xl">
         <div className="max-w-4xl mx-auto text-center space-y-6 md:space-y-8 lg:space-y-10 py-16">
-          <div className="flex justify-center">
-            <img
-              src={logo}
-              alt="Avatar Nguyễn Khánh"
-              className="w-20 h-20 rounded-full ring-4 ring-primary/20 bg-background object-cover"
-            />
+          <div className="relative inline-flex items-center justify-center">
+            <div className="rounded-full ring-4 ring-primary/20">
+              <img
+                src={logo}
+                alt="Avatar"
+                className="w-20 h-20 rounded-full object-cover"
+              />
+            </div>
           </div>
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-normal leading-snug md:leading-normal">
             Xin chào, mình là <span className="text-primary">Nguyễn Khánh</span>
