@@ -13,6 +13,7 @@ const About = lazy(() => import("./pages/About"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const QuizLibrary = lazy(() => import("./components/library/QuizLibrary"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
+const QuizDetailPage = lazy(() => import("./pages/QuizDetailPage"));
 import { SoundProvider } from "@/contexts/SoundContext";
 import { ChillMusicProvider } from "@/contexts/ChillMusicContext";
 import { Analytics } from "@vercel/analytics/react";
@@ -80,6 +81,7 @@ const AnimatedRoutes = () => {
             <Route path="/about" element={<About />} />
             <Route path="/library" element={<QuizLibrary />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/quiz/:attemptId" element={<QuizDetailPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

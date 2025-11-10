@@ -15,6 +15,7 @@ import type { RecentQuizAttempt } from "@/types/dashboard";
 import { ClockIcon, ExternalLinkIcon, CheckCircleIcon } from "lucide-react";
 import { gsap } from "gsap";
 import { shouldReduceAnimations } from "@/utils/deviceDetection";
+import { useNavigate } from "react-router-dom";
 import type { MouseEvent } from "react";
 
 interface RecentQuizzesProps {
@@ -26,6 +27,7 @@ export function RecentQuizzes({
   recentAttempts,
   isLoading,
 }: RecentQuizzesProps) {
+  const navigate = useNavigate();
   const formatTime = (seconds?: number) => {
     if (!seconds) return "N/A";
     const minutes = Math.floor(seconds / 60);
@@ -221,8 +223,8 @@ export function RecentQuizzes({
                           variant="outline"
                           size="sm"
                           onClick={() => {
-                            // TODO: Navigate to quiz details
-                            console.log("Navigate to quiz:", attempt.quiz_id);
+                            // Navigate to quiz attempt details
+                            navigate(`/quiz/${attempt.attempt_id}`);
                           }}
                           className="border-2 hover:bg-primary hover:text-primary-foreground transition-colors font-semibold"
                           onMouseEnter={handleHoverEnter}
