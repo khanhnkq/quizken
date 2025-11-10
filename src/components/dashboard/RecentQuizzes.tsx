@@ -145,32 +145,50 @@ export function RecentQuizzes({
       <CardContent className="pt-6">
         <div className="rounded-xl border-2 border-gray-100 overflow-x-auto">
           <div className="min-w-[800px]">
-            <Table>
-              <TableHeader className="bg-[#B5CC89]/10 sticky top-0 z-10">
-                <TableRow className="hover:bg-[#B5CC89]/10">
-                  <TableHead className="font-bold text-gray-900 whitespace-nowrap">
-                    Quiz
-                  </TableHead>
-                  <TableHead className="text-center font-bold text-gray-900 whitespace-nowrap">
-                    Điểm
-                  </TableHead>
-                  <TableHead className="text-center font-bold text-gray-900 whitespace-nowrap">
-                    Kết quả
-                  </TableHead>
-                  <TableHead className="text-center font-bold text-gray-900 whitespace-nowrap">
-                    Thời gian
-                  </TableHead>
-                  <TableHead className="text-center font-bold text-gray-900 whitespace-nowrap">
-                    Ngày làm
-                  </TableHead>
-                  <TableHead className="text-center font-bold text-gray-900 whitespace-nowrap">
-                    Hành động
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-            </Table>
+            <div className="pr-2.5">
+              <Table className="table-fixed">
+                <colgroup>
+                  <col style={{ width: "38%" }} />
+                  <col style={{ width: "12%" }} />
+                  <col style={{ width: "12%" }} />
+                  <col style={{ width: "12%" }} />
+                  <col style={{ width: "18%" }} />
+                  <col style={{ width: "8%" }} />
+                </colgroup>
+                <TableHeader className="bg-[#B5CC89]/10 sticky top-0 z-10">
+                  <TableRow className="hover:bg-[#B5CC89]/10">
+                    <TableHead className="font-bold text-gray-900 whitespace-nowrap">
+                      Quiz
+                    </TableHead>
+                    <TableHead className="text-center font-bold text-gray-900 whitespace-nowrap">
+                      Điểm
+                    </TableHead>
+                    <TableHead className="text-center font-bold text-gray-900 whitespace-nowrap">
+                      Kết quả
+                    </TableHead>
+                    <TableHead className="text-center font-bold text-gray-900 whitespace-nowrap">
+                      Thời gian
+                    </TableHead>
+                    <TableHead className="text-center font-bold text-gray-900 whitespace-nowrap">
+                      Ngày làm
+                    </TableHead>
+                    <TableHead className="text-center font-bold text-gray-900 whitespace-nowrap">
+                      Hành động
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+              </Table>
+            </div>
             <ScrollArea className="h-[400px] md:h-[600px]">
-              <Table>
+              <Table className="table-fixed">
+                <colgroup>
+                  <col style={{ width: "38%" }} />
+                  <col style={{ width: "12%" }} />
+                  <col style={{ width: "12%" }} />
+                  <col style={{ width: "12%" }} />
+                  <col style={{ width: "18%" }} />
+                  <col style={{ width: "8%" }} />
+                </colgroup>
                 <TableBody>
                   {recentAttempts.map((attempt, index) => (
                     <TableRow
