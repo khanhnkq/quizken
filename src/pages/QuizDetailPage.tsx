@@ -31,6 +31,13 @@ export default function QuizDetailPage() {
   const { attemptDetail, attemptSummary, isLoading, error } =
     useQuizAttemptDetail(attemptId);
 
+  // Debug logging
+  console.log("🔍 QuizDetailPage - attemptId:", attemptId);
+  console.log("🔍 QuizDetailPage - attemptDetail:", attemptDetail);
+  console.log("🔍 QuizDetailPage - attemptSummary:", attemptSummary);
+  console.log("🔍 QuizDetailPage - isLoading:", isLoading);
+  console.log("🔍 QuizDetailPage - error:", error);
+
   // Check authentication
   useEffect(() => {
     const getUser = async () => {
@@ -242,7 +249,7 @@ export default function QuizDetailPage() {
               </CardHeader>
               <CardContent className="pt-6">
                 <div className="space-y-6">
-                  {attemptSummary.answers.map((answer, index) => (
+                  {attemptSummary?.answers?.map((answer, index) => (
                     <div
                       key={index}
                       className={`border-2 rounded-xl p-6 transition-all duration-300 ${

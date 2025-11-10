@@ -21,63 +21,45 @@ export function useQuizAttemptDetail(attemptId?: string) {
     setError(null);
 
     try {
-      // First, get the attempt details
-      const { data: attemptData, error: attemptError } = await supabase
-        .from("quiz_attempts")
-        .select(
-          `
-          id,
-          quiz_id,
-          score,
-          total_questions,
-          correct_answers,
-          answers,
-          time_taken_seconds,
-          completed_at,
-          created_at,
-          user_id
-        `
-        )
-        .eq("id", id)
-        .single();
+      // Get current user
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
 
-      if (attemptError) {
-        console.error("Error fetching attempt:", attemptError);
-        setError(attemptError.message);
+      if (userError || !user) {
+        console.error("User not authenticated:", userError);
+        setError("User not authenticated");
         return;
       }
 
-      if (!attemptData) {
-        setError("Quiz attempt not found");
+      console.log("🔍 Fetching attempt detail for ID:", id);
+      console.log("🔍 User ID:", user.id);
+
+      // Use RPC function to get detailed attempt information
+      const { data, error } = await supabase.rpc("get_quiz_attempt_detail", {
+        attempt_uuid: id,
+        user_uuid: user.id,
+      });
+
+      if (error) {
+        console.error("Error fetching attempt detail:", error);
+        setError(error.message);
         return;
       }
 
-      // Then get the quiz details
-      const { data: quizData, error: quizError } = await supabase
-        .from("quizzes")
-        .select(
-          `
-          title,
-          description,
-          prompt,
-          questions,
-          category,
-          difficulty
-        `
-        )
-        .eq("id", attemptData.quiz_id)
-        .single();
-
-      if (quizError) {
-        console.error("Error fetching quiz:", quizError);
-        setError(quizError.message);
+      if (!data || data.length === 0) {
+        console.error("No data returned for attempt ID:", id);
+        setError("Quiz attempt not found or access denied");
         return;
       }
 
-      if (!quizData) {
-        setError("Quiz not found");
-        return;
-      }
+      const attemptData = data[0];
+
+      // Debug logging
+      console.log("🔍 RPC Response Data:", attemptData);
+      console.log("🔍 Quiz Questions Raw:", attemptData.quiz_questions);
+      console.log("🔍 User Answers Raw:", attemptData.user_answers);
 
       // Normalize questions to ensure they match the Question interface
       const normalizeQuestions = (raw: unknown): Question[] => {
@@ -108,6 +90,12 @@ export function useQuizAttemptDetail(attemptId?: string) {
             typeof a === "number" ? a : 0
           )
         : [];
+
+      // Debug logging after normalization
+      console.log("🔍 Normalized Questions:", questions);
+      console.log("🔍 Normalized User Answers:", userAnswers);
+      console.log("🔍 Questions Count:", questions.length);
+      console.log("🔍 User Answers Count:", userAnswers.length);
 
       // Create the attempt detail object
       const detail: QuizAttemptDetail = {
