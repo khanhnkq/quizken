@@ -112,44 +112,6 @@
 }
 
 /* Animation keyframes for entrance */
-@keyframes slideInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-.flashcard-enter {
-  animation: slideInUp 0.3s ease-out;
-}
-
-.flashcard-fade-in {
-  animation: fadeIn 0.2s ease-out;
-}
-
-/* Progress animation - Tối ưu */
-@keyframes progressGrow {
-  from {
-    width: 0%;
-  }
-}
-
-.progress-animate {
-  animation: progressGrow 0.3s ease-out;
-}
 
 /* Button effects - Tối ưu */
 .flashcard-button {
@@ -377,32 +339,32 @@
 
 /* Classes applied to the outgoing card during preload navigation */
 .flashcard-slide-out-left {
-  animation: slideOutLeft 2500ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: slideOutLeft 1000ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
   will-change: transform, opacity;
   pointer-events: none;
 }
 
 .flashcard-slide-out-right {
-  animation: slideOutRight 2500ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: slideOutRight 1000ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
   will-change: transform, opacity;
   pointer-events: none;
 }
 
 /* Entry classes for the incoming card (applied when mount) */
 .flashcard-slide-in-left {
-  animation: slideInLeft 2500ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: slideInLeft 1000ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
   will-change: transform, opacity;
 }
 
 .flashcard-slide-in-right {
-  animation: slideInRight 2500ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: slideInRight 1000ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
   will-change: transform, opacity;
 }
 
 /* Soft fade for non-sliding transitions (longer duration to match slide) */
 @keyframes flashcardFade {
   from {
-    opacity: 0;
+    opacity: 0.5;
   }
   to {
     opacity: 1;
@@ -410,5 +372,5 @@
 }
 
 .flashcard-fade-in {
-  animation: flashcardFade 2500ms ease-out;
+  animation: flashcardFade 1000ms ease-out;
 }

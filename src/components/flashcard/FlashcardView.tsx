@@ -39,7 +39,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
   const { isCurrentImageLoaded, loadedImages } = useFlashcardImagePreloader({
     currentIndex,
     totalCards,
-    preloadCount: 2, // Preload 2 ảnh tiếp theo
+    preloadCount: 10, // Preload 2 ảnh tiếp theo
   });
 
   // Calculate progress percentage
@@ -76,7 +76,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
           setIsSliding(false);
           setSlideDirection(null);
           setOutgoingIndex(null);
-        }, 2600);
+        }, 1000);
         return;
       }
 
@@ -87,7 +87,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
       });
 
       let elapsed = 0;
-      const maxWait = 2500; // ms
+      const maxWait = 1000; // ms
       const intervalMs = 100;
 
       const interval = window.setInterval(() => {
@@ -100,13 +100,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
             elapsed,
           });
           navigateFn();
-          // small delay to let flip/transition complete before clearing sliding state
-          // match CSS animation duration (2500ms) plus small buffer
-          window.setTimeout(() => {
-            setIsSliding(false);
-            setSlideDirection(null);
-            setOutgoingIndex(null);
-          }, 2600);
+          // sliding state is intentionally left set — it will be cleared by the consumer or another lifecycle action
         }
       }, intervalMs);
     },

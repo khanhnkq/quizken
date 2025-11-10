@@ -18,7 +18,7 @@ interface UseFlashcardImagePreloaderProps {
 export function useFlashcardImagePreloader({
   currentIndex,
   totalCards,
-  preloadCount = 2,
+  preloadCount = 10,
 }: UseFlashcardImagePreloaderProps) {
   const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set());
   const [errorImages, setErrorImages] = useState<Set<number>>(new Set());
@@ -54,8 +54,8 @@ export function useFlashcardImagePreloader({
       const backgroundImageIndex = (index % 30) + 1;
       const backBackgroundImageIndex = (index % 30) + 1;
 
-      const frontImagePath = `/image/flashcard-background/${backgroundImageIndex}.jpg`;
-      const backImagePath = `/image/flashcard-back-background/${backBackgroundImageIndex}.jpg`;
+      const frontImagePath = `/image/flashcard-background/${backgroundImageIndex}.webp`;
+      const backImagePath = `/image/flashcard-back-background/${backBackgroundImageIndex}.webp`;
 
       let loadedCount = 0;
       let hasError = false;

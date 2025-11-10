@@ -68,11 +68,11 @@ export const FlashcardCard: React.FC<FlashcardCardProps> = ({
 
   // Calculate background image based on current index (1-30 cycling)
   const backgroundImageIndex = (currentIndex % 30) + 1;
-  const backgroundImagePath = `/image/flashcard-background/${backgroundImageIndex}.jpg`;
+  const backgroundImagePath = `/image/flashcard-background/${backgroundImageIndex}.webp`;
 
   // Calculate back background image based on current index (1-30 cycling)
   const backBackgroundImageIndex = (currentIndex % 30) + 1;
-  const backBackgroundImagePath = `/image/flashcard-back-background/${backBackgroundImageIndex}.jpg`;
+  const backBackgroundImagePath = `/image/flashcard-back-background/${backBackgroundImageIndex}.webp`;
 
   // Debug log after image path calculation to avoid referencing uninitialized variables
   React.useEffect(() => {
