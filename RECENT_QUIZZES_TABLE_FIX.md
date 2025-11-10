@@ -6,12 +6,80 @@ Bảng "Quiz gần đây" trên Dashboard bị lệch cột giữa header và bo
 
 ## Nguyên nhân chính
 
-1. Cấu trúc colgroup không đồng bộ với nội dung động
-2. Table layout không nhất quán giữa header và body
-3. Responsive design phức tạp không được đồng bộ hóa
-4. ScrollArea và overflow handling gây ra sự lệch khi cuộn
+1. **Container overflow-hidden che 2 cột cuối**: Container ngoài đặt `overflow-hidden` trong khi cuộn ngang nằm ở lớp con, gây mất cột "Ngày làm" và "Hành động"
+2. **ScrollArea overlay scrollbar**: Radix ScrollArea dùng overlay scrollbar làm viewport co lại khi scrollbar xuất hiện, gây lệch width giữa header (sticky) và body (cuộn)
+3. **Table width cứng xung đột**: Table đặt cả `width: 850px` và `minWidth: 850px` gây xung đột với colgroup và responsive
+4. **Z-index header thấp**: Header chỉ có z-10, có thể bị ScrollBar chồng lên gây cảm giác lệch
 
-## Giải pháp chi tiết
+## Giải pháp đã áp dụng
+
+### 1. Bỏ overflow-hidden ở container ngoài
+
+**File**: `src/components/dashboard/RecentQuizzes.tsx` (dòng 199)
+**Thay đổi**:
+
+```tsx
+// Trước
+<div className="rounded-xl border-2 border-gray-100 overflow-hidden">
+
+// Sau
+<div className="rounded-xl border-2 border-gray-100">
+```
+
+**Lý do**: Container đặt `overflow-hidden` che mất 2 cột cuối khi cuộn ngang nằm ở lớp con.
+
+### 2. Thêm scrollbar-gutter ổn định cho viewport cuộn
+
+**File**: `src/components/ui/scroll-area.tsx` (dòng 11)
+**Thay đổi**:
+
+```tsx
+// Trước
+<ScrollAreaPrimitive.Viewport className="h-full w-full rounded-[inherit]">{children}</ScrollAreaPrimitive.Viewport>
+
+// Sau
+<ScrollAreaPrimitive.Viewport className="h-full w-full rounded-[inherit] scrollbar-stable" style={{ scrollbarGutter: "stable both-edges" }}>{children}</ScrollAreaPrimitive.Viewport>
+```
+
+**Lý do**: Dành không gian cố định cho scrollbar để đồng bộ width giữa header (sticky) và body (cuộn) khi scrollbar xuất hiện.
+
+### 3. Chuẩn hóa width của Table
+
+**File**: `src/components/dashboard/RecentQuizzes.tsx` (dòng 204-207)
+**Thay đổi**:
+
+```tsx
+// Trước
+<Table
+  wrap={false}
+  className="recent-quizzes-table"
+  style={{ width: "850px", minWidth: "850px" }}>
+
+// Sau
+<Table
+  wrap={false}
+  className="recent-quizzes-table"
+  style={{ minWidth: "850px" }}>
+```
+
+**Lý do**: Bỏ width cứng gây xung đột với colgroup, chỉ giữ minWidth để colgroup chi phối layout.
+
+### 4. Tăng z-index cho header
+
+**File**: `src/components/dashboard/RecentQuizzes.tsx` (dòng 216)
+**Thay đổi**:
+
+```tsx
+// Trước
+<TableHeader className="bg-[#B5CC89]/10 sticky top-0 z-10">
+
+// Sau
+<TableHeader className="bg-[#B5CC89]/10 sticky top-0 z-20">
+```
+
+**Lý do**: Đảm bảo header không bị ScrollBar chồng lên gây cảm giác lệch.
+
+## Giải pháp chi tiết (dự phòng)
 
 ### 1. Cải thiện cấu trúc colgroup và table layout
 

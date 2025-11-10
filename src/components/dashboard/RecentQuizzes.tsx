@@ -196,7 +196,7 @@ export function RecentQuizzes({
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-6">
-          <div className="rounded-xl border-2 border-gray-100 overflow-hidden">
+          <div className="rounded-xl border-2 border-gray-100">
             <div
               className="w-full overflow-x-auto"
               style={{ minWidth: "850px" }}>
@@ -204,7 +204,7 @@ export function RecentQuizzes({
                 <Table
                   wrap={false}
                   className="recent-quizzes-table"
-                  style={{ width: "850px", minWidth: "850px" }}>
+                  style={{ minWidth: "850px" }}>
                   <colgroup>
                     <col style={{ width: "300px", minWidth: "300px" }} />
                     <col style={{ width: "110px", minWidth: "110px" }} />
@@ -213,7 +213,7 @@ export function RecentQuizzes({
                     <col style={{ width: "150px", minWidth: "150px" }} />
                     <col style={{ width: "100px", minWidth: "100px" }} />
                   </colgroup>
-                  <TableHeader className="bg-[#B5CC89]/10 sticky top-0 z-10">
+                  <TableHeader className="bg-[#B5CC89]/10 sticky top-0 z-20">
                     <TableRow className="hover:bg-[#B5CC89]/10">
                       <TableHead
                         className="font-bold text-gray-900 whitespace-nowrap p-3"
