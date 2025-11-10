@@ -11,7 +11,7 @@ RETURNS TABLE(
   quiz_prompt TEXT,
   quiz_questions JSONB,
   user_answers JSONB,
-  score DECIMAL(5,2),
+  score NUMERIC(5,2),
   total_questions INTEGER,
   correct_answers INTEGER,
   time_taken_seconds INTEGER,
