@@ -26,6 +26,22 @@ import type { MouseEvent } from "react";
 
 // Responsive styles for single-line display
 const tableStyles = `
+  .recent-quizzes-table {
+    table-layout: fixed !important;
+    width: 100% !important;
+    min-width: 850px !important;
+  }
+  
+  .recent-quizzes-table colgroup col {
+    display: table-column !important;
+  }
+  
+  .recent-quizzes-table th,
+  .recent-quizzes-table td {
+    display: table-cell !important;
+    visibility: visible !important;
+  }
+  
   @media (max-width: 768px) {
     .recent-quizzes-table {
       font-size: 0.75rem;
@@ -181,9 +197,14 @@ export function RecentQuizzes({
         </CardHeader>
         <CardContent className="pt-6">
           <div className="rounded-xl border-2 border-gray-100 overflow-hidden">
-            <div className="min-w-[850px] overflow-x-auto">
+            <div
+              className="w-full overflow-x-auto"
+              style={{ minWidth: "850px" }}>
               <ScrollArea className="h-[400px]">
-                <Table wrap={false} className="recent-quizzes-table">
+                <Table
+                  wrap={false}
+                  className="recent-quizzes-table"
+                  style={{ width: "850px", minWidth: "850px" }}>
                   <colgroup>
                     <col style={{ width: "300px", minWidth: "300px" }} />
                     <col style={{ width: "110px", minWidth: "110px" }} />
