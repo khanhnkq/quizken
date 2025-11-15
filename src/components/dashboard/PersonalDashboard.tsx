@@ -165,21 +165,14 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
       {/* Statistics Cards */}
       <StatisticsCards statistics={statistics} isLoading={statsLoading} />
 
-      {/* Progress Trendline and Recent Quizzes Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Progress Trendline */}
-        <div className="order-2 lg:order-1">
-          <ProgressTrendline trendData={trendData} isLoading={trendLoading} />
-        </div>
+      {/* Progress Trendline - Full Width */}
+      <ProgressTrendline trendData={trendData} isLoading={trendLoading} />
 
-        {/* Recent Quizzes */}
-        <div className="order-1 lg:order-2">
-          <RecentQuizzes
-            recentAttempts={recentAttempts}
-            isLoading={recentLoading}
-          />
-        </div>
-      </div>
+      {/* Recent Quizzes - Full Width */}
+      <RecentQuizzes
+        recentAttempts={recentAttempts}
+        isLoading={recentLoading}
+      />
     </div>
   );
 }
