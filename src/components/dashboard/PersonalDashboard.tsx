@@ -5,6 +5,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { StatisticsCards } from "./StatisticsCards";
 import { ProgressTrendline } from "./ProgressTrendline";
 import { RecentQuizzes } from "./RecentQuizzes";
+import { UserProfile } from "../user-profile/UserProfile";
 import { useDashboardStats } from "@/hooks/useDashboardStats";
 import { useProgressTrend } from "@/hooks/useProgressTrend";
 import { useRecentQuizzes } from "@/hooks/useRecentQuizzes";
@@ -14,6 +15,7 @@ import { gsap } from "gsap";
 import { shouldReduceAnimations } from "@/utils/deviceDetection";
 import { useNavigate } from "react-router-dom";
 import { killActiveScroll, scrollToTarget } from "@/lib/scroll";
+import { useAuth } from "@/lib/auth";
 
 interface PersonalDashboardProps {
   userId?: string;
@@ -21,6 +23,7 @@ interface PersonalDashboardProps {
 
 export function PersonalDashboard({ userId }: PersonalDashboardProps) {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   // Navigate to homepage and scroll to quiz generator
   const handleCreateQuiz = () => {
@@ -161,6 +164,13 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
           </CardContent>
         </Card>
       )}
+
+      {/* User Profile Section */}
+      <UserProfile
+        user={user}
+        statistics={statistics}
+        isLoading={statsLoading}
+      />
 
       {/* Statistics Cards */}
       <StatisticsCards statistics={statistics} isLoading={statsLoading} />
