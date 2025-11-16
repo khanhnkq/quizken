@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import type { User } from "@supabase/supabase-js";
 import { cn } from "@/lib/utils";
+import { gsap } from "gsap";
+import { shouldReduceAnimations } from "@/utils/deviceDetection";
 import type { UserProfileProps } from "@/types/user";
 
 /**
@@ -59,6 +61,72 @@ export const UserProfile: React.FC<UserProfileProps> = ({
   isLoading,
   className,
 }) => {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const photoRef = useRef<HTMLImageElement>(null);
+  const watermarkRef = useRef<HTMLDivElement>(null);
+
+  // GSAP animations for hover effects
+  useEffect(() => {
+    if (!cardRef.current || shouldReduceAnimations()) return;
+
+    const card = cardRef.current;
+    const photo = photoRef.current;
+    const watermark = watermarkRef.current;
+
+    // Create timeline for hover animations
+    const tl = gsap.timeline({ paused: true });
+
+    // Card hover effect - slight lift and enhanced shadow
+    tl.to(
+      card,
+      {
+        y: -8,
+        scale: 1.02,
+        boxShadow: "0 20px 40px rgba(0,0,0,0.3)",
+        duration: 0.3,
+        ease: "power2.out",
+      },
+      0
+    );
+
+    // Photo hover effect - slight rotation and scale
+    if (photo) {
+      tl.to(
+        photo,
+        {
+          rotation: 2,
+          scale: 1.05,
+          duration: 0.4,
+          ease: "back.out(1.7)",
+        },
+        0.1
+      );
+    }
+
+    // Watermark hover effect - fade in and move
+    if (watermark) {
+      tl.fromTo(
+        watermark,
+        { opacity: 0.1, x: 0, y: 0 },
+        { opacity: 0.3, x: 10, y: -10, duration: 0.5, ease: "power2.out" },
+        0.2
+      );
+    }
+
+    // Mouse enter/leave handlers
+    const handleMouseEnter = () => tl.play();
+    const handleMouseLeave = () => tl.reverse();
+
+    card.addEventListener("mouseenter", handleMouseEnter);
+    card.addEventListener("mouseleave", handleMouseLeave);
+
+    // Cleanup
+    return () => {
+      card.removeEventListener("mouseenter", handleMouseEnter);
+      card.removeEventListener("mouseleave", handleMouseLeave);
+    };
+  }, [user]); // Re-run when user changes
+
   if (isLoading) {
     return (
       <div
@@ -132,8 +200,9 @@ export const UserProfile: React.FC<UserProfileProps> = ({
 
   return (
     <div
+      ref={cardRef}
       className={cn(
-        "w-full max-w-lg mx-auto font-sans shadow-2xl rounded-2xl overflow-hidden bg-stone-50 flex flex-col aspect-[85.6/54]",
+        "w-full max-w-lg mx-auto font-sans shadow-2xl rounded-2xl overflow-hidden bg-stone-50 flex flex-col aspect-[85.6/54] transition-all duration-300 cursor-pointer",
         className
       )}>
       {/* Header */}
@@ -151,6 +220,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({
         {/* Photo Section */}
         <div className="w-1/3 flex-shrink-0">
           <img
+            ref={photoRef}
             src={
               avatarUrl ||
               `https://ui-avatars.com/api/?name=${encodeURIComponent(
@@ -159,7 +229,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({
             }
             alt={userName}
             className={cn(
-              "w-full h-full object-cover rounded-lg border-4",
+              "w-full h-full object-cover rounded-lg border-4 transition-transform duration-300",
               theme.photoBorder
             )}
           />
@@ -219,8 +289,9 @@ export const UserProfile: React.FC<UserProfileProps> = ({
 
           {/* Watermark */}
           <Watermark
+            ref={watermarkRef}
             className={cn(
-              "absolute bottom-0 right-0 w-20 h-20",
+              "absolute bottom-0 right-0 w-20 h-20 transition-all duration-500",
               theme.watermarkText
             )}
           />
