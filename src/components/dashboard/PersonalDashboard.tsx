@@ -169,12 +169,12 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
       )}
 
       {/* User Profile Section */}
-      <div className="w-full flex justify-center">
+      <div className="w-full flex justify-center px-2 md:px-0">
         <UserProfile
           user={user}
           statistics={statistics}
           isLoading={statsLoading}
-          className="w-full max-w-full md:max-w-lg"
+          className="w-full max-w-md md:max-w-lg"
         />
       </div>
 
