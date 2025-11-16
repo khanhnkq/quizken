@@ -1,154 +1,57 @@
 import React from "react";
 import type { User } from "@supabase/supabase-js";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import {
-  User as UserIcon,
-  Settings,
-  Clock,
-  Trophy,
-  Target,
-  BookOpen,
-  TrendingUp,
-  Award,
-  Star,
-  Check,
-} from "@/lib/icons";
 import type { UserProfileProps } from "@/types/user";
 
 /**
- * UserAvatar component - displays user avatar with status indicator
+ * InfoField component - displays a key-value pair exactly like IdentityCard
  */
-const UserAvatar: React.FC<{
-  user: User;
-  size?: "sm" | "md" | "lg" | "xl";
-  showStatus?: boolean;
-  className?: string;
-}> = ({ user, size = "lg", showStatus = true, className }) => {
-  const sizeClasses = {
-    sm: "w-12 h-12",
-    md: "w-16 h-16",
-    lg: "w-24 h-24",
-    xl: "w-32 h-32",
-  };
+const InfoField: React.FC<{ label: string; value: string }> = ({
+  label,
+  value,
+}) => (
+  <div className="w-full">
+    <p className="text-xs text-gray-500 uppercase tracking-wider">{label}</p>
+    <p className="text-lg font-medium text-black -mt-1">{value}</p>
+    <div className="border-b border-gray-300 w-full mt-1"></div>
+  </div>
+);
 
-  const statusSizeClasses = {
-    sm: "w-3 h-3",
-    md: "w-4 h-4",
-    lg: "w-6 h-6",
-    xl: "w-8 h-8",
-  };
+/**
+ * Signature component - simple signature line
+ */
+const Signature: React.FC = () => (
+  <div className="w-32 h-12 -ml-2 border-b-2 border-gray-400 relative">
+    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-600"></div>
+  </div>
+);
 
-  const userName =
-    user.user_metadata?.name ||
-    user.user_metadata?.full_name ||
-    user.email ||
-    "Người dùng";
-  const avatarUrl = user.user_metadata?.avatar_url;
-
-  return (
-    <div className={cn("flex flex-col items-center gap-4", className)}>
-      <div className={cn("relative", sizeClasses[size])}>
-        <img
-          src={
-            avatarUrl ||
-            `https://ui-avatars.com/api/?name=${encodeURIComponent(
-              userName
-            )}&background=random&color=fff`
-          }
-          alt={userName}
-          className={cn(
-            "rounded-full border-4 border-[#B5CC89]/30 object-cover",
-            sizeClasses[size]
-          )}
-        />
-        {showStatus && (
-          <div
-            className={cn(
-              "absolute bottom-0 right-0 bg-[#B5CC89] rounded-full flex items-center justify-center",
-              statusSizeClasses[size]
-            )}>
-            <Check
-              className={cn(
-                "text-white",
-                size === "sm"
-                  ? "h-2 w-2"
-                  : size === "md"
-                  ? "h-3 w-3"
-                  : "h-4 w-4"
-              )}
-            />
-          </div>
+/**
+ * Barcode component - simple barcode representation
+ */
+const Barcode: React.FC = () => (
+  <div className="flex space-x-1">
+    {[...Array(8)].map((_, i) => (
+      <div
+        key={i}
+        className={cn(
+          "w-0.5 h-6",
+          i % 3 === 0 ? "bg-black" : i % 3 === 1 ? "bg-gray-600" : "bg-gray-400"
         )}
-      </div>
-      <div className="text-center">
-        <h3 className="text-lg font-bold text-gray-900">{userName}</h3>
-        <p className="text-sm text-gray-500">{user.email}</p>
-      </div>
-    </div>
-  );
-};
-
-/**
- * StatsCard component - displays a single statistic
- */
-const StatsCard: React.FC<{
-  title: string;
-  value: number | string;
-  icon: React.ReactNode;
-  color: string;
-  trend?: { value: number; isPositive: boolean };
-  className?: string;
-}> = ({ title, value, icon, color, trend, className }) => (
-  <div className={cn("p-4 rounded-xl border-2 bg-white", color, className)}>
-    <div className="flex items-center justify-between">
-      <div className="flex items-center gap-3">
-        <div className="p-2 rounded-lg bg-gray-50">{icon}</div>
-        <div>
-          <p className="text-sm text-gray-500 uppercase tracking-wider">
-            {title}
-          </p>
-          <p className="text-2xl font-bold text-gray-900">
-            {typeof value === "number" ? value.toLocaleString() : value}
-          </p>
-        </div>
-      </div>
-      {trend && (
-        <div
-          className={cn(
-            "flex items-center gap-1 text-sm font-medium",
-            trend.isPositive ? "text-green-600" : "text-red-600"
-          )}>
-          <TrendingUp
-            className={cn("h-4 w-4", !trend.isPositive && "rotate-180")}
-          />
-          {trend.value}%
-        </div>
-      )}
-    </div>
+      />
+    ))}
   </div>
 );
 
 /**
- * InfoField component - displays a key-value pair
+ * Watermark component - Quizken logo watermark
  */
-const InfoField: React.FC<{
-  label: string;
-  value: string | React.ReactNode;
-  className?: string;
-}> = ({ label, value, className }) => (
-  <div
-    className={cn(
-      "flex justify-between items-center py-2 border-b border-gray-100",
-      className
-    )}>
-    <span className="text-sm text-gray-500">{label}</span>
-    <span className="text-sm font-medium text-gray-900">{value}</span>
-  </div>
+const Watermark: React.FC<{ className?: string }> = ({ className }) => (
+  <div className={cn("text-6xl font-bold opacity-10", className)}>QK</div>
 );
 
 /**
- * Main UserProfile component
+ * Main UserProfile component - IdentityCard layout with Quizken branding
  */
 export const UserProfile: React.FC<UserProfileProps> = ({
   user,
@@ -160,18 +63,22 @@ export const UserProfile: React.FC<UserProfileProps> = ({
     return (
       <div
         className={cn(
-          "w-full max-w-4xl mx-auto font-sans shadow-2xl rounded-2xl overflow-hidden bg-white flex flex-col",
+          "w-full max-w-lg mx-auto font-sans shadow-2xl rounded-2xl overflow-hidden bg-stone-50 flex flex-col aspect-[85.6/54]",
           className
         )}>
         <div className="animate-pulse">
-          <div className="h-20 bg-gray-200"></div>
-          <div className="p-6 space-y-4">
-            <div className="h-32 bg-gray-200 rounded"></div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="h-20 bg-gray-200 rounded"></div>
-              <div className="h-20 bg-gray-200 rounded"></div>
+          <div className="h-12 bg-gray-200"></div>
+          <div className="flex-grow flex p-5 gap-4">
+            <div className="w-1/3 h-full bg-gray-200 rounded-lg"></div>
+            <div className="w-2/3 space-y-2">
+              <div className="h-6 bg-gray-200 rounded"></div>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="h-12 bg-gray-200 rounded"></div>
+                <div className="h-12 bg-gray-200 rounded"></div>
+              </div>
             </div>
           </div>
+          <div className="h-16 bg-gray-200"></div>
         </div>
       </div>
     );
@@ -181,187 +88,161 @@ export const UserProfile: React.FC<UserProfileProps> = ({
     return (
       <div
         className={cn(
-          "w-full max-w-4xl mx-auto font-sans shadow-2xl rounded-2xl overflow-hidden bg-white flex flex-col",
+          "w-full max-w-lg mx-auto font-sans shadow-2xl rounded-2xl overflow-hidden bg-stone-50 flex flex-col aspect-[85.6/54]",
           className
         )}>
-        <div className="p-8 text-center">
-          <UserIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
-            Chưa đăng nhập
-          </h2>
-          <p className="text-gray-500">
-            Vui lòng đăng nhập để xem hồ sơ của bạn
-          </p>
+        <div className="flex items-center justify-center h-full">
+          <div className="text-center">
+            <p className="text-lg font-semibold text-gray-700 mb-2">
+              Chưa đăng nhập
+            </p>
+            <p className="text-sm text-gray-500">
+              Vui lòng đăng nhập để xem hồ sơ
+            </p>
+          </div>
         </div>
       </div>
     );
   }
 
-  const joinDate = new Date(user.created_at).toLocaleDateString("vi-VN", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-
-  const lastSignIn = user.last_sign_in_at
-    ? new Date(user.last_sign_in_at).toLocaleDateString("vi-VN", {
+  const userName =
+    user.user_metadata?.name ||
+    user.user_metadata?.full_name ||
+    user.email ||
+    "Người dùng";
+  const avatarUrl = user.user_metadata?.avatar_url;
+  const joinDate = user.created_at
+    ? new Date(user.created_at).toLocaleDateString("vi-VN", {
         year: "numeric",
-        month: "long",
-        day: "numeric",
+        month: "2-digit",
+        day: "2-digit",
       })
-    : "Chưa có";
+    : "N/A";
 
+  const userId = user.id.slice(-6).toUpperCase();
   const provider = user.user_metadata?.provider || "email";
+
+  // Quizken theme colors
+  const theme = {
+    gradient: "from-[#B5CC89] to-[#8FA65F]",
+    photoBorder: "border-[#B5CC89]/50",
+    classBorder: "border-[#B5CC89]",
+    watermarkText: "text-[#B5CC89]/20",
+  };
 
   return (
     <div
       className={cn(
-        "w-full max-w-4xl mx-auto font-sans shadow-2xl rounded-2xl overflow-hidden bg-white flex flex-col",
+        "w-full max-w-lg mx-auto font-sans shadow-2xl rounded-2xl overflow-hidden bg-stone-50 flex flex-col aspect-[85.6/54]",
         className
       )}>
       {/* Header */}
-      <header className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-[#B5CC89]/10 to-[#B5CC89]/5">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900">Hồ Sơ Người Dùng</h1>
-          <Button variant="outline" size="sm">
-            <Settings className="h-4 w-4 mr-2" />
-            Cài đặt
-          </Button>
+      <header className="px-5 py-3">
+        <div className="flex justify-between items-center">
+          <h1 className="text-lg font-bold text-gray-700">QUIZKEN</h1>
+          <h2 className="text-sm font-semibold text-gray-500 tracking-[0.2em]">
+            MEMBER CARD
+          </h2>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="flex-grow flex px-6 py-6 gap-8">
-        {/* Left Column - Avatar and Basic Info */}
+      <main className="flex-grow flex px-5 pb-3 gap-4 relative">
+        {/* Photo Section */}
         <div className="w-1/3 flex-shrink-0">
-          <UserAvatar user={user} size="xl" />
-
-          {/* User Info */}
-          <div className="mt-6 space-y-1">
-            <InfoField label="ID" value={user.id.slice(0, 8) + "..."} />
-            <InfoField label="Ngày tham gia" value={joinDate} />
-            <InfoField label="Lần đăng nhập cuối" value={lastSignIn} />
-            <InfoField
-              label="Phương thức đăng nhập"
-              value={
-                provider === "google"
-                  ? "Google"
-                  : provider === "github"
-                  ? "GitHub"
-                  : "Email"
-              }
-            />
-          </div>
+          <img
+            src={
+              avatarUrl ||
+              `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                userName
+              )}&background=random&color=fff`
+            }
+            alt={userName}
+            className={cn(
+              "w-full h-full object-cover rounded-lg border-4",
+              theme.photoBorder
+            )}
+          />
         </div>
 
-        {/* Right Column - Statistics and Details */}
-        <div className="w-2/3 flex flex-col gap-6">
-          {/* Statistics Grid */}
-          {statistics && (
+        {/* Info Section */}
+        <div className="w-2/3 flex flex-col justify-between relative">
+          <div className="flex flex-col items-start space-y-2">
+            {/* Class Badge */}
+            <div
+              className={cn(
+                "border-2 rounded-full px-4 py-0.5",
+                theme.classBorder
+              )}>
+              <span
+                className={cn(
+                  "font-bold text-sm",
+                  theme.classBorder.replace("border-", "text-")
+                )}>
+                LEVEL{" "}
+                {statistics
+                  ? Math.floor(statistics.total_quizzes_taken / 10) + 1
+                  : 1}
+              </span>
+            </div>
+
+            {/* User Info Fields */}
+            <div className="w-full flex space-x-4">
+              <div className="flex-1 flex flex-col space-y-2">
+                <InfoField label="Name" value={userName} />
+                <InfoField
+                  label="Provider"
+                  value={
+                    provider === "google"
+                      ? "Google"
+                      : provider === "github"
+                      ? "GitHub"
+                      : "Email"
+                  }
+                />
+              </div>
+              <div className="flex-1 flex flex-col space-y-2">
+                <InfoField label="Member ID" value={userId} />
+                <InfoField label="Joined" value={joinDate} />
+              </div>
+            </div>
+
+            {/* Signature */}
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                Thống Kê Học Tập
-              </h2>
-              <div className="grid grid-cols-2 gap-4">
-                <StatsCard
-                  title="Quiz đã tạo"
-                  value={statistics.total_quizzes_created}
-                  icon={<BookOpen className="h-5 w-5 text-blue-600" />}
-                  color="border-blue-200"
-                />
-                <StatsCard
-                  title="Quiz đã làm"
-                  value={statistics.total_quizzes_taken}
-                  icon={<Target className="h-5 w-5 text-green-600" />}
-                  color="border-green-200"
-                />
-                <StatsCard
-                  title="Điểm cao nhất"
-                  value={`${statistics.highest_score}%`}
-                  icon={<Trophy className="h-5 w-5 text-yellow-600" />}
-                  color="border-yellow-200"
-                />
-                <StatsCard
-                  title="Điểm trung bình"
-                  value={`${statistics.average_score.toFixed(1)}%`}
-                  icon={<TrendingUp className="h-5 w-5 text-purple-600" />}
-                  color="border-purple-200"
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Achievements Section */}
-          <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
-              Thành Tích
-            </h2>
-            <div className="grid grid-cols-3 gap-3">
-              <div className="flex items-center gap-2 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-                <Star className="h-5 w-5 text-yellow-600" />
-                <div>
-                  <p className="text-sm font-medium text-gray-900">Người mới</p>
-                  <p className="text-xs text-gray-500">
-                    Hoàn thành quiz đầu tiên
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                <Award className="h-5 w-5 text-blue-600" />
-                <div>
-                  <p className="text-sm font-medium text-gray-900">
-                    Học chăm chỉ
-                  </p>
-                  <p className="text-xs text-gray-500">Hoàn thành 10 quiz</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2 p-3 bg-green-50 rounded-lg border border-green-200">
-                <Trophy className="h-5 w-5 text-green-600" />
-                <div>
-                  <p className="text-sm font-medium text-gray-900">Điểm cao</p>
-                  <p className="text-xs text-gray-500">Đạt 90% trở lên</p>
-                </div>
-              </div>
+              <p className="text-xs text-gray-500 uppercase tracking-wider">
+                Signature
+              </p>
+              <Signature />
+              <div className="border-b border-gray-300 w-full mt-1"></div>
             </div>
           </div>
 
-          {/* Recent Activity */}
-          <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
-              Hoạt Động Gần Đây
-            </h2>
-            <div className="space-y-3">
-              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                <Clock className="h-4 w-4 text-gray-500" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">
-                    Hoàn thành quiz "Lịch sử Việt Nam"
-                  </p>
-                  <p className="text-xs text-gray-500">2 giờ trước • Đạt 85%</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                <BookOpen className="h-4 w-4 text-gray-500" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">
-                    Tạo quiz "Toán học cơ bản"
-                  </p>
-                  <p className="text-xs text-gray-500">1 ngày trước</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                <Award className="h-4 w-4 text-gray-500" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">
-                    Mở khóa thành tích "Học chăm chỉ"
-                  </p>
-                  <p className="text-xs text-gray-500">3 ngày trước</p>
-                </div>
-              </div>
-            </div>
-          </div>
+          {/* Watermark */}
+          <Watermark
+            className={cn(
+              "absolute bottom-0 right-0 w-20 h-20",
+              theme.watermarkText
+            )}
+          />
         </div>
       </main>
+
+      {/* Footer */}
+      <footer
+        className={cn(
+          "h-16 flex-shrink-0 bg-gradient-to-r flex items-center justify-end px-5",
+          theme.gradient
+        )}>
+        <div className="flex flex-col items-center">
+          <Barcode />
+          <div className="flex justify-between w-full mt-1">
+            <span className="text-white text-[10px] font-mono">
+              {userName.toUpperCase()}
+            </span>
+            <span className="text-white text-[10px] font-mono">{userId}</span>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
