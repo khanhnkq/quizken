@@ -99,19 +99,19 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4 space-y-8">
+    <div className="container mx-auto py-6 md:py-8 px-3 md:px-4 space-y-6 md:space-y-8">
       {/* Enhanced Header with Brand Color */}
-      <div className="rounded-2xl bg-[#B5CC89]/10 border-2 border-[#B5CC89]/30 p-8 shadow-lg hover:shadow-xl transition-shadow">
+      <div className="rounded-2xl bg-[#B5CC89]/10 border-2 border-[#B5CC89]/30 p-4 md:p-8 shadow-lg hover:shadow-xl transition-shadow">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="p-4 rounded-2xl bg-[#B5CC89]">
-              <UserIcon className="h-10 w-10 text-black" />
+          <div className="flex items-center gap-3 md:gap-4">
+            <div className="p-3 md:p-4 rounded-2xl bg-[#B5CC89]">
+              <UserIcon className="h-8 w-8 md:h-10 md:w-10 text-black" />
             </div>
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold mb-2 text-gray-900">
+              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-2 text-gray-900">
                 Dashboard Cá Nhân
               </h1>
-              <p className="text-muted-foreground text-sm md:text-base">
+              <p className="text-muted-foreground text-xs md:text-sm lg:text-base">
                 Theo dõi tiến trình học tập và thành tích của bạn
               </p>
             </div>
@@ -119,11 +119,12 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
           <Button
             onClick={handleCreateQuiz}
             size="lg"
-            className="bg-[#B5CC89] hover:bg-black hover:text-white text-black border-2 border-transparent hover:border-[#B5CC89] font-semibold shadow-lg transition-colors"
+            className="bg-[#B5CC89] hover:bg-black hover:text-white text-black border-2 border-transparent hover:border-[#B5CC89] font-semibold shadow-lg transition-colors text-sm md:text-base"
             onMouseEnter={handleHoverEnter}
             onMouseLeave={handleHoverLeave}>
-            <PlusCircleIcon className="h-5 w-5 mr-2" />
-            Tạo Quiz Mới
+            <PlusCircleIcon className="h-4 w-4 md:h-5 md:w-5 mr-2" />
+            <span className="hidden sm:inline">Tạo Quiz Mới</span>
+            <span className="sm:hidden">Tạo Quiz</span>
           </Button>
         </div>
       </div>
@@ -131,34 +132,36 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
       {/* Welcome message for new users */}
       {hasNoData && (
         <Card className="border-2 border-[#B5CC89]/30 bg-[#B5CC89]/5 shadow-lg">
-          <CardContent className="p-8 md:p-12 text-center">
-            <div className="p-4 rounded-2xl bg-[#B5CC89] w-fit mx-auto mb-6">
-              <BarChart3Icon className="h-16 w-16 text-black" />
+          <CardContent className="p-6 md:p-8 lg:p-12 text-center">
+            <div className="p-3 md:p-4 rounded-2xl bg-[#B5CC89] w-fit mx-auto mb-4 md:mb-6">
+              <BarChart3Icon className="h-12 w-12 md:h-16 md:w-16 text-black" />
             </div>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4 text-gray-900">
               Chào mừng đến với Dashboard!
             </h2>
-            <p className="text-muted-foreground text-lg mb-8 max-w-2xl mx-auto">
+            <p className="text-muted-foreground text-sm md:text-base lg:text-lg mb-6 md:mb-8 max-w-2xl mx-auto">
               Bạn chưa có dữ liệu học tập nào. Hãy bắt đầu bằng cách tạo quiz
               mới hoặc làm các quiz có sẵn để theo dõi tiến trình của bạn.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center">
               <Button
                 size="lg"
                 onClick={() => (window.location.href = "/#quiz-generator")}
-                className="bg-[#B5CC89] hover:bg-black hover:text-white text-black font-semibold transition-colors"
+                className="bg-[#B5CC89] hover:bg-black hover:text-white text-black font-semibold transition-colors text-sm md:text-base"
                 onMouseEnter={handleHoverEnter}
                 onMouseLeave={handleHoverLeave}>
-                Tạo Quiz Mới
+                <span className="hidden sm:inline">Tạo Quiz Mới</span>
+                <span className="sm:hidden">Tạo Quiz</span>
               </Button>
               <Button
                 size="lg"
                 variant="outline"
                 onClick={() => (window.location.href = "/#quiz-library")}
-                className="border-2 hover:bg-primary hover:text-primary-foreground transition-colors font-semibold"
+                className="border-2 hover:bg-primary hover:text-primary-foreground transition-colors font-semibold text-sm md:text-base"
                 onMouseEnter={handleHoverEnter}
                 onMouseLeave={handleHoverLeave}>
-                Khám Phá Quiz Library
+                <span className="hidden sm:inline">Khám Phá Quiz Library</span>
+                <span className="sm:hidden">Quiz Library</span>
               </Button>
             </div>
           </CardContent>
@@ -166,23 +169,32 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
       )}
 
       {/* User Profile Section */}
-      <UserProfile
-        user={user}
-        statistics={statistics}
-        isLoading={statsLoading}
-      />
+      <div className="w-full flex justify-center">
+        <UserProfile
+          user={user}
+          statistics={statistics}
+          isLoading={statsLoading}
+          className="w-full max-w-full md:max-w-lg"
+        />
+      </div>
 
       {/* Statistics Cards */}
-      <StatisticsCards statistics={statistics} isLoading={statsLoading} />
+      <div className="w-full">
+        <StatisticsCards statistics={statistics} isLoading={statsLoading} />
+      </div>
 
       {/* Progress Trendline - Full Width */}
-      <ProgressTrendline trendData={trendData} isLoading={trendLoading} />
+      <div className="w-full">
+        <ProgressTrendline trendData={trendData} isLoading={trendLoading} />
+      </div>
 
       {/* Recent Quizzes - Full Width */}
-      <RecentQuizzes
-        recentAttempts={recentAttempts}
-        isLoading={recentLoading}
-      />
+      <div className="w-full">
+        <RecentQuizzes
+          recentAttempts={recentAttempts}
+          isLoading={recentLoading}
+        />
+      </div>
     </div>
   );
 }

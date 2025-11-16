@@ -84,23 +84,23 @@ export function RecentQuizzes({
     return (
       <Card className="border-2 hover:border-[#B5CC89] transition-colors">
         <CardHeader className="border-b bg-[#B5CC89]/5">
-          <CardTitle className="flex items-center gap-2 text-gray-900">
-            <ClockIcon className="h-5 w-5" />
+          <CardTitle className="flex items-center gap-2 text-gray-900 text-base md:text-lg">
+            <ClockIcon className="h-4 w-4 md:h-5 md:w-5" />
             Quiz gần đây
           </CardTitle>
         </CardHeader>
-        <CardContent className="pt-6">
-          <div className="space-y-4">
+        <CardContent className="pt-4 md:pt-6">
+          <div className="space-y-3 md:space-y-4">
             {[1, 2, 3, 4, 5].map((i) => (
               <div
                 key={i}
-                className="flex items-center space-x-4 p-4 border-2 border-gray-100 rounded-xl">
-                <Skeleton className="h-10 w-10 rounded-lg" />
+                className="flex items-center space-x-3 md:space-x-4 p-3 md:p-4 border-2 border-gray-100 rounded-xl">
+                <Skeleton className="h-8 w-8 md:h-10 md:w-10 rounded-lg" />
                 <div className="flex-1 space-y-2">
-                  <Skeleton className="h-5 w-48" />
-                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-4 w-32 md:h-5 md:w-48" />
+                  <Skeleton className="h-3 w-24 md:h-4 md:w-32" />
                 </div>
-                <Skeleton className="h-8 w-20 rounded-lg" />
+                <Skeleton className="h-6 w-16 md:h-8 md:w-20 rounded-lg" />
               </div>
             ))}
           </div>
@@ -113,19 +113,19 @@ export function RecentQuizzes({
     return (
       <Card className="border-2 border-dashed hover:border-[#B5CC89] transition-colors">
         <CardHeader className="border-b bg-[#B5CC89]/5">
-          <CardTitle className="flex items-center gap-2 text-gray-900">
-            <ClockIcon className="h-5 w-5" />
+          <CardTitle className="flex items-center gap-2 text-gray-900 text-base md:text-lg">
+            <ClockIcon className="h-4 w-4 md:h-5 md:w-5" />
             Quiz gần đây
           </CardTitle>
         </CardHeader>
-        <CardContent className="flex flex-col items-center justify-center h-64 text-center">
-          <div className="p-4 rounded-full bg-[#B5CC89]/20 mb-4">
-            <ClockIcon className="h-12 w-12 text-[#B5CC89]" />
+        <CardContent className="flex flex-col items-center justify-center h-48 md:h-64 text-center p-4">
+          <div className="p-3 md:p-4 rounded-full bg-[#B5CC89]/20 mb-3 md:mb-4">
+            <ClockIcon className="h-10 w-10 md:h-12 md:w-12 text-[#B5CC89]" />
           </div>
-          <p className="text-gray-700 font-semibold mb-2">
+          <p className="text-gray-700 font-semibold mb-2 text-sm md:text-base">
             Bạn chưa làm quiz nào
           </p>
-          <p className="text-gray-500 text-sm">
+          <p className="text-gray-500 text-xs md:text-sm">
             Hãy bắt đầu với một quiz để xem kết quả của bạn!
           </p>
         </CardContent>
@@ -136,13 +136,73 @@ export function RecentQuizzes({
   return (
     <Card className="border-2 hover:border-[#B5CC89] transition-colors hover:shadow-lg">
       <CardHeader className="border-b bg-[#B5CC89]/5">
-        <CardTitle className="flex items-center gap-2 text-gray-900">
-          <ClockIcon className="h-5 w-5" />
+        <CardTitle className="flex items-center gap-2 text-gray-900 text-base md:text-lg">
+          <ClockIcon className="h-4 w-4 md:h-5 md:w-5" />
           Quiz gần đây
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-6">
-        <div className="rounded-xl border-2 border-gray-100 overflow-auto h-[400px] md:h-[600px]">
+      <CardContent className="pt-4 md:pt-6">
+        {/* Mobile Card View */}
+        <div className="block md:hidden space-y-3">
+          {recentAttempts.map((attempt, index) => (
+            <div
+              key={attempt.attempt_id}
+              className={`border-2 rounded-xl p-3 transition-colors ${
+                index % 2 === 0
+                  ? "bg-white border-gray-100"
+                  : "bg-gray-50/50 border-gray-100"
+              }`}>
+              <div className="space-y-2">
+                <div>
+                  <p className="font-bold text-sm text-gray-900 truncate">
+                    {attempt.quiz_title}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {attempt.correct_answers}/{attempt.total_questions} câu đúng
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-lg text-gray-900">
+                      {attempt.score.toFixed(1)}%
+                    </span>
+                    <Badge
+                      className={`${getScoreColor(
+                        attempt.score
+                      )} font-semibold text-xs`}>
+                      {getScoreLabel(attempt.score)}
+                    </Badge>
+                  </div>
+
+                  <div className="flex items-center gap-1 text-xs text-gray-600">
+                    <ClockIcon className="h-3 w-3" />
+                    {formatTime(attempt.time_taken_seconds)}
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-gray-500">
+                    {formatDate(attempt.completed_at)}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigate(`/quiz/${attempt.attempt_id}`)}
+                    className="border-2 hover:bg-primary hover:text-primary-foreground transition-colors font-semibold text-xs h-7 px-2"
+                    onMouseEnter={handleHoverEnter}
+                    onMouseLeave={handleHoverLeave}>
+                    <ExternalLinkIcon className="h-3 w-3 mr-1" />
+                    Xem
+                  </Button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop Table View */}
+        <div className="hidden md:block rounded-xl border-2 border-gray-100 overflow-auto h-[400px] lg:h-[600px]">
           <div className="min-w-[800px]">
             <Table className="table-fixed">
               <TableHeader className="bg-[#B5CC89]/10 sticky top-0 z-10">
