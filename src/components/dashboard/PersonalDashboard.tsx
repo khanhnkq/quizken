@@ -169,7 +169,7 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
       )}
 
       {/* Two-Column Grid Layout: Profile + Statistics side-by-side on desktop */}
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(320px,400px)_1fr] gap-6 lg:gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(500px,650px)_1fr] gap-6 lg:gap-8">
         {/* Left Column: User Profile Card */}
         <div className="flex justify-center lg:justify-start">
           <UserProfile

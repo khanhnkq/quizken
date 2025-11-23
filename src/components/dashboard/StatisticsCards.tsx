@@ -56,7 +56,7 @@ export function StatisticsCards({
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
+      <div className="grid grid-cols-1 gap-4 md:gap-6">
         {[1, 2, 3].map((i) => (
           <Card key={i}>
             <CardContent className="p-4 md:p-6">
@@ -75,7 +75,7 @@ export function StatisticsCards({
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
+    <div className="grid grid-cols-1 gap-4 md:gap-6">
       {cards.map((card, index) => {
         const Icon = card.icon;
         return (

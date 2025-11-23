@@ -247,7 +247,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({
             }
             alt={userName}
             className={cn(
-              "w-full h-full max-h-[140px] md:max-h-[160px] object-cover rounded-lg border-2 md:border-3 transition-transform duration-300",
+              "w-full h-full max-h-[120px] md:max-h-[140px] object-cover rounded-lg border-2 md:border-3 transition-transform duration-300",
               theme.photoBorder
             )}
           />
@@ -276,7 +276,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({
           </div>
 
           {/* User Info Fields - 2 Column Grid */}
-          <div className="grid grid-cols-2 gap-x-3 gap-y-2 md:gap-x-4 md:gap-y-2.5 flex-1">
+          <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 md:gap-x-4 md:gap-y-2 flex-1">
             <InfoField label="Name" value={userName} />
             <InfoField label="Member ID" value={userId} />
             <InfoField
