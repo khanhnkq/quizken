@@ -50,11 +50,14 @@ const Barcode: React.FC = () => (
 /**
  * Watermark component - Quizken logo watermark
  */
-const Watermark: React.FC<{ className?: string }> = ({ className }) => (
-  <div className={cn("text-4xl md:text-6xl font-bold opacity-10", className)}>
-    QK
-  </div>
+const Watermark = React.forwardRef<HTMLDivElement, { className?: string }>(
+  ({ className }, ref) => (
+    <div ref={ref} className={cn("text-4xl md:text-6xl font-bold opacity-10", className)}>
+      QK
+    </div>
+  )
 );
+Watermark.displayName = "Watermark";
 
 /**
  * Main UserProfile component - IdentityCard layout with Quizken branding
@@ -135,24 +138,29 @@ export const UserProfile: React.FC<UserProfileProps> = ({
     return (
       <div
         className={cn(
-          "w-full max-w-lg mx-auto font-sans shadow-2xl rounded-2xl overflow-hidden bg-stone-50 flex flex-col",
-          // Keep ID card aspect ratio on all screens
-          "aspect-[85.6/54]",
+          "w-full mx-auto font-sans shadow-2xl rounded-2xl overflow-hidden bg-stone-50 flex flex-col min-h-[200px]",
           className
         )}>
-        <div className="animate-pulse">
-          <div className="h-8 md:h-12 bg-gray-200"></div>
-          <div className="flex-grow flex p-3 md:p-5 gap-2 md:gap-4">
-            <div className="w-1/3 h-full bg-gray-200 rounded-lg"></div>
-            <div className="w-2/3 space-y-1 md:space-y-2">
-              <div className="h-4 md:h-6 bg-gray-200 rounded"></div>
+        <div className="animate-pulse flex flex-col h-full">
+          {/* Header skeleton */}
+          <div className="h-10 bg-gray-200 border-b border-gray-300"></div>
+          {/* Horizontal content skeleton */}
+          <div className="flex-1 flex flex-row">
+            <div className="w-[35%] p-3 md:p-4">
+              <div className="w-full h-full max-h-[140px] bg-gray-300 rounded-lg"></div>
+            </div>
+            <div className="flex-1 p-3 md:p-4 space-y-2">
+              <div className="h-6 bg-gray-200 rounded w-20"></div>
               <div className="grid grid-cols-2 gap-2">
-                <div className="h-8 md:h-12 bg-gray-200 rounded"></div>
-                <div className="h-8 md:h-12 bg-gray-200 rounded"></div>
+                <div className="h-12 bg-gray-200 rounded"></div>
+                <div className="h-12 bg-gray-200 rounded"></div>
+                <div className="h-12 bg-gray-200 rounded"></div>
+                <div className="h-12 bg-gray-200 rounded"></div>
               </div>
             </div>
           </div>
-          <div className="h-10 md:h-16 bg-gray-200"></div>
+          {/* Footer skeleton */}
+          <div className="h-8 md:h-10 bg-gray-200"></div>
         </div>
       </div>
     );
@@ -162,9 +170,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({
     return (
       <div
         className={cn(
-          "w-full max-w-lg mx-auto font-sans shadow-2xl rounded-2xl overflow-hidden bg-stone-50 flex flex-col",
-          // Keep ID card aspect ratio on all screens
-          "aspect-[85.6/54]",
+          "w-full mx-auto font-sans shadow-2xl rounded-2xl overflow-hidden bg-stone-50 flex flex-col min-h-[200px]",
           className
         )}>
         <div className="flex items-center justify-center h-full p-4 md:p-8">
@@ -189,10 +195,10 @@ export const UserProfile: React.FC<UserProfileProps> = ({
   const avatarUrl = user.user_metadata?.avatar_url;
   const joinDate = user.created_at
     ? new Date(user.created_at).toLocaleDateString("vi-VN", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-      })
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    })
     : "N/A";
 
   const userId = user.id.slice(-6).toUpperCase();
@@ -210,27 +216,27 @@ export const UserProfile: React.FC<UserProfileProps> = ({
     <div
       ref={cardRef}
       className={cn(
-        "w-full max-w-lg mx-auto font-sans shadow-2xl rounded-2xl overflow-hidden bg-stone-50 flex flex-col transition-all duration-300 cursor-pointer",
-        // Keep ID card aspect ratio on all screens but scale down on mobile
-        "aspect-[85.6/54]",
+        "w-full mx-auto font-sans shadow-2xl rounded-2xl overflow-hidden bg-stone-50 flex flex-col transition-all duration-300 cursor-pointer",
+        // Remove fixed aspect ratio, use min-height for flexible landscape layout
+        "min-h-[200px]",
         className
       )}>
       {/* Header */}
-      <header className="px-3 py-2 md:px-5 md:py-3">
+      <header className="px-3 py-2 md:px-4 md:py-2.5 border-b border-gray-200">
         <div className="flex justify-between items-center">
-          <h1 className="text-sm md:text-lg font-bold text-gray-700">
+          <h1 className="text-sm md:text-base font-bold text-gray-700">
             QUIZKEN
           </h1>
-          <h2 className="text-xs md:text-sm font-semibold text-gray-500 tracking-[0.1em] md:tracking-[0.2em]">
+          <h2 className="text-[10px] md:text-xs font-semibold text-gray-500 tracking-[0.15em]">
             MEMBER CARD
           </h2>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="flex-grow flex px-3 pb-2 md:px-5 md:pb-3 gap-2 md:gap-4 relative">
-        {/* Photo Section */}
-        <div className="w-1/3 flex-shrink-0">
+      {/* Main Content - HORIZONTAL LAYOUT */}
+      <main className="flex flex-row flex-1 relative">
+        {/* Photo Section - Left 35% */}
+        <div className="w-[35%] flex-shrink-0 p-3 md:p-4 flex items-center justify-center">
           <img
             ref={photoRef}
             src={
@@ -241,24 +247,24 @@ export const UserProfile: React.FC<UserProfileProps> = ({
             }
             alt={userName}
             className={cn(
-              "w-full h-full object-cover rounded-lg border-2 md:border-4 transition-transform duration-300",
+              "w-full h-full max-h-[140px] md:max-h-[160px] object-cover rounded-lg border-2 md:border-3 transition-transform duration-300",
               theme.photoBorder
             )}
           />
         </div>
 
-        {/* Info Section */}
-        <div className="w-2/3 flex flex-col justify-between relative">
-          <div className="flex flex-col items-start space-y-1 md:space-y-2">
-            {/* Class Badge */}
+        {/* Info Section - Right 65% */}
+        <div className="flex-1 flex flex-col justify-between p-3 md:p-4 relative">
+          {/* Level Badge */}
+          <div className="mb-2 md:mb-3">
             <div
               className={cn(
-                "border-2 rounded-full px-2 py-0.5 md:px-4 md:py-0.5",
+                "inline-block border-2 rounded-full px-2 py-0.5 md:px-3 md:py-1",
                 theme.classBorder
               )}>
               <span
                 className={cn(
-                  "font-bold text-xs md:text-sm",
+                  "font-bold text-[10px] md:text-xs",
                   theme.classBorder.replace("border-", "text-")
                 )}>
                 LEVEL{" "}
@@ -267,65 +273,52 @@ export const UserProfile: React.FC<UserProfileProps> = ({
                   : 1}
               </span>
             </div>
+          </div>
 
-            {/* User Info Fields */}
-            <div className="w-full flex space-x-2 md:space-x-4">
-              <div className="flex-1 flex flex-col space-y-1 md:space-y-2">
-                <InfoField label="Name" value={userName} />
-                <InfoField
-                  label="Provider"
-                  value={
-                    provider === "google"
-                      ? "Google"
-                      : provider === "github"
-                      ? "GitHub"
-                      : "Email"
-                  }
-                />
-              </div>
-              <div className="flex-1 flex flex-col space-y-1 md:space-y-2">
-                <InfoField label="Member ID" value={userId} />
-                <InfoField label="Joined" value={joinDate} />
-              </div>
-            </div>
-
-            {/* Signature */}
-            <div>
-              <p className="text-xs text-gray-500 uppercase tracking-wider">
-                Signature
-              </p>
-              <Signature />
-              <div className="border-b border-gray-300 w-full mt-1"></div>
-            </div>
+          {/* User Info Fields - 2 Column Grid */}
+          <div className="grid grid-cols-2 gap-x-3 gap-y-2 md:gap-x-4 md:gap-y-2.5 flex-1">
+            <InfoField label="Name" value={userName} />
+            <InfoField label="Member ID" value={userId} />
+            <InfoField
+              label="Provider"
+              value={
+                provider === "google"
+                  ? "Google"
+                  : provider === "github"
+                    ? "GitHub"
+                    : "Email"
+              }
+            />
+            <InfoField label="Joined" value={joinDate} />
           </div>
 
           {/* Watermark */}
           <Watermark
             ref={watermarkRef}
             className={cn(
-              "absolute bottom-0 right-0 w-12 h-12 md:w-20 md:h-20 transition-all duration-500",
+              "absolute bottom-2 right-2 w-10 h-10 md:w-14 md:h-14 transition-all duration-500",
               theme.watermarkText
             )}
           />
         </div>
       </main>
 
-      {/* Footer */}
+      {/* Footer - Green Bar */}
       <footer
         className={cn(
-          "h-10 md:h-16 flex-shrink-0 bg-gradient-to-r flex items-center justify-end px-3 md:px-5",
+          "h-8 md:h-10 flex-shrink-0 bg-gradient-to-r flex items-center justify-between px-3 md:px-4",
           theme.gradient
         )}>
-        <div className="flex flex-col items-center">
+        <div className="flex items-center gap-2">
           <Barcode />
-          <div className="flex justify-between w-full mt-1">
-            <span className="text-white text-[8px] md:text-[10px] font-mono truncate max-w-[40%]">
-              {userName.toUpperCase()}
-            </span>
-            <span className="text-white text-[8px] md:text-[10px] font-mono">
-              {userId}
-            </span>
-          </div>
+        </div>
+        <div className="flex items-center gap-2 md:gap-3">
+          <span className="text-white text-[9px] md:text-[10px] font-mono uppercase truncate max-w-[100px] md:max-w-[140px]">
+            {userName}
+          </span>
+          <span className="text-white text-[9px] md:text-[10px] font-mono font-semibold">
+            {userId}
+          </span>
         </div>
       </footer>
     </div>
