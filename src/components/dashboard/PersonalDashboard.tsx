@@ -168,19 +168,22 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
         </Card>
       )}
 
-      {/* User Profile Section */}
-      <div className="w-full flex justify-center px-2 md:px-0">
-        <UserProfile
-          user={user}
-          statistics={statistics}
-          isLoading={statsLoading}
-          className="w-full max-w-md md:max-w-lg"
-        />
-      </div>
+      {/* Two-Column Grid Layout: Profile + Statistics side-by-side on desktop */}
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(320px,400px)_1fr] gap-6 lg:gap-8">
+        {/* Left Column: User Profile Card */}
+        <div className="flex justify-center lg:justify-start">
+          <UserProfile
+            user={user}
+            statistics={statistics}
+            isLoading={statsLoading}
+            className="w-full max-w-md lg:max-w-none"
+          />
+        </div>
 
-      {/* Statistics Cards */}
-      <div className="w-full">
-        <StatisticsCards statistics={statistics} isLoading={statsLoading} />
+        {/* Right Column: Statistics Cards */}
+        <div className="w-full">
+          <StatisticsCards statistics={statistics} isLoading={statsLoading} />
+        </div>
       </div>
 
       {/* Progress Trendline - Full Width */}
