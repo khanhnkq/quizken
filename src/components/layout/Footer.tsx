@@ -53,7 +53,7 @@ const Footer = () => {
               Bắt đầu tạo các bài kiểm tra tuyệt vời ngay hôm nay
             </h2>
             <p className="text-lg text-muted-foreground">
-              Cùng tham gia và chia sẻ kiến thức
+              {t('footer.ctaSubtitle')}
             </p>
             <div className="flex justify-center">
               <Button

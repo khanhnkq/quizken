@@ -57,6 +57,8 @@
     "quizGenerator": {
         "title": "Tạo Quiz với AI",
         "description": "Nhập chủ đề bạn muốn tạo quiz",
+        "header": "Tạo bài kiểm tra của bạn",
+        "headerDescription": "Mô tả chủ đề bài kiểm tra và để AI tạo ra các câu hỏi hấp dẫn",
         "promptPlaceholder": "Ví dụ: Lịch sử Việt Nam, Toán học lớp 10...",
         "questionCountLabel": "Số câu hỏi",
         "selectQuestionCount": "Chọn số câu hỏi",
@@ -193,7 +195,8 @@
         "terms": "Điều khoản sử dụng",
         "copyright": "© 2024 QuizKen. Bảo lưu mọi quyền.",
         "ctaTitle": "Bắt đầu tạo các bài kiểm tra tuyệt vời ngay hôm nay",
-        "ctaButton": "Tạo bài kiểm tra đầu tiên của bạn"
+        "ctaButton": "Tạo bài kiểm tra đầu tiên của bạn",
+        "ctaSubtitle": "Cùng tham gia và chia sẻ kiến thức"
     },
     "common": {
         "loading": "Đang tải...",

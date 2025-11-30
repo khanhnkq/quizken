@@ -1280,11 +1280,11 @@ const QuizGenerator = () => {
               <Sparkles className="w-16 h-16 text-[#B5CC89]" />
             </div>
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              Tạo bài kiểm tra của bạn
+              {t('quizGenerator.header')}
             </h2>
             <div className="mt-4 flex items-center justify-center gap-3 flex-wrap">
               <p className="text-lg text-muted-foreground m-0">
-                Mô tả chủ đề bài kiểm tra và để AI tạo ra các câu hỏi hấp dẫn
+                {t('quizGenerator.headerDescription')}
               </p>
             </div>
             <div className="flex items-center justify-center gap-3 mt-5">

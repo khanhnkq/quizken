@@ -57,6 +57,8 @@
     "quizGenerator": {
         "title": "Generate Quiz with AI",
         "description": "Enter the topic you want to create a quiz about",
+        "header": "Create Your Quiz",
+        "headerDescription": "Describe your quiz topic and let AI create engaging questions",
         "promptPlaceholder": "Example: Vietnamese History, Grade 10 Math...",
         "questionCountLabel": "Number of Questions",
         "selectQuestionCount": "Select number of questions",
@@ -193,7 +195,8 @@
         "terms": "Terms of Service",
         "copyright": "© 2024 QuizKen. All rights reserved.",
         "ctaTitle": "Start creating amazing quizzes today",
-        "ctaButton": "Create your first quiz"
+        "ctaButton": "Create your first quiz",
+        "ctaSubtitle": "Join and share knowledge"
     },
     "common": {
         "loading": "Loading...",
