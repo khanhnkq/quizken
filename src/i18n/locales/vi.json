@@ -124,7 +124,9 @@
             "topicLabel": "Chủ đề bài kiểm tra",
             "optional": "Tùy chọn",
             "required": "Bắt buộc",
-            "minutes": "phút"
+            "minutes": "phút",
+            "playMusic": "Phát nhạc chill",
+            "pauseMusic": "Tạm dừng nhạc"
         }
     },
     "quiz": {

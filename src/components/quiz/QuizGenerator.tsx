@@ -1297,7 +1297,7 @@ const QuizGenerator = () => {
                 onClick={handleToggleChill}
                 aria-pressed={isChillPlaying}
                 aria-label={
-                  isChillPlaying ? "Tạm dừng nhạc" : "Phát nhạc chill"
+                  isChillPlaying ? t('quizGenerator.ui.pauseMusic') : t('quizGenerator.ui.playMusic')
                 }>
                 {isChillPlaying ? (
                   <PauseCircle className="w-5 h-5" />
@@ -1305,7 +1305,7 @@ const QuizGenerator = () => {
                   <Music4 className="w-5 h-5" />
                 )}
                 <span className="text-sm font-medium">
-                  {isChillPlaying ? "Tạm dừng nhạc" : "Phát nhạc chill"}
+                  {isChillPlaying ? t('quizGenerator.ui.pauseMusic') : t('quizGenerator.ui.playMusic')}
                 </span>
                 {isChillPlaying && (
                   <span className="flex items-end gap-0.5" aria-hidden="true">
@@ -1594,7 +1594,7 @@ const QuizGenerator = () => {
             </CardContent>
           </Card>
         </div>
-      </section>
+      </section >
 
       {quiz && (
         <QuizContent
@@ -1609,7 +1609,8 @@ const QuizGenerator = () => {
           onDownload={downloadQuiz}
           userId={user?.id}
         />
-      )}
+      )
+      }
     </>
   );
 };
