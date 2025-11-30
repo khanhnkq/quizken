@@ -16,6 +16,7 @@ import { shouldReduceAnimations } from "@/utils/deviceDetection";
 import { useNavigate } from "react-router-dom";
 import { killActiveScroll, scrollToTarget } from "@/lib/scroll";
 import { useAuth } from "@/lib/auth";
+import { useTranslation } from "react-i18next";
 
 interface PersonalDashboardProps {
   userId?: string;
@@ -24,6 +25,7 @@ interface PersonalDashboardProps {
 export function PersonalDashboard({ userId }: PersonalDashboardProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   // Navigate to homepage and scroll to quiz generator
   const handleCreateQuiz = () => {
@@ -109,10 +111,10 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
             </div>
             <div>
               <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-2 text-gray-900">
-                Dashboard Cá Nhân
+                {t('dashboard.title')}
               </h1>
               <p className="text-muted-foreground text-xs md:text-sm lg:text-base">
-                Theo dõi tiến trình học tập và thành tích của bạn
+                {t('dashboard.subtitle')}
               </p>
             </div>
           </div>
@@ -123,8 +125,8 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
             onMouseEnter={handleHoverEnter}
             onMouseLeave={handleHoverLeave}>
             <PlusCircleIcon className="h-4 w-4 md:h-5 md:w-5 mr-2" />
-            <span className="hidden sm:inline">Tạo Quiz Mới</span>
-            <span className="sm:hidden">Tạo Quiz</span>
+            <span className="hidden sm:inline">{t('dashboard.createQuiz')}</span>
+            <span className="sm:hidden">{t('dashboard.createQuiz')}</span>
           </Button>
         </div>
       </div>
@@ -137,11 +139,10 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
               <BarChart3Icon className="h-12 w-12 md:h-16 md:w-16 text-black" />
             </div>
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4 text-gray-900">
-              Chào mừng đến với Dashboard!
+              {t('dashboard.welcome.title')}
             </h2>
             <p className="text-muted-foreground text-sm md:text-base lg:text-lg mb-6 md:mb-8 max-w-2xl mx-auto">
-              Bạn chưa có dữ liệu học tập nào. Hãy bắt đầu bằng cách tạo quiz
-              mới hoặc làm các quiz có sẵn để theo dõi tiến trình của bạn.
+              {t('dashboard.welcome.description')}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center">
               <Button
@@ -150,8 +151,8 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
                 className="rounded-xl bg-[#B5CC89] hover:bg-black hover:text-white text-black font-semibold transition-colors text-sm md:text-base"
                 onMouseEnter={handleHoverEnter}
                 onMouseLeave={handleHoverLeave}>
-                <span className="hidden sm:inline">Tạo Quiz Mới</span>
-                <span className="sm:hidden">Tạo Quiz</span>
+                <span className="hidden sm:inline">{t('dashboard.welcome.createButton')}</span>
+                <span className="sm:hidden">{t('dashboard.createQuiz')}</span>
               </Button>
               <Button
                 size="lg"
@@ -160,8 +161,8 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
                 className="rounded-xl border-2 hover:bg-primary hover:text-primary-foreground transition-colors font-semibold text-sm md:text-base"
                 onMouseEnter={handleHoverEnter}
                 onMouseLeave={handleHoverLeave}>
-                <span className="hidden sm:inline">Khám Phá Quiz Library</span>
-                <span className="sm:hidden">Quiz Library</span>
+                <span className="hidden sm:inline">{t('dashboard.welcome.exploreButton')}</span>
+                <span className="sm:hidden">{t('nav.library')}</span>
               </Button>
             </div>
           </CardContent>

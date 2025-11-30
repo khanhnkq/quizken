@@ -74,6 +74,7 @@ import {
   computeScoreFromShuffled,
   type ShuffledQuizData,
 } from "@/lib/quizShuffle";
+import { useTranslation } from "react-i18next";
 
 type TokenUsage = { prompt: number; candidates: number; total: number };
 
@@ -124,6 +125,7 @@ const QuizGenerator = () => {
   const [generationProgress, setGenerationProgress] = useState<string>("");
   const { toast } = useToast();
   const { user, loading: authLoading } = useAuth();
+  const { t, i18n } = useTranslation(); // Add i18n support
   const [userApiKey, setUserApiKey] = useState<string | null>(null);
   const [questionCount, setQuestionCount] = useState<string>("");
   const [isQuestionCountSelected, setIsQuestionCountSelected] =
@@ -689,9 +691,8 @@ const QuizGenerator = () => {
     userId?: string
   ) => {
     const timestamp = Math.floor(Date.now() / (1000 * 60)); // Round to minute for 5-minute window
-    const data = `${
-      userId || "anonymous"
-    }-${prompt}-${questionCount}-${timestamp}`;
+    const data = `${userId || "anonymous"
+      }-${prompt}-${questionCount}-${timestamp}`;
 
     // Simple hash function for idempotency key
     let hash = 0;
@@ -791,6 +792,7 @@ const QuizGenerator = () => {
         device: deviceInfo,
         questionCount: parseInt(questionCount),
         idempotencyKey,
+        language: i18n.language, // Add language parameter for AI prompt
       };
 
       console.log("▶️ Starting quiz generation request...");
@@ -1171,7 +1173,7 @@ const QuizGenerator = () => {
 
   // Preload PDF worker and fonts on mount to reduce first-click latency
   useEffect(() => {
-    warmupPdfWorker().catch(() => {});
+    warmupPdfWorker().catch(() => { });
   }, []);
 
   const downloadQuiz = async () => {
@@ -1189,7 +1191,7 @@ const QuizGenerator = () => {
       const filename = `${title.replace(/\s+/g, "-").toLowerCase()}.pdf`;
 
       // Ensure worker and fonts are warm before generation (no-op if already warmed)
-      await warmupPdfWorker().catch(() => {});
+      await warmupPdfWorker().catch(() => { });
 
       await generateAndDownloadPdf({
         filename,
@@ -1435,13 +1437,12 @@ const QuizGenerator = () => {
                       placeholder="Ví dụ: Tạo bộ câu hỏi trắc nghiệm về lịch sử Thế chiến thứ 2 cho học sinh THPT. Bao gồm các câu hỏi về các trận đánh lớn, nhân vật chủ chốt và ảnh hưởng của chiến tranh đến xã hội."
                       value={prompt}
                       onChange={(e) => setPrompt(e.target.value)}
-                      className={`min-h-[120px] md:min-h-[140px] resize-none transition-all ${
-                        promptError
-                          ? "border-red-500 focus-visible:ring-red-500"
-                          : isPromptValid
+                      className={`min-h-[120px] md:min-h-[140px] resize-none transition-all ${promptError
+                        ? "border-red-500 focus-visible:ring-red-500"
+                        : isPromptValid
                           ? "border-green-500 focus-visible:ring-green-500"
                           : ""
-                      }`}
+                        }`}
                     />
                     <div className="flex items-center justify-between text-sm">
                       <div className="flex items-center gap-2 flex-1 min-w-0">
@@ -1552,11 +1553,10 @@ const QuizGenerator = () => {
                           : "secondary"
                       }
                       size="lg"
-                      className={`group text-base flex items-center justify-center gap-2 w-full transition-all ${
-                        isPromptValid && isQuestionCountSelected
-                          ? "hover:bg-black hover:text-white"
-                          : "opacity-50 cursor-not-allowed"
-                      }`}>
+                      className={`group text-base flex items-center justify-center gap-2 w-full transition-all ${isPromptValid && isQuestionCountSelected
+                        ? "hover:bg-black hover:text-white"
+                        : "opacity-50 cursor-not-allowed"
+                        }`}>
                       {loading ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />

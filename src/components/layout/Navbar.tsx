@@ -21,8 +21,11 @@ import {
 import { useAudio } from "@/contexts/SoundContext";
 import logo from "@/assets/logo/logo.png";
 import { killActiveScroll, scrollToTarget } from "@/lib/scroll";
+import { useTranslation } from "react-i18next";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 const Navbar = () => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showApiSettings, setShowApiSettings] = useState(false);
@@ -88,9 +91,8 @@ const Navbar = () => {
   return (
     <nav
       ref={navRef}
-      className={`sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b transition-shadow ${
-        scrolled ? "shadow-sm" : ""
-      }`}>
+      className={`sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b transition-shadow ${scrolled ? "shadow-sm" : ""
+        }`}>
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-x-1.5">
@@ -106,13 +108,13 @@ const Navbar = () => {
               to="/"
               className="text-foreground hover:text-primary transition-colors"
               onPointerDown={playClick}>
-              Trang chủ
+              {t('nav.home')}
             </Link>
             <Link
               to="/library"
               className="text-foreground hover:text-primary transition-colors flex items-center gap-1"
               onPointerDown={playClick}>
-              Thư viện
+              {t('nav.library')}
             </Link>
             <Link
               to="/about"
@@ -123,6 +125,7 @@ const Navbar = () => {
           </div>
 
           <div className="hidden md:flex items-center space-x-4">
+            <LanguageSwitcher />
             {!loading && (
               <>
                 {user ? (
@@ -137,7 +140,7 @@ const Navbar = () => {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem disabled>
-                        Đã đăng nhập với {user.email}
+                        Đã {t('nav.login')} với {user.email}
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
@@ -146,7 +149,7 @@ const Navbar = () => {
                           className="cursor-pointer"
                           onPointerDown={playClick}>
                           <LayoutDashboard className="h-4 w-4 mr-2" />
-                          Dashboard
+                          {t('nav.dashboard')}
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem
@@ -161,7 +164,7 @@ const Navbar = () => {
                         onSelect={playClick}
                         className="text-red-600">
                         <LogOut className="h-4 w-4 mr-2" />
-                        Đăng xuất
+                        {t('nav.logout')}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -170,7 +173,7 @@ const Navbar = () => {
                     variant="outline"
                     onClick={() => setShowAuthModal(true)}
                     className="hover:bg-primary hover:text-primary-foreground hover:border-foreground transition-colors">
-                    Đăng nhập
+                    {t('nav.login')}
                   </Button>
                 )}
               </>
@@ -194,14 +197,14 @@ const Navbar = () => {
               className="block text-foreground hover:text-primary transition-colors"
               onPointerDown={playClick}
               onClick={() => setIsOpen(false)}>
-              Trang chủ
+              {t('nav.home')}
             </Link>
             <Link
               to="/library"
               className="block text-foreground hover:text-primary transition-colors flex items-center gap-2"
               onPointerDown={playClick}
               onClick={() => setIsOpen(false)}>
-              Thư viện
+              {t('nav.library')}
             </Link>
             <Link
               to="/about"
@@ -216,7 +219,7 @@ const Navbar = () => {
                   {user ? (
                     <div className="space-y-3">
                       <p className="text-sm text-muted-foreground">
-                        Đã đăng nhập với {user.email}
+                        Đã {t('nav.login')} với {user.email}
                       </p>
                       <Link to="/dashboard" onClick={() => setIsOpen(false)}>
                         <Button
@@ -224,7 +227,7 @@ const Navbar = () => {
                           className="w-full justify-start"
                           onPointerDown={playClick}>
                           <LayoutDashboard className="h-4 w-4 mr-2" />
-                          Dashboard
+                          {t('nav.dashboard')}
                         </Button>
                       </Link>
                       <Button
@@ -240,7 +243,7 @@ const Navbar = () => {
                         onClick={handleSignOut}
                         className="w-full text-red-600 border-red-200 hover:bg-red-50 justify-start">
                         <LogOut className="h-4 w-4 mr-2" />
-                        Đăng xuất
+                        {t('nav.logout')}
                       </Button>
                     </div>
                   ) : (
@@ -248,7 +251,7 @@ const Navbar = () => {
                       variant="outline"
                       onClick={() => setShowAuthModal(true)}
                       className="w-full hover:bg-primary hover:text-primary-foreground hover:border-foreground transition-colors">
-                      Đăng nhập
+                      {t('nav.login')}
                     </Button>
                   )}
                 </>

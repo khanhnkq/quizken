@@ -404,9 +404,8 @@ function buildFingerprint(fingerprint, device, ip, ua) {
   const platform = device?.platform || "";
   const tz = device?.timezone || "";
   const screen = device?.screen
-    ? `${device.screen.width || 0}x${device.screen.height || 0}x${
-        device.screen.colorDepth || 0
-      }`
+    ? `${device.screen.width || 0}x${device.screen.height || 0}x${device.screen.colorDepth || 0
+    }`
     : "";
   return simpleHash([ua || "", lang, platform, tz, screen, ip || ""].join("|"));
 }
@@ -443,6 +442,8 @@ async function processQuizGeneration(quizId, payload, req) {
       typeof payload.idempotencyKey === "string"
         ? payload.idempotencyKey
         : undefined;
+    // Extract language parameter (default to Vietnamese)
+    const language = typeof payload.language === "string" ? payload.language : "vi";
     const ip = getClientIp(req);
     const userAgent =
       req.headers.get("user-agent") || device?.userAgent || "unknown";
@@ -579,10 +580,13 @@ async function processQuizGeneration(quizId, payload, req) {
       .eq("id", quizId);
     // Generate quiz with detailed prompt
     const createPrompt = (
-      topic,
-      count
-    ) => `ạo một JSON duy nhất, không có văn bản hay markdown, về chủ đề "${topic}".
-
+      topic: string,
+      count: number,
+      language: string = 'vi'
+    ) => {
+      const isVietnamese = language === 'vi';
+      if (isVietnamese) {
+        return `Tạo một JSON duy nhất, không có văn bản hay markdown, về chủ đề "${topic}".
 **QUY TẮC NGHIÊM NGẶT:**
 1.  **Định dạng:** Chỉ trả về JSON hợp lệ.
 2.  **Ngôn ngữ:** Toàn bộ nội dung phải bằng tiếng Việt.
@@ -591,7 +595,6 @@ async function processQuizGeneration(quizId, payload, req) {
     *   **20% Trung bình:** Yêu cầu hiểu biết, bẫy dựa trên lỗi sai phổ biến.
     *   **30% Nâng cao:** Kiến thức sâu, bẫy thuyết phục.
     *   **50% Cực khó:** Dành cho chuyên gia, bẫy cực kỳ tinh vi dựa trên chi tiết nhỏ/ngoại lệ.
-
 **Cấu trúc JSON bắt buộc:**
 {
   "title": "tiêu đề tiếng Việt về ${topic}",
@@ -608,6 +611,35 @@ async function processQuizGeneration(quizId, payload, req) {
     }
   ]
 }`;
+      } else {
+        return `Create a single JSON object, without any text or markdown, about the topic "${topic}".
+**STRICT RULES:**
+1.  **Format:** Return only valid JSON.
+2.  **Language:** All content must be in English.
+3.  **Count:** JSON must contain exactly **${count}** questions.
+4.  **Quality:** Questions must have "traps" (misleading wrong choices) and difficulty distribution:
+    *   **20% Medium:** Requires understanding, traps based on common mistakes.
+    *   **30% Advanced:** Deep knowledge, convincing traps.
+    *   **50% Expert:** For experts, extremely subtle traps based on small details/exceptions.
+**Required JSON structure:**
+{
+  "title": "English title about ${topic}",
+  "description": "Brief description of the test and its difficulty",
+  "category": "Choose the most appropriate category name (1-2 words, lowercase). E.g.: history, technology, science, art, music, cooking, gaming, anime, fashion, fitness, literature, math, psychology, philosophy, economics, law, architecture, photography, film, etc. You can create new categories if the topic is special.",
+  "difficulty": "choose one: easy, medium, hard - based on question difficulty",
+  "tags": ["keyword 1", "keyword 2", "keyword 3"] - 3-5 short tags relevant to the topic (lowercase),
+  "questions": [
+    {
+      "question": "question in English",
+      "options": ["choice A", "choice B", "choice C", "choice D"],
+      "correctAnswer": 0,
+      "explanation": "detailed explanation why the answer is correct (1-2 sentences)"
+    }
+  ]
+}`;
+      }
+    };
+
     const generateQuiz = async (promptText, apiKey) =>
       await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
@@ -647,8 +679,7 @@ async function processQuizGeneration(quizId, payload, req) {
       const attempt = retryCount + 1;
       try {
         console.log(
-          `🔁 [BACKEND] Gemini attempt ${attempt}/${
-            maxRetries + 1
+          `🔁 [BACKEND] Gemini attempt ${attempt}/${maxRetries + 1
           } for quiz ${quizId}`
         );
         // Persist attempt count & progress to DB for observability
@@ -673,7 +704,7 @@ async function processQuizGeneration(quizId, payload, req) {
             ? replaceBadwordsForAi(payload.prompt, "[removed]")
             : "Default quiz topic";
         const response = await generateQuiz(
-          createPrompt(topicForAI, questionCount),
+          createPrompt(topicForAI, questionCount, language),
           apiKeyToUse
         );
         if (!response.ok) {
@@ -734,15 +765,15 @@ async function processQuizGeneration(quizId, payload, req) {
         const usageMetadata = parsedData["usageMetadata"];
         tokenUsage = usageMetadata
           ? {
-              prompt: Number(usageMetadata["promptTokenCount"] ?? 0),
-              candidates: Number(usageMetadata["candidatesTokenCount"] ?? 0),
-              total: Number(usageMetadata["totalTokenCount"] ?? 0),
-            }
+            prompt: Number(usageMetadata["promptTokenCount"] ?? 0),
+            candidates: Number(usageMetadata["candidatesTokenCount"] ?? 0),
+            total: Number(usageMetadata["totalTokenCount"] ?? 0),
+          }
           : {
-              prompt: 0,
-              candidates: 0,
-              total: 0,
-            };
+            prompt: 0,
+            candidates: 0,
+            total: 0,
+          };
         // Extract generated text safely from nested structure
         let text;
         try {
@@ -1137,18 +1168,18 @@ async function handleGetQuizStatus(req) {
         quiz:
           quiz.status === QUIZ_STATUS.COMPLETED
             ? {
-                title: quiz.title,
-                description: quiz.description,
-                questions: quiz.questions,
-                category: quiz.category || "general",
-                difficulty: quiz.difficulty || "medium",
-                tags: quiz.tags || [],
-                tokenUsage: {
-                  prompt: quiz.prompt_tokens || 0,
-                  candidates: quiz.candidates_tokens || 0,
-                  total: quiz.total_tokens || 0,
-                },
-              }
+              title: quiz.title,
+              description: quiz.description,
+              questions: quiz.questions,
+              category: quiz.category || "general",
+              difficulty: quiz.difficulty || "medium",
+              tags: quiz.tags || [],
+              tokenUsage: {
+                prompt: quiz.prompt_tokens || 0,
+                candidates: quiz.candidates_tokens || 0,
+                total: quiz.total_tokens || 0,
+              },
+            }
             : null,
         progress: quiz.progress || "Processing...",
       }),

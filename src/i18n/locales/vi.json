@@ -1,0 +1,171 @@
+{
+    "nav": {
+        "home": "Trang chủ",
+        "library": "Thư viện",
+        "dashboard": "Dashboard",
+        "login": "Đăng nhập",
+        "logout": "Đăng xuất",
+        "signup": "Đăng ký"
+    },
+    "hero": {
+        "title": "Tạo Bài Kiểm Tra AI Miễn Phí",
+        "subtitle": "QuizKen giúp giáo viên và học sinh tạo bài kiểm tra trắc nghiệm với AI trong vài giây",
+        "getStarted": "Bắt đầu ngay",
+        "learnMore": "Tìm hiểu thêm"
+    },
+    "quizGenerator": {
+        "title": "Tạo Quiz với AI",
+        "description": "Nhập chủ đề bạn muốn tạo quiz",
+        "promptPlaceholder": "Ví dụ: Lịch sử Việt Nam, Toán học lớp 10...",
+        "questionCountLabel": "Số câu hỏi",
+        "selectQuestionCount": "Chọn số câu hỏi",
+        "generateButton": "Tạo Quiz",
+        "generating": "Đang tạo...",
+        "resetButton": "Tạo mới",
+        "downloadPDF": "Tải PDF",
+        "errors": {
+            "emptyPrompt": "Vui lòng nhập chủ đề",
+            "selectQuestionCount": "Vui lòng chọn số lượng câu hỏi",
+            "invalidTopic": "Chủ đề không hợp lệ",
+            "profaneContent": "Chủ đề không được chứa từ ngữ không phù hợp",
+            "minLength": "Vui lòng nhập ít nhất 5 ký tự",
+            "maxLength": "Không được quá 500 ký tự",
+            "invalidCharacters": "Chỉ được sử dụng chữ cái, số và ký tự cơ bản"
+        },
+        "quota": {
+            "title": "Đã hết lượt miễn phí",
+            "description": "Đăng nhập để tiếp tục tạo quiz không giới hạn",
+            "loginButton": "Đăng nhập ngay"
+        },
+        "success": {
+            "title": "Tạo câu hỏi thành công!",
+            "description": "Đã tạo \"{{title}}\" với {{count}} câu hỏi"
+        }
+    },
+    "quiz": {
+        "question": "Câu {{number}}",
+        "of": "/ {{total}}",
+        "nextButton": "Câu tiếp theo",
+        "submitButton": "Nộp bài",
+        "results": "Kết quả",
+        "score": "Điểm số",
+        "correct": "Đúng",
+        "incorrect": "Sai",
+        "explanation": "Giải thích",
+        "yourAnswer": "Câu trả lời của bạn",
+        "correctAnswer": "Đáp án đúng",
+        "retakeButton": "Làm lại"
+    },
+    "dashboard": {
+        "title": "Dashboard Cá Nhân",
+        "subtitle": "Theo dõi tiến trình học tập và thành tích của bạn",
+        "createQuiz": "Tạo Quiz Mới",
+        "welcome": {
+            "title": "Chào mừng đến với Dashboard!",
+            "description": "Bạn chưa có dữ liệu học tập nào. Hãy bắt đầu bằng cách tạo quiz mới hoặc làm các quiz có sẵn để theo dõi tiến trình của bạn.",
+            "createButton": "Tạo Quiz Mới",
+            "exploreButton": "Khám Phá Quiz Library"
+        },
+        "statistics": {
+            "quizzesCreated": "Quiz đã tạo",
+            "quizzesTaken": "Quiz đã làm",
+            "highestScore": "Điểm cao nhất",
+            "description": {
+                "created": "Tổng số quiz bạn đã tạo",
+                "taken": "Tổng số quiz bạn đã hoàn thành",
+                "highest": "Điểm cao nhất bạn đạt được"
+            }
+        },
+        "recentQuizzes": {
+            "title": "Quiz gần đây",
+            "empty": "Bạn chưa làm quiz nào",
+            "emptyDescription": "Hãy bắt đầu với một quiz để xem kết quả của bạn!",
+            "viewButton": "Xem",
+            "quiz": "Quiz",
+            "score": "Điểm",
+            "result": "Kết quả",
+            "time": "Thời gian",
+            "date": "Ngày làm",
+            "action": "Hành động",
+            "excellent": "Xuất sắc",
+            "good": "Khá tốt",
+            "needsImprovement": "Cần cải thiện"
+        },
+        "progressTrend": {
+            "title": "Xu hướng tiến bộ (30 ngày)",
+            "titleShort": "Tiến bộ (30 ngày)",
+            "empty": "Chưa có dữ liệu tiến bộ",
+            "emptyDescription": "Hãy làm một vài quiz để xem xu hướng của bạn!",
+            "avgScore": "Điểm TB",
+            "quizCount": "Số quiz"
+        }
+    },
+    "library": {
+        "title": "Thư viện Quiz Chung",
+        "description": "Khám phá và sử dụng hàng nghìn bài quiz do cộng đồng chia sẻ. Học tập, ôn luyện và mở rộng kiến thức của bạn.",
+        "stats": {
+            "quizzes": "Quiz",
+            "categories": "Chủ đề",
+            "creators": "Người tạo"
+        },
+        "search": {
+            "placeholder": "Tìm kiếm trong tiêu đề, mô tả, câu hỏi... (⌘K)",
+            "clear": "Xóa tìm kiếm"
+        },
+        "filters": {
+            "sortBy": "Sắp xếp theo",
+            "mostUsed": "Nhiều lượt dùng nhất",
+            "mostDownloaded": "Nhiều lượt tải nhất",
+            "newest": "Mới nhất",
+            "searchIn": "Tìm trong",
+            "all": "Tất cả",
+            "titleDesc": "Tiêu đề & Mô tả",
+            "content": "Nội dung",
+            "category": "Danh mục",
+            "difficulty": "Độ khó",
+            "allCategories": "Tất cả danh mục",
+            "allDifficulties": "Tất cả mức độ",
+            "easy": "Dễ",
+            "medium": "Trung bình",
+            "hard": "Khó"
+        },
+        "quizCard": {
+            "views": "lượt xem",
+            "downloads": "lượt tải",
+            "questions": "câu hỏi",
+            "useButton": "Sử dụng",
+            "downloadButton": "Tải PDF",
+            "previewButton": "Xem trước"
+        },
+        "loadMore": "Tải thêm",
+        "noResults": "Không tìm thấy kết quả",
+        "loginRequired": {
+            "title": "Yêu cầu đăng nhập",
+            "description": "Vui lòng đăng nhập để sử dụng quiz"
+        }
+    },
+    "footer": {
+        "description": "Tạo bài kiểm tra trắc nghiệm với AI",
+        "quickLinks": "Liên kết",
+        "legal": "Pháp lý",
+        "privacy": "Chính sách bảo mật",
+        "terms": "Điều khoản sử dụng",
+        "copyright": "© 2024 QuizKen. Bảo lưu mọi quyền."
+    },
+    "common": {
+        "loading": "Đang tải...",
+        "error": "Có lỗi xảy ra",
+        "success": "Thành công",
+        "cancel": "Hủy",
+        "confirm": "Xác nhận",
+        "save": "Lưu",
+        "delete": "Xóa",
+        "edit": "Chỉnh sửa",
+        "view": "Xem",
+        "close": "Đóng",
+        "back": "Quay lại",
+        "next": "Tiếp theo",
+        "previous": "Trước",
+        "or": "hoặc"
+    }
+}

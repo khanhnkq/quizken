@@ -1,0 +1,171 @@
+{
+    "nav": {
+        "home": "Home",
+        "library": "Library",
+        "dashboard": "Dashboard",
+        "login": "Log in",
+        "logout": "Log out",
+        "signup": "Sign up"
+    },
+    "hero": {
+        "title": "Create AI Quiz for Free",
+        "subtitle": "QuizKen helps teachers and students create multiple-choice quizzes with AI in seconds",
+        "getStarted": "Get Started",
+        "learnMore": "Learn More"
+    },
+    "quizGenerator": {
+        "title": "Generate Quiz with AI",
+        "description": "Enter the topic you want to create a quiz about",
+        "promptPlaceholder": "Example: Vietnamese History, Grade 10 Math...",
+        "questionCountLabel": "Number of Questions",
+        "selectQuestionCount": "Select number of questions",
+        "generateButton": "Generate Quiz",
+        "generating": "Generating...",
+        "resetButton": "Create New",
+        "downloadPDF": "Download PDF",
+        "errors": {
+            "emptyPrompt": "Please enter a topic",
+            "selectQuestionCount": "Please select the number of questions",
+            "invalidTopic": "Invalid topic",
+            "profaneContent": "Topic cannot contain inappropriate words",
+            "minLength": "Please enter at least 5 characters",
+            "maxLength": "Cannot exceed 500 characters",
+            "invalidCharacters": "Only letters, numbers, and basic characters are allowed"
+        },
+        "quota": {
+            "title": "Free quota reached",
+            "description": "Log in to continue creating unlimited quizzes",
+            "loginButton": "Log in now"
+        },
+        "success": {
+            "title": "Quiz created successfully!",
+            "description": "Created \"{{title}}\" with {{count}} questions"
+        }
+    },
+    "quiz": {
+        "question": "Question {{number}}",
+        "of": "/ {{total}}",
+        "nextButton": "Next Question",
+        "submitButton": "Submit",
+        "results": "Results",
+        "score": "Score",
+        "correct": "Correct",
+        "incorrect": "Incorrect",
+        "explanation": "Explanation",
+        "yourAnswer": "Your Answer",
+        "correctAnswer": "Correct Answer",
+        "retakeButton": "Retake"
+    },
+    "dashboard": {
+        "title": "Personal Dashboard",
+        "subtitle": "Track your learning progress and achievements",
+        "createQuiz": "Create New Quiz",
+        "welcome": {
+            "title": "Welcome to Dashboard!",
+            "description": "You don't have any learning data yet. Get started by creating a new quiz or taking existing quizzes to track your progress.",
+            "createButton": "Create New Quiz",
+            "exploreButton": "Explore Quiz Library"
+        },
+        "statistics": {
+            "quizzesCreated": "Quizzes Created",
+            "quizzesTaken": "Quizzes Taken",
+            "highestScore": "Highest Score",
+            "description": {
+                "created": "Total number of quizzes you've created",
+                "taken": "Total number of quizzes you've completed",
+                "highest": "Highest score you've achieved"
+            }
+        },
+        "recentQuizzes": {
+            "title": "Recent Quizzes",
+            "empty": "You haven't taken any quizzes yet",
+            "emptyDescription": "Start with a quiz to see your results!",
+            "viewButton": "View",
+            "quiz": "Quiz",
+            "score": "Score",
+            "result": "Result",
+            "time": "Time",
+            "date": "Date Taken",
+            "action": "Action",
+            "excellent": "Excellent",
+            "good": "Good",
+            "needsImprovement": "Needs Improvement"
+        },
+        "progressTrend": {
+            "title": "Progress Trend (30 days)",
+            "titleShort": "Progress (30 days)",
+            "empty": "No progress data yet",
+            "emptyDescription": "Take a few quizzes to see your trend!",
+            "avgScore": "Avg Score",
+            "quizCount": "Quiz Count"
+        }
+    },
+    "library": {
+        "title": "Public Quiz Library",
+        "description": "Discover and use thousands of quizzes shared by the community. Learn, practice, and expand your knowledge.",
+        "stats": {
+            "quizzes": "Quizzes",
+            "categories": "Categories",
+            "creators": "Creators"
+        },
+        "search": {
+            "placeholder": "Search in title, description, questions... (⌘K)",
+            "clear": "Clear search"
+        },
+        "filters": {
+            "sortBy": "Sort by",
+            "mostUsed": "Most Used",
+            "mostDownloaded": "Most Downloaded",
+            "newest": "Newest",
+            "searchIn": "Search in",
+            "all": "All",
+            "titleDesc": "Title & Description",
+            "content": "Content",
+            "category": "Category",
+            "difficulty": "Difficulty",
+            "allCategories": "All Categories",
+            "allDifficulties": "All Difficulties",
+            "easy": "Easy",
+            "medium": "Medium",
+            "hard": "Hard"
+        },
+        "quizCard": {
+            "views": "views",
+            "downloads": "downloads",
+            "questions": "questions",
+            "useButton": "Use",
+            "downloadButton": "Download PDF",
+            "previewButton": "Preview"
+        },
+        "loadMore": "Load More",
+        "noResults": "No results found",
+        "loginRequired": {
+            "title": "Login Required",
+            "description": "Please log in to use this quiz"
+        }
+    },
+    "footer": {
+        "description": "Create multiple-choice quizzes with AI",
+        "quickLinks": "Quick Links",
+        "legal": "Legal",
+        "privacy": "Privacy Policy",
+        "terms": "Terms of Service",
+        "copyright": "© 2024 QuizKen. All rights reserved."
+    },
+    "common": {
+        "loading": "Loading...",
+        "error": "An error occurred",
+        "success": "Success",
+        "cancel": "Cancel",
+        "confirm": "Confirm",
+        "save": "Save",
+        "delete": "Delete",
+        "edit": "Edit",
+        "view": "View",
+        "close": "Close",
+        "back": "Back",
+        "next": "Next",
+        "previous": "Previous",
+        "or": "or"
+    }
+}
