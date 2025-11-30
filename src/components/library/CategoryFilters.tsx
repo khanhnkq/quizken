@@ -16,6 +16,7 @@ import {
 } from "@/lib/constants/quizCategories";
 import { BookOpen } from "@/lib/icons";
 import { useAudio } from "@/contexts/SoundContext";
+import { useTranslation } from "react-i18next";
 
 interface CategoryFiltersProps {
   selectedCategory: QuizCategory | "all";
@@ -32,6 +33,7 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
   onDifficultyChange,
   availableCategories = [],
 }) => {
+  const { t } = useTranslation();
   // Merge common categories with dynamic categories
   const commonCategoryValues = QUIZ_CATEGORIES.map((c) => c.value as string);
   const dynamicCategories = availableCategories.filter(
@@ -51,13 +53,13 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
           onCategoryChange(v as QuizCategory | "all");
         }}>
         <SelectTrigger className="w-full sm:w-[180px] border-2">
-          <SelectValue placeholder="Chủ đề" />
+          <SelectValue placeholder={t('library.search.category')} />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">
             <span className="flex items-center gap-2">
               <BookOpen size={14} className="mr-1" />
-              Tất cả chủ đề
+              {t('library.search.allCategories')}
             </span>
           </SelectItem>
 
@@ -68,7 +70,7 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
               <SelectItem key={cat.value} value={cat.value}>
                 <span className="flex items-center gap-2">
                   <Icon size={14} className="mr-1" />
-                  <span>{cat.label}</span>
+                  <span>{t(`categories.${cat.value}`)}</span>
                 </span>
               </SelectItem>
             );
@@ -107,17 +109,17 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
           onDifficultyChange(v as QuizDifficulty | "all");
         }}>
         <SelectTrigger className="w-full sm:w-[150px] border-2">
-          <SelectValue placeholder="Độ khó" />
+          <SelectValue placeholder={t('library.search.difficulty')} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">Tất cả độ khó</SelectItem>
+          <SelectItem value="all">{t('library.search.allDifficulties')}</SelectItem>
           {DIFFICULTY_LEVELS.map((diff) => {
             const Icon = diff.icon;
             return (
               <SelectItem key={diff.value} value={diff.value}>
                 <span className="flex items-center gap-2">
                   <Icon size={14} className="mr-1" />
-                  {diff.label}
+                  {t(`difficulty.${diff.value}`)}
                 </span>
               </SelectItem>
             );
@@ -139,11 +141,17 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
                 return (
                   <span className="text-foreground font-medium flex items-center gap-1">
                     <Icon size={14} />
-                    {categoryInfo.label}
+                    {t(`categories.${categoryInfo.value}`)}
                   </span>
                 );
               }
-              return null;
+              // Fallback for dynamic categories
+              return (
+                <span className="text-foreground font-medium flex items-center gap-1">
+                  <BookOpen size={14} />
+                  {getCategoryLabel(selectedCategory)}
+                </span>
+              );
             })()}
           {selectedDifficulty !== "all" &&
             (() => {
@@ -155,7 +163,7 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
                 return (
                   <span className="text-foreground font-medium flex items-center gap-1">
                     <Icon size={14} />
-                    {diffInfo.label}
+                    {t(`difficulty.${diffInfo.value}`)}
                   </span>
                 );
               }

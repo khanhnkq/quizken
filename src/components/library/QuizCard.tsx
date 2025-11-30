@@ -20,6 +20,7 @@ import {
   QuizTags,
 } from "@/components/library/QuizCategoryBadge";
 import type { QuizCategory, QuizDifficulty } from "@/lib/constants/quizCategories";
+import { useTranslation } from "react-i18next";
 
 interface QuizCardProps {
   quiz: {
@@ -49,6 +50,7 @@ export const QuizCard: React.FC<QuizCardProps> = ({
   formatDate,
   formatNumber,
 }) => {
+  const { t } = useTranslation();
   const questionCount = Array.isArray(quiz.questions) ? quiz.questions.length : 0;
 
   return (
@@ -68,7 +70,7 @@ export const QuizCard: React.FC<QuizCardProps> = ({
             <Badge
               variant="secondary"
               className="bg-[#B5CC89]/20 text-[#B5CC89]">
-              Công khai
+              {t('library.card.public')}
             </Badge>
           </div>
 
@@ -80,7 +82,7 @@ export const QuizCard: React.FC<QuizCardProps> = ({
               </CardDescription>
             ) : (
               <CardDescription className="text-muted-foreground/50 italic">
-                Không có mô tả
+                {t('library.card.noDescription')}
               </CardDescription>
             )}
           </div>
@@ -114,7 +116,7 @@ export const QuizCard: React.FC<QuizCardProps> = ({
         <div className="flex flex-wrap items-center text-sm text-muted-foreground gap-3 min-h-[1.5rem]">
           <div
             className="flex items-center gap-1"
-            title="Số lần sử dụng">
+            title={t('library.card.usageCount')}>
             <FileDown className="h-3.5 w-3.5 text-[#B5CC89]" />
             <span className="font-semibold text-foreground">
               {formatNumber(quiz.usage_count || 0)}
@@ -122,7 +124,7 @@ export const QuizCard: React.FC<QuizCardProps> = ({
           </div>
           <div
             className="flex items-center gap-1"
-            title="Số lần tải PDF">
+            title={t('library.card.downloadCount')}>
             <ArrowDown className="h-3.5 w-3.5 text-blue-500" />
             <span className="font-semibold text-foreground">
               {formatNumber(quiz.pdf_download_count || 0)}
@@ -130,7 +132,7 @@ export const QuizCard: React.FC<QuizCardProps> = ({
           </div>
           <div className="flex items-center gap-1">
             <BookOpen className="h-3 w-3" />
-            <span>{questionCount} câu</span>
+            <span>{questionCount} {t('library.card.questions')}</span>
           </div>
           <div className="flex items-center gap-1">
             <Clock className="h-3 w-3" />
@@ -145,14 +147,14 @@ export const QuizCard: React.FC<QuizCardProps> = ({
             size="sm"
             onClick={onPreview}
             className="w-full min-w-0 hover:bg-accent transition-colors">
-            Xem trước
+            {t('library.card.preview')}
           </Button>
           <Button
             variant="outline"
             size="sm"
             onClick={onUse}
             className="w-full min-w-0 hover:bg-[#B5CC89] hover:text-white transition-colors">
-            Sử dụng
+            {t('library.card.use')}
           </Button>
           <Button
             variant="outline"

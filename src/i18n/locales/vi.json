@@ -166,8 +166,41 @@
                 "loadError": "Lỗi",
                 "loadDesc": "Không thể tải thư viện quiz.",
                 "loadMoreDesc": "Không thể tải thêm quiz."
+            },
+            "card": {
+                "public": "Công khai",
+                "noDescription": "Không có mô tả",
+                "usageCount": "Số lần sử dụng",
+                "downloadCount": "Số lần tải PDF",
+                "questions": "câu",
+                "preview": "Xem trước",
+                "use": "Sử dụng"
             }
         }
+    },
+    "categories": {
+        "general": "Tổng hợp",
+        "education": "Học tập",
+        "research": "Nghiên cứu",
+        "science": "Khoa học",
+        "entertainment": "Giải trí",
+        "trivia": "Đố vui",
+        "language": "Ngôn ngữ",
+        "math": "Toán học",
+        "history": "Lịch sử",
+        "geography": "Địa lý",
+        "literature": "Văn học",
+        "technology": "Công nghệ",
+        "business": "Kinh doanh",
+        "health": "Sức khỏe",
+        "sports": "Thể thao",
+        "arts": "Nghệ thuật",
+        "music": "Âm nhạc"
+    },
+    "difficulty": {
+        "easy": "Dễ",
+        "medium": "Trung bình",
+        "hard": "Khó"
     },
     "quiz": {
         "question": "Câu {{number}}",

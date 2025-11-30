@@ -6,9 +6,11 @@ import {
   getCategoryColor,
   getDifficultyInfo,
   getDifficultyLabel,
+  QUIZ_CATEGORIES,
   type QuizCategory,
   type QuizDifficulty,
 } from "@/lib/constants/quizCategories";
+import { useTranslation } from "react-i18next";
 
 interface QuizCategoryBadgeProps {
   category: QuizCategory;
@@ -23,9 +25,15 @@ export const QuizCategoryBadge: React.FC<QuizCategoryBadgeProps> = ({
   size = "md",
   showDifficulty = true,
 }) => {
+  const { t } = useTranslation();
   const categoryColor = getCategoryColor(category);
   const CategoryIcon = getCategoryIcon(category);
-  const categoryLabel = getCategoryLabel(category);
+
+  // Use translation if available, fallback to helper for dynamic categories
+  const categoryLabel = QUIZ_CATEGORIES.some(c => c.value === category)
+    ? t(`categories.${category}`)
+    : getCategoryLabel(category);
+
   const difficultyInfo = difficulty ? getDifficultyInfo(difficulty) : null;
   const DifficultyIcon = difficultyInfo?.icon;
 
@@ -69,7 +77,7 @@ export const QuizCategoryBadge: React.FC<QuizCategoryBadgeProps> = ({
           }}
         >
           <DifficultyIcon size={iconSizes[size]} strokeWidth={2} />
-          {getDifficultyLabel(difficulty)}
+          {t(`difficulty.${difficulty}`)}
         </Badge>
       )}
     </div>
