@@ -334,7 +334,7 @@ const QuizGenerator = () => {
     }
 
     if (customIsProfane(trimmed)) {
-      setPromptError("Chủ đề không được chứa từ ngữ không phù hợp");
+      setPromptError(t('quizGenerator.toasts.profanity'));
       setIsPromptValid(false);
       return false;
     }
@@ -346,7 +346,7 @@ const QuizGenerator = () => {
     }
 
     if (trimmed.length > 500) {
-      setPromptError("Không được quá 500 ký tự");
+      setPromptError(t('quizGenerator.toasts.maxLength'));
       setIsPromptValid(false);
       return false;
     }
@@ -354,7 +354,7 @@ const QuizGenerator = () => {
     // Check for valid characters (only allow Vietnamese, English, numbers, basic punctuation)
     const validRegex = /^[\p{L}\p{N}\s.,!?"()-]+$/u;
     if (!validRegex.test(trimmed)) {
-      setPromptError("Chỉ được sử dụng chữ cái, số và ký tự cơ bản");
+      setPromptError(t('quizGenerator.toasts.invalidChars'));
       setIsPromptValid(false);
       return false;
     }
@@ -436,9 +436,9 @@ const QuizGenerator = () => {
             setLoading(false);
             localStorage.removeItem("currentQuizGeneration");
             localStorage.removeItem("currentQuizId");
-            const msg = errorMessage || "Có lỗi xảy ra khi tạo quiz";
+            const msg = errorMessage || t('quizGenerator.toasts.genericError');
             toast({
-              title: t('quizGenerator.failed.title'),
+              title: t('quizGenerator.toasts.failedTitle'),
               description: msg,
               variant: "destructive",
             });
@@ -462,7 +462,7 @@ const QuizGenerator = () => {
             const channel = new BroadcastChannel("quiz-notifications");
             channel.postMessage({
               type: "quiz-failed",
-              title: "Tạo câu hỏi thất bại",
+              title: t('quizGenerator.toasts.failedTitle'),
               description: msg,
               variant: "destructive",
             });
@@ -475,14 +475,14 @@ const QuizGenerator = () => {
             localStorage.removeItem("currentQuizGeneration");
             localStorage.removeItem("currentQuizId");
             toast({
-              title: "Quiz đã hết hạn",
+              title: t('quizGenerator.toasts.expiredTitle'),
               description: t('quizGenerator.expired.description'),
               variant: "warning",
             });
             const channel = new BroadcastChannel("quiz-notifications");
             channel.postMessage({
               type: "quiz-failed",
-              title: "Quiz đã hết hạn",
+              title: t('quizGenerator.toasts.expiredTitle'),
               description: t('quizGenerator.expired.description'),
               variant: "warning",
             });
@@ -490,12 +490,12 @@ const QuizGenerator = () => {
           },
           onProgress: (status, progress) => {
             setGenerationStatus(status);
-            setGenerationProgress(progress || "Đang xử lý...");
+            setGenerationProgress(progress || t('quizGenerator.toasts.processingStatus'));
             persistGenerationState({
               quizId,
               loading: true,
               generationStatus: status,
-              generationProgress: progress || "Đang xử lý...",
+              generationProgress: progress || t('quizGenerator.toasts.processingStatus'),
             });
           },
         });
@@ -542,16 +542,16 @@ const QuizGenerator = () => {
             setQuiz(quizWithId);
             clearPersist();
             toast({
-              title: "Đã khôi phục quiz",
-              description: "Đã tải lại quiz trước đó từ bộ nhớ tạm",
+              title: t('quizGenerator.toasts.restoreSuccessTitle'),
+              description: t('quizGenerator.toasts.restoreSuccessDesc'),
               variant: "info",
             });
           } else if (status === "failed") {
             // Quiz failed, clean up
             clearPersist();
             toast({
-              title: "Quiz trước đó thất bại",
-              description: "Bắt đầu tạo mới",
+              title: t('quizGenerator.toasts.restoreFailedTitle'),
+              description: t('quizGenerator.toasts.restoreFailedDesc'),
               variant: "warning",
             });
           } else if (status === "processing" || status === "pending") {
@@ -559,7 +559,7 @@ const QuizGenerator = () => {
             console.log("▶️ Resuming quiz generation from saved state...");
             setLoading(true);
             setGenerationStatus("processing");
-            setGenerationProgress("Tiếp tục tạo quiz...");
+            setGenerationProgress(t('quizGenerator.toasts.resuming'));
             setQuizId(savedQuizId);
             startPollingHook(savedQuizId, {
               onCompleted: ({ quiz, tokenUsage }) => {
@@ -572,16 +572,16 @@ const QuizGenerator = () => {
                 setLoading(false);
                 clearPersist();
                 toast({
-                  title: "Tạo câu hỏi thành công!",
-                  description: `Đã tạo "${quiz.title}" với ${quiz.questions.length} câu hỏi`,
+                  title: t('quizGenerator.success.title'),
+                  description: t('quizGenerator.success.description', { title: quiz.title, count: quiz.questions.length }),
                   variant: "success",
                   duration: 3000,
                 });
                 const channel = new BroadcastChannel("quiz-notifications");
                 channel.postMessage({
                   type: "quiz-complete",
-                  title: "Tạo câu hỏi thành công!",
-                  description: `Đã tạo "${quiz.title}" với ${quiz.questions.length} câu hỏi`,
+                  title: t('quizGenerator.success.title'),
+                  description: t('quizGenerator.success.description', { title: quiz.title, count: quiz.questions.length }),
                   variant: "success",
                 });
                 channel.close();
@@ -592,9 +592,10 @@ const QuizGenerator = () => {
                 setLoading(false);
                 localStorage.removeItem("currentQuizGeneration");
                 localStorage.removeItem("currentQuizId");
-                const msg = errorMessage || "Có lỗi xảy ra khi tạo quiz";
+
+                const msg = errorMessage || t('quizGenerator.toasts.genericError');
                 toast({
-                  title: "Tạo câu hỏi thất bại",
+                  title: t('quizGenerator.toasts.failedTitle'),
                   description: msg,
                   variant: "destructive",
                 });

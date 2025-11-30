@@ -105,7 +105,19 @@
             "noAnswersDesc": "Vui lòng trả lời ít nhất một câu hỏi trước khi chấm điểm",
             "gradeError": "Có lỗi xảy ra khi chấm điểm. Vui lòng thử lại",
             "musicError": "Không thể phát nhạc",
-            "musicErrorDesc": "Vui lòng kiểm tra quyền trình duyệt hoặc nguồn nhạc"
+            "musicErrorDesc": "Vui lòng kiểm tra quyền trình duyệt hoặc nguồn nhạc",
+            "profanity": "Chủ đề không được chứa từ ngữ không phù hợp",
+            "maxLength": "Không được quá 500 ký tự",
+            "invalidChars": "Chỉ được sử dụng chữ cái, số và ký tự cơ bản",
+            "genericError": "Có lỗi xảy ra khi tạo quiz",
+            "failedTitle": "Tạo câu hỏi thất bại",
+            "expiredTitle": "Quiz đã hết hạn",
+            "processingStatus": "Đang xử lý...",
+            "resuming": "Tiếp tục tạo quiz...",
+            "restoreSuccessTitle": "Đã khôi phục quiz",
+            "restoreSuccessDesc": "Đã tải lại quiz trước đó từ bộ nhớ tạm",
+            "restoreFailedTitle": "Quiz trước đó thất bại",
+            "restoreFailedDesc": "Bắt đầu tạo mới"
         },
         "ui": {
             "selectPlaceholder": "Chọn số câu hỏi",

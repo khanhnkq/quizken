@@ -105,7 +105,19 @@
             "noAnswersDesc": "Please answer at least one question before grading",
             "gradeError": "Error occurred while grading. Please try again",
             "musicError": "Cannot play music",
-            "musicErrorDesc": "Please check browser permissions or music source"
+            "musicErrorDesc": "Please check browser permissions or music source",
+            "profanity": "Topic contains inappropriate words",
+            "maxLength": "Cannot exceed 500 characters",
+            "invalidChars": "Only letters, numbers and basic characters allowed",
+            "genericError": "An error occurred while creating quiz",
+            "failedTitle": "Quiz creation failed",
+            "expiredTitle": "Quiz expired",
+            "processingStatus": "Processing...",
+            "resuming": "Resuming quiz creation...",
+            "restoreSuccessTitle": "Quiz restored",
+            "restoreSuccessDesc": "Reloaded previous quiz from storage",
+            "restoreFailedTitle": "Previous quiz failed",
+            "restoreFailedDesc": "Starting new quiz"
         },
         "ui": {
             "selectPlaceholder": "Select number of questions",
