@@ -83,6 +83,43 @@
         "success": {
             "title": "Tạo câu hỏi thành công!",
             "description": "Đã tạo \"{{title}}\" với {{count}} câu hỏi"
+        },
+        "failed": {
+            "title": "Tạo câu hỏi thất bại"
+        },
+        "expired": {
+            "description": "Quiz này đã hết hạn. Vui lòng tạo quiz mới"
+        },
+        "toasts": {
+            "quotaTitle": "Đã hết lượt miễn phí",
+            "enterTopic": "Vui lòng nhập chủ đề",
+            "enterTopicDesc": "Mô tả chủ đề câu hỏi trắc nghiệm bạn muốn tạo",
+            "selectCount": "Vui lòng chọn số lượng câu hỏi",
+            "selectCountDesc": "Hãy chọn số lượng câu hỏi bạn muốn tạo",
+            "processing": "Yêu cầu trước đó đang được xử lý. Vui lòng đợi và thử lại.",
+            "createFirst": "Vui lòng tạo quiz trước khi chấm điểm",
+            "invalidStructure": "Quiz này không có cấu trúc đúng. Vui lòng tạo quiz mới",
+            "noQuestions": "Quiz không có câu hỏi nào. Không thể chấm điểm",
+            "incomplete": "Bạn đã trả lời {{answered}}/{{total}} câu hỏi. Vui lòng hoàn thành tất cả",
+            "noAnswers": "Chưa trả lời câu hỏi nào",
+            "noAnswersDesc": "Vui lòng trả lời ít nhất một câu hỏi trước khi chấm điểm",
+            "gradeError": "Có lỗi xảy ra khi chấm điểm. Vui lòng thử lại",
+            "musicError": "Không thể phát nhạc",
+            "musicErrorDesc": "Vui lòng kiểm tra quyền trình duyệt hoặc nguồn nhạc"
+        },
+        "ui": {
+            "selectPlaceholder": "Chọn số câu hỏi",
+            "questionCount": "Số lượng câu hỏi",
+            "10questions": "10 câu hỏi",
+            "15questions": "15 câu hỏi",
+            "20questions": "20 câu hỏi",
+            "25questions": "25 câu hỏi",
+            "30questions": "30 câu hỏi",
+            "estimatedTime": "Thời gian tạo khoảng",
+            "loginUnlimited": "Đăng nhập để không giới hạn",
+            "fillAllFields": "Vui lòng điền đầy đủ thông tin",
+            "generating": "Đang tạo câu hỏi AI...",
+            "examplePlaceholder": "Ví dụ: Tạo bộ câu hỏi trắc nghiệm về lịch sử Thế chiến thứ 2 cho học sinh THPT. Bao gồm các câu hỏi về các trận đánh lớn, nhân vật chủ chốt và ảnh hưởng của chiến tranh đến xã hội."
         }
     },
     "quiz": {

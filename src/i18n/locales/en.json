@@ -81,8 +81,45 @@
             "loginButton": "Log in now"
         },
         "success": {
-            "title": "Quiz created successfully!",
+            "title": "Questions created successfully!",
             "description": "Created \"{{title}}\" with {{count}} questions"
+        },
+        "failed": {
+            "title": "Failed to create questions"
+        },
+        "expired": {
+            "description": "This quiz has expired. Please create a new quiz"
+        },
+        "toasts": {
+            "quotaTitle": "Free quota exceeded",
+            "enterTopic": "Please enter a topic",
+            "enterTopicDesc": "Describe the quiz topic you want to create",
+            "selectCount": "Please select number of questions",
+            "selectCountDesc": "Choose how many questions you want to create",
+            "processing": "Previous request is being processed. Please wait and try again.",
+            "createFirst": "Please create a quiz before grading",
+            "invalidStructure": "This quiz has invalid structure. Please create a new quiz",
+            "noQuestions": "Quiz has no questions. Cannot grade",
+            "incomplete": "You have answered {{answered}}/{{total}} questions. Please complete all",
+            "noAnswers": "No answers yet",
+            "noAnswersDesc": "Please answer at least one question before grading",
+            "gradeError": "Error occurred while grading. Please try again",
+            "musicError": "Cannot play music",
+            "musicErrorDesc": "Please check browser permissions or music source"
+        },
+        "ui": {
+            "selectPlaceholder": "Select number of questions",
+            "questionCount": "Number of Questions",
+            "10questions": "10 questions",
+            "15questions": "15 questions",
+            "20questions": "20 questions",
+            "25questions": "25 questions",
+            "30questions": "30 questions",
+            "estimatedTime": "Estimated time",
+            "loginUnlimited": "Login for unlimited",
+            "fillAllFields": "Please fill in all fields",
+            "generating": "Generating AI questions...",
+            "examplePlaceholder": "Example: Create a multiple-choice quiz about World War 2 for high school students. Include questions about major battles, key figures, and the war's impact on society."
         }
     },
     "quiz": {
