@@ -1404,7 +1404,7 @@ const QuizGenerator = () => {
                       <div className="flex items-center gap-2">
                         <Target className="w-4 h-4 text-[#B5CC89]" />
                         <span className="text-sm font-medium">
-                          Lượt tạo miễn phí:{" "}
+                          {t('quizGenerator.ui.freeQuota')}:{" "}
                           {Math.max(0, DAILY_LIMIT - anonCount)}/{DAILY_LIMIT}
                         </span>
                       </div>
@@ -1426,10 +1426,10 @@ const QuizGenerator = () => {
                       <label
                         htmlFor="quiz-topic"
                         className="text-sm font-semibold text-foreground">
-                        Chủ đề bài kiểm tra
+                        {t('quizGenerator.ui.topicLabel')}
                       </label>
                       <Badge variant="secondary" className="text-xs">
-                        Bắt buộc
+                        {t('quizGenerator.ui.required')}
                       </Badge>
                     </div>
                     <Textarea
@@ -1490,7 +1490,7 @@ const QuizGenerator = () => {
                     </div>
                     <div className="relative flex justify-center text-xs">
                       <span className="bg-card px-2 text-muted-foreground">
-                        Tùy chọn
+                        {t('quizGenerator.ui.optional')}
                       </span>
                     </div>
                   </div>
@@ -1504,7 +1504,7 @@ const QuizGenerator = () => {
                         {t('quizGenerator.ui.questionCount')}
                       </label>
                       <Badge variant="secondary" className="text-xs">
-                        Bắt buộc
+                        {t('quizGenerator.ui.required')}
                       </Badge>
                     </div>
                     <Select
@@ -1535,7 +1535,7 @@ const QuizGenerator = () => {
                       {questionCount
                         ? Math.ceil(parseInt(questionCount) / 5)
                         : 4}{" "}
-                      phút
+                      {t('quizGenerator.ui.minutes')}
                     </p>
                   </div>
 

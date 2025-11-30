@@ -119,7 +119,12 @@
             "loginUnlimited": "Login for unlimited",
             "fillAllFields": "Please fill in all fields",
             "generating": "Generating AI questions...",
-            "examplePlaceholder": "Example: Create a multiple-choice quiz about World War 2 for high school students. Include questions about major battles, key figures, and the war's impact on society."
+            "examplePlaceholder": "Example: Create a multiple-choice quiz about World War 2 for high school students. Include questions about major battles, key figures, and the war's impact on society.",
+            "freeQuota": "Free quota",
+            "topicLabel": "Quiz Topic",
+            "optional": "Optional",
+            "required": "Required",
+            "minutes": "minutes"
         }
     },
     "quiz": {
