@@ -264,8 +264,8 @@ const QuizLibrary: React.FC = () => {
       if (error) {
         console.error("Error loading public quizzes:", error);
         toast({
-          title: "Lỗi",
-          description: "Không thể tải thư viện quiz.",
+          title: t('library.toasts.loadError'),
+          description: t('library.toasts.loadDesc'),
           variant: "destructive",
         });
       } else {
@@ -317,8 +317,8 @@ const QuizLibrary: React.FC = () => {
       if (error) {
         console.error("Error loading more quizzes:", error);
         toast({
-          title: "Lỗi",
-          description: "Không thể tải thêm quiz.",
+          title: t('library.toasts.loadError'),
+          description: t('library.toasts.loadMoreDesc'),
           variant: "destructive",
         });
         return;
@@ -561,8 +561,8 @@ const QuizLibrary: React.FC = () => {
   const handleUseQuiz = async (quiz: PublicQuiz) => {
     if (!user) {
       toast({
-        title: "Yêu cầu đăng nhập",
-        description: "Vui lòng đăng nhập để sử dụng quiz.",
+        title: t('library.toasts.loginRequired'),
+        description: t('library.toasts.loginDesc'),
         variant: "warning",
       });
       setShowAuthModal(true);
@@ -583,8 +583,8 @@ const QuizLibrary: React.FC = () => {
 
     // Provide quick confirmation
     toast({
-      title: "Chuyển đến trình làm quiz",
-      description: `Đang mở "${quiz.title}" để làm bài.`,
+      title: t('library.toasts.openingQuiz'),
+      description: t('library.toasts.openingDesc', { title: quiz.title }),
       variant: "success",
     });
   };
@@ -686,11 +686,10 @@ const QuizLibrary: React.FC = () => {
               </div>
 
               <h1 className="text-4xl md:text-6xl font-bold mb-4">
-                Thư viện Quiz Chung
+                {t('library.hero.title')}
               </h1>
               <p className="text-lg text-muted-foreground mb-8">
-                Khám phá và sử dụng hàng nghìn bài quiz do cộng đồng chia sẻ.
-                Học tập, ôn luyện và mở rộng kiến thức của bạn.
+                {t('library.hero.description')}
               </p>
             </div>
 
@@ -705,7 +704,7 @@ const QuizLibrary: React.FC = () => {
                       0
                     </div>
                     <p className="text-sm md:text-base text-muted-foreground font-medium">
-                      Quiz
+                      {t('library.stats.quizzes')}
                     </p>
                   </CardContent>
                 </Card>
@@ -717,7 +716,7 @@ const QuizLibrary: React.FC = () => {
                       0
                     </div>
                     <p className="text-sm md:text-base text-muted-foreground font-medium">
-                      Chủ đề
+                      {t('library.stats.topics')}
                     </p>
                   </CardContent>
                 </Card>
@@ -729,7 +728,7 @@ const QuizLibrary: React.FC = () => {
                       0
                     </div>
                     <p className="text-sm md:text-base text-muted-foreground font-medium">
-                      Người tạo
+                      {t('library.stats.creators')}
                     </p>
                   </CardContent>
                 </Card>
@@ -742,7 +741,7 @@ const QuizLibrary: React.FC = () => {
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input
                     ref={searchInputRef}
-                    placeholder="Tìm kiếm trong tiêu đề, mô tả, câu hỏi... (⌘K)"
+                    placeholder={t('library.search.placeholder')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-12 pr-12 text-base py-6 rounded-xl border-2 focus:border-[#B5CC89] transition-all"
@@ -751,7 +750,7 @@ const QuizLibrary: React.FC = () => {
                     <button
                       onClick={() => setSearchQuery("")}
                       className="absolute right-4 top-1/2 -translate-y-1/2 p-1 hover:bg-muted rounded-full transition-colors"
-                      aria-label="Xóa tìm kiếm">
+                      aria-label={t('library.search.clear')}>
                       <X className="h-4 w-4 text-muted-foreground" />
                     </button>
                   )}
@@ -770,16 +769,16 @@ const QuizLibrary: React.FC = () => {
                           setSortBy(v as typeof sortBy);
                         }}>
                         <SelectTrigger className="w-full sm:w-[180px] border-2">
-                          <SelectValue placeholder="Sắp xếp theo" />
+                          <SelectValue placeholder={t('library.search.sortBy')} />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="usage">
-                            Nhiều lượt dùng nhất
+                            {t('library.search.sort.usage')}
                           </SelectItem>
                           <SelectItem value="downloads">
-                            Nhiều lượt tải nhất
+                            {t('library.search.sort.downloads')}
                           </SelectItem>
-                          <SelectItem value="date">Mới nhất</SelectItem>
+                          <SelectItem value="date">{t('library.search.sort.date')}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -794,13 +793,13 @@ const QuizLibrary: React.FC = () => {
                           setSearchIn(v as typeof searchIn);
                         }}>
                         <SelectTrigger className="w-full sm:w-[160px] border-2">
-                          <SelectValue placeholder="Tìm trong" />
+                          <SelectValue placeholder={t('library.search.searchIn')} />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="all">Tất cả</SelectItem>
-                          <SelectItem value="title">Tiêu đề & Mô tả</SelectItem>
+                          <SelectItem value="all">{t('library.search.scope.all')}</SelectItem>
+                          <SelectItem value="title">{t('library.search.scope.title')}</SelectItem>
                           <SelectItem value="content">
-                            Nội dung câu hỏi
+                            {t('library.search.scope.content')}
                           </SelectItem>
                         </SelectContent>
                       </Select>

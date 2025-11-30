@@ -127,6 +127,46 @@
             "minutes": "minutes",
             "playMusic": "Play chill music",
             "pauseMusic": "Pause music"
+        },
+        "library": {
+            "hero": {
+                "title": "Public Quiz Library",
+                "description": "Explore and use thousands of quizzes shared by the community. Learn, practice, and expand your knowledge."
+            },
+            "stats": {
+                "quizzes": "Quizzes",
+                "topics": "Topics",
+                "creators": "Creators"
+            },
+            "search": {
+                "placeholder": "Search in title, description, questions... (⌘K)",
+                "clear": "Clear search",
+                "sortBy": "Sort by",
+                "sort": {
+                    "usage": "Most Used",
+                    "downloads": "Most Downloaded",
+                    "date": "Newest"
+                },
+                "searchIn": "Search in",
+                "scope": {
+                    "all": "All",
+                    "title": "Title",
+                    "content": "Question Content"
+                },
+                "category": "Topic",
+                "allCategories": "All Topics",
+                "difficulty": "Difficulty",
+                "allDifficulties": "All Difficulties"
+            },
+            "toasts": {
+                "loginRequired": "Login Required",
+                "loginDesc": "Please login to use this quiz.",
+                "openingQuiz": "Opening Quiz Player",
+                "openingDesc": "Opening \"{{title}}\"...",
+                "loadError": "Error",
+                "loadDesc": "Could not load quiz library.",
+                "loadMoreDesc": "Could not load more quizzes."
+            }
         }
     },
     "quiz": {

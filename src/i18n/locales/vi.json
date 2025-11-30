@@ -127,6 +127,46 @@
             "minutes": "phút",
             "playMusic": "Phát nhạc chill",
             "pauseMusic": "Tạm dừng nhạc"
+        },
+        "library": {
+            "hero": {
+                "title": "Thư viện Quiz Chung",
+                "description": "Khám phá và sử dụng hàng nghìn bài quiz do cộng đồng chia sẻ. Học tập, ôn luyện và mở rộng kiến thức của bạn."
+            },
+            "stats": {
+                "quizzes": "Quiz",
+                "topics": "Chủ đề",
+                "creators": "Người tạo"
+            },
+            "search": {
+                "placeholder": "Tìm kiếm trong tiêu đề, mô tả, câu hỏi... (⌘K)",
+                "clear": "Xóa tìm kiếm",
+                "sortBy": "Sắp xếp theo",
+                "sort": {
+                    "usage": "Nhiều lượt dùng nhất",
+                    "downloads": "Nhiều lượt tải nhất",
+                    "date": "Mới nhất"
+                },
+                "searchIn": "Tìm trong",
+                "scope": {
+                    "all": "Tất cả",
+                    "title": "Tiêu đề",
+                    "content": "Nội dung câu hỏi"
+                },
+                "category": "Chủ đề",
+                "allCategories": "Tất cả chủ đề",
+                "difficulty": "Độ khó",
+                "allDifficulties": "Tất cả độ khó"
+            },
+            "toasts": {
+                "loginRequired": "Yêu cầu đăng nhập",
+                "loginDesc": "Vui lòng đăng nhập để sử dụng quiz.",
+                "openingQuiz": "Chuyển đến trình làm quiz",
+                "openingDesc": "Đang mở \"{{title}}\" để làm bài.",
+                "loadError": "Lỗi",
+                "loadDesc": "Không thể tải thư viện quiz.",
+                "loadMoreDesc": "Không thể tải thêm quiz."
+            }
         }
     },
     "quiz": {
