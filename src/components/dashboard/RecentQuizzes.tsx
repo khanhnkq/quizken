@@ -16,6 +16,7 @@ import { gsap } from "gsap";
 import { shouldReduceAnimations } from "@/utils/deviceDetection";
 import { useNavigate } from "react-router-dom";
 import type { MouseEvent } from "react";
+import { useTranslation } from "react-i18next";
 
 interface RecentQuizzesProps {
   recentAttempts: RecentQuizAttempt[];
@@ -26,6 +27,7 @@ export function RecentQuizzes({
   recentAttempts,
   isLoading,
 }: RecentQuizzesProps) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const formatTime = (seconds?: number) => {
     if (!seconds) return "N/A";
@@ -51,9 +53,9 @@ export function RecentQuizzes({
   };
 
   const getScoreLabel = (score: number) => {
-    if (score >= 80) return "Xuất sắc";
-    if (score >= 60) return "Khá tốt";
-    return "Cần cải thiện";
+    if (score >= 80) return t('dashboard.recentQuizzes.excellent');
+    if (score >= 60) return t('dashboard.recentQuizzes.good');
+    return t('dashboard.recentQuizzes.needsImprovement');
   };
 
   // GSAP hover effects like homepage
@@ -86,7 +88,7 @@ export function RecentQuizzes({
         <CardHeader className="border-b bg-[#B5CC89]/5">
           <CardTitle className="flex items-center gap-2 text-gray-900 text-base md:text-lg">
             <ClockIcon className="h-4 w-4 md:h-5 md:w-5" />
-            Quiz gần đây
+            {t('dashboard.recentQuizzes.title')}
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-4 md:pt-6">
@@ -115,7 +117,7 @@ export function RecentQuizzes({
         <CardHeader className="border-b bg-[#B5CC89]/5">
           <CardTitle className="flex items-center gap-2 text-gray-900 text-base md:text-lg">
             <ClockIcon className="h-4 w-4 md:h-5 md:w-5" />
-            Quiz gần đây
+            {t('dashboard.recentQuizzes.title')}
           </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col items-center justify-center h-48 md:h-64 text-center p-4">
@@ -123,10 +125,10 @@ export function RecentQuizzes({
             <ClockIcon className="h-10 w-10 md:h-12 md:w-12 text-[#B5CC89]" />
           </div>
           <p className="text-gray-700 font-semibold mb-2 text-sm md:text-base">
-            Bạn chưa làm quiz nào
+            {t('dashboard.recentQuizzes.empty')}
           </p>
           <p className="text-gray-500 text-xs md:text-sm">
-            Hãy bắt đầu với một quiz để xem kết quả của bạn!
+            {t('dashboard.recentQuizzes.emptyDescription')}
           </p>
         </CardContent>
       </Card>
@@ -138,7 +140,7 @@ export function RecentQuizzes({
       <CardHeader className="border-b bg-[#B5CC89]/5">
         <CardTitle className="flex items-center gap-2 text-gray-900 text-base md:text-lg">
           <ClockIcon className="h-4 w-4 md:h-5 md:w-5" />
-          Quiz gần đây
+          {t('dashboard.recentQuizzes.title')}
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-4 md:pt-6">
@@ -148,8 +150,8 @@ export function RecentQuizzes({
             <div
               key={attempt.attempt_id}
               className={`border-2 rounded-xl p-3 transition-colors ${index % 2 === 0
-                  ? "bg-white border-gray-100"
-                  : "bg-gray-50/50 border-gray-100"
+                ? "bg-white border-gray-100"
+                : "bg-gray-50/50 border-gray-100"
                 }`}>
               <div className="space-y-2">
                 <div>

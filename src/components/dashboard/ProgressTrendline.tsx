@@ -1,4 +1,7 @@
+```typescript
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { useTranslation } from "react-i18next";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   LineChart,
@@ -13,21 +16,23 @@ import type { ProgressTrendData } from "@/types/dashboard";
 import { TrendingUpIcon } from "lucide-react";
 
 interface ProgressTrendlineProps {
-  trendData: ProgressTrendData[];
+  progressData: ProgressTrendData[];
   isLoading: boolean;
 }
 
 export function ProgressTrendline({
-  trendData,
+  progressData,
   isLoading,
 }: ProgressTrendlineProps) {
+  const { t } = useTranslation();
+  const isMobile = useIsMobile();
+
   if (isLoading) {
     return (
       <Card className="border-2 hover:border-[#B5CC89] transition-colors">
         <CardHeader className="border-b bg-[#B5CC89]/5">
           <CardTitle className="flex items-center gap-2 text-gray-900 text-base md:text-lg">
             <TrendingUpIcon className="h-4 w-4 md:h-5 md:w-5" />
-            <span className="hidden sm:inline">Xu hướng tiến bộ (30 ngày)</span>
             <span className="sm:inline">Tiến bộ (30 ngày)</span>
           </CardTitle>
         </CardHeader>
@@ -53,10 +58,10 @@ export function ProgressTrendline({
             <TrendingUpIcon className="h-10 w-10 md:h-12 md:w-12 text-[#B5CC89]" />
           </div>
           <p className="text-gray-700 font-semibold mb-2 text-sm md:text-base">
-            Chưa có dữ liệu tiến bộ
+            {t('dashboard.progressTrend.empty')}
           </p>
           <p className="text-gray-500 text-xs md:text-sm">
-            Hãy làm một vài quiz để xem xu hướng của bạn!
+            {t('dashboard.progressTrend.emptyDescription')}
           </p>
         </CardContent>
       </Card>
@@ -107,8 +112,8 @@ export function ProgressTrendline({
       <CardHeader className="border-b bg-[#B5CC89]/5">
         <CardTitle className="flex items-center gap-2 text-gray-900 text-base md:text-lg">
           <TrendingUpIcon className="h-4 w-4 md:h-5 md:w-5" />
-          <span className="hidden sm:inline">Xu hướng tiến bộ (30 ngày)</span>
-          <span className="sm:inline">Tiến bộ (30 ngày)</span>
+          <span className="hidden sm:inline">{t('dashboard.progressTrend.title')}</span>
+          <span className="sm:inline">{t('dashboard.progressTrend.titleShort')}</span>
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-4 md:pt-6">
