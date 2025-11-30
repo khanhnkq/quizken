@@ -340,7 +340,7 @@ const QuizGenerator = () => {
     }
 
     if (trimmed.length < 5) {
-      setPromptError("Vui lòng nhập ít nhất 5 ký tự");
+      setPromptError(t('quizGenerator.errors.minLength'));
       setIsPromptValid(false);
       return false;
     }
@@ -400,7 +400,7 @@ const QuizGenerator = () => {
         // Restore the generation state
         setLoading(storedLoading);
         setGenerationStatus(storedStatus);
-        setGenerationProgress(storedProgress || "Đang tạo câu hỏi AI...");
+        setGenerationProgress(storedProgress || t('quizGenerator.ui.generating'));
         setQuizId(quizId);
 
         // Resume polling via hook
@@ -416,16 +416,16 @@ const QuizGenerator = () => {
             localStorage.removeItem("currentQuizGeneration");
             localStorage.removeItem("currentQuizId");
             toast({
-              title: "Tạo câu hỏi thành công!",
-              description: `Đã tạo "${quiz.title}" với ${quiz.questions.length} câu hỏi`,
+              title: t('quizGenerator.success.title'),
+              description: t('quizGenerator.success.description', { title: quiz.title, count: quiz.questions.length }),
               variant: "success",
               duration: 3000,
             });
             const channel = new BroadcastChannel("quiz-notifications");
             channel.postMessage({
               type: "quiz-complete",
-              title: "Tạo câu hỏi thành công!",
-              description: `Đã tạo "${quiz.title}" với ${quiz.questions.length} câu hỏi`,
+              title: t('quizGenerator.success.title'),
+              description: t('quizGenerator.success.description', { title: quiz.title, count: quiz.questions.length }),
               variant: "success",
             });
             channel.close();
@@ -438,7 +438,7 @@ const QuizGenerator = () => {
             localStorage.removeItem("currentQuizId");
             const msg = errorMessage || "Có lỗi xảy ra khi tạo quiz";
             toast({
-              title: "Tạo câu hỏi thất bại",
+              title: t('quizGenerator.failed.title'),
               description: msg,
               variant: "destructive",
             });
@@ -476,14 +476,14 @@ const QuizGenerator = () => {
             localStorage.removeItem("currentQuizId");
             toast({
               title: "Quiz đã hết hạn",
-              description: "Quiz này đã hết hạn. Vui lòng tạo quiz mới",
+              description: t('quizGenerator.expired.description'),
               variant: "warning",
             });
             const channel = new BroadcastChannel("quiz-notifications");
             channel.postMessage({
               type: "quiz-failed",
               title: "Quiz đã hết hạn",
-              description: "Quiz này đã hết hạn. Vui lòng tạo quiz mới",
+              description: t('quizGenerator.expired.description'),
               variant: "warning",
             });
             channel.close();
@@ -708,8 +708,8 @@ const QuizGenerator = () => {
     if (!user && hasReachedLimit) {
       setShowQuotaDialog(true);
       toast({
-        title: "Đã hết lượt miễn phí",
-        description: "Đăng nhập để tiếp tục tạo quiz không giới hạn",
+        title: t('quizGenerator.toasts.quotaTitle'),
+        description: t('quizGenerator.quota.description'),
         variant: "warning",
       });
       return;
@@ -717,8 +717,8 @@ const QuizGenerator = () => {
 
     if (!prompt.trim()) {
       toast({
-        title: "Vui lòng nhập chủ đề",
-        description: "Mô tả chủ đề câu hỏi trắc nghiệm bạn muốn tạo",
+        title: t('quizGenerator.toasts.enterTopic'),
+        description: t('quizGenerator.toasts.enterTopicDesc'),
         variant: "warning",
       });
       return;
@@ -726,8 +726,8 @@ const QuizGenerator = () => {
 
     if (!isQuestionCountSelected) {
       toast({
-        title: "Vui lòng chọn số lượng câu hỏi",
-        description: "Hãy chọn số lượng câu hỏi bạn muốn tạo",
+        title: t('quizGenerator.toasts.selectCount'),
+        description: t('quizGenerator.toasts.selectCountDesc'),
         variant: "warning",
       });
       return;
@@ -1012,7 +1012,7 @@ const QuizGenerator = () => {
       toast({
         title: "Vui chờ",
         description:
-          "Yêu cầu trước đó đang được xử lý. Vui lòng đợi và thử lại.",
+          t('quizGenerator.toasts.processing'),
         variant: "warning",
       });
       return;
@@ -1041,7 +1041,7 @@ const QuizGenerator = () => {
       if (!quiz) {
         toast({
           title: "Không có bài kiểm tra",
-          description: "Vui lòng tạo quiz trước khi chấm điểm",
+          description: t('quizGenerator.toasts.createFirst'),
           variant: "destructive",
         });
         return;
@@ -1051,7 +1051,7 @@ const QuizGenerator = () => {
       if (!quiz.questions || !Array.isArray(quiz.questions)) {
         toast({
           title: "Dữ liệu quiz không hợp lệ",
-          description: "Quiz này không có cấu trúc đúng. Vui lòng tạo quiz mới",
+          description: t('quizGenerator.toasts.invalidStructure'),
           variant: "destructive",
         });
         return;
@@ -1061,7 +1061,7 @@ const QuizGenerator = () => {
       if (quiz.questions.length === 0) {
         toast({
           title: "Quiz trống",
-          description: "Quiz không có câu hỏi nào. Không thể chấm điểm",
+          description: t('quizGenerator.toasts.noQuestions'),
           variant: "destructive",
         });
         return;
@@ -1074,7 +1074,7 @@ const QuizGenerator = () => {
       if (answeredCount !== quiz.questions.length) {
         toast({
           title: "Chưa hoàn thành bài kiểm tra",
-          description: `Bạn đã trả lời ${answeredCount}/${quiz.questions.length} câu hỏi. Vui lòng hoàn thành tất cả`,
+          description: t('quizGenerator.toasts.incomplete', { answered: answeredCount, total: quiz.questions.length }),
           variant: "destructive",
         });
         return;
@@ -1083,9 +1083,9 @@ const QuizGenerator = () => {
       // Handle edge case 5: All answers are undefined (shouldn't happen after above check)
       if (answeredCount === 0) {
         toast({
-          title: "Chưa trả lời câu hỏi nào",
+          title: t('quizGenerator.toasts.noAnswers'),
           description:
-            "Vui lòng trả lời ít nhất một câu hỏi trước khi chấm điểm",
+            t('quizGenerator.toasts.noAnswersDesc'),
           variant: "destructive",
         });
         return;
@@ -1097,7 +1097,7 @@ const QuizGenerator = () => {
       console.error("Error grading quiz:", error);
       toast({
         title: "Lỗi chấm điểm",
-        description: "Có lỗi xảy ra khi chấm điểm. Vui lòng thử lại",
+        description: t('quizGenerator.toasts.gradeError'),
         variant: "destructive",
       });
     }
@@ -1164,8 +1164,8 @@ const QuizGenerator = () => {
     } catch (error) {
       console.error("Chill audio error:", error);
       toast({
-        title: "Không thể phát nhạc",
-        description: "Vui lòng kiểm tra quyền trình duyệt hoặc nguồn nhạc",
+        title: t('quizGenerator.toasts.musicError'),
+        description: t('quizGenerator.toasts.musicErrorDesc'),
         variant: "warning",
       });
     }
@@ -1414,7 +1414,7 @@ const QuizGenerator = () => {
                             window.dispatchEvent(new Event("open-auth-modal"));
                           }}
                           className="text-xs text-primary hover:underline font-medium">
-                          Đăng nhập để không giới hạn
+                          {t('quizGenerator.ui.loginUnlimited')}
                         </button>
                       )}
                     </div>
@@ -1434,7 +1434,7 @@ const QuizGenerator = () => {
                     </div>
                     <Textarea
                       id="quiz-topic"
-                      placeholder="Ví dụ: Tạo bộ câu hỏi trắc nghiệm về lịch sử Thế chiến thứ 2 cho học sinh THPT. Bao gồm các câu hỏi về các trận đánh lớn, nhân vật chủ chốt và ảnh hưởng của chiến tranh đến xã hội."
+                      placeholder={t('quizGenerator.ui.examplePlaceholder')}
                       value={prompt}
                       onChange={(e) => setPrompt(e.target.value)}
                       className={`min-h-[120px] md:min-h-[140px] resize-none transition-all ${promptError
@@ -1501,7 +1501,7 @@ const QuizGenerator = () => {
                       <label
                         htmlFor="question-count"
                         className="text-sm font-semibold text-foreground">
-                        Số lượng câu hỏi
+                        {t('quizGenerator.ui.questionCount')}
                       </label>
                       <Badge variant="secondary" className="text-xs">
                         Bắt buộc
@@ -1516,18 +1516,18 @@ const QuizGenerator = () => {
                       <SelectTrigger
                         id="question-count"
                         className="w-full md:w-48 hover:bg-primary/5 hover:border-primary transition-colors">
-                        <SelectValue placeholder="Chọn số câu hỏi" />
+                        <SelectValue placeholder={t('quizGenerator.ui.selectPlaceholder')} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="10">10 câu hỏi</SelectItem>
-                        <SelectItem value="15">15 câu hỏi</SelectItem>
-                        <SelectItem value="20">20 câu hỏi</SelectItem>
-                        <SelectItem value="25">25 câu hỏi</SelectItem>
-                        <SelectItem value="30">30 câu hỏi</SelectItem>
+                        <SelectItem value="10">{t('quizGenerator.ui.10questions')}</SelectItem>
+                        <SelectItem value="15">{t('quizGenerator.ui.15questions')}</SelectItem>
+                        <SelectItem value="20">{t('quizGenerator.ui.20questions')}</SelectItem>
+                        <SelectItem value="25">{t('quizGenerator.ui.25questions')}</SelectItem>
+                        <SelectItem value="30">{t('quizGenerator.ui.30questions')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <p className="text-xs text-muted-foreground">
-                      Thời gian tạo khoảng{" "}
+                      {t('quizGenerator.ui.estimatedTime')}{" "}
                       {questionCount
                         ? Math.ceil(parseInt(questionCount) / 10)
                         : 2}
@@ -1567,7 +1567,7 @@ const QuizGenerator = () => {
                           <Sparkles className="w-5 h-5" />
                           {isPromptValid && isQuestionCountSelected
                             ? "Tạo Quiz Ngay"
-                            : "Vui lòng điền đầy đủ thông tin"}
+                            : t('quizGenerator.ui.fillAllFields')}
                           {isPromptValid && isQuestionCountSelected && (
                             <div className="bg-[#B5CC89] p-1 rounded-lg ml-1">
                               <svg
