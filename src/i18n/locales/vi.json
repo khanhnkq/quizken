@@ -279,6 +279,7 @@
         "title": "Dashboard Cá Nhân",
         "subtitle": "Theo dõi tiến trình học tập và thành tích của bạn",
         "createQuiz": "Tạo Quiz Mới",
+        "error": "Đã có lỗi xảy ra khi tải dữ liệu dashboard. Vui lòng thử lại sau.",
         "welcome": {
             "title": "Chào mừng đến với Dashboard!",
             "description": "Bạn chưa có dữ liệu học tập nào. Hãy bắt đầu bằng cách tạo quiz mới hoặc làm các quiz có sẵn để theo dõi tiến trình của bạn.",
@@ -287,8 +288,11 @@
         },
         "statistics": {
             "quizzesCreated": "Quiz đã tạo",
+            "createdDesc": "Tổng số quiz bạn đã tạo",
             "quizzesTaken": "Quiz đã làm",
+            "takenDesc": "Tổng số quiz bạn đã hoàn thành",
             "highestScore": "Điểm cao nhất",
+            "highestScoreDesc": "Điểm cao nhất bạn đạt được",
             "description": {
                 "created": "Tổng số quiz bạn đã tạo",
                 "taken": "Tổng số quiz bạn đã hoàn thành",
@@ -313,10 +317,12 @@
         "progressTrend": {
             "title": "Xu hướng tiến bộ (30 ngày)",
             "titleShort": "Tiến bộ (30 ngày)",
-            "empty": "Chưa có dữ liệu tiến bộ",
-            "emptyDescription": "Hãy làm một vài quiz để xem xu hướng của bạn!",
+            "empty": "Chưa có dữ liệu xu hướng",
+            "emptyDescription": "Hãy làm thêm quiz để xem biểu đồ tiến bộ của bạn",
+            "score": "Điểm",
             "avgScore": "Điểm TB",
-            "quizCount": "Số quiz"
+            "quizCount": "Số quiz",
+            "scoreAxis": "Điểm (%)"
         }
     },
     "footer": {

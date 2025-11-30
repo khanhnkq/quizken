@@ -15,12 +15,12 @@ import type { ProgressTrendData } from "@/types/dashboard";
 import { TrendingUpIcon } from "lucide-react";
 
 interface ProgressTrendlineProps {
-  progressData: ProgressTrendData[];
+  trendData: ProgressTrendData[];
   isLoading: boolean;
 }
 
 export function ProgressTrendline({
-  progressData,
+  trendData,
   isLoading,
 }: ProgressTrendlineProps) {
   const { t } = useTranslation();
@@ -32,7 +32,7 @@ export function ProgressTrendline({
         <CardHeader className="border-b bg-[#B5CC89]/5">
           <CardTitle className="flex items-center gap-2 text-gray-900 text-base md:text-lg">
             <TrendingUpIcon className="h-4 w-4 md:h-5 md:w-5" />
-            <span className="sm:inline">Tiến bộ (30 ngày)</span>
+            <span className="sm:inline">{t('dashboard.progressTrend.titleShort')}</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-4 md:pt-6">
@@ -42,14 +42,14 @@ export function ProgressTrendline({
     );
   }
 
-  if (!progressData || progressData.length === 0) {
+  if (!trendData || trendData.length === 0) {
     return (
       <Card className="border-2 border-dashed hover:border-[#B5CC89] transition-colors">
         <CardHeader className="border-b bg-[#B5CC89]/5">
           <CardTitle className="flex items-center gap-2 text-gray-900 text-base md:text-lg">
             <TrendingUpIcon className="h-4 w-4 md:h-5 md:w-5" />
-            <span className="hidden sm:inline">Xu hướng tiến bộ (30 ngày)</span>
-            <span className="sm:inline">Tiến bộ (30 ngày)</span>
+            <span className="hidden sm:inline">{t('dashboard.progressTrend.title')}</span>
+            <span className="sm:inline">{t('dashboard.progressTrend.titleShort')}</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col items-center justify-center h-48 md:h-64 text-center p-4">
@@ -70,8 +70,8 @@ export function ProgressTrendline({
   // Format data for chart
   const chartData = trendData.map((item) => ({
     date: item.date,
-    điểm: item.average_score,
-    "Số quiz": item.quiz_count,
+    [t('dashboard.progressTrend.score')]: item.average_score,
+    [t('dashboard.progressTrend.quizCount')]: item.quiz_count,
   }));
 
   const CustomTooltip = ({
@@ -93,11 +93,11 @@ export function ProgressTrendline({
           <div className="space-y-1">
             <p className="text-sm font-semibold text-[#B5CC89] flex items-center gap-2">
               <span className="w-3 h-3 rounded-full bg-[#B5CC89]"></span>
-              Điểm TB: {payload[0]?.value?.toFixed(1)}%
+              {t('dashboard.progressTrend.avgScore')}: {payload[0]?.value?.toFixed(1)}%
             </p>
             <p className="text-sm font-semibold text-gray-600 flex items-center gap-2">
               <span className="w-3 h-3 rounded-full bg-gray-500"></span>
-              Số quiz: {payload[1]?.value}
+              {t('dashboard.progressTrend.quizCount')}: {payload[1]?.value}
             </p>
           </div>
         </div>
@@ -144,7 +144,7 @@ export function ProgressTrendline({
               tick={{ fontSize: 10, fill: "#6b7280" }}
               domain={[0, 100]}
               label={{
-                value: "Điểm (%)",
+                value: t('dashboard.progressTrend.scoreAxis'),
                 angle: -90,
                 position: "insideLeft",
                 fill: "#B5CC89",
@@ -158,7 +158,7 @@ export function ProgressTrendline({
               orientation="right"
               tick={{ fontSize: 10, fill: "#6b7280" }}
               label={{
-                value: "Số quiz",
+                value: t('dashboard.progressTrend.quizCount'),
                 angle: 90,
                 position: "insideRight",
                 fill: "#6b7280",
@@ -171,7 +171,7 @@ export function ProgressTrendline({
             <Line
               yAxisId="score"
               type="monotone"
-              dataKey="điểm"
+              dataKey={t('dashboard.progressTrend.score')}
               stroke="#B5CC89"
               strokeWidth={2}
               dot={{ fill: "#B5CC89", strokeWidth: 1, r: 3 }}
@@ -181,7 +181,7 @@ export function ProgressTrendline({
             <Line
               yAxisId="count"
               type="monotone"
-              dataKey="Số quiz"
+              dataKey={t('dashboard.progressTrend.quizCount')}
               stroke="#6b7280"
               strokeWidth={2}
               dot={{ fill: "#6b7280", strokeWidth: 1, r: 2 }}

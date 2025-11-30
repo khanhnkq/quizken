@@ -9,10 +9,13 @@ interface StatisticsCardsProps {
   isLoading: boolean;
 }
 
+import { useTranslation } from "react-i18next";
+
 export function StatisticsCards({
   statistics,
   isLoading,
 }: StatisticsCardsProps) {
+  const { t } = useTranslation();
   const totalCreatedRef = useCountUp(statistics?.total_quizzes_created || 0, {
     duration: 1.5,
   });
@@ -25,30 +28,30 @@ export function StatisticsCards({
 
   const cards = [
     {
-      title: "Quiz đã tạo",
+      title: t('dashboard.statistics.quizzesCreated'),
       icon: FileTextIcon,
       bgColor: "bg-[#B5CC89]/20",
       iconBg: "bg-[#B5CC89]",
       iconColor: "text-black",
-      description: "Tổng số quiz bạn đã tạo",
+      description: t('dashboard.statistics.createdDesc'),
       ref: totalCreatedRef,
     },
     {
-      title: "Quiz đã làm",
+      title: t('dashboard.statistics.quizzesTaken'),
       icon: CheckCircleIcon,
       bgColor: "bg-[#B5CC89]/20",
       iconBg: "bg-[#B5CC89]",
       iconColor: "text-black",
-      description: "Tổng số quiz bạn đã hoàn thành",
+      description: t('dashboard.statistics.takenDesc'),
       ref: totalTakenRef,
     },
     {
-      title: "Điểm cao nhất",
+      title: t('dashboard.statistics.highestScore'),
       icon: TrophyIcon,
       bgColor: "bg-[#B5CC89]/20",
       iconBg: "bg-[#B5CC89]",
       iconColor: "text-black",
-      description: "Điểm cao nhất bạn đạt được",
+      description: t('dashboard.statistics.highestScoreDesc'),
       ref: highestScoreRef,
       suffix: "%",
     },

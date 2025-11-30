@@ -93,7 +93,7 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
         <Alert className="max-w-2xl mx-auto">
           <BarChart3Icon className="h-4 w-4" />
           <AlertDescription>
-            Đã có lỗi xảy ra khi tải dữ liệu dashboard. Vui lòng thử lại sau.
+            {t('dashboard.error')}
           </AlertDescription>
         </Alert>
       </div>
