@@ -16,10 +16,13 @@ import { useFlashcardImagePreloader } from "@/hooks/useFlashcardImagePreloader";
 import type { FlashcardViewProps } from "@/types/flashcard";
 import "./flashcard.css";
 
+import { useTranslation } from "react-i18next";
+
 export const FlashcardView: React.FC<FlashcardViewProps> = ({
   quiz,
   onBack,
 }) => {
+  const { t } = useTranslation();
   const {
     currentFlashcard,
     currentIndex,
@@ -179,7 +182,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
     return (
       <div className="text-center space-y-4 py-12">
         <div className="loading-spinner rounded-full h-12 w-12 border-b-2 border-[#B5CC89] mx-auto"></div>
-        <p className="text-muted-foreground">Đang tải flashcards...</p>
+        <p className="text-muted-foreground">{t('quizGenerator.flashcard.loading')}</p>
       </div>
     );
   }
@@ -190,11 +193,11 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
         <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto">
           <span className="text-2xl">⚠️</span>
         </div>
-        <h2 className="text-xl font-semibold text-foreground">Có lỗi xảy ra</h2>
+        <h2 className="text-xl font-semibold text-foreground">{t('quizGenerator.flashcard.error')}</h2>
         <p className="text-muted-foreground">{error}</p>
         <Button onClick={onBack} variant="outline">
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Quay lại
+          {t('quizGenerator.flashcard.back')}
         </Button>
       </div>
     );
@@ -205,14 +208,14 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
       <div className="text-center space-y-4 py-12">
         <BookOpen className="w-16 h-16 text-[#B5CC89] mx-auto" />
         <h2 className="text-xl font-semibold text-foreground">
-          Không có flashcard
+          {t('quizGenerator.flashcard.noCards')}
         </h2>
         <p className="text-muted-foreground">
-          Quiz này không có câu hỏi để hiển thị flashcard.
+          {t('quizGenerator.flashcard.noCardsDesc')}
         </p>
         <Button onClick={onBack} variant="outline">
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Quay lại
+          {t('quizGenerator.flashcard.back')}
         </Button>
       </div>
     );
@@ -229,11 +232,11 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                   Flashcard
                 </span>
                 <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-secondary text-secondary-foreground">
-                  {totalCards} thẻ
+                  {totalCards} {t('quizGenerator.flashcard.cards')}
                 </span>
               </div>
               <CardTitle className="text-xl md:text-2xl">
-                Chế độ Flashcard
+                {t('quizGenerator.flashcard.mode')}
               </CardTitle>
               <CardDescription className="mt-1">{quiz?.title}</CardDescription>
             </div>
@@ -244,15 +247,15 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                 size="sm"
                 className="flex-1 lg:flex-initial">
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                <span className="hidden xs:inline">Quay lại Quiz</span>
-                <span className="xs:hidden">Quay lại</span>
+                <span className="hidden xs:inline">{t('quizGenerator.flashcard.backToQuiz')}</span>
+                <span className="xs:hidden">{t('quizGenerator.flashcard.back')}</span>
               </Button>
             </div>
           </div>
 
           <div className="mt-4">
             <div className="flex items-center justify-between mb-2 text-sm text-muted-foreground">
-              <span>Tiến độ</span>
+              <span>{t('quizGenerator.flashcard.progress')}</span>
               <span>
                 {currentIndex + 1}/{totalCards}
               </span>

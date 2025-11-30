@@ -4,10 +4,13 @@ import { cn } from "@/lib/utils";
 import type { FlashcardControlsProps } from "@/types/flashcard";
 import "./flashcard.css";
 
+import { useTranslation } from "react-i18next";
+
 export const FlashcardControls: React.FC<FlashcardControlsProps> = ({
   currentIndex,
   totalCards,
 }) => {
+  const { t } = useTranslation();
   const progressPercent =
     totalCards > 0 ? ((currentIndex + 1) / totalCards) * 100 : 0;
 
@@ -42,17 +45,16 @@ export const FlashcardControls: React.FC<FlashcardControlsProps> = ({
                     index > currentIndex
                       ? "left"
                       : index < currentIndex
-                      ? "right"
-                      : null;
+                        ? "right"
+                        : null;
                   const event = new CustomEvent("goToCard", {
                     detail: index,
                     direction,
                   });
                   window.dispatchEvent(event);
                 }}
-                title={`Thẻ ${index + 1}: ${
-                  isCurrent ? "Đang xem" : "Chưa xem"
-                }`}>
+                title={`${t('quizGenerator.flashcard.card')} ${index + 1}: ${isCurrent ? t('quizGenerator.flashcard.viewing') : t('quizGenerator.flashcard.notViewed')
+                  }`}>
                 <span className="relative z-10 text-xs sm:text-sm">
                   {index + 1}
                 </span>
@@ -68,13 +70,13 @@ export const FlashcardControls: React.FC<FlashcardControlsProps> = ({
 
         {/* Help text - Giống QuizContent */}
         <p className="text-center text-xs text-muted-foreground">
-          Nhấp để đi tới thẻ tương ứng. Thẻ đang xem có màu xanh.
+          {t('quizGenerator.flashcard.help')}
         </p>
       </div>
 
       {/* Keyboard Shortcuts - Chỉ hiển thị trên desktop */}
       <div className="hidden lg:block text-center text-xs text-muted-foreground">
-        ← → để điều hướng • Space để lật thẻ
+        {t('quizGenerator.flashcard.shortcuts')}
       </div>
     </div>
   );

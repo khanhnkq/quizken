@@ -139,6 +139,24 @@
             "minutes": "minutes",
             "playMusic": "Play chill music",
             "pauseMusic": "Pause music"
+        },
+        "flashcard": {
+            "loading": "Loading flashcards...",
+            "error": "An error occurred",
+            "back": "Back",
+            "backToQuiz": "Back to Quiz",
+            "noCards": "No flashcards",
+            "noCardsDesc": "This quiz has no questions to display flashcards.",
+            "mode": "Flashcard Mode",
+            "progress": "Progress",
+            "card": "Card",
+            "cards": "cards",
+            "viewing": "Viewing",
+            "notViewed": "Not viewed",
+            "help": "Click to navigate. Current card is highlighted.",
+            "shortcuts": "← → to navigate • Space to flip",
+            "correctAnswer": "Correct Answer",
+            "explanation": "Explanation"
         }
     },
     "library": {

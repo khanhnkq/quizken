@@ -139,6 +139,24 @@
             "minutes": "phút",
             "playMusic": "Phát nhạc chill",
             "pauseMusic": "Tạm dừng nhạc"
+        },
+        "flashcard": {
+            "loading": "Đang tải flashcards...",
+            "error": "Có lỗi xảy ra",
+            "back": "Quay lại",
+            "backToQuiz": "Quay lại Quiz",
+            "noCards": "Không có flashcard",
+            "noCardsDesc": "Quiz này không có câu hỏi để hiển thị flashcard.",
+            "mode": "Chế độ Flashcard",
+            "progress": "Tiến độ",
+            "card": "Thẻ",
+            "cards": "thẻ",
+            "viewing": "Đang xem",
+            "notViewed": "Chưa xem",
+            "help": "Nhấp để đi tới thẻ tương ứng. Thẻ đang xem có màu xanh.",
+            "shortcuts": "← → để điều hướng • Space để lật thẻ",
+            "correctAnswer": "Đáp án đúng",
+            "explanation": "Giải thích"
         }
     },
     "library": {

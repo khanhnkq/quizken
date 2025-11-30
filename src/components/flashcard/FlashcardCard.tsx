@@ -11,6 +11,8 @@ import "./flashcard.css";
  * - Luôn tăng chiều cao của thẻ (autoHeight) để hiển thị đầy đủ đáp án và giải thích — không có scroll nội bộ.
  */
 
+import { useTranslation } from "react-i18next";
+
 export const FlashcardCard: React.FC<FlashcardCardProps> = ({
   flashcard,
   isFlipped,
@@ -20,6 +22,7 @@ export const FlashcardCard: React.FC<FlashcardCardProps> = ({
   isImagePreloaded = false,
   entryClass,
 }) => {
+  const { t } = useTranslation();
   // Delegate flip handling to FlipCard while keeping keyboard accessibility
   const handleFlip = () => {
     onFlip?.();
@@ -35,7 +38,7 @@ export const FlashcardCard: React.FC<FlashcardCardProps> = ({
             ✓
           </div>
           <span className="text-lg font-semibold text-foreground">
-            Đáp án đúng
+            {t('quizGenerator.flashcard.correctAnswer')}
           </span>
         </div>
 
@@ -53,7 +56,7 @@ export const FlashcardCard: React.FC<FlashcardCardProps> = ({
           <div className="flex items-center justify-center gap-2 mb-2">
             <Info className="w-4 h-4 text-muted-foreground" />
             <span className="text-sm font-medium text-muted-foreground">
-              Giải thích
+              {t('quizGenerator.flashcard.explanation')}
             </span>
           </div>
           <div className="bg-card border border-border rounded-lg p-3 shadow-sm">
