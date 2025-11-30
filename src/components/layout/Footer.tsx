@@ -50,7 +50,7 @@ const Footer = () => {
               <Sparkles className="w-16 h-16 text-[#B5CC89]" />
             </div>
             <h2 className="text-4xl md:text-5xl font-bold">
-              Bắt đầu tạo các bài kiểm tra tuyệt vời ngay hôm nay
+              {t('footer.ctaTitle')}
             </h2>
             <p className="text-lg text-muted-foreground">
               {t('footer.ctaSubtitle')}
