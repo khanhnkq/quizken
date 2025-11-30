@@ -42,7 +42,7 @@ export function ProgressTrendline({
     );
   }
 
-  if (!trendData || trendData.length === 0) {
+  if (!progressData || progressData.length === 0) {
     return (
       <Card className="border-2 border-dashed hover:border-[#B5CC89] transition-colors">
         <CardHeader className="border-b bg-[#B5CC89]/5">

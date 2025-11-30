@@ -66,6 +66,7 @@ import ScrollSmoother from "gsap/ScrollSmoother";
 import { Eye } from "lucide-react";
 import SeoMeta from "@/components/SeoMeta";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useTranslation } from "react-i18next";
 
 interface PublicQuiz {
   id: string;
@@ -94,6 +95,7 @@ interface QuizQuestion {
 }
 
 const QuizLibrary: React.FC = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { toast } = useToast();
   const [quizzes, setQuizzes] = useState<PublicQuiz[]>([]);
@@ -530,7 +532,7 @@ const QuizLibrary: React.FC = () => {
 
   // Warm up PDF worker và font để lần bấm đầu nhanh hơn
   useEffect(() => {
-    warmupPdfWorker().catch(() => {});
+    warmupPdfWorker().catch(() => { });
   }, []);
 
   // Chuẩn hóa dữ liệu JSON từ DB thành Question[] chặt chẽ, không dùng any
@@ -593,7 +595,7 @@ const QuizLibrary: React.FC = () => {
         title="Thư viện các bài tập trắc nghiệm miễn phí"
         description="Khám phá hàng trăm quiz trắc nghiệm được tạo bằng AI trên QuizKen, lọc theo chủ đề và độ khó để luyện tập hiệu quả."
         canonical="/library"
-        keywords={["thư viện quiz", "quiz ai", "quiz miễn phí", "trắc nghiệm" ]}
+        keywords={["thư viện quiz", "quiz ai", "quiz miễn phí", "trắc nghiệm"]}
       />
       <Navbar />
 
@@ -860,12 +862,11 @@ const QuizLibrary: React.FC = () => {
                             );
 
                           const title = quiz.title || "quiz";
-                          const filename = `${
-                            title.replace(/\s+/g, "-").toLowerCase() || "quiz"
-                          }.pdf`;
+                          const filename = `${title.replace(/\s+/g, "-").toLowerCase() || "quiz"
+                            }.pdf`;
 
                           // Warm up worker (no-op if already warmed) then generate in background thread
-                          await warmupPdfWorker().catch(() => {});
+                          await warmupPdfWorker().catch(() => { });
                           await generateAndDownloadPdf({
                             filename,
                             title,
@@ -898,42 +899,42 @@ const QuizLibrary: React.FC = () => {
 
               {(filteredQuizzes.length > PAGE_SIZE ||
                 (hasMore && !debouncedQuery)) && (
-                <div className="flex justify-center gap-3 mt-8">
-                  {filteredQuizzes.length > PAGE_SIZE && (
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        if (displayLimit > PAGE_SIZE) {
-                          setDisplayLimit(PAGE_SIZE);
-                        } else {
-                          setDisplayLimit(
-                            Math.max(PAGE_SIZE, filteredQuizzes.length)
-                          );
-                        }
-                      }}
-                      className="min-w-[140px]">
-                      {displayLimit > PAGE_SIZE ? "Thu gọn" : "Hiển thị tất cả"}
-                    </Button>
-                  )}
+                  <div className="flex justify-center gap-3 mt-8">
+                    {filteredQuizzes.length > PAGE_SIZE && (
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          if (displayLimit > PAGE_SIZE) {
+                            setDisplayLimit(PAGE_SIZE);
+                          } else {
+                            setDisplayLimit(
+                              Math.max(PAGE_SIZE, filteredQuizzes.length)
+                            );
+                          }
+                        }}
+                        className="min-w-[140px]">
+                        {displayLimit > PAGE_SIZE ? "Thu gọn" : "Hiển thị tất cả"}
+                      </Button>
+                    )}
 
-                  {hasMore && !debouncedQuery && (
-                    <Button
-                      variant="outline"
-                      onClick={loadMore}
-                      disabled={loadingMore}
-                      className="min-w-[140px]">
-                      {loadingMore ? (
-                        <span className="flex items-center gap-2">
-                          <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary" />
-                          Đang tải...
-                        </span>
-                      ) : (
-                        "Xem thêm"
-                      )}
-                    </Button>
-                  )}
-                </div>
-              )}
+                    {hasMore && !debouncedQuery && (
+                      <Button
+                        variant="outline"
+                        onClick={loadMore}
+                        disabled={loadingMore}
+                        className="min-w-[140px]">
+                        {loadingMore ? (
+                          <span className="flex items-center gap-2">
+                            <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary" />
+                            Đang tải...
+                          </span>
+                        ) : (
+                          "Xem thêm"
+                        )}
+                      </Button>
+                    )}
+                  </div>
+                )}
 
               {!loading && filteredQuizzes.length === 0 && (
                 <div className="text-center py-16 px-4">
@@ -1043,7 +1044,7 @@ const QuizLibrary: React.FC = () => {
                             Danh sách câu hỏi:
                           </h3>
                           {Array.isArray(selectedQuiz.questions) &&
-                          selectedQuiz.questions.length > 0 ? (
+                            selectedQuiz.questions.length > 0 ? (
                             (selectedQuiz.questions as QuizQuestion[]).map(
                               (q, idx) => (
                                 <div
@@ -1055,7 +1056,7 @@ const QuizLibrary: React.FC = () => {
                                   </h4>
                                   <div className="space-y-2 pl-4">
                                     {Array.isArray(q.options) &&
-                                    q.options.length > 0 ? (
+                                      q.options.length > 0 ? (
                                       q.options.map((opt, optIdx) => (
                                         <div
                                           key={optIdx}
@@ -1104,15 +1105,14 @@ const QuizLibrary: React.FC = () => {
                                   Array.isArray(selectedQuiz.questions)
                                     ? selectedQuiz.questions
                                     : JSON.parse(
-                                        String(selectedQuiz.questions || "[]")
-                                      )
+                                      String(selectedQuiz.questions || "[]")
+                                    )
                                 );
                               const title = selectedQuiz.title || "quiz";
-                              const filename = `${
-                                title.replace(/\s+/g, "-").toLowerCase() ||
+                              const filename = `${title.replace(/\s+/g, "-").toLowerCase() ||
                                 "quiz"
-                              }.pdf`;
-                              await warmupPdfWorker().catch(() => {});
+                                }.pdf`;
+                              await warmupPdfWorker().catch(() => { });
                               await generateAndDownloadPdf({
                                 filename,
                                 title,
