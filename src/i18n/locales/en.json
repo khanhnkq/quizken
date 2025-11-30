@@ -24,6 +24,36 @@
         "badgeInstant": "Instant Creation",
         "badgeSmartQuestions": "Smart Questions"
     },
+    "features": {
+        "title": "Why Choose QuizKen",
+        "subtitle": "The smartest way to create engaging quizzes. Use advanced AI to deliver quality educational content instantly.",
+        "items": [
+            {
+                "title": "AI-Powered Quizzes",
+                "description": "Advanced AI creates smart, contextually relevant questions tailored to your exact topic."
+            },
+            {
+                "title": "Instant Results",
+                "description": "Generate complete quiz sets in seconds instead of hours. Save time and boost productivity."
+            },
+            {
+                "title": "Diverse Topics",
+                "description": "Create quizzes for any subject: science, history, languages, or custom topics."
+            },
+            {
+                "title": "Customizable Difficulty",
+                "description": "Adjust difficulty levels from basic to advanced to match your target audience."
+            },
+            {
+                "title": "Perfect for Everyone",
+                "description": "Ideal for teachers, students, content creators, and anyone who needs quizzes."
+            },
+            {
+                "title": "Quality Questions",
+                "description": "Every question includes detailed explanations to enhance learning and retention"
+            }
+        ]
+    },
     "quizGenerator": {
         "title": "Generate Quiz with AI",
         "description": "Enter the topic you want to create a quiz about",

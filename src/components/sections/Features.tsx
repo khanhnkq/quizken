@@ -8,44 +8,40 @@ import {
   Star,
 } from '@/lib/icons';
 import { Card, CardContent } from "@/components/ui/card";
+import { useTranslation } from "react-i18next";
 
 const Features = () => {
+  const { t } = useTranslation();
   const features = [
     {
       icon: Sparkles,
-      title: "Tạo quiz bằng AI",
-      description:
-        "AI tiên tiến tạo ra câu hỏi thông minh, phù hợp ngữ cảnh theo đúng chủ đề của bạn.",
+      title: t('features.items.0.title'),
+      description: t('features.items.0.description'),
     },
     {
       icon: Zap,
-      title: "Kết quả tức thì",
-      description:
-        "Tạo trọn bộ quiz trong vài giây thay vì hàng giờ. Tiết kiệm thời gian và tăng hiệu suất.",
+      title: t('features.items.1.title'),
+      description: t('features.items.1.description'),
     },
     {
       icon: BookOpen,
-      title: "Đa dạng chủ đề",
-      description:
-        "Tạo quiz cho mọi lĩnh vực: khoa học, lịch sử, ngôn ngữ hoặc chủ đề tùy chỉnh.",
+      title: t('features.items.2.title'),
+      description: t('features.items.2.description'),
     },
     {
       icon: Target,
-      title: "Tùy chỉnh độ khó",
-      description:
-        "Điều chỉnh mức độ khó từ cơ bản đến nâng cao cho đúng đối tượng người học.",
+      title: t('features.items.3.title'),
+      description: t('features.items.3.description'),
     },
     {
       icon: Users,
-      title: "Phù hợp cho mọi người",
-      description:
-        "Lý tưởng cho giáo viên, học sinh, sinh viên, người tạo nội dung và bất kỳ ai cần quiz.",
+      title: t('features.items.4.title'),
+      description: t('features.items.4.description'),
     },
     {
       icon: Award,
-      title: "Câu hỏi chất lượng",
-      description:
-        "Mỗi câu hỏi đều có giải thích chi tiết để tăng hiệu quả học tập và ghi nhớ",
+      title: t('features.items.5.title'),
+      description: t('features.items.5.description'),
     },
   ];
 
@@ -59,11 +55,10 @@ const Features = () => {
             <Star className="w-12 h-12 text-[#B5CC89]" />
           </div>
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            Vì sao chọn QuizKen
+            {t('features.title')}
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Cách thông minh nhất để tạo các bài kiểm tra hấp dẫn. Sử dụng AI
-            tiên tiến để cung cấp nội dung giáo dục chất lượng ngay lập tức.
+            {t('features.subtitle')}
           </p>
         </div>
 
