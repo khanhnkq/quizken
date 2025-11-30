@@ -168,18 +168,19 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
         </Card>
       )}
 
-      {/* Profile Card - Full Width */}
-      <div className="w-full">
-        <UserProfile
-          user={user}
-          statistics={statistics}
-          isLoading={statsLoading}
-          className="w-full"
-        />
-      </div>
+      {/* Bento 2x2 Grid Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Item 1: Profile Card (Top Left) */}
+        <div className="w-full h-full">
+          <UserProfile
+            user={user}
+            statistics={statistics}
+            isLoading={statsLoading}
+            className="w-full h-full"
+          />
+        </div>
 
-      {/* Statistics Cards - Full Width */}
-      <div className="w-full">
+        {/* Items 2-4: Statistics Cards (Top Right, Bottom Left, Bottom Right) */}
         <StatisticsCards statistics={statistics} isLoading={statsLoading} />
       </div>
 
