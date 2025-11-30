@@ -11,7 +11,18 @@
         "title": "Create AI Quiz for Free",
         "subtitle": "QuizKen helps teachers and students create multiple-choice quizzes with AI in seconds",
         "getStarted": "Get Started",
-        "learnMore": "Learn More"
+        "learnMore": "Learn More",
+        "titlePart1": "Create",
+        "titlePart2": "Amazing Quizzes",
+        "titlePart3": "with",
+        "titlePart4": "AI",
+        "titlePart5": "in seconds",
+        "typingText": "Create any quiz with AI. Perfect for everyone",
+        "createQuizButton": "Create Quiz Now",
+        "viewExamplesButton": "View Examples",
+        "badgeAI": "AI-Powered",
+        "badgeInstant": "Instant Creation",
+        "badgeSmartQuestions": "Smart Questions"
     },
     "quizGenerator": {
         "title": "Generate Quiz with AI",
@@ -150,7 +161,9 @@
         "legal": "Legal",
         "privacy": "Privacy Policy",
         "terms": "Terms of Service",
-        "copyright": "© 2024 QuizKen. All rights reserved."
+        "copyright": "© 2024 QuizKen. All rights reserved.",
+        "ctaTitle": "Start creating amazing quizzes today",
+        "ctaButton": "Create your first quiz"
     },
     "common": {
         "loading": "Loading...",

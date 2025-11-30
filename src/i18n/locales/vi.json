@@ -11,7 +11,18 @@
         "title": "Tạo Bài Kiểm Tra AI Miễn Phí",
         "subtitle": "QuizKen giúp giáo viên và học sinh tạo bài kiểm tra trắc nghiệm với AI trong vài giây",
         "getStarted": "Bắt đầu ngay",
-        "learnMore": "Tìm hiểu thêm"
+        "learnMore": "Tìm hiểu thêm",
+        "titlePart1": "Tạo",
+        "titlePart2": "Bài Kiểm Tra Tuyệt Vời",
+        "titlePart3": "với",
+        "titlePart4": "AI",
+        "titlePart5": "trong vài giây",
+        "typingText": "Tạo mọi bài kiểm tra với AI. Phù hợp với tất cả mọi người",
+        "createQuizButton": "Tạo Bài Kiểm Tra Ngay",
+        "viewExamplesButton": "Xem Ví Dụ",
+        "badgeAI": "Được tạo bởi AI",
+        "badgeInstant": "Tạo Trong Tức Thì",
+        "badgeSmartQuestions": "Câu Hỏi Thông Minh"
     },
     "quizGenerator": {
         "title": "Tạo Quiz với AI",
@@ -150,7 +161,9 @@
         "legal": "Pháp lý",
         "privacy": "Chính sách bảo mật",
         "terms": "Điều khoản sử dụng",
-        "copyright": "© 2024 QuizKen. Bảo lưu mọi quyền."
+        "copyright": "© 2024 QuizKen. Bảo lưu mọi quyền.",
+        "ctaTitle": "Bắt đầu tạo các bài kiểm tra tuyệt vời ngay hôm nay",
+        "ctaButton": "Tạo bài kiểm tra đầu tiên của bạn"
     },
     "common": {
         "loading": "Đang tải...",

@@ -2,8 +2,10 @@ import { Button } from "@/components/ui/button";
 import { Sparkles } from "@/lib/icons";
 import { type MouseEvent } from "react";
 import { gsap } from "gsap";
+import { useTranslation } from "react-i18next";
 
 const Footer = () => {
+  const { t } = useTranslation();
   const scrollToGenerator = () => {
     const el = document.getElementById("generator");
     if (!el) return;
@@ -89,7 +91,7 @@ const Footer = () => {
       <div className="border-t py-6 px-4">
         <div className="container mx-auto max-w-7xl">
           <p className="text-center text-sm text-muted-foreground">
-          "Grow, learn, and share — from Quizken with love"
+            "Grow, learn, and share — from Quizken with love"
           </p>
         </div>
       </div>

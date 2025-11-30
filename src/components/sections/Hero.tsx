@@ -3,10 +3,12 @@ import { Sparkles, Zap, Brain, Eye } from "@/lib/icons";
 import { useState, useEffect, type MouseEvent } from "react";
 import { gsap } from "gsap";
 import { killActiveScroll, scrollToTarget } from "@/lib/scroll";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { shouldReduceAnimations } from "@/utils/deviceDetection";
 
 const Hero = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const scrollToGenerator = async () => {
     // Chuẩn hóa cuộn bằng tiện ích thống nhất, ưu tiên ScrollSmoother nếu khả dụng
@@ -18,7 +20,7 @@ const Hero = () => {
   // Typing effect state
   const [displayText, setDisplayText] = useState("");
   const [showCursor, setShowCursor] = useState(true);
-  const fullText = "Tạo mọi bài kiểm tra với AI. Phù hợp với tất cả mọi người";
+  const fullText = t("hero.typingText");
 
   useEffect(() => {
     let currentIndex = 0;
@@ -26,9 +28,9 @@ const Hero = () => {
     const typingSpeed = shouldReduceAnimations() ? 50 : 120;
     const displayTime = 2000; // 2 seconds before restarting
 
-    let typeTimeout;
-    let cursorTimeout;
-    let restartTimeout;
+    let typeTimeout: NodeJS.Timeout;
+    let cursorTimeout: NodeJS.Timeout;
+    let restartTimeout: NodeJS.Timeout;
 
     const restartTyping = () => {
       setDisplayText("");
@@ -61,7 +63,7 @@ const Hero = () => {
       clearTimeout(cursorTimeout);
       clearTimeout(restartTimeout);
     };
-  }, []);
+  }, [fullText]);
 
   const handleHoverEnter = (e: MouseEvent<HTMLButtonElement>) => {
     // Skip animations on mobile/low-end devices
@@ -95,15 +97,15 @@ const Hero = () => {
       <div className="container mx-auto max-w-7xl">
         <div className="max-w-4xl mx-auto text-center space-y-6 md:space-y-8 lg:space-y-10">
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-normal leading-snug md:leading-normal group hover:text-primary transition-all duration-500 hover:drop-shadow-2xl hover:scale-105 cursor-pointer">
-            Tạo{" "}
+            {t("hero.titlePart1")}{" "}
             <span className="text-primary group-hover:text-yellow-300 group-hover:scale-110 group-hover:animate-pulse transition-all duration-700">
-              Bài Kiểm Tra Tuyệt Vời
+              {t("hero.titlePart2")}
             </span>{" "}
-            với{" "}
+            {t("hero.titlePart3")}{" "}
             <span className="text-primary group-hover:text-yellow-300 group-hover:scale-110 group-hover:animate-pulse transition-all duration-700">
-              AI
+              {t("hero.titlePart4")}
             </span>{" "}
-            trong vài giây
+            {t("hero.titlePart5")}
           </h1>
           <div className="h-14 sm:h-14 md:h-16 lg:h-20 flex items-center justify-center">
             {" "}
@@ -125,7 +127,7 @@ const Hero = () => {
               onClick={scrollToGenerator}
               onMouseEnter={handleHoverEnter}
               onMouseLeave={handleHoverLeave}>
-              Tạo Bài Kiểm Tra Ngay
+              {t("hero.createQuizButton")}
               <div className="bg-[#B5CC89] p-1 rounded-lg">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -149,7 +151,7 @@ const Hero = () => {
               onClick={() => navigate("/library")}
               onMouseEnter={handleHoverEnter}
               onMouseLeave={handleHoverLeave}>
-              Xem Ví Dụ
+              {t("hero.viewExamplesButton")}
             </Button>
           </div>
 
@@ -160,7 +162,7 @@ const Hero = () => {
                 <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-black" />
               </div>
               <span className="text-xs md:text-sm font-medium">
-                Được tạo bởi AI
+                {t("hero.badgeAI")}
               </span>
             </div>
             <div className="flex items-center gap-2">
@@ -168,7 +170,7 @@ const Hero = () => {
                 <Zap className="w-4 h-4 md:w-5 md:h-5 text-black" />
               </div>
               <span className="text-xs md:text-sm font-medium">
-                Tạo Trong Tức Thì
+                {t("hero.badgeInstant")}
               </span>
             </div>
             <div className="flex items-center gap-2">
@@ -176,7 +178,7 @@ const Hero = () => {
                 <Brain className="w-4 h-4 md:w-5 md:h-5 text-black" />
               </div>
               <span className="text-xs md:text-sm font-medium">
-                Câu Hỏi Thông Minh
+                {t("hero.badgeSmartQuestions")}
               </span>
             </div>
           </div>
