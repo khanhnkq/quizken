@@ -176,7 +176,7 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
             user={user}
             statistics={statistics}
             isLoading={statsLoading}
-            className="w-full max-w-md lg:max-w-none"
+            className="w-full"
           />
         </div>
 

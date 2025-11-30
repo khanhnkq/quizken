@@ -216,50 +216,50 @@ export const UserProfile: React.FC<UserProfileProps> = ({
     <div
       ref={cardRef}
       className={cn(
-        "w-full mx-auto font-sans shadow-2xl rounded-2xl overflow-hidden bg-stone-50 flex flex-col transition-all duration-300 cursor-pointer",
-        // Remove fixed aspect ratio, use min-height for flexible landscape layout
-        "min-h-[200px]",
+        "w-full mx-auto font-sans shadow-2xl rounded-2xl overflow-hidden bg-stone-50 flex flex-row transition-all duration-300 cursor-pointer",
+        // Horizontal layout with fixed height or min-height
+        "min-h-[220px]",
         className
       )}>
-      {/* Header */}
-      <header className="px-3 py-2 md:px-4 md:py-2.5 border-b border-gray-200">
-        <div className="flex justify-between items-center">
-          <h1 className="text-sm md:text-base font-bold text-gray-700">
-            QUIZKEN
-          </h1>
-          <h2 className="text-[10px] md:text-xs font-semibold text-gray-500 tracking-[0.15em]">
-            MEMBER CARD
-          </h2>
-        </div>
-      </header>
+      {/* LEFT SIDE - Photo Section (35%) */}
+      <div className="w-[35%] flex-shrink-0 p-3 md:p-4 flex items-center justify-center border-r border-gray-200 bg-gray-50/50">
+        <img
+          ref={photoRef}
+          src={
+            avatarUrl ||
+            `https://ui-avatars.com/api/?name=${encodeURIComponent(
+              userName
+            )}&background=random&color=fff`
+          }
+          alt={userName}
+          className={cn(
+            "w-full h-auto aspect-square object-cover rounded-lg border-2 md:border-3 transition-transform duration-300 shadow-sm",
+            theme.photoBorder
+          )}
+        />
+      </div>
 
-      {/* Main Content - HORIZONTAL LAYOUT */}
-      <main className="flex flex-row flex-1 relative">
-        {/* Photo Section - Left 35% */}
-        <div className="w-[35%] flex-shrink-0 p-3 md:p-4 flex items-center justify-center">
-          <img
-            ref={photoRef}
-            src={
-              avatarUrl ||
-              `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                userName
-              )}&background=random&color=fff`
-            }
-            alt={userName}
-            className={cn(
-              "w-full h-full max-h-[120px] md:max-h-[140px] object-cover rounded-lg border-2 md:border-3 transition-transform duration-300",
-              theme.photoBorder
-            )}
-          />
-        </div>
+      {/* RIGHT SIDE - Content Section (65%) */}
+      <div className="flex-1 flex flex-col relative">
+        {/* Header */}
+        <header className="px-3 py-2 md:px-4 md:py-2.5 border-b border-gray-200 bg-white/50">
+          <div className="flex justify-between items-center">
+            <h1 className="text-sm md:text-base font-bold text-gray-700">
+              QUIZKEN
+            </h1>
+            <h2 className="text-[10px] md:text-xs font-semibold text-gray-500 tracking-[0.15em]">
+              MEMBER CARD
+            </h2>
+          </div>
+        </header>
 
-        {/* Info Section - Right 65% */}
-        <div className="flex-1 flex flex-col justify-between p-3 md:p-4 relative">
+        {/* Info Content */}
+        <div className="flex-1 p-3 md:p-4 relative flex flex-col justify-center">
           {/* Level Badge */}
-          <div className="mb-2 md:mb-3">
+          <div className="mb-3 absolute top-3 right-4">
             <div
               className={cn(
-                "inline-block border-2 rounded-full px-2 py-0.5 md:px-3 md:py-1",
+                "inline-block border-2 rounded-full px-2 py-0.5 md:px-3 md:py-1 bg-white",
                 theme.classBorder
               )}>
               <span
@@ -276,7 +276,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({
           </div>
 
           {/* User Info Fields - 2 Column Grid */}
-          <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 md:gap-x-4 md:gap-y-2 flex-1">
+          <div className="grid grid-cols-2 gap-x-3 gap-y-2 md:gap-x-4 mt-4">
             <InfoField label="Name" value={userName} />
             <InfoField label="Member ID" value={userId} />
             <InfoField
@@ -296,31 +296,31 @@ export const UserProfile: React.FC<UserProfileProps> = ({
           <Watermark
             ref={watermarkRef}
             className={cn(
-              "absolute bottom-2 right-2 w-10 h-10 md:w-14 md:h-14 transition-all duration-500",
+              "absolute bottom-2 right-2 w-10 h-10 md:w-14 md:h-14 transition-all duration-500 pointer-events-none",
               theme.watermarkText
             )}
           />
         </div>
-      </main>
 
-      {/* Footer - Green Bar */}
-      <footer
-        className={cn(
-          "h-8 md:h-10 flex-shrink-0 bg-gradient-to-r flex items-center justify-between px-3 md:px-4",
-          theme.gradient
-        )}>
-        <div className="flex items-center gap-2">
-          <Barcode />
-        </div>
-        <div className="flex items-center gap-2 md:gap-3">
-          <span className="text-white text-[9px] md:text-[10px] font-mono uppercase truncate max-w-[100px] md:max-w-[140px]">
-            {userName}
-          </span>
-          <span className="text-white text-[9px] md:text-[10px] font-mono font-semibold">
-            {userId}
-          </span>
-        </div>
-      </footer>
+        {/* Footer - Green Bar */}
+        <footer
+          className={cn(
+            "h-8 md:h-10 flex-shrink-0 bg-gradient-to-r flex items-center justify-between px-3 md:px-4",
+            theme.gradient
+          )}>
+          <div className="flex items-center gap-2">
+            <Barcode />
+          </div>
+          <div className="flex items-center gap-2 md:gap-3">
+            <span className="text-white text-[9px] md:text-[10px] font-mono uppercase truncate max-w-[100px] md:max-w-[140px]">
+              {userName}
+            </span>
+            <span className="text-white text-[9px] md:text-[10px] font-mono font-semibold">
+              {userId}
+            </span>
+          </div>
+        </footer>
+      </div>
     </div>
   );
 };
