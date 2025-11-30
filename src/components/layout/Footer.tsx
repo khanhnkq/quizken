@@ -63,7 +63,7 @@ const Footer = () => {
                 onClick={scrollToGenerator}
                 onMouseEnter={handleHoverEnter}
                 onMouseLeave={handleHoverLeave}>
-                Tạo bài kiểm tra đầu tiên của bạn
+                {t('footer.ctaButton')}
                 <div className="bg-[#B5CC89] p-1 rounded-lg">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
