@@ -18,6 +18,7 @@ import { isIOSSafari } from "@/utils/deviceDetection";
 import { supabase } from "@/integrations/supabase/client";
 import { useFlashcardPersistence } from "@/hooks/useFlashcardPersistence";
 import FlashcardView from "@/components/flashcard/FlashcardView";
+import { useTranslation } from "react-i18next";
 
 interface TokenUsage {
   prompt: number;
@@ -87,6 +88,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
   onDownload,
   userId,
 }) => {
+  const { t } = useTranslation();
   const { activateFlashcard, deactivateFlashcard } =
     useFlashcardPersistence(null);
   const [showFlashcard, setShowFlashcard] = React.useState(false);
@@ -191,19 +193,17 @@ export const QuizContent: React.FC<QuizContentProps> = ({
           </div>
           <h2 className="text-4xl md:text-5xl font-bold">{quiz.title}</h2>
           <p className="text-lg text-muted-foreground">
-            {quiz.description ||
-              "Trả lời các câu hỏi bên dưới và xem giải thích sau khi chấm điểm"}
+            {quiz.description || t('quizContent.defaultDescription')}
           </p>
         </div>
 
         {/* Flashcard View - Conditionally Rendered */}
         <div className="relative w-full">
           <div
-            className={`transition-all duration-500 ease-in-out transform-gpu ${
-              showFlashcard
+            className={`transition-all duration-500 ease-in-out transform-gpu ${showFlashcard
                 ? "opacity-0 scale-95 rotate-y-90 pointer-events-none absolute"
                 : "opacity-100 scale-100 rotate-y-0"
-            }`}>
+              }`}>
             <Card
               ref={cardRef}
               className="border-2 rounded-none md:rounded-xl shadow-lg bg-card">
@@ -211,9 +211,9 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                 <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
                   <div className="flex-1">
                     <div className="flex flex-wrap items-center gap-2 mb-2">
-                      <Badge variant="secondary">Bài kiểm tra</Badge>
+                      <Badge variant="secondary">{t('quizContent.badge')}</Badge>
                       <Badge className="text-xs">
-                        {quiz.questions.length} câu hỏi
+                        {quiz.questions.length} {t('quizContent.questions')}
                         {tokenUsage && (
                           <span className="ml-1 opacity-75">
                             ({tokenUsage.total} token)
@@ -239,7 +239,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                         size="sm"
                         sound="alert"
                         className="flex-1 lg:flex-initial">
-                        Làm lại
+                        {t('quizContent.retake')}
                       </Button>
                     )}
                     <Button
@@ -249,17 +249,16 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                       variant={showFlashcard ? "default" : "outline"}
                       size="sm"
                       sound="success"
-                      className={`flex-1 lg:flex-initial ${
-                        showFlashcard
+                      className={`flex-1 lg:flex-initial ${showFlashcard
                           ? "bg-[#B5CC89] text-white hover:bg-[#B5CC89]/90"
                           : ""
-                      }`}>
+                        }`}>
                       <BookOpen className="mr-2 h-4 w-4" />
                       <span className="hidden xs:inline">
-                        {showFlashcard ? "Đang học" : "Flashcard"}
+                        {showFlashcard ? t('quizContent.studying') : t('quizContent.flashcard')}
                       </span>
                       <span className="xs:hidden">
-                        {showFlashcard ? "Học" : "Card"}
+                        {showFlashcard ? t('quizContent.study') : t('quizContent.card')}
                       </span>
                     </Button>
                     <Button
@@ -269,15 +268,15 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                       sound="success"
                       className="flex-1 lg:flex-initial">
                       <Download className="mr-2 h-4 w-4" />
-                      <span className="hidden xs:inline">Tải PDF</span>
-                      <span className="xs:hidden">PDF</span>
+                      <span className="hidden xs:inline">{t('quizContent.downloadPDF')}</span>
+                      <span className="xs:hidden">{t('quizContent.pdf')}</span>
                     </Button>
                   </div>
                 </div>
 
                 <div className="mt-4">
                   <div className="flex items-center justify-between mb-2 text-sm text-muted-foreground">
-                    <span>Tiến độ</span>
+                    <span>{t('quizContent.progress')}</span>
                     <span>
                       {answeredCount}/{quiz.questions.length}
                     </span>
@@ -289,7 +288,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                       data-score-display
                       className="mt-4 p-4 bg-[#B5CC89]/10 rounded-lg">
                       <h4 className="text-lg font-semibold">
-                        Điểm của bạn: {calculateScore()}/{quiz.questions.length}{" "}
+                        {t('quizContent.yourScore')}: {calculateScore()}/{quiz.questions.length}{" "}
                         (
                         {Math.round(
                           (calculateScore() / quiz.questions.length) * 100
@@ -313,10 +312,10 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                       const stateClasses = isCorrect
                         ? "border-green-500 text-green-600 hover:bg-green-50"
                         : isIncorrect
-                        ? "border-red-500 text-red-600 hover:bg-red-50"
-                        : isAnswered
-                        ? "border-[#B5CC89] text-[#B5CC89] hover:bg-[#B5CC89]/10"
-                        : "border-border text-muted-foreground hover:bg-accent";
+                          ? "border-red-500 text-red-600 hover:bg-red-50"
+                          : isAnswered
+                            ? "border-[#B5CC89] text-[#B5CC89] hover:bg-[#B5CC89]/10"
+                            : "border-border text-muted-foreground hover:bg-accent";
 
                       return (
                         <Button
@@ -326,15 +325,14 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                           size="icon"
                           className={`relative w-10 h-10 rounded-full ${stateClasses}`}
                           onClick={() => handleNavigateQuestion(idx)}
-                          title={`Câu ${idx + 1}: ${
-                            isCorrect
-                              ? "Đúng"
+                          title={`${t('quizContent.question')} ${idx + 1}: ${isCorrect
+                              ? t('quizContent.correct')
                               : isIncorrect
-                              ? "Sai"
-                              : isAnswered
-                              ? "Đã trả lời"
-                              : "Chưa trả lời"
-                          }`}>
+                                ? t('quizContent.incorrect')
+                                : isAnswered
+                                  ? t('quizContent.answered')
+                                  : t('quizContent.unanswered')
+                            }`}>
                           <span className="relative z-10">{idx + 1}</span>
                           {showResults && isCorrect && (
                             <span className="pointer-events-none absolute -right-1 -top-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-white text-green-600 border border-green-600 text-[10px] font-bold">
@@ -351,8 +349,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                     })}
                   </div>
                   <p className="mt-3 text-center text-xs text-muted-foreground">
-                    Nhấp để đi tới câu hỏi tương ứng. Vòng tròn sáng màu thể
-                    hiện câu đã trả lời, đỏ là sai, xanh là đúng.
+                    {t('quizContent.navigationHelp')}
                   </p>
                 </div>
               </CardHeader>
@@ -363,7 +360,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                     if (!q || typeof q.question !== "string") {
                       return (
                         <div key={idx} className="text-red-500">
-                          Câu hỏi {idx} không hợp lệ
+                          {t('quizContent.invalidQuestion')} {idx}
                         </div>
                       );
                     }
@@ -396,15 +393,14 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                                   return (
                                     <label
                                       key={optIdx}
-                                      className={`flex items-start gap-2 p-2 sm:p-3 rounded-lg border cursor-pointer ${
-                                        showResults && isCorrect
+                                      className={`flex items-start gap-2 p-2 sm:p-3 rounded-lg border cursor-pointer ${showResults && isCorrect
                                           ? "bg-green-50 border-green-500"
                                           : userSelectedWrong
-                                          ? "bg-red-50 border-red-500"
-                                          : userSelectedCorrect
-                                          ? "bg-green-50 border-green-500"
-                                          : "bg-muted/50 border-gray-200 hover:bg-muted/80"
-                                      }`}>
+                                            ? "bg-red-50 border-red-500"
+                                            : userSelectedCorrect
+                                              ? "bg-green-50 border-green-500"
+                                              : "bg-muted/50 border-gray-200 hover:bg-muted/80"
+                                        }`}>
                                       <div className="flex items-center gap-2 w-full">
                                         <input
                                           type="radio"
@@ -431,17 +427,17 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                                       </div>
                                       {showResults && isCorrect && (
                                         <span className="ml-2 text-green-600 font-semibold">
-                                          ✓ Đáp án đúng
+                                          ✓ {t('quizContent.correctAnswer')}
                                         </span>
                                       )}
                                       {userSelectedWrong && (
                                         <span className="ml-2 text-red-600 font-semibold">
-                                          ✗ Câu trả lời của bạn
+                                          ✗ {t('quizContent.yourAnswer')}
                                         </span>
                                       )}
                                       {userSelectedCorrect && (
                                         <span className="ml-2 text-green-600 font-semibold">
-                                          ✓ Câu trả lời của bạn
+                                          ✓ {t('quizContent.yourAnswer')}
                                         </span>
                                       )}
                                     </label>
@@ -449,7 +445,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                                 })
                               ) : (
                                 <div className="text-red-500">
-                                  Không có đáp án cho câu hỏi {idx}
+                                  {t('quizContent.noOptions')} {idx}
                                 </div>
                               )}
                             </div>
@@ -457,7 +453,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                               <div className="pt-2 border-t">
                                 <p className="text-sm text-muted-foreground">
                                   <span className="font-semibold">
-                                    Giải thích:
+                                    {t('quizContent.explanation')}:
                                   </span>{" "}
                                   {q.explanation}
                                 </p>
@@ -472,10 +468,10 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                       <div
                         key={idx}
                         className="text-red-500 border border-red-300 p-4 rounded">
-                        Lỗi hiển thị câu hỏi {idx}:{" "}
+                        {t('quizContent.displayError')} {idx}:{" "}
                         {error instanceof Error
                           ? error.message
-                          : "Lỗi không xác định"}
+                          : t('quizContent.unknownError')}
                       </div>
                     );
                   }
@@ -533,8 +529,8 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                     sound="success"
                     className="w-full sm:w-auto text-sm sm:text-base !h-auto min-h-[2.75rem] py-3 !whitespace-normal break-words leading-snug hover:bg-primary hover:text-primary-foreground hover:border-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                     {answeredCount !== quiz.questions.length
-                      ? `Vui lòng trả lời hết tất cả ${quiz.questions.length} câu hỏi (${answeredCount}/${quiz.questions.length} đã trả lời)`
-                      : "Chấm điểm"}
+                      ? t('quizContent.answerAll', { total: quiz.questions.length, answered: answeredCount })
+                      : t('quizContent.grade')}
                   </Button>
                 ) : (
                   <Button
@@ -545,7 +541,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                     variant="outline"
                     size="lg"
                     sound="alert">
-                    Làm lại
+                    {t('quizContent.retake')}
                   </Button>
                 )}
               </CardFooter>
@@ -553,11 +549,10 @@ export const QuizContent: React.FC<QuizContentProps> = ({
           </div>
 
           <div
-            className={`transition-all duration-500 ease-in-out transform-gpu ${
-              showFlashcard
+            className={`transition-all duration-500 ease-in-out transform-gpu ${showFlashcard
                 ? "opacity-100 scale-100 rotate-y-0"
                 : "opacity-0 scale-95 -rotate-y-90 pointer-events-none absolute"
-            }`}>
+              }`}>
             <FlashcardView
               quiz={quiz}
               onBack={() => {
