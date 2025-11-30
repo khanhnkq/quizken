@@ -127,55 +127,55 @@
             "minutes": "phút",
             "playMusic": "Phát nhạc chill",
             "pauseMusic": "Tạm dừng nhạc"
+        }
+    },
+    "library": {
+        "hero": {
+            "title": "Thư viện Quiz Chung",
+            "description": "Khám phá và sử dụng hàng nghìn bài quiz do cộng đồng chia sẻ. Học tập, ôn luyện và mở rộng kiến thức của bạn."
         },
-        "library": {
-            "hero": {
-                "title": "Thư viện Quiz Chung",
-                "description": "Khám phá và sử dụng hàng nghìn bài quiz do cộng đồng chia sẻ. Học tập, ôn luyện và mở rộng kiến thức của bạn."
+        "stats": {
+            "quizzes": "Quiz",
+            "topics": "Chủ đề",
+            "creators": "Người tạo"
+        },
+        "search": {
+            "placeholder": "Tìm kiếm trong tiêu đề, mô tả, câu hỏi... (⌘K)",
+            "clear": "Xóa tìm kiếm",
+            "sortBy": "Sắp xếp theo",
+            "sort": {
+                "usage": "Nhiều lượt dùng nhất",
+                "downloads": "Nhiều lượt tải nhất",
+                "date": "Mới nhất"
             },
-            "stats": {
-                "quizzes": "Quiz",
-                "topics": "Chủ đề",
-                "creators": "Người tạo"
+            "searchIn": "Tìm trong",
+            "scope": {
+                "all": "Tất cả",
+                "title": "Tiêu đề",
+                "content": "Nội dung câu hỏi"
             },
-            "search": {
-                "placeholder": "Tìm kiếm trong tiêu đề, mô tả, câu hỏi... (⌘K)",
-                "clear": "Xóa tìm kiếm",
-                "sortBy": "Sắp xếp theo",
-                "sort": {
-                    "usage": "Nhiều lượt dùng nhất",
-                    "downloads": "Nhiều lượt tải nhất",
-                    "date": "Mới nhất"
-                },
-                "searchIn": "Tìm trong",
-                "scope": {
-                    "all": "Tất cả",
-                    "title": "Tiêu đề",
-                    "content": "Nội dung câu hỏi"
-                },
-                "category": "Chủ đề",
-                "allCategories": "Tất cả chủ đề",
-                "difficulty": "Độ khó",
-                "allDifficulties": "Tất cả độ khó"
-            },
-            "toasts": {
-                "loginRequired": "Yêu cầu đăng nhập",
-                "loginDesc": "Vui lòng đăng nhập để sử dụng quiz.",
-                "openingQuiz": "Chuyển đến trình làm quiz",
-                "openingDesc": "Đang mở \"{{title}}\" để làm bài.",
-                "loadError": "Lỗi",
-                "loadDesc": "Không thể tải thư viện quiz.",
-                "loadMoreDesc": "Không thể tải thêm quiz."
-            },
-            "card": {
-                "public": "Công khai",
-                "noDescription": "Không có mô tả",
-                "usageCount": "Số lần sử dụng",
-                "downloadCount": "Số lần tải PDF",
-                "questions": "câu",
-                "preview": "Xem trước",
-                "use": "Sử dụng"
-            }
+            "category": "Chủ đề",
+            "allCategories": "Tất cả chủ đề",
+            "difficulty": "Độ khó",
+            "allDifficulties": "Tất cả độ khó"
+        },
+        "toasts": {
+            "loginRequired": "Yêu cầu đăng nhập",
+            "loginDesc": "Vui lòng đăng nhập để sử dụng quiz.",
+            "openingQuiz": "Chuyển đến trình làm quiz",
+            "openingDesc": "Đang mở \"{{title}}\" để làm bài.",
+            "loadError": "Lỗi",
+            "loadDesc": "Không thể tải thư viện quiz.",
+            "loadMoreDesc": "Không thể tải thêm quiz."
+        },
+        "card": {
+            "public": "Công khai",
+            "noDescription": "Không có mô tả",
+            "usageCount": "Số lần sử dụng",
+            "downloadCount": "Số lần tải PDF",
+            "questions": "câu",
+            "preview": "Xem trước",
+            "use": "Sử dụng"
         }
     },
     "categories": {
@@ -287,50 +287,6 @@
             "emptyDescription": "Hãy làm một vài quiz để xem xu hướng của bạn!",
             "avgScore": "Điểm TB",
             "quizCount": "Số quiz"
-        }
-    },
-    "library": {
-        "title": "Thư viện Quiz Chung",
-        "description": "Khám phá và sử dụng hàng nghìn bài quiz do cộng đồng chia sẻ. Học tập, ôn luyện và mở rộng kiến thức của bạn.",
-        "stats": {
-            "quizzes": "Quiz",
-            "categories": "Chủ đề",
-            "creators": "Người tạo"
-        },
-        "search": {
-            "placeholder": "Tìm kiếm trong tiêu đề, mô tả, câu hỏi... (⌘K)",
-            "clear": "Xóa tìm kiếm"
-        },
-        "filters": {
-            "sortBy": "Sắp xếp theo",
-            "mostUsed": "Nhiều lượt dùng nhất",
-            "mostDownloaded": "Nhiều lượt tải nhất",
-            "newest": "Mới nhất",
-            "searchIn": "Tìm trong",
-            "all": "Tất cả",
-            "titleDesc": "Tiêu đề & Mô tả",
-            "content": "Nội dung",
-            "category": "Danh mục",
-            "difficulty": "Độ khó",
-            "allCategories": "Tất cả danh mục",
-            "allDifficulties": "Tất cả mức độ",
-            "easy": "Dễ",
-            "medium": "Trung bình",
-            "hard": "Khó"
-        },
-        "quizCard": {
-            "views": "lượt xem",
-            "downloads": "lượt tải",
-            "questions": "câu hỏi",
-            "useButton": "Sử dụng",
-            "downloadButton": "Tải PDF",
-            "previewButton": "Xem trước"
-        },
-        "loadMore": "Tải thêm",
-        "noResults": "Không tìm thấy kết quả",
-        "loginRequired": {
-            "title": "Yêu cầu đăng nhập",
-            "description": "Vui lòng đăng nhập để sử dụng quiz"
         }
     },
     "footer": {

@@ -127,55 +127,55 @@
             "minutes": "minutes",
             "playMusic": "Play chill music",
             "pauseMusic": "Pause music"
+        }
+    },
+    "library": {
+        "hero": {
+            "title": "Public Quiz Library",
+            "description": "Explore and use thousands of quizzes shared by the community. Learn, practice, and expand your knowledge."
         },
-        "library": {
-            "hero": {
-                "title": "Public Quiz Library",
-                "description": "Explore and use thousands of quizzes shared by the community. Learn, practice, and expand your knowledge."
+        "stats": {
+            "quizzes": "Quizzes",
+            "topics": "Topics",
+            "creators": "Creators"
+        },
+        "search": {
+            "placeholder": "Search in title, description, questions... (⌘K)",
+            "clear": "Clear search",
+            "sortBy": "Sort by",
+            "sort": {
+                "usage": "Most Used",
+                "downloads": "Most Downloaded",
+                "date": "Newest"
             },
-            "stats": {
-                "quizzes": "Quizzes",
-                "topics": "Topics",
-                "creators": "Creators"
+            "searchIn": "Search in",
+            "scope": {
+                "all": "All",
+                "title": "Title",
+                "content": "Question Content"
             },
-            "search": {
-                "placeholder": "Search in title, description, questions... (⌘K)",
-                "clear": "Clear search",
-                "sortBy": "Sort by",
-                "sort": {
-                    "usage": "Most Used",
-                    "downloads": "Most Downloaded",
-                    "date": "Newest"
-                },
-                "searchIn": "Search in",
-                "scope": {
-                    "all": "All",
-                    "title": "Title",
-                    "content": "Question Content"
-                },
-                "category": "Topic",
-                "allCategories": "All Topics",
-                "difficulty": "Difficulty",
-                "allDifficulties": "All Difficulties"
-            },
-            "toasts": {
-                "loginRequired": "Login Required",
-                "loginDesc": "Please login to use this quiz.",
-                "openingQuiz": "Opening Quiz Player",
-                "openingDesc": "Opening \"{{title}}\"...",
-                "loadError": "Error",
-                "loadDesc": "Could not load quiz library.",
-                "loadMoreDesc": "Could not load more quizzes."
-            },
-            "card": {
-                "public": "Public",
-                "noDescription": "No description",
-                "usageCount": "Usage count",
-                "downloadCount": "PDF downloads",
-                "questions": "questions",
-                "preview": "Preview",
-                "use": "Use Quiz"
-            }
+            "category": "Topic",
+            "allCategories": "All Topics",
+            "difficulty": "Difficulty",
+            "allDifficulties": "All Difficulties"
+        },
+        "toasts": {
+            "loginRequired": "Login Required",
+            "loginDesc": "Please login to use this quiz.",
+            "openingQuiz": "Opening Quiz Player",
+            "openingDesc": "Opening \"{{title}}\"...",
+            "loadError": "Error",
+            "loadDesc": "Could not load quiz library.",
+            "loadMoreDesc": "Could not load more quizzes."
+        },
+        "card": {
+            "public": "Public",
+            "noDescription": "No description",
+            "usageCount": "Usage count",
+            "downloadCount": "PDF downloads",
+            "questions": "questions",
+            "preview": "Preview",
+            "use": "Use Quiz"
         }
     },
     "categories": {
@@ -287,50 +287,6 @@
             "emptyDescription": "Take a few quizzes to see your trend!",
             "avgScore": "Avg Score",
             "quizCount": "Quiz Count"
-        }
-    },
-    "library": {
-        "title": "Public Quiz Library",
-        "description": "Discover and use thousands of quizzes shared by the community. Learn, practice, and expand your knowledge.",
-        "stats": {
-            "quizzes": "Quizzes",
-            "categories": "Categories",
-            "creators": "Creators"
-        },
-        "search": {
-            "placeholder": "Search in title, description, questions... (⌘K)",
-            "clear": "Clear search"
-        },
-        "filters": {
-            "sortBy": "Sort by",
-            "mostUsed": "Most Used",
-            "mostDownloaded": "Most Downloaded",
-            "newest": "Newest",
-            "searchIn": "Search in",
-            "all": "All",
-            "titleDesc": "Title & Description",
-            "content": "Content",
-            "category": "Category",
-            "difficulty": "Difficulty",
-            "allCategories": "All Categories",
-            "allDifficulties": "All Difficulties",
-            "easy": "Easy",
-            "medium": "Medium",
-            "hard": "Hard"
-        },
-        "quizCard": {
-            "views": "views",
-            "downloads": "downloads",
-            "questions": "questions",
-            "useButton": "Use",
-            "downloadButton": "Download PDF",
-            "previewButton": "Preview"
-        },
-        "loadMore": "Load More",
-        "noResults": "No results found",
-        "loginRequired": {
-            "title": "Login Required",
-            "description": "Please log in to use this quiz"
         }
     },
     "footer": {
