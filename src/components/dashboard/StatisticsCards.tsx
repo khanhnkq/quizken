@@ -81,7 +81,7 @@ export function StatisticsCards({
         return (
           <Card
             key={index}
-            className={`border-2 hover:border-[#B5CC89] transition-colors duration-300 hover:shadow-lg ${card.bgColor}`}>
+            className={`rounded-2xl border-2 hover:border-[#B5CC89] transition-all duration-300 hover:shadow-lg bg-white`}>
             <CardContent className="p-4 md:p-6 lg:p-8 text-center space-y-3 md:space-y-4">
               <div
                 className={`inline-flex p-3 md:p-4 ${card.iconBg} rounded-2xl`}>

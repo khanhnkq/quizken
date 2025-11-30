@@ -134,7 +134,7 @@ export function RecentQuizzes({
   }
 
   return (
-    <Card className="border-2 hover:border-[#B5CC89] transition-colors hover:shadow-lg">
+    <Card className="rounded-2xl border-2 hover:border-[#B5CC89] transition-all hover:shadow-lg">
       <CardHeader className="border-b bg-[#B5CC89]/5">
         <CardTitle className="flex items-center gap-2 text-gray-900 text-base md:text-lg">
           <ClockIcon className="h-4 w-4 md:h-5 md:w-5" />
@@ -147,11 +147,10 @@ export function RecentQuizzes({
           {recentAttempts.map((attempt, index) => (
             <div
               key={attempt.attempt_id}
-              className={`border-2 rounded-xl p-3 transition-colors ${
-                index % 2 === 0
+              className={`border-2 rounded-xl p-3 transition-colors ${index % 2 === 0
                   ? "bg-white border-gray-100"
                   : "bg-gray-50/50 border-gray-100"
-              }`}>
+                }`}>
               <div className="space-y-2">
                 <div>
                   <p className="font-bold text-sm text-gray-900 truncate">
@@ -231,9 +230,8 @@ export function RecentQuizzes({
                 {recentAttempts.map((attempt, index) => (
                   <TableRow
                     key={attempt.attempt_id}
-                    className={`hover:bg-[#B5CC89]/5 transition-colors ${
-                      index % 2 === 0 ? "bg-white" : "bg-gray-50/50"
-                    }`}>
+                    className={`hover:bg-[#B5CC89]/5 transition-colors ${index % 2 === 0 ? "bg-white" : "bg-gray-50/50"
+                      }`}>
                     <TableCell className="font-medium">
                       <div>
                         <p className="font-bold text-gray-900">

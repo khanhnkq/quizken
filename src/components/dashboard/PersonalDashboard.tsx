@@ -119,7 +119,7 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
           <Button
             onClick={handleCreateQuiz}
             size="lg"
-            className="bg-[#B5CC89] hover:bg-black hover:text-white text-black border-2 border-transparent hover:border-[#B5CC89] font-semibold shadow-lg transition-colors text-sm md:text-base"
+            className="rounded-xl bg-[#B5CC89] hover:bg-black hover:text-white text-black border-2 border-transparent hover:border-[#B5CC89] font-semibold shadow-lg transition-colors text-sm md:text-base"
             onMouseEnter={handleHoverEnter}
             onMouseLeave={handleHoverLeave}>
             <PlusCircleIcon className="h-4 w-4 md:h-5 md:w-5 mr-2" />
@@ -131,7 +131,7 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
 
       {/* Welcome message for new users */}
       {hasNoData && (
-        <Card className="border-2 border-[#B5CC89]/30 bg-[#B5CC89]/5 shadow-lg">
+        <Card className="rounded-2xl border-2 border-[#B5CC89]/30 bg-[#B5CC89]/5 shadow-lg">
           <CardContent className="p-6 md:p-8 lg:p-12 text-center">
             <div className="p-3 md:p-4 rounded-2xl bg-[#B5CC89] w-fit mx-auto mb-4 md:mb-6">
               <BarChart3Icon className="h-12 w-12 md:h-16 md:w-16 text-black" />
@@ -147,7 +147,7 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
               <Button
                 size="lg"
                 onClick={() => (window.location.href = "/#quiz-generator")}
-                className="bg-[#B5CC89] hover:bg-black hover:text-white text-black font-semibold transition-colors text-sm md:text-base"
+                className="rounded-xl bg-[#B5CC89] hover:bg-black hover:text-white text-black font-semibold transition-colors text-sm md:text-base"
                 onMouseEnter={handleHoverEnter}
                 onMouseLeave={handleHoverLeave}>
                 <span className="hidden sm:inline">Tạo Quiz Mới</span>
@@ -157,7 +157,7 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
                 size="lg"
                 variant="outline"
                 onClick={() => (window.location.href = "/#quiz-library")}
-                className="border-2 hover:bg-primary hover:text-primary-foreground transition-colors font-semibold text-sm md:text-base"
+                className="rounded-xl border-2 hover:bg-primary hover:text-primary-foreground transition-colors font-semibold text-sm md:text-base"
                 onMouseEnter={handleHoverEnter}
                 onMouseLeave={handleHoverLeave}>
                 <span className="hidden sm:inline">Khám Phá Quiz Library</span>

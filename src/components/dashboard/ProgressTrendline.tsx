@@ -103,7 +103,7 @@ export function ProgressTrendline({
   };
 
   return (
-    <Card className="border-2 hover:border-[#B5CC89] transition-colors hover:shadow-lg">
+    <Card className="rounded-2xl border-2 hover:border-[#B5CC89] transition-all hover:shadow-lg">
       <CardHeader className="border-b bg-[#B5CC89]/5">
         <CardTitle className="flex items-center gap-2 text-gray-900 text-base md:text-lg">
           <TrendingUpIcon className="h-4 w-4 md:h-5 md:w-5" />
