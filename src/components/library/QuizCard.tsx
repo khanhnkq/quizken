@@ -69,7 +69,7 @@ export const QuizCard: React.FC<QuizCardProps> = ({
   };
 
   return (
-    <Card className="h-full flex flex-col rounded-3xl border-4 border-primary/10 hover:border-primary/30 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 bg-white group overflow-hidden">
+    <Card className="h-full flex flex-col rounded-3xl border-4 border-primary/20 hover:border-primary/40 shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 bg-white group overflow-hidden">
       {/* Visual Header - Game Cartridge Style */}
       <div className="relative h-36 overflow-hidden bg-gradient-to-br from-secondary/50 to-secondary/20">
         {/* Decorative Pattern */}

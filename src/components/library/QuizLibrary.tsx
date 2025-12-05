@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 import { useCountUp } from "@/hooks/useCountUp";
 import {
   BookOpen,
@@ -67,6 +68,15 @@ import { Eye } from "lucide-react";
 import SeoMeta from "@/components/SeoMeta";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useTranslation } from "react-i18next";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 interface PublicQuiz {
   id: string;
@@ -104,14 +114,16 @@ const QuizLibrary: React.FC = () => {
   const [selectedQuiz, setSelectedQuiz] = useState<PublicQuiz | null>(null);
   const [sortBy, setSortBy] = useState<"usage" | "downloads" | "date">("usage");
   const [searchIn, setSearchIn] = useState<"all" | "title" | "content">("all");
-  const [selectedCategory, setSelectedCategory] = useState<
-    QuizCategory | "all"
-  >("all");
-  const [selectedDifficulty, setSelectedDifficulty] = useState<
-    QuizDifficulty | "all"
-  >("all");
+  const [selectedCategory, setSelectedCategory] = useState<QuizCategory | "all">("all");
+  const [selectedDifficulty, setSelectedDifficulty] = useState<QuizDifficulty | "all">("all");
+
+  // Pagination State
+  const PAGE_SIZE = 9;
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+
   const searchInputRef = React.useRef<HTMLInputElement>(null);
-  // Lưu overflow/touchAction gốc để khôi phục khi đóng modal
   const bodyOverflowRef = React.useRef<{
     body: string;
     html: string;
@@ -122,16 +134,14 @@ const QuizLibrary: React.FC = () => {
     touch: "",
   });
 
-  // Note: Loại bỏ auto scroll khi mở preview để không ảnh hưởng hành vi cuộn trong Dialog
   const [showAuthModal, setShowAuthModal] = useState(false);
   const navigate = useNavigate();
   const { play } = useAudio();
   const isMobile = useIsMobile();
 
-  // Khóa cuộn body/html khi mở preview để không cuộn phía sau Dialog
+  // Lock body scroll when modal is open
   useEffect(() => {
     if (selectedQuiz) {
-      // Lưu trạng thái inline hiện tại một lần khi mở modal
       if (
         !bodyOverflowRef.current.body &&
         !bodyOverflowRef.current.html &&
@@ -147,24 +157,20 @@ const QuizLibrary: React.FC = () => {
       document.documentElement.style.overflow = "hidden";
       document.body.style.touchAction = "none";
     } else {
-      // Khôi phục khi đóng modal
       document.body.style.overflow = bodyOverflowRef.current.body || "";
-      document.documentElement.style.overflow =
-        bodyOverflowRef.current.html || "";
+      document.documentElement.style.overflow = bodyOverflowRef.current.html || "";
       document.body.style.touchAction = bodyOverflowRef.current.touch || "";
       bodyOverflowRef.current = { body: "", html: "", touch: "" };
     }
 
     return () => {
-      // Khôi phục nếu component unmount trong khi modal đang mở
       document.body.style.overflow = bodyOverflowRef.current.body || "";
-      document.documentElement.style.overflow =
-        bodyOverflowRef.current.html || "";
+      document.documentElement.style.overflow = bodyOverflowRef.current.html || "";
       document.body.style.touchAction = bodyOverflowRef.current.touch || "";
     };
   }, [selectedQuiz]);
 
-  // Pause/Resume GSAP ScrollSmoother khi mở/đóng modal xem trước quiz
+  // GSAP ScrollSmoother handling
   useEffect(() => {
     type ScrollSmootherInterface = {
       get?: () => {
@@ -189,9 +195,6 @@ const QuizLibrary: React.FC = () => {
       // no-op
     }
   }, [selectedQuiz]);
-  const PAGE_SIZE = 9;
-  const [hasMore, setHasMore] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
 
   // Total stats from database
   const [totalStats, setTotalStats] = useState({
@@ -214,14 +217,25 @@ const QuizLibrary: React.FC = () => {
     delay: 0.5,
   });
 
-  // Debounce search để giảm tính toán khi người dùng đang gõ
+  // Available categories for filter
+  const availableCategories = React.useMemo(() => QUIZ_CATEGORIES.map(c => c.value), []);
+
+  // Debounce search
   const [debouncedQuery, setDebouncedQuery] = useState("");
   useEffect(() => {
-    const t = setTimeout(() => setDebouncedQuery(searchQuery), 200);
+    const t = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+      setCurrentPage(1); // Reset to page 1 on new search
+    }, 500);
     return () => clearTimeout(t);
   }, [searchQuery]);
 
-  // Load total stats from database
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory, selectedDifficulty, sortBy]);
+
+  // Load total stats
   const loadTotalStats = useCallback(async () => {
     try {
       const { data, error } = await supabase
@@ -248,45 +262,81 @@ const QuizLibrary: React.FC = () => {
     }
   }, []);
 
-  const loadPublicQuizzes = useCallback(async () => {
+  // Fetch Quizzes with Server-Side Pagination & Filtering
+  const fetchQuizzes = useCallback(async () => {
     try {
-      const { data, error } = await supabase
+      setLoading(true);
+
+      let query = supabase
         .from("quizzes")
         .select(
-          "id,title,description,prompt,questions,prompt_tokens,candidates_tokens,total_tokens,created_at,user_id,is_public,usage_count,pdf_download_count,category,tags,difficulty"
+          "id,title,description,prompt,questions,prompt_tokens,candidates_tokens,total_tokens,created_at,user_id,is_public,usage_count,pdf_download_count,category,tags,difficulty",
+          { count: "exact" }
         )
-        .eq("is_public", true)
-        .order("usage_count", { ascending: false })
-        .order("pdf_download_count", { ascending: false })
-        .order("created_at", { ascending: false })
-        .range(0, PAGE_SIZE - 1);
+        .eq("is_public", true);
+
+      // Apply Search
+      if (debouncedQuery) {
+        // Search in title or description - PostgREST uses * for wildcards in ilike
+        query = query.or(`title.ilike.*${debouncedQuery}*,description.ilike.*${debouncedQuery}*`);
+      }
+
+      // Apply Filters
+      if (selectedCategory !== "all") {
+        query = query.eq("category", selectedCategory);
+      }
+
+      if (selectedDifficulty !== "all") {
+        query = query.eq("difficulty", selectedDifficulty);
+      }
+
+      // Apply Sorting
+      switch (sortBy) {
+        case "usage":
+          query = query.order("usage_count", { ascending: false });
+          break;
+        case "downloads":
+          query = query.order("pdf_download_count", { ascending: false });
+          break;
+        case "date":
+          query = query.order("created_at", { ascending: false });
+          break;
+      }
+
+      // Apply Pagination
+      const from = (currentPage - 1) * PAGE_SIZE;
+      const to = from + PAGE_SIZE - 1;
+      query = query.range(from, to);
+
+      const { data, error, count } = await query;
 
       if (error) {
-        console.error("Error loading public quizzes:", error);
-        toast({
-          title: t('library.toasts.loadError'),
-          description: t('library.toasts.loadDesc'),
-          variant: "destructive",
-        });
-      } else {
-        const rows = data || [];
-        setQuizzes(rows);
-        setHasMore(rows.length === PAGE_SIZE);
+        throw error;
       }
+
+      setQuizzes(data || []);
+      setTotalItems(count || 0);
+      setTotalPages(Math.ceil((count || 0) / PAGE_SIZE));
+
     } catch (error) {
-      console.error("Load public quizzes error:", error);
+      console.error("Error fetching quizzes:", error);
+      toast({
+        title: t('library.toasts.loadError'),
+        description: t('library.toasts.loadDesc'),
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [currentPage, debouncedQuery, selectedCategory, selectedDifficulty, sortBy]);
 
+  // Initial load and refetch on dependencies change
   useEffect(() => {
     loadTotalStats();
-    loadPublicQuizzes();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Only run once on mount
+    fetchQuizzes();
+  }, [fetchQuizzes, loadTotalStats]);
 
-  // Keyboard shortcut: Ctrl/Cmd + K to focus search
+  // Keyboard shortcut
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
@@ -297,222 +347,6 @@ const QuizLibrary: React.FC = () => {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
-
-  // Tải thêm trang tiếp theo (phân trang phía server)
-  const loadMore = async () => {
-    if (loadingMore || !hasMore) return;
-    try {
-      setLoadingMore(true);
-      const from = quizzes.length;
-      const to = from + PAGE_SIZE - 1;
-      const { data, error } = await supabase
-        .from("quizzes")
-        .select(
-          "id,title,description,prompt,questions,prompt_tokens,candidates_tokens,total_tokens,created_at,user_id,is_public,usage_count,pdf_download_count,category,tags,difficulty"
-        )
-        .eq("is_public", true)
-        .order("created_at", { ascending: false })
-        .range(from, to);
-
-      if (error) {
-        console.error("Error loading more quizzes:", error);
-        toast({
-          title: t('library.toasts.loadError'),
-          description: t('library.toasts.loadMoreDesc'),
-          variant: "destructive",
-        });
-        return;
-      }
-
-      const rows = data || [];
-      console.log(
-        "📥 loadMore - loaded rows:",
-        rows.length,
-        "current quizzes:",
-        quizzes.length
-      );
-
-      // Direct state updates without startTransition to avoid race conditions
-      setQuizzes((prev) => {
-        const updated = [...prev, ...rows];
-        console.log(
-          "📥 setQuizzes - prev:",
-          prev.length,
-          "rows:",
-          rows.length,
-          "updated:",
-          updated.length
-        );
-        return updated;
-      });
-      setDisplayLimit((prev) => prev + PAGE_SIZE);
-      setHasMore(rows.length === PAGE_SIZE);
-    } finally {
-      setLoadingMore(false);
-    }
-  };
-
-  // Discover all unique categories from loaded quizzes
-  const availableCategories = useMemo(() => {
-    const categoriesSet = new Set<string>();
-    quizzes.forEach((quiz) => {
-      if (quiz.category) {
-        categoriesSet.add(quiz.category);
-      }
-    });
-    return Array.from(categoriesSet).sort();
-  }, [quizzes]);
-
-  const filteredQuizzes = useMemo(() => {
-    console.log("🔍 filteredQuizzes memo - quizzes.length:", quizzes.length);
-    const q = debouncedQuery.toLowerCase();
-    let results = quizzes;
-
-    // Apply category filter
-    if (selectedCategory !== "all") {
-      results = results.filter((quiz) => quiz.category === selectedCategory);
-    }
-
-    // Apply difficulty filter
-    if (selectedDifficulty !== "all") {
-      results = results.filter(
-        (quiz) => quiz.difficulty === selectedDifficulty
-      );
-    }
-
-    // Apply search filter
-    if (q) {
-      results = results.filter((quiz) => {
-        const title = (quiz.title || "").toLowerCase();
-        const desc = (quiz.description || "").toLowerCase();
-        const prompt = (quiz.prompt || "").toLowerCase();
-
-        // Search in questions content
-        let questionsText = "";
-        if (Array.isArray(quiz.questions)) {
-          questionsText = quiz.questions
-            .map((q: QuizQuestion) => {
-              const question = q.question || "";
-              const options = Array.isArray(q.options)
-                ? q.options.join(" ")
-                : "";
-              const explanation = q.explanation || "";
-              return `${question} ${options} ${explanation}`;
-            })
-            .join(" ")
-            .toLowerCase();
-        }
-
-        // Apply search scope
-        switch (searchIn) {
-          case "title":
-            return title.includes(q) || desc.includes(q);
-          case "content":
-            return questionsText.includes(q) || prompt.includes(q);
-          case "all":
-          default:
-            return (
-              title.includes(q) ||
-              desc.includes(q) ||
-              prompt.includes(q) ||
-              questionsText.includes(q)
-            );
-        }
-      });
-    }
-
-    // Apply sorting
-    const sorted = [...results].sort((a, b) => {
-      switch (sortBy) {
-        case "usage":
-          return (b.usage_count || 0) - (a.usage_count || 0);
-        case "downloads":
-          return (b.pdf_download_count || 0) - (a.pdf_download_count || 0);
-        case "date":
-          return (
-            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-          );
-        default:
-          return 0;
-      }
-    });
-
-    return sorted;
-  }, [
-    quizzes,
-    debouncedQuery,
-    sortBy,
-    searchIn,
-    selectedCategory,
-    selectedDifficulty,
-  ]);
-
-  // Reset displayLimit chỉ khi search query hoặc filters thay đổi
-  useEffect(() => {
-    if (
-      debouncedQuery ||
-      selectedCategory !== "all" ||
-      selectedDifficulty !== "all"
-    ) {
-      // Reset về PAGE_SIZE khi có filter
-      setDisplayLimit(PAGE_SIZE);
-    }
-  }, [debouncedQuery, selectedCategory, selectedDifficulty]);
-
-  // Display limit: số lượng quiz tối đa hiển thị
-  const [displayLimit, setDisplayLimit] = useState(PAGE_SIZE);
-
-  // Stats cho dashboard - dựa vào quiz đang hiển thị
-  const displayedStats = useMemo(() => {
-    const displayedQuizzesForStats = filteredQuizzes.slice(0, displayLimit);
-    const totalTokens = displayedQuizzesForStats.reduce(
-      (sum, quiz) => sum + (quiz.total_tokens || 0),
-      0
-    );
-    const uniqueCreators = new Set(
-      displayedQuizzesForStats.map((q) => q.user_id)
-    ).size;
-
-    return {
-      quizCount: displayedQuizzesForStats.length,
-      totalTokens,
-      uniqueCreators,
-    };
-  }, [filteredQuizzes, displayLimit]);
-
-  // Stats tổng cho toàn bộ quiz đã load (để hiển thị khi cần)
-  const allQuizzesStats = useMemo(() => {
-    const totalTokens = quizzes.reduce(
-      (sum, quiz) => sum + (quiz.total_tokens || 0),
-      0
-    );
-    const uniqueCreators = new Set(quizzes.map((q) => q.user_id)).size;
-
-    return {
-      quizCount: quizzes.length,
-      totalTokens,
-      uniqueCreators,
-    };
-  }, [quizzes]);
-
-  const displayedQuizzes = useMemo(() => {
-    // Đảm bảo displayLimit không vượt quá số quiz có sẵn
-    const maxDisplay = Math.min(displayLimit, filteredQuizzes.length);
-    const result = filteredQuizzes.slice(0, maxDisplay);
-
-    // Debug log để theo dõi
-    console.log("DisplayedQuizzes Debug:", {
-      displayLimit,
-      filteredQuizzesLength: filteredQuizzes.length,
-      maxDisplay,
-      resultLength: result.length,
-      hasMore,
-      debouncedQuery,
-      quizzesLength: quizzes.length,
-    });
-
-    return result;
-  }, [filteredQuizzes, displayLimit, hasMore, debouncedQuery, quizzes.length]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("vi-VN", {
@@ -863,7 +697,7 @@ const QuizLibrary: React.FC = () => {
                     <Badge
                       variant="secondary"
                       className="bg-[#B5CC89]/20 text-[#B5CC89] px-4 py-2">
-                      {filteredQuizzes.length} kết quả
+                      {totalItems} kết quả
                     </Badge>
                   )}
                 </div>
@@ -882,7 +716,7 @@ const QuizLibrary: React.FC = () => {
                 <div
                   data-lib-list
                   className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-500 items-start">
-                  {displayedQuizzes.map((quiz) => (
+                  {quizzes.map((quiz) => (
                     <QuizCard
                       key={quiz.id}
                       quiz={quiz}
@@ -939,46 +773,81 @@ const QuizLibrary: React.FC = () => {
                 </div>
               )}
 
-              {(filteredQuizzes.length > PAGE_SIZE ||
-                (hasMore && !debouncedQuery)) && (
-                  <div className="flex justify-center gap-3 mt-8">
-                    {filteredQuizzes.length > PAGE_SIZE && (
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          if (displayLimit > PAGE_SIZE) {
-                            setDisplayLimit(PAGE_SIZE);
-                          } else {
-                            setDisplayLimit(
-                              Math.max(PAGE_SIZE, filteredQuizzes.length)
+              {!loading && quizzes.length > 0 && totalPages > 1 && (
+                <div className="mt-12 mb-20 flex justify-center">
+                  <div className="bg-white/60 backdrop-blur-md rounded-full border-4 border-white/50 shadow-xl p-2 inline-block">
+                    <Pagination>
+                      <PaginationContent className="gap-2">
+                        <PaginationItem>
+                          <PaginationPrevious
+                            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                            className={cn(
+                              "rounded-full px-4 h-10 font-heading font-bold transition-all duration-300",
+                              currentPage === 1
+                                ? "pointer-events-none opacity-50"
+                                : "hover:bg-white hover:text-primary hover:shadow-md hover:-translate-x-1 cursor-pointer"
+                            )}
+                          />
+                        </PaginationItem>
+
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                          // Show first page, last page, current page, and pages around current
+                          if (
+                            page === 1 ||
+                            page === totalPages ||
+                            (page >= currentPage - 1 && page <= currentPage + 1)
+                          ) {
+                            return (
+                              <PaginationItem key={page}>
+                                <PaginationLink
+                                  isActive={page === currentPage}
+                                  onClick={() => setCurrentPage(page)}
+                                  className={cn(
+                                    "rounded-full w-10 h-10 font-heading font-bold transition-all duration-300 border-2",
+                                    page === currentPage
+                                      ? "bg-primary text-white border-white shadow-lg scale-110 rotate-[-6deg]"
+                                      : "bg-transparent border-transparent hover:bg-white hover:text-primary hover:border-white/50 hover:shadow-md hover:scale-110 hover:rotate-12 cursor-pointer"
+                                  )}
+                                >
+                                  {page}
+                                </PaginationLink>
+                              </PaginationItem>
                             );
                           }
-                        }}
-                        className="min-w-[140px]">
-                        {displayLimit > PAGE_SIZE ? "Thu gọn" : "Hiển thị tất cả"}
-                      </Button>
-                    )}
 
-                    {hasMore && !debouncedQuery && (
-                      <Button
-                        variant="outline"
-                        onClick={loadMore}
-                        disabled={loadingMore}
-                        className="min-w-[140px]">
-                        {loadingMore ? (
-                          <span className="flex items-center gap-2">
-                            <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary" />
-                            Đang tải...
-                          </span>
-                        ) : (
-                          "Xem thêm"
-                        )}
-                      </Button>
-                    )}
+                          // Show ellipsis
+                          if (
+                            page === currentPage - 2 ||
+                            page === currentPage + 2
+                          ) {
+                            return (
+                              <PaginationItem key={page}>
+                                <PaginationEllipsis className="text-primary/50" />
+                              </PaginationItem>
+                            );
+                          }
+
+                          return null;
+                        })}
+
+                        <PaginationItem>
+                          <PaginationNext
+                            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                            className={cn(
+                              "rounded-full px-4 h-10 font-heading font-bold transition-all duration-300",
+                              currentPage === totalPages
+                                ? "pointer-events-none opacity-50"
+                                : "hover:bg-white hover:text-primary hover:shadow-md hover:translate-x-1 cursor-pointer"
+                            )}
+                          />
+                        </PaginationItem>
+                      </PaginationContent>
+                    </Pagination>
                   </div>
-                )}
+                </div>
+              )}
 
-              {!loading && filteredQuizzes.length === 0 && (
+              {!loading && quizzes.length === 0 && (
                 <div className="text-center py-16 px-4">
                   <div className="max-w-md mx-auto">
                     <Search className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
