@@ -25,11 +25,11 @@ export const FlashcardControls: React.FC<FlashcardControlsProps> = ({
 
       {/* Question Navigation - Layout giống QuizContent */}
       <div className="space-y-3 sm:space-y-4">
-        <div className="flex flex-wrap justify-center gap-1 sm:gap-2">
+        <div className="flex flex-wrap justify-center gap-2">
           {Array.from({ length: totalCards }, (_, index) => {
             const isCurrent = index === currentIndex;
             const stateClasses = isCurrent
-              ? "border-[#B5CC89] text-[#B5CC89] bg-[#B5CC89]/10 hover:bg-[#B5CC89]/20"
+              ? "border-[#B5CC89] text-[#B5CC89] hover:bg-[#B5CC89]/10"
               : "border-border text-muted-foreground hover:bg-accent";
 
             return (
@@ -38,7 +38,7 @@ export const FlashcardControls: React.FC<FlashcardControlsProps> = ({
                 type="button"
                 variant="outline"
                 size="icon"
-                className={`relative w-8 h-8 sm:w-10 sm:h-10 rounded-full transition-colors duration-300 ${stateClasses}`}
+                className={`relative w-10 h-10 rounded-xl border-2 transition-transform hover:scale-110 duration-200 ${stateClasses}`}
                 onClick={() => {
                   // Use the same event but include direction so view can animate slide
                   const direction =
@@ -55,12 +55,10 @@ export const FlashcardControls: React.FC<FlashcardControlsProps> = ({
                 }}
                 title={`${t('quizGenerator.flashcard.card')} ${index + 1}: ${isCurrent ? t('quizGenerator.flashcard.viewing') : t('quizGenerator.flashcard.notViewed')
                   }`}>
-                <span className="relative z-10 text-xs sm:text-sm">
-                  {index + 1}
-                </span>
+                <span className="relative z-10">{index + 1}</span>
                 {isCurrent && (
-                  <span className="pointer-events-none absolute -right-1 -top-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-white text-[#B5CC89] border border-[#B5CC89] text-[10px] font-bold">
-                    •
+                  <span className="pointer-events-none absolute -right-1 -top-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-[#B5CC89] text-white text-[10px] font-bold shadow-sm">
+                    ✓
                   </span>
                 )}
               </Button>
