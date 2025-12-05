@@ -58,11 +58,9 @@ const Footer = () => {
             <div className="flex justify-center">
               <Button
                 variant="hero"
-                size="lg"
-                className="flex items-center gap-2 group"
-                onClick={scrollToGenerator}
-                onMouseEnter={handleHoverEnter}
-                onMouseLeave={handleHoverLeave}>
+                size="xl"
+                className="flex items-center gap-2 group px-8 py-6 rounded-3xl shadow-xl transition-all duration-200 hover:shadow-2xl hover:-translate-y-1 bg-primary text-white font-heading border-4 border-primary hover:border-primary-foreground/20 active:scale-95"
+                onClick={scrollToGenerator}>
                 {t('footer.ctaButton')}
                 <div className="bg-[#B5CC89] p-1 rounded-lg">
                   <svg

@@ -223,19 +223,19 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
 
   return (
     <>
-      <Card className="border-2 rounded-none md:rounded-xl shadow-lg bg-card">
+      <Card className="border-4 border-primary/20 rounded-3xl shadow-2xl bg-white/90 backdrop-blur-md">
         <CardHeader className="pb-6">
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
             <div className="flex-1">
               <div className="flex flex-wrap items-center gap-2 mb-2">
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[#B5CC89]/10 text-[#B5CC89]">
+                <span className="inline-flex items-center px-3 py-1 rounded-xl text-xs font-heading font-medium bg-[#B5CC89]/10 text-[#B5CC89] border border-[#B5CC89]/20">
                   Flashcard
                 </span>
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-secondary text-secondary-foreground">
+                <span className="inline-flex items-center px-3 py-1 rounded-xl text-xs font-heading font-medium bg-secondary text-secondary-foreground border border-border">
                   {totalCards} {t('quizGenerator.flashcard.cards')}
                 </span>
               </div>
-              <CardTitle className="text-xl md:text-2xl">
+              <CardTitle className="text-xl md:text-3xl font-heading text-primary">
                 {t('quizGenerator.flashcard.mode')}
               </CardTitle>
               <CardDescription className="mt-1">{quiz?.title}</CardDescription>
@@ -245,7 +245,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                 onClick={onBack}
                 variant="outline"
                 size="sm"
-                className="flex-1 lg:flex-initial">
+                className="flex-1 lg:flex-initial rounded-3xl border-4 border-border hover:bg-destructive hover:text-white hover:border-destructive transition-all duration-200 active:scale-95">
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 <span className="hidden xs:inline">{t('quizGenerator.flashcard.backToQuiz')}</span>
                 <span className="xs:hidden">{t('quizGenerator.flashcard.back')}</span>
@@ -260,11 +260,13 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                 {currentIndex + 1}/{totalCards}
               </span>
             </div>
-            <div className="w-full bg-secondary rounded-full h-2">
+            <div className="w-full bg-secondary/50 rounded-full h-3">
               <div
-                className="bg-[#B5CC89] h-2 rounded-full transition-all duration-300"
+                className="bg-[#B5CC89] h-3 rounded-full transition-all duration-300 relative overflow-hidden"
                 style={{ width: `${progressPercent}%` }}
-              />
+              >
+                <div className="absolute inset-0 bg-white/20 animate-progress-indeterminate w-full h-full" />
+              </div>
             </div>
           </div>
         </CardHeader>

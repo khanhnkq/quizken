@@ -1552,19 +1552,11 @@ const QuizGenerator = () => {
                     <Button
                       data-fast-hover
                       onClick={handleGenerateClick}
-                      disabled={
-                        loading || !isPromptValid || !isQuestionCountSelected
-                      }
-                      variant={
-                        isPromptValid && isQuestionCountSelected
-                          ? "hero"
-                          : "secondary"
-                      }
+                      disabled={loading || !isPromptValid || !isQuestionCountSelected}
+                      className="w-full h-14 sm:h-16 text-lg sm:text-xl rounded-3xl shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 bg-primary text-white font-heading relative overflow-hidden group border-4 border-primary hover:border-primary-foreground/20 active:scale-95"
+                      variant="hero"
                       size="xl"
-                      className={`group w-full font-heading text-xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 rounded-2xl ${isPromptValid && isQuestionCountSelected
-                        ? "bg-primary text-white hover:bg-primary/90"
-                        : "opacity-50 cursor-not-allowed"
-                        }`}>
+                    >
                       {loading ? (
                         <>
                           <Loader2 className="mr-3 h-6 w-6 animate-spin" />

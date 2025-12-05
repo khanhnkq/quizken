@@ -242,7 +242,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                         variant="outline"
                         size="default"
                         sound="alert"
-                        className="flex-1 lg:flex-initial rounded-2xl hover:bg-destructive hover:text-white">
+                        className="flex-1 lg:flex-initial rounded-3xl border-4 border-border hover:bg-destructive hover:text-white hover:border-destructive transition-all duration-200 active:scale-95">
                         {t('quizContent.retake')}
                       </Button>
                     )}
@@ -253,9 +253,9 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                       variant={showFlashcard ? "default" : "outline"}
                       size="default"
                       sound="success"
-                      className={`flex-1 lg:flex-initial rounded-2xl transition-all duration-300 ${showFlashcard
-                        ? "bg-[#B5CC89] text-white hover:bg-[#B5CC89]/90 shadow-lg scale-105"
-                        : "hover:border-[#B5CC89] hover:text-[#B5CC89]"
+                      className={`flex-1 lg:flex-initial rounded-3xl border-4 transition-all duration-200 active:scale-95 ${showFlashcard
+                        ? "bg-[#B5CC89] text-white border-[#B5CC89] hover:bg-[#B5CC89]/90 shadow-lg scale-105"
+                        : "border-border hover:border-[#B5CC89] text-muted-foreground hover:text-[#B5CC89] hover:bg-[#B5CC89]/10"
                         }`}>
                       <BookOpen className="mr-2 h-4 w-4" />
                       <span className="hidden xs:inline">
@@ -270,7 +270,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                       variant="outline"
                       size="default"
                       sound="success"
-                      className="flex-1 lg:flex-initial rounded-2xl hover:border-primary hover:text-primary">
+                      className="flex-1 lg:flex-initial rounded-3xl border-4 border-border hover:border-primary hover:text-primary hover:bg-primary/10 transition-all duration-200 active:scale-95">
                       <Download className="mr-2 h-4 w-4" />
                       <span className="hidden xs:inline">{t('quizContent.downloadPDF')}</span>
                       <span className="xs:hidden">{t('quizContent.pdf')}</span>
@@ -327,7 +327,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                           type="button"
                           variant="outline"
                           size="icon"
-                          className={`relative w-10 h-10 rounded-full transition-transform hover:scale-110 duration-200 ${stateClasses}`}
+                          className={`relative w-10 h-10 rounded-xl border-2 transition-transform hover:scale-110 duration-200 ${stateClasses}`}
                           onClick={() => handleNavigateQuestion(idx)}
                           title={`${t('quizContent.question')} ${idx + 1}: ${isCorrect
                             ? t('quizContent.correct')
@@ -339,12 +339,12 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                             }`}>
                           <span className="relative z-10">{idx + 1}</span>
                           {showResults && isCorrect && (
-                            <span className="pointer-events-none absolute -right-1 -top-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-white text-green-600 border border-green-600 text-[10px] font-bold">
+                            <span className="pointer-events-none absolute -right-1 -top-1 inline-flex items-center justify-center w-4 h-4 rounded-xl bg-white text-green-600 border-2 border-green-600 text-[10px] font-bold shadow-sm">
                               ✓
                             </span>
                           )}
                           {showResults && isIncorrect && (
-                            <span className="pointer-events-none absolute -right-1 -top-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-white text-red-600 border border-red-600 text-[10px] font-bold">
+                            <span className="pointer-events-none absolute -right-1 -top-1 inline-flex items-center justify-center w-4 h-4 rounded-xl bg-white text-red-600 border-2 border-red-600 text-[10px] font-bold shadow-sm">
                               ✗
                             </span>
                           )}
@@ -531,9 +531,9 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                     variant={answeredCount === quiz.questions.length ? "hero" : "outline"}
                     size="xl"
                     sound="success"
-                    className={`w-full sm:w-auto text-base sm:text-lg min-h-[3.5rem] py-4 rounded-2xl shadow-xl transition-all duration-300 ${answeredCount === quiz.questions.length
-                      ? "hover:-translate-y-1 hover:shadow-2xl"
-                      : "opacity-50 cursor-not-allowed"
+                    className={`w-full sm:w-auto text-base sm:text-lg min-h-[3.5rem] py-4 rounded-3xl border-4 shadow-xl transition-all duration-200 active:scale-95 ${answeredCount === quiz.questions.length
+                      ? "border-primary hover:shadow-2xl hover:border-primary-foreground/20"
+                      : "border-border opacity-50 cursor-not-allowed"
                       }`}>
                     {answeredCount !== quiz.questions.length
                       ? t('quizContent.answerAll', { total: quiz.questions.length, answered: answeredCount })
@@ -548,7 +548,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                     variant="hero"
                     size="xl"
                     sound="alert"
-                    className="min-w-[200px] rounded-2xl shadow-xl hover:-translate-y-1">
+                    className="min-w-[200px] rounded-3xl border-4 border-primary hover:border-primary-foreground/20 shadow-xl active:scale-95 transition-all duration-200">
                     {t('quizContent.retake')}
                   </Button>
                 )}

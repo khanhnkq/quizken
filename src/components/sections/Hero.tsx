@@ -160,12 +160,10 @@ const Hero = () => {
             <Button
               variant="hero"
               size="xl"
-              className="group text-lg px-8 py-6 rounded-2xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 font-heading bg-primary hover:bg-primary/90 text-white w-full sm:w-auto"
-              onClick={scrollToGenerator}
-              onMouseEnter={handleHoverEnter}
-              onMouseLeave={handleHoverLeave}>
+              className="group text-lg px-8 py-6 rounded-3xl shadow-xl border-4 border-primary hover:border-primary-foreground/50 active:scale-95 transition-all duration-200 font-heading bg-primary text-white w-full sm:w-auto"
+              onClick={scrollToGenerator}>
               {t("hero.createQuizButton")}
-              <div className="bg-white/20 p-1.5 rounded-lg ml-2 group-hover:rotate-12 transition-transform">
+              <div className="bg-white/20 p-1.5 rounded-xl ml-2 group-hover:rotate-12 transition-transform">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="w-5 h-5 text-white"
@@ -184,10 +182,8 @@ const Hero = () => {
             <Button
               variant="outline"
               size="xl"
-              className="text-lg px-8 py-6 rounded-2xl border-2 hover:bg-secondary hover:text-secondary-foreground hover:-translate-y-1 transition-all duration-300 font-heading w-full sm:w-auto"
-              onClick={() => navigate("/library")}
-              onMouseEnter={handleHoverEnter}
-              onMouseLeave={handleHoverLeave}>
+              className="text-lg px-8 py-6 rounded-3xl border-4 border-border hover:border-primary/50 hover:bg-secondary hover:text-secondary-foreground active:scale-95 transition-all duration-200 font-heading w-full sm:w-auto"
+              onClick={() => navigate("/library")}>
               {t("hero.viewExamplesButton")}
             </Button>
           </div>
