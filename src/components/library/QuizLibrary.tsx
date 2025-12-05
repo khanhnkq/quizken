@@ -770,11 +770,11 @@ const QuizLibrary: React.FC = () => {
               ) : (
                 <div
                   data-lib-list
-                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-500 items-start">
+                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-500">
                   {quizzes.map((quiz, index) => (
                     <div
                       key={quiz.id}
-                      className="animate-in fade-in zoom-in-50 duration-500 fill-mode-backwards"
+                      className="animate-in fade-in zoom-in-50 duration-500 fill-mode-backwards h-full"
                       style={{ animationDelay: `${index * 100}ms` }}
                     >
                       <QuizCard

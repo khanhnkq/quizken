@@ -1348,16 +1348,15 @@ const QuizGenerator = () => {
             onOpenChange={setShowConfirmDialog}>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Xác nhận tạo quiz mới</AlertDialogTitle>
+                <AlertDialogTitle>{t('quizGenerator.confirmDialog.title')}</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Bài quiz hiện tại sẽ bị xóa khỏi màn hình và tiến trình đang
-                  chạy (nếu có) sẽ được hủy. Bạn có muốn tiếp tục tạo quiz mới?
+                  {t('quizGenerator.confirmDialog.description')}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel asChild>
                   <Button variant="secondary" sound="alert">
-                    Hủy
+                    {t('quizGenerator.confirmDialog.cancel')}
                   </Button>
                 </AlertDialogCancel>
                 <AlertDialogAction asChild>
@@ -1375,7 +1374,7 @@ const QuizGenerator = () => {
                       }
                       void generateQuiz();
                     }}>
-                    Xác nhận
+                    {t('quizGenerator.confirmDialog.confirm')}
                     <div className="bg-[#B5CC89] p-1 rounded-lg">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"

@@ -125,7 +125,13 @@
             "restoreSuccessTitle": "Quiz restored",
             "restoreSuccessDesc": "Reloaded previous quiz from storage",
             "restoreFailedTitle": "Previous quiz failed",
-            "restoreFailedDesc": "Starting new quiz"
+            "restoreFailedDesc": "Starting fresh"
+        },
+        "confirmDialog": {
+            "title": "Confirm Create New Quiz",
+            "description": "The current quiz will be removed from screen and any ongoing process will be cancelled. Do you want to continue creating a new quiz?",
+            "cancel": "Cancel",
+            "confirm": "Confirm"
         },
         "ui": {
             "selectPlaceholder": "Select number of questions",
@@ -437,11 +443,15 @@
         "test": "Test",
         "testing": "Testing...",
         "paste": "Paste",
-        "tip": "Quick Tip",
-        "tipText": "Your personal API key gives you unlimited access without monthly limits.",
+        "tip": {
+            "title": "Quick Tip",
+            "description": "Using your own API key helps you create quizzes faster and never worry about question limits! 🌟"
+        },
+        "saveError": "Error saving API key",
+        "deleteError": "Error deleting API key",
         "loginRequired": "Please log in to manage API keys.",
         "pasteFromClipboard": "Paste from clipboard",
-        "apiReady": "Great! API key is ready.",
+        "apiReady": "Excellent! API key is ready.",
         "toasts": {
             "loadError": "Error",
             "loadErrorDesc": "Could not load API keys. Please try again.",

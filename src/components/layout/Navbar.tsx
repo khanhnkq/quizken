@@ -282,7 +282,7 @@ const Navbar = () => {
       <Dialog open={showApiSettings} onOpenChange={setShowApiSettings}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Cài đặt API</DialogTitle>
+            <DialogTitle>{t('nav.apiSettings')}</DialogTitle>
           </DialogHeader>
           <ApiKeySettings />
         </DialogContent>

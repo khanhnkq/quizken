@@ -141,7 +141,7 @@ const ApiKeySettings: React.FC = () => {
       if (error) {
         console.error("Save API key error:", error);
         toast({
-          title: "Lỗi lưu API key",
+          title: t("apiKeySettings.saveError"),
           description: error.message,
           variant: "destructive",
         });
@@ -176,7 +176,7 @@ const ApiKeySettings: React.FC = () => {
       if (error) {
         console.error("Delete API key error:", error);
         toast({
-          title: "Lỗi xóa API key",
+          title: t("apiKeySettings.deleteError"),
           description: error.message,
           variant: "destructive",
         });
@@ -338,36 +338,36 @@ const ApiKeySettings: React.FC = () => {
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-2 space-y-6">
-      {/* Header - Playful */}
-      <div className="text-center space-y-2">
-        <div className="inline-flex items-center justify-center p-4 bg-secondary/40 rounded-3xl mb-2 animate-bounce-subtle">
-          <Shield className="w-8 h-8 text-primary-foreground" />
+    <div className="max-w-2xl mx-auto space-y-4">
+      {/* Header - Compact */}
+      <div className="text-center space-y-1">
+        <div className="inline-flex items-center justify-center p-2.5 bg-secondary/40 rounded-2xl">
+          <Shield className="w-6 h-6 text-primary-foreground" />
         </div>
-        <h2 className="text-3xl font-bold font-heading text-primary">{t("apiKeySettings.title")}</h2>
-        <p className="text-base text-muted-foreground font-medium max-w-md mx-auto">
+        <h2 className="text-2xl font-bold font-heading text-primary">{t("apiKeySettings.title")}</h2>
+        <p className="text-sm text-muted-foreground font-medium max-w-md mx-auto">
           {t("apiKeySettings.description")}
         </p>
       </div>
 
-      {/* Gemini API Key Form - Playful Card */}
-      <Card className="rounded-3xl border-4 border-primary/20 shadow-lg overflow-hidden">
-        <CardHeader className="pb-4 bg-gradient-to-r from-secondary/30 to-transparent">
-          <CardTitle className="flex items-center justify-between text-xl font-heading">
+      {/* Gemini API Key Form - Compact Card */}
+      <Card className="rounded-2xl border-3 border-primary/20 shadow-md overflow-hidden">
+        <CardHeader className="pb-2 pt-4 px-4 bg-gradient-to-r from-secondary/30 to-transparent">
+          <CardTitle className="flex items-center justify-between text-lg font-heading">
             <div className="flex items-center gap-2">
-              <div className="p-2 bg-white rounded-xl border-2 border-primary/10">
-                <Key className="w-5 h-5 text-primary" />
+              <div className="p-1.5 bg-white rounded-lg border-2 border-primary/10">
+                <Key className="w-4 h-4 text-primary" />
               </div>
               API Key Gemini AI
             </div>
             {apiKeys.some((k) => k.provider === "gemini") && (
-              <div className="flex items-center gap-1.5 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-bold border-2 border-green-200">
-                <Check className="w-4 h-4" />
+              <div className="flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-bold border border-green-200">
+                <Check className="w-3 h-3" />
                 <span>{t("apiKeySettings.connected")}</span>
               </div>
             )}
           </CardTitle>
-          <CardDescription className="text-base font-medium ml-1">
+          <CardDescription className="text-sm font-medium">
             {t("apiKeySettings.getFreeKey")}{" "}
             <a
               href="https://makersuite.google.com/app/apikey"
@@ -378,10 +378,10 @@ const ApiKeySettings: React.FC = () => {
             </a>
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-5 p-6">
+        <CardContent className="space-y-3 p-4 pt-3">
           {/* Input field */}
-          <div className="space-y-2">
-            <Label htmlFor="gemini-key" className="text-base font-heading font-bold text-foreground/80 ml-1">
+          <div className="space-y-1.5">
+            <Label htmlFor="gemini-key" className="text-sm font-heading font-bold text-foreground/80">
               {t("apiKeySettings.pasteKey")}
             </Label>
             <div className="relative group">
@@ -391,29 +391,29 @@ const ApiKeySettings: React.FC = () => {
                 placeholder={t("apiKeySettings.placeholder")}
                 value={geminiKey}
                 onChange={(e) => setGeminiKey(e.target.value)}
-                className="pr-12 h-14 rounded-2xl border-4 border-border focus:border-primary/50 focus:ring-4 focus:ring-primary/10 text-lg transition-all duration-200"
+                className="pr-10 h-11 rounded-xl border-3 border-border focus:border-primary/50 focus:ring-2 focus:ring-primary/10 text-base transition-all duration-200"
               />
               <Button
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="absolute right-2 top-2 h-10 w-10 rounded-xl hover:bg-secondary/50 text-muted-foreground"
+                className="absolute right-1.5 top-1.5 h-8 w-8 rounded-lg hover:bg-secondary/50 text-muted-foreground"
                 onClick={() => toggleKeyVisibility("gemini")}>
                 {showKeys["gemini"] ? (
-                  <EyeOff className="h-5 w-5" />
+                  <EyeOff className="h-4 w-4" />
                 ) : (
-                  <Eye className="h-5 w-5" />
+                  <Eye className="h-4 w-4" />
                 )}
               </Button>
             </div>
-            <div className="ml-1">
+            <div>
               {geminiKeyError ? (
-                <p className="text-sm font-medium text-red-500 flex items-center gap-1">
-                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-red-500" />
+                <p className="text-xs font-medium text-red-500 flex items-center gap-1">
+                  <span className="inline-block w-1 h-1 rounded-full bg-red-500" />
                   {geminiKeyError}
                 </p>
               ) : (
-                <p className="text-sm font-medium text-muted-foreground">
+                <p className="text-xs font-medium text-muted-foreground">
                   {t("apiKeySettings.secureNote")}
                 </p>
               )}
@@ -421,7 +421,7 @@ const ApiKeySettings: React.FC = () => {
           </div>
 
           {/* Action buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 pt-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <Button
               onClick={() => saveApiKey("gemini")}
               disabled={
@@ -430,17 +430,17 @@ const ApiKeySettings: React.FC = () => {
                 geminiKey === "••••••••••••••••••••••••••••••••" ||
                 !isValid
               }
-              size="lg"
+              size="default"
               variant="hero"
-              className="flex-1 rounded-2xl font-heading text-base shadow-md hover:shadow-lg transition-all duration-200">
+              className="flex-1 rounded-xl font-heading text-sm shadow-md hover:shadow-lg transition-all duration-200">
               {saving === "gemini" ? (
                 <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  <div className="animate-spin rounded-full h-3.5 w-3.5 border-b-2 border-white mr-2"></div>
                   {t("apiKeySettings.saving")}
                 </>
               ) : (
                 <>
-                  <Save className="h-4 w-4 mr-2" />
+                  <Save className="h-3.5 w-3.5 mr-1.5" />
                   {t("apiKeySettings.saveKey")}
                 </>
               )}
@@ -455,10 +455,10 @@ const ApiKeySettings: React.FC = () => {
                   !isValid
                 }
                 variant="outline"
-                size="lg"
-                className="flex-1 sm:flex-none rounded-2xl border-4 border-border hover:border-primary/50 hover:bg-secondary/30 font-heading">
+                size="default"
+                className="flex-1 sm:flex-none rounded-xl border-3 border-border hover:border-primary/50 hover:bg-secondary/30 font-heading text-sm">
                 {testLoading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
                 ) : (
                   t("apiKeySettings.test")
                 )}
@@ -467,20 +467,20 @@ const ApiKeySettings: React.FC = () => {
               <Button
                 type="button"
                 variant="outline"
-                size="lg"
+                size="default"
                 onClick={handlePasteFromClipboard}
-                className="flex-1 sm:flex-none rounded-2xl border-4 border-border hover:border-primary/50 hover:bg-secondary/30 font-heading"
+                className="flex-1 sm:flex-none rounded-xl border-3 border-border hover:border-primary/50 hover:bg-secondary/30 font-heading"
                 title={t("apiKeySettings.pasteFromClipboard")}>
-                <ClipboardPaste className="h-4 w-4" />
+                <ClipboardPaste className="h-3.5 w-3.5" />
               </Button>
 
               {apiKeys.some((k) => k.provider === "gemini") && (
                 <Button
                   onClick={() => deleteApiKey("gemini")}
                   variant="outline"
-                  size="lg"
-                  className="rounded-2xl border-4 border-red-100 text-red-500 hover:bg-red-50 hover:border-red-200 hover:text-red-600">
-                  <Trash2 className="h-4 w-4" />
+                  size="default"
+                  className="rounded-xl border-3 border-red-100 text-red-500 hover:bg-red-50 hover:border-red-200 hover:text-red-600">
+                  <Trash2 className="h-3.5 w-3.5" />
                 </Button>
               )}
             </div>
@@ -488,9 +488,9 @@ const ApiKeySettings: React.FC = () => {
 
           {/* Success message */}
           {apiKeys.some((k) => k.provider === "gemini") && (
-            <div className="flex items-center gap-3 p-4 bg-green-50 border-2 border-green-200 rounded-2xl text-green-700 animate-in fade-in slide-in-from-top-2">
-              <div className="p-1 bg-green-200 rounded-full">
-                <Check className="h-4 w-4 text-green-700" />
+            <div className="flex items-center gap-2 p-2.5 bg-green-50 border border-green-200 rounded-xl text-green-700 text-sm">
+              <div className="p-0.5 bg-green-200 rounded-full">
+                <Check className="h-3 w-3 text-green-700" />
               </div>
               <span className="font-bold font-heading">
                 {t("apiKeySettings.apiReady")}
@@ -500,16 +500,16 @@ const ApiKeySettings: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Quick Setup Tip - Playful Style */}
-      <Card className="bg-gradient-to-br from-[#B5CC89]/20 to-primary/5 border-4 border-[#B5CC89]/30 rounded-3xl shadow-sm">
-        <CardContent className="p-5 flex items-start gap-4">
-          <div className="p-3 bg-white rounded-2xl shadow-sm rotate-3">
-            <Sparkles className="w-6 h-6 text-[#B5CC89]" />
+      {/* Quick Setup Tip - Compact */}
+      <Card className="bg-gradient-to-br from-[#B5CC89]/20 to-primary/5 border-2 border-[#B5CC89]/30 rounded-2xl shadow-sm">
+        <CardContent className="p-3 flex items-center gap-3">
+          <div className="p-2 bg-white rounded-xl shadow-sm">
+            <Sparkles className="w-4 h-4 text-[#B5CC89]" />
           </div>
-          <div className="space-y-1">
-            <h4 className="font-bold font-heading text-lg text-foreground">Mẹo nhỏ</h4>
-            <p className="text-sm font-medium text-muted-foreground leading-relaxed">
-              Sử dụng API key riêng giúp bạn tạo quiz nhanh hơn và không bao giờ lo bị giới hạn số lượng câu hỏi! 🌟
+          <div>
+            <h4 className="font-bold font-heading text-sm text-foreground">{t("apiKeySettings.tip.title")}</h4>
+            <p className="text-xs font-medium text-muted-foreground">
+              {t("apiKeySettings.tip.description")}
             </p>
           </div>
         </CardContent>

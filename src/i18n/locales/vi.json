@@ -126,6 +126,12 @@
             "restoreFailedTitle": "Quiz trước đó thất bại",
             "restoreFailedDesc": "Bắt đầu tạo mới"
         },
+        "confirmDialog": {
+            "title": "Xác nhận tạo quiz mới",
+            "description": "Bài quiz hiện tại sẽ bị xóa khỏi màn hình và tiến trình đang chạy (nếu có) sẽ được hủy. Bạn có muốn tiếp tục tạo quiz mới?",
+            "cancel": "Hủy",
+            "confirm": "Xác nhận"
+        },
         "ui": {
             "topicPlaceholder": "Nhập chủ đề (VD: Lịch sử thế giới, Python cơ bản...)",
             "createButton": "Tạo Quiz Ngay",
@@ -438,11 +444,15 @@
         "test": "Kiểm tra",
         "testing": "Đang kiểm tra...",
         "paste": "Dán",
-        "tip": "Mẹo nhanh",
-        "tipText": "API key cá nhân giúp bạn truy cập không giới hạn mà không bị giới hạn hàng tháng.",
         "loginRequired": "Vui lòng đăng nhập để quản lý API keys.",
         "pasteFromClipboard": "Dán từ clipboard",
         "apiReady": "Tuyệt vời! API key đã sẵn sàng.",
+        "tip": {
+            "title": "Mẹo nhỏ",
+            "description": "Sử dụng API key riêng giúp bạn tạo quiz nhanh hơn và không bao giờ lo bị giới hạn số lượng câu hỏi! 🌟"
+        },
+        "saveError": "Lỗi lưu API key",
+        "deleteError": "Lỗi xóa API key",
         "toasts": {
             "loadError": "Lỗi",
             "loadErrorDesc": "Không thể tải API keys. Vui lòng thử lại.",
