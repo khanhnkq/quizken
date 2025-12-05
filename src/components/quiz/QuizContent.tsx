@@ -98,6 +98,15 @@ export const QuizContent: React.FC<QuizContentProps> = ({
   const sectionRef = React.useRef<HTMLElement | null>(null);
   const scoreRef = React.useRef<HTMLDivElement | null>(null);
 
+  // Auto-activate flashcard mode from URL param
+  React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("mode") === "flashcard" && !showFlashcard) {
+      activateFlashcard();
+      setShowFlashcard(true);
+    }
+  }, []);
+
   const answeredCount = React.useMemo(
     () => userAnswers.filter((ans) => ans !== undefined).length,
     [userAnswers]

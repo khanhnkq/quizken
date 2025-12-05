@@ -117,6 +117,40 @@ const QuizLibrary: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<QuizCategory | "all">("all");
   const [selectedDifficulty, setSelectedDifficulty] = useState<QuizDifficulty | "all">("all");
 
+  // Scroll to top on mount
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, []);
+
+  // All available categories from database (fetched once, not affected by filters)
+  // Only show categories with at least 2 quizzes, limit dynamic cats to top 10
+  const [allCategories, setAllCategories] = useState<string[]>([]);
+  useEffect(() => {
+    const fetchAllCategories = async () => {
+      const { data, error } = await supabase
+        .from("quizzes")
+        .select("category")
+        .eq("is_public", true);
+      if (!error && data) {
+        // Count occurrences of each category
+        const catCount: Record<string, number> = {};
+        data.forEach(q => {
+          if (q.category) {
+            catCount[q.category] = (catCount[q.category] || 0) + 1;
+          }
+        });
+        // Filter: only categories with 2+ quizzes, sort by count, limit to 15
+        const filtered = Object.entries(catCount)
+          .filter(([_, count]) => count >= 2)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 15)
+          .map(([cat]) => cat);
+        setAllCategories(filtered);
+      }
+    };
+    fetchAllCategories();
+  }, []);
+
   // Pagination State
   const PAGE_SIZE = 9;
   const [currentPage, setCurrentPage] = useState(1);
@@ -217,8 +251,8 @@ const QuizLibrary: React.FC = () => {
     delay: 0.5,
   });
 
-  // Available categories for filter
-  const availableCategories = React.useMemo(() => QUIZ_CATEGORIES.map(c => c.value), []);
+  // Use all categories from database (not affected by current filters)
+  const availableCategories = allCategories;
 
   // Debounce search
   const [debouncedQuery, setDebouncedQuery] = useState("");
@@ -437,11 +471,32 @@ const QuizLibrary: React.FC = () => {
         <div id="smooth-content">
           {/* Hero Section */}
           <section className="relative overflow-hidden bg-gradient-to-b from-secondary/30 via-background to-background min-h-[60vh] flex flex-col justify-center py-20 px-4">
-            {/* Background Decorations */}
+            {/* Enhanced Background Decorations */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-              <div className="absolute top-20 left-10 w-24 h-24 bg-yellow-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
-              <div className="absolute top-40 right-10 w-32 h-32 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
-              <div className="absolute -bottom-8 left-20 w-32 h-32 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+              {/* Animated Gradient Blobs */}
+              <div className="absolute top-10 left-[5%] w-72 h-72 bg-gradient-to-br from-primary/30 to-green-200/40 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-blob"></div>
+              <div className="absolute top-40 right-[10%] w-80 h-80 bg-gradient-to-br from-yellow-200/50 to-orange-200/30 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-2000"></div>
+              <div className="absolute bottom-20 left-[20%] w-64 h-64 bg-gradient-to-br from-pink-200/40 to-purple-200/30 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-4000"></div>
+              <div className="absolute -bottom-20 right-[25%] w-96 h-96 bg-gradient-to-br from-blue-200/30 to-cyan-200/20 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob animation-delay-3000"></div>
+
+              {/* Dot Grid Pattern */}
+              <div className="absolute inset-0 opacity-[0.03] bg-[radial-gradient(circle_at_1px_1px,hsl(var(--primary))_1px,transparent_0)] bg-[length:24px_24px]"></div>
+
+              {/* Floating Geometric Shapes */}
+              <div className="absolute top-[15%] left-[8%] w-4 h-4 bg-primary/40 rounded-full animate-float" style={{ animationDelay: '0s' }}></div>
+              <div className="absolute top-[25%] right-[15%] w-3 h-3 bg-yellow-400/50 rounded-full animate-float" style={{ animationDelay: '1s' }}></div>
+              <div className="absolute top-[45%] left-[12%] w-2 h-2 bg-pink-400/40 rounded-full animate-float" style={{ animationDelay: '2s' }}></div>
+              <div className="absolute top-[35%] right-[8%] w-5 h-5 bg-green-400/30 rounded-full animate-float" style={{ animationDelay: '0.5s' }}></div>
+              <div className="absolute bottom-[30%] left-[25%] w-3 h-3 bg-purple-400/40 rounded-full animate-float" style={{ animationDelay: '1.5s' }}></div>
+              <div className="absolute bottom-[20%] right-[20%] w-4 h-4 bg-blue-400/30 rounded-full animate-float" style={{ animationDelay: '2.5s' }}></div>
+
+              {/* Decorative Rings */}
+              <div className="absolute top-[20%] right-[5%] w-24 h-24 border-2 border-primary/10 rounded-full animate-spin-slow hidden lg:block"></div>
+              <div className="absolute bottom-[25%] left-[5%] w-32 h-32 border-2 border-dashed border-yellow-300/20 rounded-full animate-spin-reverse hidden lg:block"></div>
+
+              {/* Gradient Line Accents */}
+              <div className="absolute top-[40%] left-0 w-1/3 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent"></div>
+              <div className="absolute top-[60%] right-0 w-1/4 h-px bg-gradient-to-l from-transparent via-yellow-400/20 to-transparent"></div>
             </div>
             {!isMobile && (
               <div className="absolute inset-0 -z-10 opacity-5 hidden md:block">
@@ -1072,7 +1127,7 @@ const QuizLibrary: React.FC = () => {
                     onClick={() => {
                       if (selectedQuiz) {
                         play("click");
-                        navigate(`/flashcard/${selectedQuiz.id}`);
+                        navigate(`/quiz/${selectedQuiz.id}?mode=flashcard`);
                       }
                     }}
                     className="flex-1 sm:flex-none h-12 px-6 rounded-3xl border-4 border-border bg-white text-muted-foreground hover:border-primary/50 hover:bg-primary/10 hover:text-primary active:scale-95 transition-all duration-200 font-heading"

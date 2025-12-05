@@ -322,6 +322,25 @@ All colors MUST be HSL.
   .animate-heart-beat {
     animation: heart-beat 1.5s ease-in-out infinite;
   }
+
+  /* Slow spinning for decorative elements */
+  @keyframes spin-slow {
+    from {
+      transform: rotate(0deg);
+    }
+
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .animate-spin-slow {
+    animation: spin-slow 20s linear infinite;
+  }
+
+  .animate-spin-reverse {
+    animation: spin-slow 25s linear infinite reverse;
+  }
 }
 
 /* Scroll utilities for modal content */
