@@ -7,13 +7,13 @@ export interface Question {
   question: string;
   options: string[];
   correctAnswer: number;
-  explanation: string;
+  explanation?: string;
 }
 
 export interface Quiz {
   id?: string;
   title: string;
-  description: string;
+  description?: string | null;
   questions: Question[];
   category?: QuizCategory;
   difficulty?: QuizDifficulty;

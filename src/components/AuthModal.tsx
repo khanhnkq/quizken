@@ -1,5 +1,5 @@
 import * as React from "react";
-import {  useState  } from "react";
+import { useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Shield, LogIn } from '@/lib/icons';
+import { useTranslation } from "react-i18next";
 
 interface AuthModalProps {
   open: boolean;
@@ -22,23 +23,24 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onOpenChange }) => {
   const { signInWithGoogle } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const { t } = useTranslation();
 
   const handleGoogleSignIn = async () => {
     try {
       setLoading(true);
       await signInWithGoogle();
       toast({
-        title: "Đang chuyển đến Google...",
-        description: "Vui lòng hoàn tất đăng nhập trên trang Google",
+        title: t("auth.redirecting"),
+        description: t("auth.completeLogin"),
       });
       // Supabase sẽ redirect sang Google; sau khi quay lại, session sẽ được cập nhật tự động
     } catch (error) {
       const message =
         error instanceof Error
           ? error.message
-          : "Đã xảy ra lỗi khi đăng nhập Google.";
+          : t("auth.defaultError");
       toast({
-        title: "Lỗi đăng nhập",
+        title: t("auth.loginError"),
         description: message,
         variant: "destructive",
       });
@@ -60,7 +62,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onOpenChange }) => {
               </DialogTitle>
             </div>
             <DialogDescription className="text-center text-[11px] text-muted-foreground leading-relaxed">
-              Chỉ hỗ trợ đăng nhập bằng Google
+              {t("auth.googleOnly")}
             </DialogDescription>
           </DialogHeader>
 
@@ -73,18 +75,17 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onOpenChange }) => {
               {loading ? (
                 <>
                   <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-                  <span className="text-sm">Đang chuyển hướng...</span>
+                  <span className="text-sm">{t("auth.redirectingShort")}</span>
                 </>
               ) : (
                 <>
                   <LogIn className="h-4 w-4" />
-                  <span className="text-sm">Đăng nhập với Google</span>
+                  <span className="text-sm">{t("auth.signInWithGoogle")}</span>
                 </>
               )}
             </Button>
             <p className="text-[11px] text-muted-foreground text-center">
-              Bằng cách tiếp tục, bạn đồng ý với Điều khoản và Chính sách bảo
-              mật của chúng tôi.
+              {t("auth.termsAgreement")}
             </p>
           </div>
 
@@ -94,7 +95,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onOpenChange }) => {
               variant="hero"
               className="px-8 group hover:bg-black hover:text-white"
               disabled={loading}>
-              Để sau
+              {t("auth.later")}
             </Button>
           </DialogFooter>
         </DialogContent>

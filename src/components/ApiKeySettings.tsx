@@ -1,5 +1,5 @@
 import * as React from "react";
-import {  useState, useEffect  } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 import {
   Key,
   Eye,
@@ -25,13 +26,28 @@ import {
   Loader2,
   ClipboardPaste,
 } from '@/lib/icons';
-import { Tables, TablesInsert } from "@/integrations/supabase/types";
 
-type UserApiKey = Tables<"user_api_keys">;
+// Define types locally since they are missing in generated types
+interface UserApiKey {
+  user_id: string;
+  provider: string;
+  encrypted_key: string;
+  is_active: boolean;
+  updated_at: string;
+}
+
+interface UserApiKeyInsert {
+  user_id: string;
+  provider: string;
+  encrypted_key: string;
+  is_active?: boolean;
+  updated_at?: string;
+}
 
 const ApiKeySettings: React.FC = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [apiKeys, setApiKeys] = useState<UserApiKey[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<string | null>(null);
@@ -69,8 +85,8 @@ const ApiKeySettings: React.FC = () => {
           );
         } else {
           toast({
-            title: "Lỗi",
-            description: "Không thể tải API keys. Vui lòng thử lại.",
+            title: t("apiKeySettings.toasts.loadError"),
+            description: t("apiKeySettings.toasts.loadErrorDesc"),
             variant: "destructive",
           });
         }
@@ -98,8 +114,8 @@ const ApiKeySettings: React.FC = () => {
   const saveApiKey = async (provider: "gemini") => {
     if (!user || !geminiKey.trim()) {
       toast({
-        title: "Lỗi",
-        description: "Vui lòng nhập API key hợp lệ.",
+        title: t("apiKeySettings.toasts.invalidKey"),
+        description: t("apiKeySettings.toasts.invalidKeyDesc"),
         variant: "destructive",
       });
       return;
@@ -107,7 +123,7 @@ const ApiKeySettings: React.FC = () => {
 
     setSaving(provider);
     try {
-      const insertData: TablesInsert<"user_api_keys"> = {
+      const insertData: UserApiKeyInsert = {
         user_id: user.id,
         provider,
         encrypted_key: geminiKey, // In production: encrypt this
@@ -131,8 +147,8 @@ const ApiKeySettings: React.FC = () => {
         });
       } else {
         toast({
-          title: "Thành công!",
-          description: `API key ${provider} đã được lưu.`,
+          title: t("apiKeySettings.toasts.saveSuccess"),
+          description: t("apiKeySettings.toasts.saveSuccessDesc", { provider }),
         });
         setGeminiKey("••••••••••••••••••••••••••••••••"); // Hide after save
         loadApiKeys(); // Refresh list
@@ -140,8 +156,8 @@ const ApiKeySettings: React.FC = () => {
     } catch (error) {
       console.error("Save API key error:", error);
       toast({
-        title: "Lỗi",
-        description: "Không thể lưu API key. Vui lòng thử lại.",
+        title: t("apiKeySettings.toasts.genericSaveError"),
+        description: t("apiKeySettings.toasts.genericSaveErrorDesc"),
         variant: "destructive",
       });
     } finally {
@@ -166,8 +182,8 @@ const ApiKeySettings: React.FC = () => {
         });
       } else {
         toast({
-          title: "Đã xóa",
-          description: `API key ${provider} đã được xóa.`,
+          title: t("apiKeySettings.toasts.deleteSuccess"),
+          description: t("apiKeySettings.toasts.deleteSuccessDesc", { provider }),
         });
         setGeminiKey("");
         setApiKeys(apiKeys.filter((k) => k.provider !== provider));
@@ -175,8 +191,8 @@ const ApiKeySettings: React.FC = () => {
     } catch (error) {
       console.error("Delete API key error:", error);
       toast({
-        title: "Lỗi",
-        description: "Không thể xóa API key. Vui lòng thử lại.",
+        title: t("apiKeySettings.toasts.genericDeleteError"),
+        description: t("apiKeySettings.toasts.genericDeleteErrorDesc"),
         variant: "destructive",
       });
     }
@@ -208,13 +224,13 @@ const ApiKeySettings: React.FC = () => {
     }
 
     if (/\s/.test(trimmed)) {
-      setGeminiKeyError("API key không được chứa khoảng trắng");
+      setGeminiKeyError(t("apiKeySettings.toasts.noWhitespace"));
       setIsValid(false);
       return false;
     }
 
     if (trimmed.length < 24) {
-      setGeminiKeyError("API key quá ngắn");
+      setGeminiKeyError(t("apiKeySettings.toasts.tooShort"));
       setIsValid(false);
       return false;
     }
@@ -234,9 +250,9 @@ const ApiKeySettings: React.FC = () => {
       if (text) setGeminiKey(text.trim());
     } catch {
       toast({
-        title: "Không thể dán từ clipboard",
+        title: t("apiKeySettings.toasts.clipboardError"),
         description:
-          "Trình duyệt chặn truy cập clipboard. Hãy dán thủ công (Cmd/Ctrl + V).",
+          t("apiKeySettings.toasts.clipboardErrorDesc"),
         variant: "destructive",
       });
     }
@@ -247,8 +263,8 @@ const ApiKeySettings: React.FC = () => {
 
     if (!validateGeminiKey(key)) {
       toast({
-        title: "API key không hợp lệ",
-        description: geminiKeyError || "Vui lòng kiểm tra và thử lại.",
+        title: t("apiKeySettings.toasts.invalidKeyToast"),
+        description: geminiKeyError || t("apiKeySettings.toasts.invalidKeyToastDesc"),
         variant: "destructive",
       });
       return;
@@ -256,8 +272,8 @@ const ApiKeySettings: React.FC = () => {
 
     if (key === "••••••••••••••••••••••••••••••••") {
       toast({
-        title: "Không thể kiểm tra",
-        description: "Vui lòng dán API key thực tế để kiểm tra.",
+        title: t("apiKeySettings.toasts.cannotTest"),
+        description: t("apiKeySettings.toasts.cannotTestDesc"),
         variant: "destructive",
       });
       return;
@@ -283,17 +299,17 @@ const ApiKeySettings: React.FC = () => {
       }
 
       toast({
-        title: "Kết nối thành công",
-        description: "API key hoạt động bình thường.",
+        title: t("apiKeySettings.toasts.testSuccess"),
+        description: t("apiKeySettings.toasts.testSuccessDesc"),
         variant: "success",
       });
     } catch (error) {
       toast({
-        title: "Kiểm tra thất bại",
+        title: t("apiKeySettings.toasts.testFailed"),
         description:
           error instanceof Error
             ? error.message
-            : "Không thể xác thực API key.",
+            : t("apiKeySettings.toasts.testFailedDesc"),
         variant: "destructive",
       });
     } finally {
@@ -306,7 +322,7 @@ const ApiKeySettings: React.FC = () => {
       <Card>
         <CardContent className="p-6 text-center">
           <p className="text-muted-foreground">
-            Vui lòng đăng nhập để quản lý API keys.
+            {t("apiKeySettings.loginRequired")}
           </p>
         </CardContent>
       </Card>
@@ -322,93 +338,90 @@ const ApiKeySettings: React.FC = () => {
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-4 space-y-4">
-      {/* Header - Compact */}
-      <div className="text-center">
-        <div className="flex items-center justify-center gap-3 mb-4">
-          <div className="bg-[#B5CC89] p-2 rounded-full">
-            <Shield className="w-6 h-6 text-black" />
-          </div>
-          <h2 className="text-2xl font-bold">Cài đặt API Key</h2>
+    <div className="max-w-2xl mx-auto p-2 space-y-6">
+      {/* Header - Playful */}
+      <div className="text-center space-y-2">
+        <div className="inline-flex items-center justify-center p-4 bg-secondary/40 rounded-3xl mb-2 animate-bounce-subtle">
+          <Shield className="w-8 h-8 text-primary-foreground" />
         </div>
-        <p className="text-sm text-muted-foreground">
-          Thêm API key riêng để sử dụng dịch vụ AI của bạn
+        <h2 className="text-3xl font-bold font-heading text-primary">{t("apiKeySettings.title")}</h2>
+        <p className="text-base text-muted-foreground font-medium max-w-md mx-auto">
+          {t("apiKeySettings.description")}
         </p>
       </div>
 
-      {/* Gemini API Key Form - Compact */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center justify-between text-lg">
+      {/* Gemini API Key Form - Playful Card */}
+      <Card className="rounded-3xl border-4 border-primary/20 shadow-lg overflow-hidden">
+        <CardHeader className="pb-4 bg-gradient-to-r from-secondary/30 to-transparent">
+          <CardTitle className="flex items-center justify-between text-xl font-heading">
             <div className="flex items-center gap-2">
-              <Key className="w-4 h-4" />
+              <div className="p-2 bg-white rounded-xl border-2 border-primary/10">
+                <Key className="w-5 h-5 text-primary" />
+              </div>
               API Key Gemini AI
             </div>
             {apiKeys.some((k) => k.provider === "gemini") && (
-              <Check className="w-4 h-4 text-green-600" />
+              <div className="flex items-center gap-1.5 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-bold border-2 border-green-200">
+                <Check className="w-4 h-4" />
+                <span>{t("apiKeySettings.connected")}</span>
+              </div>
             )}
           </CardTitle>
-          <CardDescription className="text-sm">
-            Lấy API key từ{" "}
+          <CardDescription className="text-base font-medium ml-1">
+            {t("apiKeySettings.getFreeKey")}{" "}
             <a
               href="https://makersuite.google.com/app/apikey"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-primary hover:underline font-medium">
+              className="text-primary hover:underline font-bold">
               Google AI Studio
             </a>
-            {(() => {
-              const u = apiKeys.find((k) => k.provider === "gemini")
-                ?.updated_at as string | undefined;
-              return u ? (
-                <div className="mt-1 text-xs text-muted-foreground">
-                  Cập nhật lần cuối: {new Date(u).toLocaleString("vi-VN")}
-                </div>
-              ) : null;
-            })()}
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-5 p-6">
           {/* Input field */}
           <div className="space-y-2">
-            <Label htmlFor="gemini-key" className="text-sm font-medium">
-              API Key Gemini
+            <Label htmlFor="gemini-key" className="text-base font-heading font-bold text-foreground/80 ml-1">
+              {t("apiKeySettings.pasteKey")}
             </Label>
-            <div className="relative">
+            <div className="relative group">
               <Input
                 id="gemini-key"
                 type={showKeys["gemini"] ? "text" : "password"}
-                placeholder="Nhập API key của bạn..."
+                placeholder={t("apiKeySettings.placeholder")}
                 value={geminiKey}
                 onChange={(e) => setGeminiKey(e.target.value)}
-                className="pr-10"
+                className="pr-12 h-14 rounded-2xl border-4 border-border focus:border-primary/50 focus:ring-4 focus:ring-primary/10 text-lg transition-all duration-200"
               />
               <Button
                 type="button"
                 variant="ghost"
-                size="sm"
-                className="absolute right-0 top-0 h-full px-2 hover:bg-black/10 transition-colors"
+                size="icon"
+                className="absolute right-2 top-2 h-10 w-10 rounded-xl hover:bg-secondary/50 text-muted-foreground"
                 onClick={() => toggleKeyVisibility("gemini")}>
                 {showKeys["gemini"] ? (
-                  <EyeOff className="h-4 w-4" />
+                  <EyeOff className="h-5 w-5" />
                 ) : (
-                  <Eye className="h-4 w-4" />
+                  <Eye className="h-5 w-5" />
                 )}
               </Button>
             </div>
-            <div className="mt-1">
+            <div className="ml-1">
               {geminiKeyError ? (
-                <p className="text-xs text-red-600">{geminiKeyError}</p>
+                <p className="text-sm font-medium text-red-500 flex items-center gap-1">
+                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-red-500" />
+                  {geminiKeyError}
+                </p>
               ) : (
-                <p className="text-xs text-muted-foreground">
-                  Dán API key từ Google AI Studio. Không chia sẻ key công khai.
+                <p className="text-sm font-medium text-muted-foreground">
+                  {t("apiKeySettings.secureNote")}
                 </p>
               )}
             </div>
           </div>
 
           {/* Action buttons */}
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-col sm:flex-row gap-3 pt-2">
             <Button
               onClick={() => saveApiKey("gemini")}
               disabled={
@@ -417,93 +430,87 @@ const ApiKeySettings: React.FC = () => {
                 geminiKey === "••••••••••••••••••••••••••••••••" ||
                 !isValid
               }
-              size="sm"
+              size="lg"
               variant="hero"
-              className="flex-1 min-w-[140px] group hover:bg-black hover:text-white">
+              className="flex-1 rounded-2xl font-heading text-base shadow-md hover:shadow-lg transition-all duration-200">
               {saving === "gemini" ? (
                 <>
-                  <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white mr-2"></div>
-                  Đang lưu...
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  {t("apiKeySettings.saving")}
                 </>
               ) : (
                 <>
-                  <Save className="h-3 w-3 mr-2" />
-                  Lưu API Key
+                  <Save className="h-4 w-4 mr-2" />
+                  {t("apiKeySettings.saveKey")}
                 </>
               )}
             </Button>
 
-            <Button
-              onClick={testApiKey}
-              disabled={
-                testLoading ||
-                geminiKey === "••••••••••••••••••••••••••••••••" ||
-                !isValid
-              }
-              variant="outline"
-              size="sm"
-              className="min-w-[140px]">
-              {testLoading ? (
-                <>
-                  <Loader2 className="h-3 w-3 mr-2 animate-spin" />
-                  Đang kiểm tra...
-                </>
-              ) : (
-                <>Kiểm tra kết nối</>
-              )}
-            </Button>
-
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={handlePasteFromClipboard}
-              className="min-w-[120px]">
-              <ClipboardPaste className="h-3 w-3 mr-2" />
-              Dán từ clipboard
-            </Button>
-
-            {apiKeys.some((k) => k.provider === "gemini") && (
+            <div className="flex gap-2">
               <Button
-                onClick={() => deleteApiKey("gemini")}
+                onClick={testApiKey}
+                disabled={
+                  testLoading ||
+                  geminiKey === "••••••••••••••••••••••••••••••••" ||
+                  !isValid
+                }
                 variant="outline"
-                size="sm"
-                className="hover:bg-red-50 hover:text-red-600 hover:border-red-300 min-w-[44px]">
-                <Trash2 className="h-3 w-3" />
+                size="lg"
+                className="flex-1 sm:flex-none rounded-2xl border-4 border-border hover:border-primary/50 hover:bg-secondary/30 font-heading">
+                {testLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  t("apiKeySettings.test")
+                )}
               </Button>
-            )}
-          </div>
 
-          {/* Security note */}
-          <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/30 p-2 rounded">
-            <Shield className="w-3 h-3 text-muted-foreground" />
-            <span>API key được mã hóa và chỉ bạn có thể sử dụng</span>
+              <Button
+                type="button"
+                variant="outline"
+                size="lg"
+                onClick={handlePasteFromClipboard}
+                className="flex-1 sm:flex-none rounded-2xl border-4 border-border hover:border-primary/50 hover:bg-secondary/30 font-heading"
+                title={t("apiKeySettings.pasteFromClipboard")}>
+                <ClipboardPaste className="h-4 w-4" />
+              </Button>
+
+              {apiKeys.some((k) => k.provider === "gemini") && (
+                <Button
+                  onClick={() => deleteApiKey("gemini")}
+                  variant="outline"
+                  size="lg"
+                  className="rounded-2xl border-4 border-red-100 text-red-500 hover:bg-red-50 hover:border-red-200 hover:text-red-600">
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
           </div>
 
           {/* Success message */}
           {apiKeys.some((k) => k.provider === "gemini") && (
-            <div className="flex items-center gap-2 p-2 bg-green-50 border border-green-200 rounded text-sm text-green-700">
-              <Check className="h-3 w-3" />
-              <span className="font-medium">
-                API key đã được lưu và sẵn sàng sử dụng
+            <div className="flex items-center gap-3 p-4 bg-green-50 border-2 border-green-200 rounded-2xl text-green-700 animate-in fade-in slide-in-from-top-2">
+              <div className="p-1 bg-green-200 rounded-full">
+                <Check className="h-4 w-4 text-green-700" />
+              </div>
+              <span className="font-bold font-heading">
+                {t("apiKeySettings.apiReady")}
               </span>
             </div>
           )}
         </CardContent>
       </Card>
 
-      {/* Quick Setup Tip */}
-      <Card className="bg-gradient-to-r from-primary/5 to-[#B5CC89]/10 border-primary/20">
-        <CardContent className="p-4">
-          <div className="flex items-start gap-3">
-            <Sparkles className="w-5 h-5 text-[#B5CC89] mt-0.5" />
-            <div>
-              <h4 className="font-semibold text-sm mb-1">Mẹo nhanh</h4>
-              <p className="text-xs text-muted-foreground">
-                Sau khi lưu API key, bạn có thể tạo quiz không giới hạn mà không
-                gặp các lỗi về rate limit.
-              </p>
-            </div>
+      {/* Quick Setup Tip - Playful Style */}
+      <Card className="bg-gradient-to-br from-[#B5CC89]/20 to-primary/5 border-4 border-[#B5CC89]/30 rounded-3xl shadow-sm">
+        <CardContent className="p-5 flex items-start gap-4">
+          <div className="p-3 bg-white rounded-2xl shadow-sm rotate-3">
+            <Sparkles className="w-6 h-6 text-[#B5CC89]" />
+          </div>
+          <div className="space-y-1">
+            <h4 className="font-bold font-heading text-lg text-foreground">Mẹo nhỏ</h4>
+            <p className="text-sm font-medium text-muted-foreground leading-relaxed">
+              Sử dụng API key riêng giúp bạn tạo quiz nhanh hơn và không bao giờ lo bị giới hạn số lượng câu hỏi! 🌟
+            </p>
           </div>
         </CardContent>
       </Card>

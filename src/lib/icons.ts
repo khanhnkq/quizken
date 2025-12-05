@@ -37,6 +37,7 @@ export const ArrowUp = L.ArrowUp;
 export const ArrowDown = L.ArrowDown;
 export const ArrowUpDown = L.ArrowUpDown;
 
+export const Home = L.Home;
 export const Menu = L.Menu;
 export const LogOut = L.LogOut;
 export const User = L.User;
@@ -122,6 +123,7 @@ export const make = (name: string): AppIcon | undefined => {
     ArrowUp,
     ArrowDown,
     ArrowUpDown,
+    Home,
     Menu,
     LogOut,
     User,

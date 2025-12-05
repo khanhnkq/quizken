@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Menu, LogOut, User, Settings, LayoutDashboard } from "@/lib/icons";
+import { Menu, LogOut, User, Settings, LayoutDashboard, Home, BookOpen, Info } from "@/lib/icons";
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/lib/auth";
 import { Link } from "react-router-dom";
@@ -120,7 +120,7 @@ const Navbar = () => {
               to="/about"
               className="text-foreground hover:text-primary transition-colors"
               onPointerDown={playClick}>
-              Giới thiệu
+              {t('nav.about')}
             </Link>
           </div>
 
@@ -135,18 +135,18 @@ const Navbar = () => {
                         variant="outline"
                         className="flex items-center gap-0 rounded-3xl border-4 border-border hover:border-primary hover:text-primary active:scale-95 transition-all duration-200">
                         <User className="h-4 w-4" />
-                        {user.email?.split("@")[0] || "Tài khoản"}
+                        {user.email?.split("@")[0] || t('nav.account')}
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem disabled>
-                        Đã {t('nav.login')} với {user.email}
+                    <DropdownMenuContent align="end" className="w-64 rounded-3xl border-4 border-primary/20 shadow-xl bg-white/95 backdrop-blur-sm p-2 animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2">
+                      <DropdownMenuItem disabled className="rounded-xl font-heading py-3 px-4 opacity-70">
+                        {t('nav.loggedInWith')} {user.email}
                       </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem asChild>
+                      <DropdownMenuSeparator className="bg-border/50 my-1" />
+                      <DropdownMenuItem asChild className="rounded-xl font-heading focus:bg-secondary/50 focus:text-primary cursor-pointer py-3 px-4 transition-colors duration-200">
                         <Link
                           to="/dashboard"
-                          className="cursor-pointer"
+                          className="w-full flex items-center"
                           onPointerDown={playClick}>
                           <LayoutDashboard className="h-4 w-4 mr-2" />
                           {t('nav.dashboard')}
@@ -155,14 +155,15 @@ const Navbar = () => {
                       <DropdownMenuItem
                         onClick={() => setShowApiSettings(true)}
                         onSelect={playClick}
-                        className="cursor-pointer">
+                        className="rounded-xl font-heading focus:bg-secondary/50 focus:text-primary cursor-pointer py-3 px-4 transition-colors duration-200">
                         <Settings className="h-4 w-4 mr-2" />
-                        Cài đặt API
+                        {t('nav.apiSettings')}
                       </DropdownMenuItem>
+                      <DropdownMenuSeparator className="bg-border/50 my-1" />
                       <DropdownMenuItem
                         onClick={handleSignOut}
                         onSelect={playClick}
-                        className="text-red-600">
+                        className="rounded-xl font-heading text-red-500 focus:bg-red-50 focus:text-red-600 cursor-pointer py-3 px-4 transition-colors duration-200">
                         <LogOut className="h-4 w-4 mr-2" />
                         {t('nav.logout')}
                       </DropdownMenuItem>
@@ -191,58 +192,74 @@ const Navbar = () => {
 
         {/* Mobile Menu */}
         {isOpen && (
-          <div className="md:hidden py-4 space-y-4">
-            <Link
-              to="/"
-              className="block text-foreground hover:text-primary transition-colors"
-              onPointerDown={playClick}
-              onClick={() => setIsOpen(false)}>
-              {t('nav.home')}
-            </Link>
-            <Link
-              to="/library"
-              className="block text-foreground hover:text-primary transition-colors flex items-center gap-2"
-              onPointerDown={playClick}
-              onClick={() => setIsOpen(false)}>
-              {t('nav.library')}
-            </Link>
-            <Link
-              to="/about"
-              className="block text-foreground hover:text-primary transition-colors"
-              onPointerDown={playClick}
-              onClick={() => setIsOpen(false)}>
-              Giới thiệu
-            </Link>
-            <div className="pt-4 space-y-2">
+          <div className="md:hidden absolute top-16 left-0 right-0 bg-white/95 backdrop-blur-md border-b-4 border-primary/20 shadow-2xl p-6 space-y-6 animate-in slide-in-from-top-5 z-40 rounded-b-3xl">
+            <div className="space-y-2">
+              <Link
+                to="/"
+                className="flex items-center gap-3 p-3 rounded-2xl hover:bg-secondary/30 text-lg font-heading font-bold text-foreground transition-colors"
+                onPointerDown={playClick}
+                onClick={() => setIsOpen(false)}>
+                <Home className="w-5 h-5 text-primary" />
+                {t('nav.home')}
+              </Link>
+              <Link
+                to="/library"
+                className="flex items-center gap-3 p-3 rounded-2xl hover:bg-secondary/30 text-lg font-heading font-bold text-foreground transition-colors"
+                onPointerDown={playClick}
+                onClick={() => setIsOpen(false)}>
+                <BookOpen className="w-5 h-5 text-primary" />
+                {t('nav.library')}
+              </Link>
+              <Link
+                to="/about"
+                className="flex items-center gap-3 p-3 rounded-2xl hover:bg-secondary/30 text-lg font-heading font-bold text-foreground transition-colors"
+                onPointerDown={playClick}
+                onClick={() => setIsOpen(false)}>
+                <Info className="w-5 h-5 text-primary" />
+                {t('nav.about')}
+              </Link>
+            </div>
+
+            <div className="border-t-2 border-dashed border-border pt-6 space-y-4">
+              <div className="flex items-center justify-between px-2 p-2 rounded-2xl bg-secondary/20">
+                <span className="text-base font-heading font-bold text-muted-foreground">{t('nav.language')}</span>
+                <LanguageSwitcher />
+              </div>
+
               {!loading && (
                 <>
                   {user ? (
                     <div className="space-y-3">
-                      <p className="text-sm text-muted-foreground">
-                        Đã {t('nav.login')} với {user.email}
-                      </p>
+                      <div className="px-2 pb-2">
+                        <p className="text-sm font-medium text-muted-foreground">
+                          {t('nav.loggedInWith')}
+                        </p>
+                        <p className="text-base font-bold text-primary truncate">
+                          {user.email}
+                        </p>
+                      </div>
                       <Link to="/dashboard" onClick={() => setIsOpen(false)}>
                         <Button
                           variant="outline"
-                          className="w-full justify-start rounded-3xl border-4 border-border hover:border-primary hover:text-primary active:scale-95 transition-all duration-200"
+                          className="w-full justify-start rounded-3xl border-4 border-border hover:border-primary hover:text-primary active:scale-95 transition-all duration-200 h-12 text-base font-heading"
                           onPointerDown={playClick}>
-                          <LayoutDashboard className="h-4 w-4 mr-2" />
+                          <LayoutDashboard className="h-5 w-5 mr-3" />
                           {t('nav.dashboard')}
                         </Button>
                       </Link>
                       <Button
                         variant="outline"
                         onClick={() => setShowApiSettings(true)}
-                        className="w-full justify-start rounded-3xl border-4 border-border hover:border-primary hover:text-primary active:scale-95 transition-all duration-200"
+                        className="w-full justify-start rounded-3xl border-4 border-border hover:border-primary hover:text-primary active:scale-95 transition-all duration-200 h-12 text-base font-heading"
                         onPointerDown={playClick}>
-                        <Settings className="h-4 w-4 mr-2" />
-                        Cài đặt API
+                        <Settings className="h-5 w-5 mr-3" />
+                        {t('nav.apiSettings')}
                       </Button>
                       <Button
                         variant="outline"
                         onClick={handleSignOut}
-                        className="w-full text-red-600 border-4 border-red-200 hover:bg-red-50 hover:border-red-400 justify-start rounded-3xl active:scale-95 transition-all duration-200">
-                        <LogOut className="h-4 w-4 mr-2" />
+                        className="w-full text-red-600 border-4 border-red-200 hover:bg-red-50 hover:border-red-400 justify-start rounded-3xl active:scale-95 transition-all duration-200 h-12 text-base font-heading">
+                        <LogOut className="h-5 w-5 mr-3" />
                         {t('nav.logout')}
                       </Button>
                     </div>
@@ -250,7 +267,7 @@ const Navbar = () => {
                     <Button
                       variant="outline"
                       onClick={() => setShowAuthModal(true)}
-                      className="w-full hover:bg-primary/10 hover:text-primary hover:border-primary rounded-3xl border-4 border-border transition-all duration-200 active:scale-95">
+                      className="w-full hover:bg-primary/10 hover:text-primary hover:border-primary rounded-3xl border-4 border-border transition-all duration-200 active:scale-95 h-12 text-lg font-heading font-bold">
                       {t('nav.login')}
                     </Button>
                   )}

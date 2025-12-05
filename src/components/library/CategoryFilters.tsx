@@ -91,7 +91,7 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
                   <SelectItem key={cat} value={cat}>
                     <span className="flex items-center gap-2">
                       <Icon size={14} className="mr-1" />
-                      <span>{getCategoryLabel(cat)}</span>
+                      <span>{t(getCategoryLabel(cat))}</span>
                     </span>
                   </SelectItem>
                 );
@@ -149,7 +149,7 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
               return (
                 <span className="text-foreground font-medium flex items-center gap-1">
                   <BookOpen size={14} />
-                  {getCategoryLabel(selectedCategory)}
+                  {t(getCategoryLabel(selectedCategory))}
                 </span>
               );
             })()}

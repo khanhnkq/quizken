@@ -20,7 +20,7 @@ import {
   QuizTags,
 } from "./QuizCategoryBadge";
 import type { QuizCategory, QuizDifficulty } from "@/lib/constants/quizCategories";
-import { getDifficultyLabel } from "@/lib/constants/quizCategories";
+import { getDifficultyLabel, getCategoryLabel } from "@/lib/constants/quizCategories";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 
@@ -93,7 +93,7 @@ export const QuizCard: React.FC<QuizCardProps> = ({
         {/* Category Sticker */}
         <div className="absolute bottom-4 left-4 z-10">
           <Badge variant="secondary" className="rounded-xl border-2 border-white/50 shadow-sm bg-white/80 backdrop-blur-sm text-primary hover:bg-white">
-            {quiz.category}
+            {t(getCategoryLabel(quiz.category))}
           </Badge>
         </div>
       </div>

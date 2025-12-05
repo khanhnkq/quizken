@@ -752,7 +752,7 @@ const QuizLibrary: React.FC = () => {
                     <Badge
                       variant="secondary"
                       className="bg-[#B5CC89]/20 text-[#B5CC89] px-4 py-2">
-                      {totalItems} kết quả
+                      {t('library.search.resultsCount', { count: totalItems })}
                     </Badge>
                   )}
                 </div>
@@ -812,15 +812,15 @@ const QuizLibrary: React.FC = () => {
                             });
 
                             toast({
-                              title: "Đã tải xuống PDF",
-                              description: `Quiz được lưu thành ${filename}`,
+                              title: t('library.toasts.pdfDownloaded'),
+                              description: t('library.toasts.pdfSaved', { filename }),
                               variant: "success",
                             });
                           } catch (e) {
                             console.error("Download error:", e);
                             toast({
-                              title: "Lỗi tải xuống",
-                              description: "Không thể tạo file PDF. Vui lòng thử lại.",
+                              title: t('library.toasts.pdfError'),
+                              description: t('library.toasts.pdfErrorDesc'),
                               variant: "destructive",
                             });
                           }
@@ -912,27 +912,27 @@ const QuizLibrary: React.FC = () => {
                   <div className="max-w-md mx-auto">
                     <Search className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
                     <h3 className="text-xl font-semibold mb-2">
-                      {searchQuery ? "Không tìm thấy kết quả" : "Không có quiz"}
+                      {searchQuery ? t('library.empty.noResults') : t('library.empty.noQuizzes')}
                     </h3>
                     <p className="text-muted-foreground mb-4">
                       {searchQuery
-                        ? `Không tìm thấy quiz nào cho "${searchQuery}"`
-                        : "Hãy tạo một quiz và chia sẻ!"}
+                        ? t('library.empty.noResultsFor', { query: searchQuery })
+                        : t('library.empty.createAndShare')}
                     </p>
                     {searchQuery && (
                       <div className="space-y-2">
-                        <p className="text-sm text-muted-foreground">Gợi ý:</p>
+                        <p className="text-sm text-muted-foreground">{t('library.empty.suggestions')}</p>
                         <ul className="text-sm text-muted-foreground space-y-1">
-                          <li>• Thử từ khóa khác hoặc ngắn gọn hơn</li>
-                          <li>• Kiểm tra chính tả</li>
-                          <li>• Thử thay đổi phạm vi tìm kiếm</li>
-                          <li>• Thử sắp xếp theo tiêu chí khác</li>
+                          <li>• {t('library.empty.suggestion1')}</li>
+                          <li>• {t('library.empty.suggestion2')}</li>
+                          <li>• {t('library.empty.suggestion3')}</li>
+                          <li>• {t('library.empty.suggestion4')}</li>
                         </ul>
                         <Button
                           variant="outline"
                           onClick={() => setSearchQuery("")}
                           className="mt-4">
-                          Xóa bộ lọc
+                          {t('library.empty.clearFilters')}
                         </Button>
                       </div>
                     )}
@@ -951,8 +951,8 @@ const QuizLibrary: React.FC = () => {
             <DialogContent className="p-0 w-full max-w-4xl rounded-3xl border-4 border-primary/20 overflow-hidden shadow-2xl bg-card sm:max-h-[90vh] max-h-[95vh] flex flex-col">
               <DialogTitle className="sr-only">
                 {selectedQuiz
-                  ? `Xem trước quiz: ${selectedQuiz.title}`
-                  : "Xem trước quiz"}
+                  ? t('library.preview.titleWithName', { name: selectedQuiz.title })
+                  : t('library.preview.title')}
               </DialogTitle>
 
               {/* Header - Game Cartridge Style */}
@@ -975,7 +975,7 @@ const QuizLibrary: React.FC = () => {
                       setSelectedQuiz(null);
                     }}
                     className="h-12 w-12 rounded-full border-4 border-border bg-white text-muted-foreground hover:border-destructive/50 hover:bg-destructive/10 hover:text-destructive active:scale-95 transition-all duration-200 shadow-lg"
-                    aria-label="Đóng">
+                    aria-label={t('common.close')}>
                     <X className="w-6 h-6" />
                   </Button>
                 </div>
@@ -985,7 +985,7 @@ const QuizLibrary: React.FC = () => {
                   <div className="flex flex-wrap gap-2 mb-3">
                     {selectedQuiz && (
                       <Badge variant="secondary" className="rounded-xl border-2 border-white/50 shadow-sm bg-white/80 backdrop-blur-sm text-primary hover:bg-white">
-                        {getCategoryLabel(selectedQuiz.category)}
+                        {t(getCategoryLabel(selectedQuiz.category))}
                       </Badge>
                     )}
                     {selectedQuiz && selectedQuiz.difficulty && (
@@ -995,7 +995,7 @@ const QuizLibrary: React.FC = () => {
                         selectedQuiz.difficulty === "medium" && "bg-yellow-100 text-yellow-700 border-yellow-200",
                         selectedQuiz.difficulty === "hard" && "bg-red-100 text-red-700 border-red-200"
                       )}>
-                        {t(`difficulty.${selectedQuiz.difficulty}`)}
+                        {t(getDifficultyLabel(selectedQuiz.difficulty))}
                       </Badge>
                     )}
                   </div>
@@ -1022,11 +1022,11 @@ const QuizLibrary: React.FC = () => {
                     <div className="flex flex-wrap gap-3">
                       <div className="flex items-center gap-1.5 bg-secondary/40 rounded-full px-4 py-2 text-sm font-medium text-muted-foreground">
                         <BookOpen className="w-4 h-4" />
-                        <span>{Array.isArray(selectedQuiz.questions) ? selectedQuiz.questions.length : 0} câu hỏi</span>
+                        <span>{Array.isArray(selectedQuiz.questions) ? selectedQuiz.questions.length : 0} {t('library.preview.questions')}</span>
                       </div>
                       <div className="flex items-center gap-1.5 bg-green-50 text-green-600 rounded-full px-4 py-2 text-sm font-medium">
                         <TrendingUp className="w-4 h-4" />
-                        <span>{selectedQuiz.usage_count || 0} lượt chơi</span>
+                        <span>{selectedQuiz.usage_count || 0} {t('library.preview.plays')}</span>
                       </div>
                       <div className="flex items-center gap-1.5 bg-blue-50 text-blue-600 rounded-full px-4 py-2 text-sm font-medium">
                         <Clock className="w-4 h-4" />
@@ -1045,7 +1045,7 @@ const QuizLibrary: React.FC = () => {
                     <div className="space-y-4">
                       <div className="flex items-center gap-2 mb-4">
                         <div className="h-0.5 flex-1 bg-border rounded-full"></div>
-                        <span className="text-xs font-heading uppercase tracking-widest text-muted-foreground">Xem trước câu hỏi</span>
+                        <span className="text-xs font-heading uppercase tracking-widest text-muted-foreground">{t('library.preview.questionsPreview')}</span>
                         <div className="h-0.5 flex-1 bg-border rounded-full"></div>
                       </div>
 
@@ -1061,7 +1061,7 @@ const QuizLibrary: React.FC = () => {
                               </div>
                               <div className="flex-1 space-y-3">
                                 <h4 className="font-heading font-semibold text-base text-foreground leading-snug">
-                                  {q.question || "Không có nội dung câu hỏi"}
+                                  {q.question || t('library.preview.noQuestionContent')}
                                 </h4>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                   {Array.isArray(q.options) && q.options.map((opt, optIdx) => (
@@ -1079,7 +1079,7 @@ const QuizLibrary: React.FC = () => {
                         ))
                       ) : (
                         <div className="text-center py-12 text-muted-foreground italic bg-secondary/20 rounded-2xl border-2 border-dashed border-border">
-                          Chưa có câu hỏi nào được thêm vào quiz này.
+                          {t('library.preview.noQuestions')}
                         </div>
                       )}
                     </div>
@@ -1109,14 +1109,14 @@ const QuizLibrary: React.FC = () => {
                         showResults: false,
                         userAnswers: [],
                       });
-                      toast({ title: "Đã tải xuống PDF", description: `Đã lưu ${filename}`, variant: "default" });
+                      toast({ title: t("library.toasts.pdfDownloaded"), description: t("library.toasts.pdfSaved", { filename }), variant: "default" });
                     } catch (e) {
                       console.error("Download quiz PDF error:", e);
-                      toast({ title: "Lỗi", description: "Không thể tạo/tải PDF.", variant: "destructive" });
+                      toast({ title: t("library.toasts.pdfError"), description: t("library.toasts.pdfErrorDesc"), variant: "destructive" });
                     }
                   }}
                   className="h-12 w-12 rounded-3xl border-4 border-border bg-white text-muted-foreground hover:border-blue-400 hover:bg-blue-50 hover:text-blue-500 active:scale-95 transition-all duration-200"
-                  title="Tải PDF"
+                  title={t("library.tooltips.downloadPdf")}
                 >
                   <Download className="w-5 h-5" />
                 </Button>
@@ -1148,7 +1148,7 @@ const QuizLibrary: React.FC = () => {
                     size="lg"
                   >
                     <Sparkles className="w-4 h-4 mr-1.5" />
-                    Làm bài ngay
+                    {t('library.preview.startQuiz')}
                   </Button>
                 </div>
               </div>

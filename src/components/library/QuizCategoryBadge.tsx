@@ -30,9 +30,7 @@ export const QuizCategoryBadge: React.FC<QuizCategoryBadgeProps> = ({
   const CategoryIcon = getCategoryIcon(category);
 
   // Use translation if available, fallback to helper for dynamic categories
-  const categoryLabel = QUIZ_CATEGORIES.some(c => c.value === category)
-    ? t(`categories.${category}`)
-    : getCategoryLabel(category);
+  const categoryLabel = t(getCategoryLabel(category));
 
   const difficultyInfo = difficulty ? getDifficultyInfo(difficulty) : null;
   const DifficultyIcon = difficultyInfo?.icon;
@@ -77,7 +75,7 @@ export const QuizCategoryBadge: React.FC<QuizCategoryBadgeProps> = ({
           }}
         >
           <DifficultyIcon size={iconSizes[size]} strokeWidth={2} />
-          {t(`difficulty.${difficulty}`)}
+          {t(getDifficultyLabel(difficulty))}
         </Badge>
       )}
     </div>

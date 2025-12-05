@@ -2,10 +2,15 @@
     "nav": {
         "home": "Home",
         "library": "Library",
+        "about": "About",
         "dashboard": "Dashboard",
         "login": "Log in",
         "logout": "Log out",
-        "signup": "Sign up"
+        "signup": "Sign up",
+        "language": "Language",
+        "account": "Account",
+        "loggedInWith": "Logged in with",
+        "apiSettings": "API Settings"
     },
     "hero": {
         "title": "Create AI Quiz for Free",
@@ -62,7 +67,8 @@
         "promptPlaceholder": "Example: Vietnamese History, Grade 10 Math...",
         "questionCountLabel": "Number of Questions",
         "selectQuestionCount": "Select number of questions",
-        "generateButton": "Generate Quiz",
+        "topicPlaceholder": "Enter a topic (e.g., World History, Basic Python...)",
+        "createButton": "Create Quiz Now",
         "generating": "Generating...",
         "resetButton": "Create New",
         "downloadPDF": "Download PDF",
@@ -113,6 +119,8 @@
             "failedTitle": "Quiz creation failed",
             "expiredTitle": "Quiz expired",
             "processingStatus": "Processing...",
+            "sensitiveContent": "Topic contains sensitive words, please edit.",
+            "preparing": "Preparing...",
             "resuming": "Resuming quiz creation...",
             "restoreSuccessTitle": "Quiz restored",
             "restoreSuccessDesc": "Reloaded previous quiz from storage",
@@ -136,6 +144,7 @@
             "topicLabel": "Quiz Topic",
             "optional": "Optional",
             "required": "Required",
+            "validPrompt": "Ready to generate",
             "minutes": "minutes",
             "playMusic": "Play chill music",
             "pauseMusic": "Pause music"
@@ -184,10 +193,33 @@
                 "title": "Title",
                 "content": "Question Content"
             },
+            "resultsCount": "{{count}} results",
             "category": "Topic",
             "allCategories": "All Topics",
             "difficulty": "Difficulty",
             "allDifficulties": "All Difficulties"
+        },
+        "empty": {
+            "noResults": "No results found",
+            "noQuizzes": "No quizzes yet",
+            "noResultsFor": "No quizzes found for \"{{query}}\"",
+            "createAndShare": "Create a quiz and share it!",
+            "suggestions": "Suggestions:",
+            "suggestion1": "Try different or shorter keywords",
+            "suggestion2": "Check your spelling",
+            "suggestion3": "Try changing the search scope",
+            "suggestion4": "Try sorting by different criteria",
+            "clearFilters": "Clear filters"
+        },
+        "preview": {
+            "title": "Preview Quiz",
+            "titleWithName": "Preview Quiz: {{name}}",
+            "questions": "questions",
+            "plays": "plays",
+            "questionsPreview": "Questions Preview",
+            "noQuestionContent": "No question content",
+            "noQuestions": "No questions added to this quiz yet.",
+            "startQuiz": "Start Quiz"
         },
         "toasts": {
             "loginRequired": "Login Required",
@@ -196,7 +228,19 @@
             "openingDesc": "Opening \"{{title}}\"...",
             "loadError": "Error",
             "loadDesc": "Could not load quiz library.",
-            "loadMoreDesc": "Could not load more quizzes."
+            "loadMoreDesc": "Could not load more quizzes.",
+            "pdfDownloaded": "PDF Downloaded",
+            "pdfSaved": "Saved {{filename}}",
+            "pdfError": "Error",
+            "pdfErrorDesc": "Could not create/download PDF."
+        },
+        "tooltips": {
+            "downloadPdf": "Download PDF"
+        },
+        "tags": {
+            "label": "Tags (max 5 tags, press Enter to add)",
+            "placeholder": "Ex: history, vietnam, basic...",
+            "helper": "{{count}}/5 tags • Tags help users find quizzes easier"
         },
         "card": {
             "public": "Public",
@@ -210,22 +254,39 @@
     },
     "categories": {
         "general": "General",
+        "generalDesc": "General knowledge from various topics",
         "education": "Education",
+        "educationDesc": "Study materials and exam preparation",
         "research": "Research",
+        "researchDesc": "Scientific and academic research",
         "science": "Science",
+        "scienceDesc": "Physics, Chemistry, Biology",
         "entertainment": "Entertainment",
+        "entertainmentDesc": "Movies, music, and entertainment",
         "trivia": "Trivia",
+        "triviaDesc": "Fun quizzes and general trivia",
         "language": "Language",
+        "languageDesc": "English, Vietnamese, and other languages",
         "math": "Math",
+        "mathDesc": "Mathematics, algebra, geometry",
         "history": "History",
+        "historyDesc": "Vietnamese and world history",
         "geography": "Geography",
+        "geographyDesc": "Physical and economic geography",
         "literature": "Literature",
+        "literatureDesc": "Vietnamese and world literature",
         "technology": "Technology",
+        "technologyDesc": "IT, programming, digital technology",
         "business": "Business",
+        "businessDesc": "Economics, management, marketing",
         "health": "Health",
+        "healthDesc": "Medicine, health, nutrition",
         "sports": "Sports",
+        "sportsDesc": "Sports, Olympics, physical education",
         "arts": "Arts",
-        "music": "Music"
+        "artsDesc": "Painting, sculpture, architecture",
+        "music": "Music",
+        "musicDesc": "Music, instruments, singers"
     },
     "difficulty": {
         "easy": "Easy",
@@ -351,5 +412,101 @@
         "next": "Next",
         "previous": "Previous",
         "or": "or"
+    },
+    "auth": {
+        "redirecting": "Redirecting to Google...",
+        "completeLogin": "Please complete login on Google page",
+        "loginError": "Login Error",
+        "defaultError": "An error occurred while logging in with Google.",
+        "signInWithGoogle": "Sign in with Google",
+        "redirectingShort": "Redirecting...",
+        "googleOnly": "Only Google sign-in is supported",
+        "termsAgreement": "By continuing, you agree to our Terms of Service and Privacy Policy.",
+        "later": "Later"
+    },
+    "apiKeySettings": {
+        "title": "API Key Settings",
+        "description": "Add your own API key to unlock unlimited AI power 🚀",
+        "connected": "Connected",
+        "getFreeKey": "Get a free API key from",
+        "pasteKey": "Paste API Key here",
+        "placeholder": "Enter your API key...",
+        "secureNote": "Your key is securely encrypted 🔒",
+        "saving": "Saving...",
+        "saveKey": "Save Key",
+        "test": "Test",
+        "testing": "Testing...",
+        "paste": "Paste",
+        "tip": "Quick Tip",
+        "tipText": "Your personal API key gives you unlimited access without monthly limits.",
+        "loginRequired": "Please log in to manage API keys.",
+        "pasteFromClipboard": "Paste from clipboard",
+        "apiReady": "Great! API key is ready.",
+        "toasts": {
+            "loadError": "Error",
+            "loadErrorDesc": "Could not load API keys. Please try again.",
+            "invalidKey": "Error",
+            "invalidKeyDesc": "Please enter a valid API key.",
+            "saveError": "Error saving API key",
+            "saveSuccess": "Success!",
+            "saveSuccessDesc": "API key {{provider}} has been saved.",
+            "genericSaveError": "Error",
+            "genericSaveErrorDesc": "Could not save API key. Please try again.",
+            "deleteError": "Error deleting API key",
+            "deleteSuccess": "Deleted",
+            "deleteSuccessDesc": "API key {{provider}} has been deleted.",
+            "genericDeleteError": "Error",
+            "genericDeleteErrorDesc": "Could not delete API key. Please try again.",
+            "noWhitespace": "API key cannot contain whitespace",
+            "tooShort": "API key is too short",
+            "clipboardError": "Cannot paste from clipboard",
+            "clipboardErrorDesc": "Browser blocked clipboard access. Please paste manually (Cmd/Ctrl + V).",
+            "invalidKeyToast": "Invalid API key",
+            "invalidKeyToastDesc": "Please check and try again.",
+            "cannotTest": "Cannot test",
+            "cannotTestDesc": "Please paste an actual API key to test.",
+            "testSuccess": "Connection successful",
+            "testSuccessDesc": "API key is working correctly.",
+            "testFailed": "Test failed",
+            "testFailedDesc": "Could not verify API key."
+        }
+    },
+    "apiKeyErrorDialog": {
+        "title": "API Key Authentication Error",
+        "description": "Could not connect to AI service. Please check and update your API Key.",
+        "errorLabel": "Error:",
+        "reasons": {
+            "invalid": "API Key is invalid or expired",
+            "noAccess": "API Key does not have Gemini AI access",
+            "limitReached": "API usage limit reached",
+            "network": "Network connection error"
+        },
+        "fixTitle": "How to fix:",
+        "steps": {
+            "login": "Log in to use personal API key",
+            "settings": "Go to API Settings in Navbar",
+            "newKey": "Get a new API key from",
+            "enableAccess": "Enable Gemini AI access"
+        },
+        "buttons": {
+            "retry": "Try again later",
+            "update": "Update API Key"
+        }
+    },
+    "quotaDialog": {
+        "title": "Free Quota Exceeded",
+        "description": "You have used 3/3 free quiz generations today.",
+        "loginPrompt": "Log in to continue creating unlimited quizzes",
+        "benefits": {
+            "save": "Save quizzes to personal library",
+            "download": "Download PDF and share",
+            "manageKey": "Manage personal API key to avoid rate limits"
+        },
+        "resetTime": "Free quota will reset in {{hours}} hours {{minutes}} minutes",
+        "resetTimeDefault": "Free quota starts from your first quiz generation of the day",
+        "buttons": {
+            "close": "Close",
+            "login": "Log in"
+        }
     }
 }

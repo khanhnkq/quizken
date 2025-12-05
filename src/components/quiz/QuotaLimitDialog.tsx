@@ -2,6 +2,7 @@ import * as React from "react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Shield, Sparkles, Clock } from '@/lib/icons';
+import { useTranslation } from "react-i18next";
 
 interface TimeUntilReset {
   hours: number;
@@ -15,6 +16,8 @@ interface QuotaLimitDialogProps {
 }
 
 export const QuotaLimitDialog: React.FC<QuotaLimitDialogProps> = ({ open, onOpenChange, getTimeUntilReset }) => {
+  const { t } = useTranslation();
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md bg-gradient-to-br from-card to-secondary/20 border-2 border-border">
@@ -23,10 +26,10 @@ export const QuotaLimitDialog: React.FC<QuotaLimitDialogProps> = ({ open, onOpen
             <div className="bg-[#B5CC89] p-1 rounded-md">
               <Shield className="w-4 h-4 text-black" />
             </div>
-            <DialogTitle className="text-lg font-bold text-primary">Bạn đã hết lượt miễn phí</DialogTitle>
+            <DialogTitle className="text-lg font-bold text-primary">{t("quotaDialog.title")}</DialogTitle>
           </div>
           <DialogDescription className="text-center text-[12px] text-muted-foreground leading-relaxed">
-            Bạn đã sử dụng 3/3 lượt tạo quiz miễn phí hôm nay.
+            {t("quotaDialog.description")}
           </DialogDescription>
         </DialogHeader>
 
@@ -34,12 +37,12 @@ export const QuotaLimitDialog: React.FC<QuotaLimitDialogProps> = ({ open, onOpen
           <div className="p-3 bg-[#B5CC89]/10 border border-[#B5CC89]/20 rounded-lg">
             <div className="flex items-center gap-1.5 mb-1.5">
               <Sparkles className="w-3.5 h-3.5 text-[#B5CC89]" />
-              <p className="text-xs font-medium text-foreground">Đăng nhập để tiếp tục tạo quiz không giới hạn</p>
+              <p className="text-xs font-medium text-foreground">{t("quotaDialog.loginPrompt")}</p>
             </div>
             <ul className="text-[11px] text-muted-foreground leading-relaxed list-disc list-inside space-y-1">
-              <li>Lưu quiz vào thư viện cá nhân</li>
-              <li>Tải xuống PDF và chia sẻ</li>
-              <li>Quản lý API key cá nhân để tránh rate limit</li>
+              <li>{t("quotaDialog.benefits.save")}</li>
+              <li>{t("quotaDialog.benefits.download")}</li>
+              <li>{t("quotaDialog.benefits.manageKey")}</li>
             </ul>
           </div>
 
@@ -47,10 +50,10 @@ export const QuotaLimitDialog: React.FC<QuotaLimitDialogProps> = ({ open, onOpen
             <Clock className="w-3.5 h-3.5" />
             <span>
               {(() => {
-                const t = getTimeUntilReset();
-                return t
-                  ? `Lượt miễn phí sẽ reset sau ${t.hours} giờ ${t.minutes} phút`
-                  : "Lượt miễn phí sẽ bắt đầu tính từ thời điểm bạn tạo quiz đầu tiên trong ngày";
+                const time = getTimeUntilReset();
+                return time
+                  ? t("quotaDialog.resetTime", { hours: time.hours, minutes: time.minutes })
+                  : t("quotaDialog.resetTimeDefault");
               })()}
             </span>
           </div>
@@ -62,7 +65,7 @@ export const QuotaLimitDialog: React.FC<QuotaLimitDialogProps> = ({ open, onOpen
             size="sm"
             onClick={() => onOpenChange(false)}
             className="flex-1 h-8 text-xs border-2 hover:bg-primary hover:text-primary-foreground hover:border-foreground">
-            Đóng
+            {t("quotaDialog.buttons.close")}
           </Button>
           <Button
             variant="hero"
@@ -72,7 +75,7 @@ export const QuotaLimitDialog: React.FC<QuotaLimitDialogProps> = ({ open, onOpen
               window.dispatchEvent(new Event("open-auth-modal"));
             }}
             className="flex-1 h-8 text-xs group hover:bg-black hover:text-white transition-colors">
-            Đăng nhập
+            {t("quotaDialog.buttons.login")}
           </Button>
         </DialogFooter>
       </DialogContent>

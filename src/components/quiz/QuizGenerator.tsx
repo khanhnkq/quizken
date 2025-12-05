@@ -620,7 +620,7 @@ const QuizGenerator = () => {
                 const channel = new BroadcastChannel("quiz-notifications");
                 channel.postMessage({
                   type: "quiz-failed",
-                  title: "Tạo câu hỏi thất bại",
+                  title: t('quizGenerator.toasts.failedTitle'),
                   description: msg,
                   variant: "destructive",
                 });
@@ -633,27 +633,27 @@ const QuizGenerator = () => {
                 localStorage.removeItem("currentQuizGeneration");
                 localStorage.removeItem("currentQuizId");
                 toast({
-                  title: "Quiz đã hết hạn",
-                  description: "Quiz này đã hết hạn. Vui lòng tạo quiz mới",
+                  title: t('quizGenerator.toasts.expiredTitle'),
+                  description: t('quizGenerator.expired.description'),
                   variant: "warning",
                 });
                 const channel = new BroadcastChannel("quiz-notifications");
                 channel.postMessage({
                   type: "quiz-failed",
-                  title: "Quiz đã hết hạn",
-                  description: "Quiz này đã hết hạn. Vui lòng tạo quiz mới",
+                  title: t('quizGenerator.toasts.expiredTitle'),
+                  description: t('quizGenerator.expired.description'),
                   variant: "warning",
                 });
                 channel.close();
               },
               onProgress: (status, progress) => {
                 setGenerationStatus(status);
-                setGenerationProgress(progress || "Đang xử lý...");
+                setGenerationProgress(progress || t('quizGenerator.toasts.processingStatus'));
                 persistGenerationState({
                   quizId: savedQuizId,
                   loading: true,
                   generationStatus: status,
-                  generationProgress: progress || "Đang xử lý...",
+                  generationProgress: progress || t('quizGenerator.toasts.processingStatus'),
                 });
               },
             });
@@ -737,11 +737,11 @@ const QuizGenerator = () => {
 
     // Block create if prompt contains sensitive words (client-side validation)
     if (containsVietnameseBadwords(prompt)) {
-      setPromptError("Chủ đề không được chứa từ ngữ không phù hợp");
+      setPromptError(t('quizGenerator.errors.profaneContent'));
       setIsPromptValid(false);
       toast({
-        title: "Chủ đề không hợp lệ",
-        description: "Chủ đề chứa từ ngữ nhạy cảm, vui lòng chỉnh sửa.",
+        title: t('quizGenerator.errors.invalidTopic'),
+        description: t('quizGenerator.toasts.sensitiveContent'),
         variant: "destructive",
       });
       return;
@@ -755,7 +755,7 @@ const QuizGenerator = () => {
     setShowResults(false);
     setTokenUsage(null);
     setGenerationStatus("pending");
-    setGenerationProgress("Đang chuẩn bị...");
+    setGenerationProgress(t('quizGenerator.toasts.preparing'));
     setLoading(true);
     // Clear persisted state for previous generation
     clearPersist();
@@ -1476,7 +1476,7 @@ const QuizGenerator = () => {
                         {isPromptValid && !promptError && (
                           <span className="text-primary font-medium flex items-center gap-1.5 text-sm animate-in slide-in-from-left-2 fade-in duration-300">
                             <Sparkles className="w-4 h-4" />
-                            Đủ điều kiện
+                            {t('quizGenerator.ui.validPrompt')}
                           </span>
                         )}
                       </div>
@@ -1567,7 +1567,7 @@ const QuizGenerator = () => {
                         <>
                           <Sparkles className="w-6 h-6 mr-2" />
                           {isPromptValid && isQuestionCountSelected
-                            ? "Tạo Quiz Ngay"
+                            ? t('quizGenerator.createButton')
                             : t('quizGenerator.ui.fillAllFields')}
                           {isPromptValid && isQuestionCountSelected && (
                             <div className="bg-white/20 p-1.5 rounded-lg ml-3 group-hover:rotate-12 transition-transform">

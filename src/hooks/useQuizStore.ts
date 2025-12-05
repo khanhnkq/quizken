@@ -1,18 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-
-interface Question {
-  question: string;
-  options: string[];
-  correctAnswer: number;
-  explanation?: string;
-}
-
-interface Quiz {
-  title: string;
-  description?: string | null;
-  questions: Question[];
-}
+import type { Quiz } from "@/types/quiz";
 
 interface TokenUsage {
   prompt: number;
