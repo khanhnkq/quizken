@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback, type MouseEvent } from "react";
 import { useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { BackgroundDecorations } from "@/components/ui/BackgroundDecorations";
 import {
   Card,
   CardContent,
@@ -1228,54 +1229,63 @@ const QuizGenerator = () => {
       <section
         id="generator"
         className="relative overflow-hidden bg-gradient-to-b from-secondary/30 to-background min-h-screen py-20 px-4">
-        <div className="container mx-auto max-w-4xl">
-          {/* Background scroll velocity effect - desktop only to optimize mobile */}
-          {!isMobile && (
-            <div className="absolute inset-0 -z-10 opacity-5">
-              <ScrollVelocityContainer className="text-6xl md:text-8xl font-bold">
-                <ScrollVelocityRow baseVelocity={75} rowIndex={0}>
-                  AI Education Smart Learning Intelligent Teaching Digital
-                  Classroom
-                </ScrollVelocityRow>
-                <ScrollVelocityRow baseVelocity={75} rowIndex={1}>
-                  Adaptive Assessment Personalized Learning Virtual Teacher
-                  Cognitive Training
-                </ScrollVelocityRow>
-                <ScrollVelocityRow baseVelocity={75} rowIndex={2}>
-                  Educational Analytics Student Engagement Knowledge Discovery
-                  Learning Analytics
-                </ScrollVelocityRow>
-                <ScrollVelocityRow baseVelocity={75} rowIndex={3}>
-                  Artificial Intelligence Machine Learning Neural Networks
-                  Cognitive Computing
-                </ScrollVelocityRow>
-                <ScrollVelocityRow baseVelocity={75} rowIndex={4}>
-                  Interactive Assessment Educational Technology Intelligent
-                  Tutoring Automated Grading
-                </ScrollVelocityRow>
-                <ScrollVelocityRow baseVelocity={75} rowIndex={5}>
-                  AI Education Smart Learning Intelligent Teaching Digital
-                  Classroom
-                </ScrollVelocityRow>
-                <ScrollVelocityRow baseVelocity={75} rowIndex={6}>
-                  Adaptive Assessment Personalized Learning Virtual Teacher
-                  Cognitive Training
-                </ScrollVelocityRow>
-                <ScrollVelocityRow baseVelocity={75} rowIndex={7}>
-                  Educational Analytics Student Engagement Knowledge Discovery
-                  Learning Analytics
-                </ScrollVelocityRow>
-                <ScrollVelocityRow baseVelocity={75} rowIndex={8}>
-                  Artificial Intelligence Machine Learning Neural Networks
-                  Cognitive Computing
-                </ScrollVelocityRow>
-                <ScrollVelocityRow baseVelocity={75} rowIndex={9}>
-                  Interactive Assessment Educational Technology Intelligent
-                  Tutoring Automated Grading
-                </ScrollVelocityRow>
-              </ScrollVelocityContainer>
-            </div>
-          )}
+
+        {/* Background scroll velocity effect - desktop only to optimize mobile */}
+        {!isMobile && (
+          <div className="absolute inset-0 z-0 opacity-5">
+            <ScrollVelocityContainer className="text-6xl md:text-8xl font-bold">
+              <ScrollVelocityRow baseVelocity={75} rowIndex={0}>
+                AI Education Smart Learning Intelligent Teaching Digital
+                Classroom
+              </ScrollVelocityRow>
+              <ScrollVelocityRow baseVelocity={75} rowIndex={1}>
+                Adaptive Assessment Personalized Learning Virtual Teacher
+                Cognitive Training
+              </ScrollVelocityRow>
+              <ScrollVelocityRow baseVelocity={75} rowIndex={2}>
+                Educational Analytics Student Engagement Knowledge Discovery
+                Learning Analytics
+              </ScrollVelocityRow>
+              <ScrollVelocityRow baseVelocity={75} rowIndex={3}>
+                Artificial Intelligence Machine Learning Neural Networks
+                Cognitive Computing
+              </ScrollVelocityRow>
+              <ScrollVelocityRow baseVelocity={75} rowIndex={4}>
+                Interactive Assessment Educational Technology Intelligent
+                Tutoring Automated Grading
+              </ScrollVelocityRow>
+              <ScrollVelocityRow baseVelocity={75} rowIndex={5}>
+                AI Education Smart Learning Intelligent Teaching Digital
+                Classroom
+              </ScrollVelocityRow>
+              <ScrollVelocityRow baseVelocity={75} rowIndex={6}>
+                Adaptive Assessment Personalized Learning Virtual Teacher
+                Cognitive Training
+              </ScrollVelocityRow>
+              <ScrollVelocityRow baseVelocity={75} rowIndex={7}>
+                Educational Analytics Student Engagement Knowledge Discovery
+                Learning Analytics
+              </ScrollVelocityRow>
+              <ScrollVelocityRow baseVelocity={75} rowIndex={8}>
+                Artificial Intelligence Machine Learning Neural Networks
+                Cognitive Computing
+              </ScrollVelocityRow>
+              <ScrollVelocityRow baseVelocity={75} rowIndex={9}>
+                Interactive Assessment Educational Technology Intelligent
+                Tutoring Automated Grading
+              </ScrollVelocityRow>
+            </ScrollVelocityContainer>
+          </div>
+        )}
+
+        <BackgroundDecorations />
+
+        {/* Floating Icons - Replaced with BackgroundDecorations component */}
+
+        <div className="container mx-auto max-w-4xl relative z-10">
+
+
+
           <div className="text-center mb-12">
             <div className="flex justify-center mb-6">
               <Sparkles className="w-16 h-16 text-[#B5CC89]" />
@@ -1387,7 +1397,7 @@ const QuizGenerator = () => {
             </AlertDialogContent>
           </AlertDialog>
 
-          <Card className="mb-8 border-2 hover:border-primary transition-colors duration-300 hover:shadow-lg">
+          <Card className="mb-8 border-2 border-primary/20 bg-white/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 rounded-3xl overflow-hidden">
             <CardContent className="p-6 md:p-10 space-y-8">
               {/* Show Form OR Loading Progress */}
               {loading ? (
@@ -1401,12 +1411,15 @@ const QuizGenerator = () => {
                 <>
                   {/* Quota indicator for anonymous users */}
                   {!user && (
-                    <div className="flex items-center justify-between p-3 bg-[#B5CC89]/10 border border-[#B5CC89]/30 rounded-lg">
-                      <div className="flex items-center gap-2">
-                        <Target className="w-4 h-4 text-[#B5CC89]" />
+                    <div className="flex items-center justify-between p-4 bg-secondary/50 border-2 border-secondary rounded-2xl">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-white rounded-xl">
+                          <Target className="w-5 h-5 text-primary" />
+                        </div>
                         <span className="text-sm font-medium">
                           {t('quizGenerator.ui.freeQuota')}:{" "}
-                          {Math.max(0, DAILY_LIMIT - anonCount)}/{DAILY_LIMIT}
+                          <span className="font-bold text-primary text-base">{Math.max(0, DAILY_LIMIT - anonCount)}</span>
+                          <span className="text-muted-foreground">/{DAILY_LIMIT}</span>
                         </span>
                       </div>
                       {anonCount > 0 && (
@@ -1414,7 +1427,7 @@ const QuizGenerator = () => {
                           onClick={() => {
                             window.dispatchEvent(new Event("open-auth-modal"));
                           }}
-                          className="text-xs text-primary hover:underline font-medium">
+                          className="text-xs md:text-sm text-primary hover:text-primary/80 font-bold hover:underline transition-colors">
                           {t('quizGenerator.ui.loginUnlimited')}
                         </button>
                       )}
@@ -1423,74 +1436,60 @@ const QuizGenerator = () => {
 
                   {/* Topic Input Section */}
                   <div className="space-y-4">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-3">
                       <label
                         htmlFor="quiz-topic"
-                        className="text-sm font-semibold text-foreground">
+                        className="text-lg font-heading font-bold text-foreground">
                         {t('quizGenerator.ui.topicLabel')}
                       </label>
-                      <Badge variant="secondary" className="text-xs">
+                      <Badge variant="secondary" className="rounded-lg px-2 py-0.5 text-xs font-bold border-2 border-border">
                         {t('quizGenerator.ui.required')}
                       </Badge>
                     </div>
-                    <Textarea
-                      id="quiz-topic"
-                      placeholder={t('quizGenerator.ui.examplePlaceholder')}
-                      value={prompt}
-                      onChange={(e) => setPrompt(e.target.value)}
-                      className={`min-h-[120px] md:min-h-[140px] resize-none transition-all ${promptError
-                        ? "border-red-500 focus-visible:ring-red-500"
-                        : isPromptValid
-                          ? "border-green-500 focus-visible:ring-green-500"
-                          : ""
-                        }`}
-                    />
-                    <div className="flex items-center justify-between text-sm">
-                      <div className="flex items-center gap-2 flex-1 min-w-0">
+                    <div className="relative group">
+                      <Textarea
+                        id="quiz-topic"
+                        placeholder={t('quizGenerator.ui.examplePlaceholder')}
+                        value={prompt}
+                        onChange={(e) => setPrompt(e.target.value)}
+                        className={`min-h-[140px] md:min-h-[160px] resize-none text-lg p-6 rounded-2xl border-2 shadow-sm transition-all text-base leading-relaxed ${promptError
+                          ? "border-destructive/50 focus-visible:ring-destructive/20 focus-visible:border-destructive"
+                          : isPromptValid
+                            ? "border-primary/50 focus-visible:ring-primary/20 focus-visible:border-primary bg-primary/5"
+                            : "border-border hover:border-primary/50 focus-visible:ring-primary/20 focus-visible:border-primary"
+                          }`}
+                      />
+                      {/* Character count floating inside */}
+                      <div className="absolute bottom-4 right-4 text-xs font-medium text-muted-foreground bg-white/80 px-2 py-1 rounded-md backdrop-blur-sm border border-border/50">
+                        {prompt.trim().length}/500
+                      </div>
+                    </div>
+
+                    <div className="min-h-[20px]">
+                      <div className="flex items-center gap-2">
                         {promptError && (
-                          <span className="text-red-600 flex items-center gap-1 text-xs md:text-sm">
-                            <svg
-                              className="w-4 h-4 flex-shrink-0"
-                              fill="currentColor"
-                              viewBox="0 0 20 20">
-                              <path
-                                fillRule="evenodd"
-                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                            <span className="truncate">{promptError}</span>
+                          <span className="text-destructive font-medium flex items-center gap-1.5 text-sm animate-in slide-in-from-left-2 fade-in duration-300">
+                            <XCircle className="w-4 h-4" />
+                            <span>{promptError}</span>
                           </span>
                         )}
                         {isPromptValid && !promptError && (
-                          <span className="text-green-600 flex items-center gap-1 text-xs md:text-sm">
-                            <svg
-                              className="w-4 h-4 flex-shrink-0"
-                              fill="currentColor"
-                              viewBox="0 0 20 20">
-                              <path
-                                fillRule="evenodd"
-                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
+                          <span className="text-primary font-medium flex items-center gap-1.5 text-sm animate-in slide-in-from-left-2 fade-in duration-300">
+                            <Sparkles className="w-4 h-4" />
                             Đủ điều kiện
                           </span>
                         )}
                       </div>
-                      <span className="text-muted-foreground text-xs ml-2 flex-shrink-0">
-                        {prompt.trim().length}/500
-                      </span>
                     </div>
                   </div>
 
                   {/* Divider */}
-                  <div className="relative py-4">
+                  <div className="relative py-2">
                     <div className="absolute inset-0 flex items-center">
-                      <div className="w-full border-t border-border"></div>
+                      <div className="w-full border-t-2 border-dashed border-border/60"></div>
                     </div>
-                    <div className="relative flex justify-center text-xs">
-                      <span className="bg-card px-2 text-muted-foreground">
+                    <div className="relative flex justify-center text-xs font-medium uppercase tracking-wider text-muted-foreground/70">
+                      <span className="bg-white/80 backdrop-blur-sm px-4 py-1 rounded-full border border-border/50">
                         {t('quizGenerator.ui.optional')}
                       </span>
                     </div>
@@ -1498,50 +1497,58 @@ const QuizGenerator = () => {
 
                   {/* Question Count Selection */}
                   <div className="space-y-4">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-3">
                       <label
                         htmlFor="question-count"
-                        className="text-sm font-semibold text-foreground">
+                        className="text-lg font-heading font-bold text-foreground">
                         {t('quizGenerator.ui.questionCount')}
                       </label>
-                      <Badge variant="secondary" className="text-xs">
+                      <Badge variant="secondary" className="rounded-lg px-2 py-0.5 text-xs font-bold border-2 border-border">
                         {t('quizGenerator.ui.required')}
                       </Badge>
                     </div>
-                    <Select
-                      value={questionCount}
-                      onValueChange={(value) => {
-                        setQuestionCount(value);
-                        setIsQuestionCountSelected(true);
-                      }}>
-                      <SelectTrigger
-                        id="question-count"
-                        className="w-full md:w-48 hover:bg-primary/5 hover:border-primary transition-colors">
-                        <SelectValue placeholder={t('quizGenerator.ui.selectPlaceholder')} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="10">{t('quizGenerator.ui.10questions')}</SelectItem>
-                        <SelectItem value="15">{t('quizGenerator.ui.15questions')}</SelectItem>
-                        <SelectItem value="20">{t('quizGenerator.ui.20questions')}</SelectItem>
-                        <SelectItem value="25">{t('quizGenerator.ui.25questions')}</SelectItem>
-                        <SelectItem value="30">{t('quizGenerator.ui.30questions')}</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <p className="text-xs text-muted-foreground">
-                      {t('quizGenerator.ui.estimatedTime')}{" "}
-                      {questionCount
-                        ? Math.ceil(parseInt(questionCount) / 10)
-                        : 2}
-                      -
-                      {questionCount
-                        ? Math.ceil(parseInt(questionCount) / 5)
-                        : 4}{" "}
-                      {t('quizGenerator.ui.minutes')}
-                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                      <Select
+                        value={questionCount}
+                        onValueChange={(value) => {
+                          setQuestionCount(value);
+                          setIsQuestionCountSelected(true);
+                        }}>
+                        <SelectTrigger
+                          id="question-count"
+                          className="w-full h-14 rounded-2xl border-2 text-base px-4 font-medium transition-all hover:border-primary/50 focus:ring-primary/20 bg-background text-foreground shadow-sm">
+                          <SelectValue placeholder={t('quizGenerator.ui.selectPlaceholder')} />
+                        </SelectTrigger>
+                        <SelectContent className="rounded-xl border-2">
+                          <SelectItem value="10" className="rounded-lg my-1 py-3 cursor-pointer">{t('quizGenerator.ui.10questions')}</SelectItem>
+                          <SelectItem value="15" className="rounded-lg my-1 py-3 cursor-pointer">{t('quizGenerator.ui.15questions')}</SelectItem>
+                          <SelectItem value="20" className="rounded-lg my-1 py-3 cursor-pointer">{t('quizGenerator.ui.20questions')}</SelectItem>
+                          <SelectItem value="25" className="rounded-lg my-1 py-3 cursor-pointer">{t('quizGenerator.ui.25questions')}</SelectItem>
+                          <SelectItem value="30" className="rounded-lg my-1 py-3 cursor-pointer">{t('quizGenerator.ui.30questions')}</SelectItem>
+                        </SelectContent>
+                      </Select>
+
+                      <div className="flex items-center gap-3 p-3 rounded-2xl bg-secondary/30 border border-secondary text-muted-foreground">
+                        <Clock className="w-5 h-5 text-primary" />
+                        <p className="text-sm font-medium">
+                          {t('quizGenerator.ui.estimatedTime')}{" "}
+                          <span className="text-foreground font-bold">
+                            {questionCount
+                              ? Math.ceil(parseInt(questionCount) / 10)
+                              : 2}
+                            -
+                            {questionCount
+                              ? Math.ceil(parseInt(questionCount) / 5)
+                              : 4}{" "}
+                          </span>
+                          {t('quizGenerator.ui.minutes')}
+                        </p>
+                      </div>
+                    </div>
                   </div>
 
                   {/* Generate Button */}
-                  <div className="pt-6">
+                  <div className="pt-4">
                     <Button
                       data-fast-hover
                       onClick={handleGenerateClick}
@@ -1553,34 +1560,34 @@ const QuizGenerator = () => {
                           ? "hero"
                           : "secondary"
                       }
-                      size="lg"
-                      className={`group text-base flex items-center justify-center gap-2 w-full transition-all ${isPromptValid && isQuestionCountSelected
-                        ? "hover:bg-black hover:text-white"
+                      size="xl"
+                      className={`group w-full font-heading text-xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 rounded-2xl ${isPromptValid && isQuestionCountSelected
+                        ? "bg-primary text-white hover:bg-primary/90"
                         : "opacity-50 cursor-not-allowed"
                         }`}>
                       {loading ? (
                         <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          <Loader2 className="mr-3 h-6 w-6 animate-spin" />
                           {loadingMessage}
                         </>
                       ) : (
                         <>
-                          <Sparkles className="w-5 h-5" />
+                          <Sparkles className="w-6 h-6 mr-2" />
                           {isPromptValid && isQuestionCountSelected
                             ? "Tạo Quiz Ngay"
                             : t('quizGenerator.ui.fillAllFields')}
                           {isPromptValid && isQuestionCountSelected && (
-                            <div className="bg-[#B5CC89] p-1 rounded-lg ml-1">
+                            <div className="bg-white/20 p-1.5 rounded-lg ml-3 group-hover:rotate-12 transition-transform">
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
-                                className="w-4 h-4 text-black group-hover:text-white transition-colors"
+                                className="w-5 h-5 text-white"
                                 fill="none"
                                 viewBox="0 0 24 24"
                                 stroke="currentColor">
                                 <path
                                   strokeLinecap="round"
                                   strokeLinejoin="round"
-                                  strokeWidth="2"
+                                  strokeWidth="3"
                                   d="M14 5l7 7m0 0l-7 7m7-7H3"
                                 />
                               </svg>

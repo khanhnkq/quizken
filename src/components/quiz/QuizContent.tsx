@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Download, Sparkles, BookOpen } from "@/lib/icons";
+import { BackgroundDecorations } from "@/components/ui/BackgroundDecorations";
 import {
   Card,
   CardContent,
@@ -186,7 +187,10 @@ export const QuizContent: React.FC<QuizContentProps> = ({
       ref={sectionRef}
       id="quiz"
       className="quiz-content relative overflow-hidden bg-gradient-to-b from-background to-secondary/20 py-20 px-0 sm:px-4">
-      <div className="mx-auto max-w-4xl px-2 sm:px-4">
+
+      <BackgroundDecorations />
+
+      <div className="mx-auto max-w-4xl px-2 sm:px-4 relative z-10">
         <div className="text-center mb-12">
           <div className="flex justify-center mb-6">
             <Sparkles className="w-12 h-12 text-[#B5CC89]" />
@@ -201,27 +205,27 @@ export const QuizContent: React.FC<QuizContentProps> = ({
         <div className="relative w-full">
           <div
             className={`transition-all duration-500 ease-in-out transform-gpu ${showFlashcard
-                ? "opacity-0 scale-95 rotate-y-90 pointer-events-none absolute"
-                : "opacity-100 scale-100 rotate-y-0"
+              ? "opacity-0 scale-95 rotate-y-90 pointer-events-none absolute"
+              : "opacity-100 scale-100 rotate-y-0"
               }`}>
             <Card
               ref={cardRef}
-              className="border-2 rounded-none md:rounded-xl shadow-lg bg-card">
+              className="border-4 border-primary/20 rounded-3xl shadow-2xl bg-white/90 backdrop-blur-md overflow-hidden">
               <CardHeader className="pb-6">
                 <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
                   <div className="flex-1">
                     <div className="flex flex-wrap items-center gap-2 mb-2">
-                      <Badge variant="secondary">{t('quizContent.badge')}</Badge>
-                      <Badge className="text-xs">
+                      <Badge variant="secondary" className="font-heading rounded-xl px-3 py-1">{t('quizContent.badge')}</Badge>
+                      <Badge className="text-xs font-heading rounded-xl px-3 py-1">
                         {quiz.questions.length} {t('quizContent.questions')}
                         {tokenUsage && (
-                          <span className="ml-1 opacity-75">
+                          <span className="ml-1 opacity-75 font-sans">
                             ({tokenUsage.total} token)
                           </span>
                         )}
                       </Badge>
                     </div>
-                    <CardTitle className="text-2xl md:text-3xl">
+                    <CardTitle className="text-3xl md:text-4xl font-heading text-primary">
                       {quiz.title}
                     </CardTitle>
                     <CardDescription className="mt-1">
@@ -236,9 +240,9 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                           scrollToTop();
                         }}
                         variant="outline"
-                        size="sm"
+                        size="default"
                         sound="alert"
-                        className="flex-1 lg:flex-initial">
+                        className="flex-1 lg:flex-initial rounded-2xl hover:bg-destructive hover:text-white">
                         {t('quizContent.retake')}
                       </Button>
                     )}
@@ -247,11 +251,11 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                         handleToggleFlashcard();
                       }}
                       variant={showFlashcard ? "default" : "outline"}
-                      size="sm"
+                      size="default"
                       sound="success"
-                      className={`flex-1 lg:flex-initial ${showFlashcard
-                          ? "bg-[#B5CC89] text-white hover:bg-[#B5CC89]/90"
-                          : ""
+                      className={`flex-1 lg:flex-initial rounded-2xl transition-all duration-300 ${showFlashcard
+                        ? "bg-[#B5CC89] text-white hover:bg-[#B5CC89]/90 shadow-lg scale-105"
+                        : "hover:border-[#B5CC89] hover:text-[#B5CC89]"
                         }`}>
                       <BookOpen className="mr-2 h-4 w-4" />
                       <span className="hidden xs:inline">
@@ -264,9 +268,9 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                     <Button
                       onClick={onDownload}
                       variant="outline"
-                      size="sm"
+                      size="default"
                       sound="success"
-                      className="flex-1 lg:flex-initial">
+                      className="flex-1 lg:flex-initial rounded-2xl hover:border-primary hover:text-primary">
                       <Download className="mr-2 h-4 w-4" />
                       <span className="hidden xs:inline">{t('quizContent.downloadPDF')}</span>
                       <span className="xs:hidden">{t('quizContent.pdf')}</span>
@@ -323,15 +327,15 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                           type="button"
                           variant="outline"
                           size="icon"
-                          className={`relative w-10 h-10 rounded-full ${stateClasses}`}
+                          className={`relative w-10 h-10 rounded-full transition-transform hover:scale-110 duration-200 ${stateClasses}`}
                           onClick={() => handleNavigateQuestion(idx)}
                           title={`${t('quizContent.question')} ${idx + 1}: ${isCorrect
-                              ? t('quizContent.correct')
-                              : isIncorrect
-                                ? t('quizContent.incorrect')
-                                : isAnswered
-                                  ? t('quizContent.answered')
-                                  : t('quizContent.unanswered')
+                            ? t('quizContent.correct')
+                            : isIncorrect
+                              ? t('quizContent.incorrect')
+                              : isAnswered
+                                ? t('quizContent.answered')
+                                : t('quizContent.unanswered')
                             }`}>
                           <span className="relative z-10">{idx + 1}</span>
                           {showResults && isCorrect && (
@@ -371,11 +375,11 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                         ref={(element) => {
                           questionRefs.current[idx] = element;
                         }}
-                        className="border-2 hover:border-[#B5CC89] transition-colors duration-300 hover:shadow-lg scroll-mt-[var(--navbar-height,64px)]">
+                        className="border-2 rounded-2xl hover:border-[#B5CC89] transition-all duration-300 hover:-translate-y-1 hover:shadow-lg scroll-mt-[var(--navbar-height,64px)]">
                         <CardContent className="p-4 sm:p-6 md:p-8 space-y-3 sm:space-y-4">
-                          <div className="space-y-3">
+                          <div className="space-y-4">
                             {q.question && (
-                              <h3 className="text-lg font-semibold text-foreground">
+                              <h3 className="text-xl font-heading font-medium text-foreground leading-relaxed">
                                 {idx + 1}. {q.question}
                               </h3>
                             )}
@@ -393,13 +397,13 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                                   return (
                                     <label
                                       key={optIdx}
-                                      className={`flex items-start gap-2 p-2 sm:p-3 rounded-lg border cursor-pointer ${showResults && isCorrect
-                                          ? "bg-green-50 border-green-500"
-                                          : userSelectedWrong
-                                            ? "bg-red-50 border-red-500"
-                                            : userSelectedCorrect
-                                              ? "bg-green-50 border-green-500"
-                                              : "bg-muted/50 border-gray-200 hover:bg-muted/80"
+                                      className={`flex items-start gap-3 p-3 sm:p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 hover:scale-[1.01] ${showResults && isCorrect
+                                        ? "bg-green-50 border-green-500"
+                                        : userSelectedWrong
+                                          ? "bg-red-50 border-red-500"
+                                          : userSelectedCorrect
+                                            ? "bg-green-50 border-green-500"
+                                            : "bg-muted/50 border-gray-200 hover:bg-muted/80"
                                         }`}>
                                       <div className="flex items-center gap-2 w-full">
                                         <input
@@ -524,10 +528,13 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                       scrollToTop();
                     }}
                     disabled={answeredCount !== quiz.questions.length}
-                    variant="outline"
-                    size="lg"
+                    variant={answeredCount === quiz.questions.length ? "hero" : "outline"}
+                    size="xl"
                     sound="success"
-                    className="w-full sm:w-auto text-sm sm:text-base !h-auto min-h-[2.75rem] py-3 !whitespace-normal break-words leading-snug hover:bg-primary hover:text-primary-foreground hover:border-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                    className={`w-full sm:w-auto text-base sm:text-lg min-h-[3.5rem] py-4 rounded-2xl shadow-xl transition-all duration-300 ${answeredCount === quiz.questions.length
+                      ? "hover:-translate-y-1 hover:shadow-2xl"
+                      : "opacity-50 cursor-not-allowed"
+                      }`}>
                     {answeredCount !== quiz.questions.length
                       ? t('quizContent.answerAll', { total: quiz.questions.length, answered: answeredCount })
                       : t('quizContent.grade')}
@@ -538,9 +545,10 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                       onReset();
                       scrollToTop();
                     }}
-                    variant="outline"
-                    size="lg"
-                    sound="alert">
+                    variant="hero"
+                    size="xl"
+                    sound="alert"
+                    className="min-w-[200px] rounded-2xl shadow-xl hover:-translate-y-1">
                     {t('quizContent.retake')}
                   </Button>
                 )}
@@ -550,8 +558,8 @@ export const QuizContent: React.FC<QuizContentProps> = ({
 
           <div
             className={`transition-all duration-500 ease-in-out transform-gpu ${showFlashcard
-                ? "opacity-100 scale-100 rotate-y-0"
-                : "opacity-0 scale-95 -rotate-y-90 pointer-events-none absolute"
+              ? "opacity-100 scale-100 rotate-y-0"
+              : "opacity-0 scale-95 -rotate-y-90 pointer-events-none absolute"
               }`}>
             <FlashcardView
               quiz={quiz}

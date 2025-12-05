@@ -1,4 +1,13 @@
 /* Ubuntu Font Family - Optimized for Performance */
+@font-face {
+  font-family: 'Fredoka';
+  src: url('/fonts/vn/DVN-Fredoka-Bold.ttf') format('truetype');
+  font-weight: 400 900;
+  /* Use this file for all weights for now since it is the only one provided */
+  font-style: normal;
+  font-display: swap;
+}
+
 /* Only loading used font weights: Regular (400), Medium (500), Bold (700) */
 /* Removed: Thin (100), Light (300), and all italic variants */
 @font-face {
@@ -7,7 +16,8 @@
     url("./assets/fonts/ubuntu-viethoa/Ubuntu.woff") format("woff");
   font-weight: 400;
   font-style: normal;
-  font-display: swap; /* Improves loading performance */
+  font-display: swap;
+  /* Improves loading performance */
 }
 
 @font-face {
@@ -56,6 +66,7 @@
     opacity: 0;
     transform: translateX(100%) scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: translateX(0) scale(1);
@@ -67,6 +78,7 @@
     opacity: 1;
     transform: translateX(0) scale(1);
   }
+
   to {
     opacity: 0;
     transform: translateX(100%) scale(0.95);
@@ -171,8 +183,18 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased leading-normal;
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
     overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: 'Fredoka', sans-serif;
   }
 
   [data-hot-toast],
@@ -192,10 +214,12 @@ All colors MUST be HSL.
 
 @layer utilities {
   @keyframes slow-blink {
+
     0%,
     50% {
       opacity: 1;
     }
+
     51%,
     100% {
       opacity: 0;
@@ -211,9 +235,11 @@ All colors MUST be HSL.
     0% {
       transform: translateX(-120%);
     }
+
     50% {
       transform: translateX(0%);
     }
+
     100% {
       transform: translateX(120%);
     }
@@ -229,22 +255,21 @@ All colors MUST be HSL.
     0% {
       background-position: 0 0;
     }
+
     100% {
       background-position: 16px 0;
     }
   }
 
   .progress-stripes {
-    background-image: linear-gradient(
-      45deg,
-      rgba(255, 255, 255, 0.3) 25%,
-      transparent 25%,
-      transparent 50%,
-      rgba(255, 255, 255, 0.3) 50%,
-      rgba(255, 255, 255, 0.3) 75%,
-      transparent 75%,
-      transparent
-    );
+    background-image: linear-gradient(45deg,
+        rgba(255, 255, 255, 0.3) 25%,
+        transparent 25%,
+        transparent 50%,
+        rgba(255, 255, 255, 0.3) 50%,
+        rgba(255, 255, 255, 0.3) 75%,
+        transparent 75%,
+        transparent);
     background-size: 16px 16px;
     animation: stripes-move 1s linear infinite;
     opacity: 0.35;
@@ -258,9 +283,11 @@ All colors MUST be HSL.
   .scroll-touch {
     -webkit-overflow-scrolling: touch;
   }
+
   .overscroll-contain {
     overscroll-behavior: contain;
   }
+
   .scrollbar-stable {
     scrollbar-gutter: stable;
   }

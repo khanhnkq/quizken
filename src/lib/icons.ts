@@ -97,6 +97,10 @@ export const PanelLeft = L.PanelLeft;
 export const MousePointer = L.MousePointer;
 export const GripVertical = L.GripVertical;
 
+export const Cat = L.Cat;
+export const Dog = L.Dog;
+export const Rabbit = L.Rabbit;
+
 /**
  * Generic maker to get an icon by name if needed.
  * Returns a React component (may be undefined if Lucide has no matching export).
