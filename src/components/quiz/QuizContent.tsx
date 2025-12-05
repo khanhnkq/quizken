@@ -2,7 +2,7 @@ import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Download, Sparkles, BookOpen } from "@/lib/icons";
+import { Download, Sparkles, BookOpen, Brain } from "@/lib/icons";
 import { BackgroundDecorations } from "@/components/ui/BackgroundDecorations";
 import {
   Card,
@@ -379,8 +379,11 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                         <CardContent className="p-4 sm:p-6 md:p-8 space-y-3 sm:space-y-4">
                           <div className="space-y-4">
                             {q.question && (
-                              <h3 className="text-xl font-heading font-medium text-foreground leading-relaxed">
-                                {idx + 1}. {q.question}
+                              <h3 className="text-2xl font-heading font-medium text-foreground leading-relaxed flex gap-3 items-start">
+                                <span className="flex-shrink-0 mt-1 p-1.5 bg-primary/10 rounded-lg">
+                                  <Brain className="w-5 h-5 text-primary" />
+                                </span>
+                                {q.question}
                               </h3>
                             )}
                             <div className="flex flex-col gap-2">
@@ -397,51 +400,52 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                                   return (
                                     <label
                                       key={optIdx}
-                                      className={`flex items-start gap-3 p-3 sm:p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 hover:scale-[1.01] ${showResults && isCorrect
-                                        ? "bg-green-50 border-green-500"
+                                      className={`group w-full text-left p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200 active:scale-95 flex items-center gap-4 ${showResults && isCorrect
+                                        ? "bg-green-50 border-green-500 shadow-[0_4px_0_0_#22c55e] translate-y-[-2px]"
                                         : userSelectedWrong
-                                          ? "bg-red-50 border-red-500"
+                                          ? "bg-red-50 border-red-500 shadow-[0_4px_0_0_#ef4444] translate-y-[-2px]"
                                           : userSelectedCorrect
-                                            ? "bg-green-50 border-green-500"
-                                            : "bg-muted/50 border-gray-200 hover:bg-muted/80"
+                                            ? "bg-green-50 border-green-500 shadow-[0_4px_0_0_#22c55e] translate-y-[-2px]"
+                                            : isSelected
+                                              ? "bg-primary/5 border-primary shadow-[0_4px_0_0_#FF6B6B] translate-y-[-2px]"
+                                              : "bg-white border-border/60 hover:border-primary/50 hover:shadow-lg hover:-translate-y-1"
                                         }`}>
-                                      <div className="flex items-center gap-2 w-full">
-                                        <input
-                                          type="radio"
-                                          name={`question-${idx}`}
-                                          value={optIdx}
-                                          checked={isSelected}
-                                          onChange={(e) => {
-                                            play("pop");
-                                            handleAnswerSelect(
-                                              idx,
-                                              optIdx,
-                                              e.currentTarget
-                                            );
-                                          }}
-                                          disabled={showResults}
-                                          className="h-4 w-4 shrink-0"
-                                        />
-                                        <span className="font-medium mr-2 select-none whitespace-nowrap flex-shrink-0">
-                                          {String.fromCharCode(65 + optIdx)}.
-                                        </span>
-                                        <span className="flex-1 whitespace-normal break-words leading-snug text-sm sm:text-base">
+                                      <input
+                                        type="radio"
+                                        name={`question-${idx}`}
+                                        value={optIdx}
+                                        checked={isSelected}
+                                        onChange={(e) => {
+                                          play("pop");
+                                          handleAnswerSelect(
+                                            idx,
+                                            optIdx,
+                                            e.currentTarget
+                                          );
+                                        }}
+                                        disabled={showResults}
+                                        className="sr-only"
+                                      />
+                                      <div className={`
+                                        w-10 h-10 rounded-xl flex items-center justify-center 
+                                        font-heading font-bold text-lg transition-colors shrink-0
+                                        ${isSelected || (showResults && isCorrect) ? 'bg-primary text-white' : 'bg-secondary/30 text-secondary-foreground group-hover:bg-primary group-hover:text-white'}
+                                      `}>
+                                        {String.fromCharCode(65 + optIdx)}
+                                      </div>
+                                      <div className="flex-1">
+                                        <span className="text-base sm:text-lg font-medium leading-snug">
                                           {option}
                                         </span>
                                       </div>
                                       {showResults && isCorrect && (
-                                        <span className="ml-2 text-green-600 font-semibold">
-                                          ✓ {t('quizContent.correctAnswer')}
+                                        <span className="text-green-600 font-bold text-sm bg-white px-2 py-1 rounded-lg border border-green-200 shadow-sm shrink-0">
+                                          {t('quizContent.correctAnswer')}
                                         </span>
                                       )}
                                       {userSelectedWrong && (
-                                        <span className="ml-2 text-red-600 font-semibold">
-                                          ✗ {t('quizContent.yourAnswer')}
-                                        </span>
-                                      )}
-                                      {userSelectedCorrect && (
-                                        <span className="ml-2 text-green-600 font-semibold">
-                                          ✓ {t('quizContent.yourAnswer')}
+                                        <span className="text-red-600 font-bold text-sm bg-white px-2 py-1 rounded-lg border border-red-200 shadow-sm shrink-0">
+                                          {t('quizContent.yourAnswer')}
                                         </span>
                                       )}
                                     </label>
