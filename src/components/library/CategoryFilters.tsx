@@ -52,7 +52,7 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
           play("toggle");
           onCategoryChange(v as QuizCategory | "all");
         }}>
-        <SelectTrigger className="w-full sm:w-[180px] border-2">
+        <SelectTrigger className="w-full sm:w-[180px] h-12 rounded-2xl border-4 border-border font-heading font-medium">
           <SelectValue placeholder={t('library.search.category')} />
         </SelectTrigger>
         <SelectContent>
@@ -108,7 +108,7 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
           play("toggle");
           onDifficultyChange(v as QuizDifficulty | "all");
         }}>
-        <SelectTrigger className="w-full sm:w-[150px] border-2">
+        <SelectTrigger className="w-full sm:w-[150px] h-12 rounded-2xl border-4 border-border font-heading font-medium">
           <SelectValue placeholder={t('library.search.difficulty')} />
         </SelectTrigger>
         <SelectContent>

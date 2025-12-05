@@ -716,59 +716,64 @@ const QuizLibrary: React.FC = () => {
                 <div
                   data-lib-list
                   className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-500 items-start">
-                  {quizzes.map((quiz) => (
-                    <QuizCard
+                  {quizzes.map((quiz, index) => (
+                    <div
                       key={quiz.id}
-                      quiz={quiz}
-                      onPreview={() => setSelectedQuiz(quiz)}
-                      onUse={() => handleUseQuiz(quiz)}
-                      onDownload={async () => {
-                        try {
-                          // Increment PDF download count
-                          await supabase.rpc("increment_quiz_pdf_download", {
-                            quiz_id: quiz.id,
-                          });
+                      className="animate-in fade-in zoom-in-50 duration-500 fill-mode-backwards"
+                      style={{ animationDelay: `${index * 100}ms` }}
+                    >
+                      <QuizCard
+                        quiz={quiz}
+                        onPreview={() => setSelectedQuiz(quiz)}
+                        onUse={() => handleUseQuiz(quiz)}
+                        onDownload={async () => {
+                          try {
+                            // Increment PDF download count
+                            await supabase.rpc("increment_quiz_pdf_download", {
+                              quiz_id: quiz.id,
+                            });
 
-                          // Chuẩn hóa về Question[] chặt chẽ
-                          const questionsArray: Question[] =
-                            normalizeToQuestions(
-                              Array.isArray(quiz.questions)
-                                ? quiz.questions
-                                : JSON.parse(String(quiz.questions || "[]"))
-                            );
+                            // Chuẩn hóa về Question[] chặt chẽ
+                            const questionsArray: Question[] =
+                              normalizeToQuestions(
+                                Array.isArray(quiz.questions)
+                                  ? quiz.questions
+                                  : JSON.parse(String(quiz.questions || "[]"))
+                              );
 
-                          const title = quiz.title || "quiz";
-                          const filename = `${title.replace(/\s+/g, "-").toLowerCase() || "quiz"
-                            }.pdf`;
+                            const title = quiz.title || "quiz";
+                            const filename = `${title.replace(/\s+/g, "-").toLowerCase() || "quiz"
+                              }.pdf`;
 
-                          // Warm up worker (no-op if already warmed) then generate in background thread
-                          await warmupPdfWorker().catch(() => { });
-                          await generateAndDownloadPdf({
-                            filename,
-                            title,
-                            description: quiz.description || "",
-                            questions: questionsArray,
-                            showResults: false,
-                            userAnswers: [],
-                          });
+                            // Warm up worker (no-op if already warmed) then generate in background thread
+                            await warmupPdfWorker().catch(() => { });
+                            await generateAndDownloadPdf({
+                              filename,
+                              title,
+                              description: quiz.description || "",
+                              questions: questionsArray,
+                              showResults: false,
+                              userAnswers: [],
+                            });
 
-                          toast({
-                            title: "Đã tải xuống PDF",
-                            description: `Quiz được lưu thành ${filename}`,
-                            variant: "success",
-                          });
-                        } catch (e) {
-                          console.error("Download quiz PDF error:", e);
-                          toast({
-                            title: "Lỗi",
-                            description: "Không thể tạo/tải PDF.",
-                            variant: "destructive",
-                          });
-                        }
-                      }}
-                      formatDate={formatDate}
-                      formatNumber={formatNumber}
-                    />
+                            toast({
+                              title: "Đã tải xuống PDF",
+                              description: `Quiz được lưu thành ${filename}`,
+                              variant: "success",
+                            });
+                          } catch (e) {
+                            console.error("Download error:", e);
+                            toast({
+                              title: "Lỗi tải xuống",
+                              description: "Không thể tạo file PDF. Vui lòng thử lại.",
+                              variant: "destructive",
+                            });
+                          }
+                        }}
+                        formatDate={formatDate}
+                        formatNumber={formatNumber}
+                      />
+                    </div>
                   ))}
                 </div>
               )}
@@ -880,11 +885,12 @@ const QuizLibrary: React.FC = () => {
                 </div>
               )}
             </div>
-          </section>
+          </section >
 
           {/* Selected Quiz Preview Modal (Radix Dialog) */}
-          <Dialog
-            open={!!selectedQuiz}
+          < Dialog
+            open={!!selectedQuiz
+            }
             onOpenChange={(open) => {
               if (!open) setSelectedQuiz(null);
             }}>
@@ -1057,10 +1063,10 @@ const QuizLibrary: React.FC = () => {
                 </Card>
               </div>
             </DialogContent>
-          </Dialog>
+          </Dialog >
           <AuthModal open={showAuthModal} onOpenChange={setShowAuthModal} />
-        </div>
-      </div>
+        </div >
+      </div >
     </>
   );
 };
