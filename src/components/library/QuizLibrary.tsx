@@ -775,7 +775,7 @@ const QuizLibrary: React.FC = () => {
 
               {!loading && quizzes.length > 0 && totalPages > 1 && (
                 <div className="mt-12 mb-20 flex justify-center">
-                  <div className="bg-white/60 backdrop-blur-md rounded-full border-4 border-white/50 shadow-xl p-2 inline-block">
+                  <div className="bg-white/90 backdrop-blur-xl rounded-full border-4 border-white shadow-2xl p-2 inline-block">
                     <Pagination>
                       <PaginationContent className="gap-2">
                         <PaginationItem>
