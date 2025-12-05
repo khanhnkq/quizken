@@ -192,19 +192,19 @@ export const FlipCard: React.FC<FlipCardProps> = ({
             variant === "image-only"
               ? "bg-transparent"
               : isDark
-              ? "bg-gradient-to-br from-black/45 via-black/35 to-black/65 border-card text-card-foreground"
-              : "bg-gradient-to-br from-white/95 to-[#ECF2F7] text-foreground border-border"
+                ? "bg-gradient-to-br from-black/45 via-black/35 to-black/65 border-card text-card-foreground"
+                : "bg-gradient-to-br from-white/95 to-[#ECF2F7] text-foreground border-border"
           )}
           style={{
             willChange: "transform",
             backfaceVisibility: "hidden",
             ...(image && frontImageLoaded
               ? {
-                  backgroundImage: `url(${image})`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  backgroundRepeat: "no-repeat",
-                }
+                backgroundImage: `url(${image})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
+              }
               : {}),
           }}>
           {/* Loading placeholder for front image */}
@@ -280,11 +280,11 @@ export const FlipCard: React.FC<FlipCardProps> = ({
             backfaceVisibility: "hidden",
             ...(backImage && backImageLoaded
               ? {
-                  backgroundImage: `url(${backImage})`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  backgroundRepeat: "no-repeat",
-                }
+                backgroundImage: `url(${backImage})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
+              }
               : {}),
           }}>
           {/* Loading placeholder for back image */}

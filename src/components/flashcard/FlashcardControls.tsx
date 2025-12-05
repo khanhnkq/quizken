@@ -29,8 +29,8 @@ export const FlashcardControls: React.FC<FlashcardControlsProps> = ({
           {Array.from({ length: totalCards }, (_, index) => {
             const isCurrent = index === currentIndex;
             const stateClasses = isCurrent
-              ? "border-primary text-primary bg-primary/10 hover:bg-primary/20 font-bold shadow-sm"
-              : "border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground";
+              ? "border-[#B5CC89] text-[#B5CC89] bg-[#B5CC89]/10 hover:bg-[#B5CC89]/20"
+              : "border-border text-muted-foreground hover:bg-accent";
 
             return (
               <Button
@@ -38,7 +38,7 @@ export const FlashcardControls: React.FC<FlashcardControlsProps> = ({
                 type="button"
                 variant="outline"
                 size="icon"
-                className={`relative w-8 h-8 sm:w-10 sm:h-10 rounded-xl transition-all duration-300 hover:scale-110 ${stateClasses}`}
+                className={`relative w-8 h-8 sm:w-10 sm:h-10 rounded-full transition-colors duration-300 ${stateClasses}`}
                 onClick={() => {
                   // Use the same event but include direction so view can animate slide
                   const direction =
@@ -59,7 +59,7 @@ export const FlashcardControls: React.FC<FlashcardControlsProps> = ({
                   {index + 1}
                 </span>
                 {isCurrent && (
-                  <span className="pointer-events-none absolute -right-1 -top-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-primary text-white border-2 border-white text-[10px] font-bold shadow-sm">
+                  <span className="pointer-events-none absolute -right-1 -top-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-white text-[#B5CC89] border border-[#B5CC89] text-[10px] font-bold">
                     •
                   </span>
                 )}

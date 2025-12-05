@@ -602,7 +602,13 @@ const QuizLibrary: React.FC = () => {
       <div className="min-h-screen" id="smooth-wrapper">
         <div id="smooth-content">
           {/* Hero Section */}
-          <section className="relative overflow-hidden bg-gradient-to-b from-secondary/30 to-background min-h-screen py-20 px-4">
+          <section className="relative overflow-hidden bg-gradient-to-b from-secondary/30 via-background to-background min-h-[60vh] flex flex-col justify-center py-20 px-4">
+            {/* Background Decorations */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+              <div className="absolute top-20 left-10 w-24 h-24 bg-yellow-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+              <div className="absolute top-40 right-10 w-32 h-32 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+              <div className="absolute -bottom-8 left-20 w-32 h-32 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+            </div>
             {!isMobile && (
               <div className="absolute inset-0 -z-10 opacity-5 hidden md:block">
                 <ScrollVelocityContainer className="text-6xl md:text-8xl font-bold">
@@ -679,55 +685,86 @@ const QuizLibrary: React.FC = () => {
                 </ScrollVelocityContainer>
               </div>
             )}
+            {/* Peeking Mascots - Just like Footer */}
+            <div className="absolute top-24 left-[8%] opacity-30 hidden md:block animate-bounce-slow" style={{ animationDelay: '0s' }}>
+              <Star className="w-20 h-20 text-primary rotate-[-12deg]" />
+            </div>
+            <div className="absolute top-32 right-[12%] opacity-30 hidden md:block animate-bounce-slow" style={{ animationDelay: '1s' }}>
+              <Sparkles className="w-16 h-16 text-[#B5CC89] rotate-[12deg]" />
+            </div>
+            <div className="absolute bottom-48 left-[15%] opacity-20 hidden lg:block animate-bounce-slow" style={{ animationDelay: '0.5s' }}>
+              <TrendingUp className="w-14 h-14 text-primary rotate-[6deg]" />
+            </div>
+            <div className="absolute bottom-56 right-[18%] opacity-20 hidden lg:block animate-bounce-slow" style={{ animationDelay: '1.5s' }}>
+              <BookOpen className="w-18 h-18 text-[#B5CC89] rotate-[-8deg]" />
+            </div>
 
-            <div className="container mx-auto max-w-4xl text-center">
-              <div className="flex justify-center mb-6">
-                <BookOpen className="w-16 h-16 text-[#B5CC89]" />
+            <div className="container mx-auto max-w-4xl text-center relative z-10">
+              {/* Bouncy Icon Badge - Like Footer */}
+              <div className="inline-flex justify-center p-5 bg-white/60 backdrop-blur-sm rounded-full shadow-xl mb-6 animate-bounce-slow border-4 border-white/50">
+                <BookOpen className="w-14 h-14 text-[#B5CC89]" />
               </div>
 
-              <h1 className="text-4xl md:text-6xl font-bold mb-4">
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold font-heading bg-gradient-to-br from-primary to-primary/60 bg-clip-text text-transparent mb-4">
                 {t('library.hero.title')}
               </h1>
-              <p className="text-lg text-muted-foreground mb-8">
+              <p className="text-xl text-muted-foreground font-medium max-w-2xl mx-auto mb-8">
                 {t('library.hero.description')}
               </p>
             </div>
 
             <div className="container mx-auto max-w-6xl">
-              {/* Stats */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
-                <Card className="rounded-2xl bg-secondary/20 backdrop-blur-sm">
-                  <CardContent className="p-6 text-center">
+              {/* Stats - Playful Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+                {/* Quizzes Card */}
+                <Card className="rounded-3xl border-4 border-primary/20 bg-gradient-to-br from-green-50 to-white backdrop-blur-md shadow-xl hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 group cursor-pointer overflow-hidden">
+                  <CardContent className="p-6 text-center relative">
+                    {/* Floating Icon */}
+                    <div className="absolute -top-2 -right-2 p-3 bg-primary/10 rounded-full transform rotate-12 group-hover:rotate-0 group-hover:scale-110 transition-all duration-300">
+                      <BookOpen className="w-8 h-8 text-primary" />
+                    </div>
                     <div
                       ref={totalQuizzesRef}
-                      className="text-4xl md:text-5xl font-bold text-primary mb-2">
+                      className="text-5xl md:text-6xl font-bold font-heading text-primary mb-2">
                       0
                     </div>
-                    <p className="text-sm md:text-base text-muted-foreground font-medium">
+                    <p className="text-base text-muted-foreground font-heading font-medium">
                       {t('library.stats.quizzes')}
                     </p>
                   </CardContent>
                 </Card>
-                <Card className="rounded-2xl bg-secondary/20 backdrop-blur-sm">
-                  <CardContent className="p-6 text-center">
+
+                {/* Topics Card */}
+                <Card className="rounded-3xl border-4 border-purple-200 bg-gradient-to-br from-purple-50 to-white backdrop-blur-md shadow-xl hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 group cursor-pointer overflow-hidden">
+                  <CardContent className="p-6 text-center relative">
+                    {/* Floating Icon */}
+                    <div className="absolute -top-2 -right-2 p-3 bg-purple-100 rounded-full transform rotate-12 group-hover:rotate-0 group-hover:scale-110 transition-all duration-300">
+                      <Sparkles className="w-8 h-8 text-purple-500" />
+                    </div>
                     <div
                       ref={totalCategoriesRef}
-                      className="text-4xl md:text-5xl font-bold text-primary mb-2">
+                      className="text-5xl md:text-6xl font-bold font-heading text-purple-600 mb-2">
                       0
                     </div>
-                    <p className="text-sm md:text-base text-muted-foreground font-medium">
+                    <p className="text-base text-muted-foreground font-heading font-medium">
                       {t('library.stats.topics')}
                     </p>
                   </CardContent>
                 </Card>
-                <Card className="rounded-2xl bg-secondary/20 backdrop-blur-sm">
-                  <CardContent className="p-6 text-center">
+
+                {/* Creators Card */}
+                <Card className="rounded-3xl border-4 border-orange-200 bg-gradient-to-br from-orange-50 to-white backdrop-blur-md shadow-xl hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 group cursor-pointer overflow-hidden">
+                  <CardContent className="p-6 text-center relative">
+                    {/* Floating Icon */}
+                    <div className="absolute -top-2 -right-2 p-3 bg-orange-100 rounded-full transform rotate-12 group-hover:rotate-0 group-hover:scale-110 transition-all duration-300">
+                      <Star className="w-8 h-8 text-orange-500" />
+                    </div>
                     <div
                       ref={totalCreatorsRef}
-                      className="text-4xl md:text-5xl font-bold text-primary mb-2">
+                      className="text-5xl md:text-6xl font-bold font-heading text-orange-500 mb-2">
                       0
                     </div>
-                    <p className="text-sm md:text-base text-muted-foreground font-medium">
+                    <p className="text-base text-muted-foreground font-heading font-medium">
                       {t('library.stats.creators')}
                     </p>
                   </CardContent>
@@ -738,22 +775,28 @@ const QuizLibrary: React.FC = () => {
               <div className="max-w-4xl mx-auto mb-12 space-y-4">
                 {/* Search Bar */}
                 <div className="relative">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                  <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-8 w-8 text-primary/40" />
                   <Input
                     ref={searchInputRef}
                     placeholder={t('library.search.placeholder')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-12 pr-12 text-base py-6 rounded-xl border-2 focus:border-[#B5CC89] transition-all"
+                    className="pl-16 pr-16 text-xl py-8 h-20 rounded-full border-4 border-primary/20 focus:border-primary shadow-xl hover:shadow-2xl transition-all placeholder:text-muted-foreground/50 font-medium"
                   />
-                  {searchQuery && (
-                    <button
-                      onClick={() => setSearchQuery("")}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 p-1 hover:bg-muted rounded-full transition-colors"
-                      aria-label={t('library.search.clear')}>
-                      <X className="h-4 w-4 text-muted-foreground" />
-                    </button>
-                  )}
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    {searchQuery ? (
+                      <button
+                        onClick={() => setSearchQuery("")}
+                        className="p-2 hover:bg-red-100 text-red-400 hover:text-red-500 rounded-full transition-colors"
+                        aria-label={t('library.search.clear')}>
+                        <X className="h-6 w-6" />
+                      </button>
+                    ) : (
+                      <div className="p-3 bg-primary/10 rounded-full text-primary">
+                        <Search className="h-6 w-6" />
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Filters Row */}
@@ -768,7 +811,7 @@ const QuizLibrary: React.FC = () => {
                           play("toggle");
                           setSortBy(v as typeof sortBy);
                         }}>
-                        <SelectTrigger className="w-full sm:w-[180px] border-2">
+                        <SelectTrigger className="w-full sm:w-[180px] h-12 rounded-2xl border-4 border-border font-heading font-medium">
                           <SelectValue placeholder={t('library.search.sortBy')} />
                         </SelectTrigger>
                         <SelectContent>
@@ -792,7 +835,7 @@ const QuizLibrary: React.FC = () => {
                           play("toggle");
                           setSearchIn(v as typeof searchIn);
                         }}>
-                        <SelectTrigger className="w-full sm:w-[160px] border-2">
+                        <SelectTrigger className="w-full sm:w-[160px] h-12 rounded-2xl border-4 border-border font-heading font-medium">
                           <SelectValue placeholder={t('library.search.searchIn')} />
                         </SelectTrigger>
                         <SelectContent>

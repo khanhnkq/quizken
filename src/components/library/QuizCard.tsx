@@ -12,15 +12,17 @@ import {
   BookOpen,
   Clock,
   Download,
-  ArrowDown,
-  FileDown,
-} from "@/lib/icons";
+  Play,
+  Sparkles,
+  TrendingUp,
+} from "lucide-react";
 import {
-  QuizCategoryBadge,
   QuizTags,
-} from "@/components/library/QuizCategoryBadge";
+} from "./QuizCategoryBadge";
 import type { QuizCategory, QuizDifficulty } from "@/lib/constants/quizCategories";
+import { getDifficultyLabel } from "@/lib/constants/quizCategories";
 import { useTranslation } from "react-i18next";
+import { cn } from "@/lib/utils";
 
 interface QuizCardProps {
   quiz: {
@@ -53,118 +55,123 @@ export const QuizCard: React.FC<QuizCardProps> = ({
   const { t } = useTranslation();
   const questionCount = Array.isArray(quiz.questions) ? quiz.questions.length : 0;
 
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty?.toLowerCase()) {
+      case "easy":
+        return "bg-green-100 text-green-700 border-green-200";
+      case "medium":
+        return "bg-yellow-100 text-yellow-700 border-yellow-200";
+      case "hard":
+        return "bg-red-100 text-red-700 border-red-200";
+      default:
+        return "bg-gray-100 text-gray-700 border-gray-200";
+    }
+  };
+
   return (
-    <Card className="border-2 hover:border-[#B5CC89] transition-all duration-300 md:hover:shadow-lg md:hover:scale-105 flex flex-col h-full">
-      {/* Header - Fixed height area */}
-      <CardHeader className="pb-4 flex-shrink-0">
-        <div className="space-y-3">
-          {/* Title with consistent height */}
-          <div className="min-h-[3.5rem]">
-            <CardTitle className="text-lg line-clamp-2 leading-snug">
-              {quiz.title}
-            </CardTitle>
-          </div>
+    <Card className="h-full flex flex-col rounded-3xl border-4 border-primary/10 hover:border-primary/30 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 bg-white group overflow-hidden">
+      {/* Visual Header - Game Cartridge Style */}
+      <div className="relative h-36 overflow-hidden bg-gradient-to-br from-secondary/50 to-secondary/20">
+        {/* Decorative Pattern */}
+        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_1px_1px,#000_1px,transparent_0)] bg-[length:16px_16px]" />
 
-          {/* Public badge */}
-          <div>
-            <Badge
-              variant="secondary"
-              className="bg-[#B5CC89]/20 text-[#B5CC89]">
-              {t('library.card.public')}
-            </Badge>
-          </div>
-
-          {/* Description with consistent height */}
-          <div className="min-h-[2.5rem]">
-            {quiz.description ? (
-              <CardDescription className="line-clamp-2">
-                {quiz.description}
-              </CardDescription>
-            ) : (
-              <CardDescription className="text-muted-foreground/50 italic">
-                {t('library.card.noDescription')}
-              </CardDescription>
-            )}
-          </div>
-
-          {/* Category and Difficulty */}
-          <div>
-            <QuizCategoryBadge
-              category={quiz.category}
-              difficulty={quiz.difficulty}
-              size="sm"
-            />
-          </div>
-        </div>
-      </CardHeader>
-
-      {/* Content - Flexible grow area */}
-      <CardContent className="space-y-4 flex-grow flex flex-col">
-        {/* Tags with consistent height */}
-        <div className="min-h-[2rem]">
-          {quiz.tags && quiz.tags.length > 0 ? (
-            <QuizTags tags={quiz.tags} maxTags={3} />
-          ) : (
-            <div className="h-6" /> // Placeholder for consistent spacing
-          )}
+        {/* Floating Icon */}
+        <div className="absolute -right-6 -bottom-6 text-primary/10 transform rotate-12 group-hover:rotate-0 group-hover:scale-110 transition-all duration-500">
+          <BookOpen className="w-32 h-32" />
         </div>
 
-        {/* Spacer to push stats and buttons to bottom */}
-        <div className="flex-grow" />
+        {/* Difficulty Sticker */}
+        {quiz.difficulty && (
+          <div className={cn(
+            "absolute top-4 right-4 rounded-full border-2 px-3 py-1 font-heading uppercase text-[10px] tracking-wider shadow-sm z-10",
+            getDifficultyColor(quiz.difficulty)
+          )}>
+            {t(getDifficultyLabel(quiz.difficulty))}
+          </div>
+        )}
 
-        {/* Stats - Fixed height area */}
-        <div className="flex flex-wrap items-center text-sm text-muted-foreground gap-3 min-h-[1.5rem]">
-          <div
-            className="flex items-center gap-1"
-            title={t('library.card.usageCount')}>
-            <FileDown className="h-3.5 w-3.5 text-[#B5CC89]" />
-            <span className="font-semibold text-foreground">
-              {formatNumber(quiz.usage_count || 0)}
-            </span>
-          </div>
-          <div
-            className="flex items-center gap-1"
-            title={t('library.card.downloadCount')}>
-            <ArrowDown className="h-3.5 w-3.5 text-blue-500" />
-            <span className="font-semibold text-foreground">
-              {formatNumber(quiz.pdf_download_count || 0)}
-            </span>
-          </div>
-          <div className="flex items-center gap-1">
-            <BookOpen className="h-3 w-3" />
+        {/* Category Sticker */}
+        <div className="absolute bottom-4 left-4 z-10">
+          <Badge variant="secondary" className="rounded-xl border-2 border-white/50 shadow-sm bg-white/80 backdrop-blur-sm text-primary hover:bg-white">
+            {quiz.category}
+          </Badge>
+        </div>
+      </div>
+
+      <CardContent className="flex-grow p-5 pt-6 flex flex-col gap-3">
+        {/* Title */}
+        <h3 className="text-lg md:text-xl font-heading font-bold text-foreground leading-tight line-clamp-2 min-h-[3rem] group-hover:text-primary transition-colors">
+          {quiz.title}
+        </h3>
+
+        {/* Description */}
+        <p className="line-clamp-2 text-sm text-muted-foreground min-h-[2.5rem]">
+          {quiz.description || t('library.card.noDescription')}
+        </p>
+
+        {/* Stats Bubbles */}
+        <div className="flex items-center gap-3 mt-2">
+          <div className="flex items-center gap-1.5 bg-secondary/40 rounded-full px-3 py-1.5 text-xs font-medium text-muted-foreground">
+            <BookOpen className="w-3.5 h-3.5" />
             <span>{questionCount} {t('library.card.questions')}</span>
           </div>
-          <div className="flex items-center gap-1">
-            <Clock className="h-3 w-3" />
-            <span>{formatDate(quiz.created_at)}</span>
+          <div className="flex items-center gap-1.5 bg-green-50 text-green-600 rounded-full px-3 py-1.5 text-xs font-medium">
+            <TrendingUp className="w-3.5 h-3.5" />
+            <span>{formatNumber(quiz.usage_count || 0)}</span>
           </div>
         </div>
 
-        {/* Action Buttons - Fixed height area */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onPreview}
-            className="w-full min-w-0 hover:bg-accent transition-colors">
-            {t('library.card.preview')}
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onUse}
-            className="w-full min-w-0 hover:bg-[#B5CC89] hover:text-white transition-colors">
-            {t('library.card.use')}
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onDownload}
-            className="w-full min-w-0 hover:bg-muted">
-            <Download className="h-4 w-4" />
-          </Button>
+        {/* Tags */}
+        <div className="mt-2">
+          {quiz.tags && quiz.tags.length > 0 ? (
+            <QuizTags tags={quiz.tags} maxTags={2} />
+          ) : null}
+        </div>
+
+        {/* Spacer */}
+        <div className="flex-grow" />
+
+        {/* Date */}
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-3">
+          <Clock className="w-3.5 h-3.5" />
+          <span>{formatDate(quiz.created_at)}</span>
         </div>
       </CardContent>
+
+      {/* Action Buttons - Match Hero Section Style */}
+      <div className="p-5 pt-4 mt-auto border-t-2 border-border/30 bg-secondary/10">
+        <div className="flex gap-3">
+          <Button
+            className="flex-1 rounded-3xl font-heading shadow-xl border-4 border-primary hover:border-primary-foreground/50 active:scale-95 transition-all duration-200 text-sm bg-primary text-white"
+            variant="hero"
+            size="lg"
+            onClick={onUse}
+          >
+            <Sparkles className="w-4 h-4 mr-1.5" />
+            {t('library.card.use')}
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-12 w-12 rounded-3xl border-4 border-border bg-white text-muted-foreground hover:border-primary/50 hover:bg-primary/10 hover:text-primary active:scale-95 transition-all duration-200"
+            onClick={onPreview}
+            title={t('library.card.preview')}
+          >
+            <BookOpen className="w-5 h-5" />
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-12 w-12 rounded-3xl border-4 border-border bg-white text-muted-foreground hover:border-blue-400 hover:bg-blue-50 hover:text-blue-500 active:scale-95 transition-all duration-200"
+            onClick={onDownload}
+            title={t('library.card.download')}
+          >
+            <Download className="w-5 h-5" />
+          </Button>
+        </div>
+      </div>
     </Card>
   );
 };

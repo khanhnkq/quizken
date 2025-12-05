@@ -3,7 +3,6 @@ import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
 
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
-import { gsap } from "gsap";
 
 const AlertDialog = AlertDialogPrimitive.Root;
 
@@ -17,7 +16,7 @@ const AlertDialogOverlay = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <AlertDialogPrimitive.Overlay
     className={cn(
-      "fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+      "fixed inset-0 z-50 bg-black/40 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
       className
     )}
     {...props}
@@ -35,7 +34,7 @@ const AlertDialogContent = React.forwardRef<
     <AlertDialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg",
+        "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border-4 border-primary/20 bg-white/95 backdrop-blur-md p-6 shadow-[0_8px_30px_rgba(0,0,0,0.12),inset_0_2px_0_rgba(255,255,255,0.9)] duration-300 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-3xl",
         className
       )}
       {...props}
@@ -78,7 +77,7 @@ const AlertDialogTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <AlertDialogPrimitive.Title
     ref={ref}
-    className={cn("text-lg font-semibold", className)}
+    className={cn("text-2xl font-heading font-bold text-primary", className)}
     {...props}
   />
 ));
@@ -104,7 +103,7 @@ const AlertDialogAction = React.forwardRef<
   <AlertDialogPrimitive.Action
     ref={ref}
     asChild={asChild}
-    className={cn(asChild ? "" : buttonVariants(), className)}
+    className={cn(asChild ? "" : buttonVariants(), "rounded-3xl border-4 border-primary shadow-lg hover:border-primary-foreground/50 active:scale-95 transition-all duration-200 font-heading", className)}
     {...props}
   />
 ));
@@ -113,85 +112,21 @@ AlertDialogAction.displayName = AlertDialogPrimitive.Action.displayName;
 const AlertDialogCancel = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Cancel>,
   React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Cancel>
->(
-  (
-    {
-      className,
-      asChild,
-      onMouseEnter,
-      onMouseLeave,
-      onFocus,
-      onBlur,
-      ...props
-    },
-    ref
-  ) => {
-    const handleEnter = (e: React.MouseEvent<HTMLButtonElement>) => {
-      onMouseEnter?.(e);
-      const el = e.currentTarget;
-      gsap.to(el, {
-        y: -2,
-        scale: 1.04,
-        boxShadow: "0 12px 30px rgba(0,0,0,0.45)",
-        duration: 0.12,
-        ease: "power3.out",
-      });
-    };
+>(({ className, asChild, ...props }, ref) => {
+  return (
+    <AlertDialogPrimitive.Cancel
+      ref={ref}
+      asChild={asChild}
+      className={cn(
+        asChild ? "" : buttonVariants({ variant: "outline" }),
+        "mt-2 sm:mt-0 rounded-3xl border-4 border-border hover:border-primary/50 hover:bg-secondary hover:text-secondary-foreground active:scale-95 transition-all duration-200 font-heading",
+        className
+      )}
+      {...props}
+    />
+  );
+});
 
-    const handleLeave = (e: React.MouseEvent<HTMLButtonElement>) => {
-      onMouseLeave?.(e);
-      const el = e.currentTarget;
-      gsap.to(el, {
-        y: 0,
-        scale: 1,
-        boxShadow: "0 0 0 rgba(0,0,0,0)",
-        duration: 0.16,
-        ease: "power3.inOut",
-      });
-    };
-
-    const handleFocus = (e: React.FocusEvent<HTMLButtonElement>) => {
-      onFocus?.(e);
-      const el = e.currentTarget;
-      gsap.to(el, {
-        y: -2,
-        scale: 1.04,
-        boxShadow: "0 12px 30px rgba(0,0,0,0.45)",
-        duration: 0.12,
-        ease: "power3.out",
-      });
-    };
-
-    const handleBlur = (e: React.FocusEvent<HTMLButtonElement>) => {
-      onBlur?.(e);
-      const el = e.currentTarget;
-      gsap.to(el, {
-        y: 0,
-        scale: 1,
-        boxShadow: "0 0 0 rgba(0,0,0,0)",
-        duration: 0.16,
-        ease: "power3.inOut",
-      });
-    };
-
-    return (
-      <AlertDialogPrimitive.Cancel
-        ref={ref}
-        asChild={asChild}
-        className={cn(
-          asChild ? "" : buttonVariants({ variant: "outline" }),
-          "mt-2 sm:mt-0 duration-150",
-          className
-        )}
-        onMouseEnter={handleEnter}
-        onMouseLeave={handleLeave}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
-        {...props}
-      />
-    );
-  }
-);
 AlertDialogCancel.displayName = AlertDialogPrimitive.Cancel.displayName;
 
 export {

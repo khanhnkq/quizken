@@ -34,17 +34,17 @@ export const FlashcardCard: React.FC<FlashcardCardProps> = ({
     <div className="relative z-10 p-4 flex flex-col h-full">
       <div className="flex-1 flex flex-col items-center justify-center pt-16">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-8 h-8 rounded-xl bg-primary text-primary-foreground flex items-center justify-center text-lg font-bold shadow-sm">
+          <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-lg font-bold">
             ✓
           </div>
-          <span className="text-lg font-heading font-semibold text-foreground">
+          <span className="text-lg font-semibold text-foreground">
             {t('quizGenerator.flashcard.correctAnswer')}
           </span>
         </div>
 
         <div className="w-full max-w-md">
-          <div className="bg-card border-2 border-primary/20 rounded-2xl p-6 shadow-sm">
-            <span className="text-foreground text-lg font-medium leading-relaxed text-center break-words font-heading">
+          <div className="bg-card border-2 border-primary/20 rounded-lg p-4 shadow-md">
+            <span className="text-foreground text-base font-medium leading-relaxed text-center break-words">
               {flashcard.answer}
             </span>
           </div>
@@ -59,7 +59,7 @@ export const FlashcardCard: React.FC<FlashcardCardProps> = ({
               {t('quizGenerator.flashcard.explanation')}
             </span>
           </div>
-          <div className="bg-card border border-border rounded-2xl p-4 shadow-sm">
+          <div className="bg-card border border-border rounded-lg p-3 shadow-sm">
             <p className="text-sm text-muted-foreground leading-relaxed text-center break-words">
               {flashcard.explanation}
             </p>
