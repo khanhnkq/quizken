@@ -4,11 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { StatisticsCards } from "./StatisticsCards";
 import { ProgressTrendline } from "./ProgressTrendline";
+import { CreatedQuizzes } from "./CreatedQuizzes";
 import { RecentQuizzes } from "./RecentQuizzes";
 import { UserProfile } from "../user-profile/UserProfile";
 import { useDashboardStats } from "@/hooks/useDashboardStats";
 import { useProgressTrend } from "@/hooks/useProgressTrend";
 import { useRecentQuizzes } from "@/hooks/useRecentQuizzes";
+import { useCreatedQuizzes } from "@/hooks/useCreatedQuizzes";
 import { supabase } from "@/integrations/supabase/client";
 import { BarChart3Icon, PlusCircleIcon, UserIcon, Sparkles, ChevronLeftIcon } from "lucide-react";
 import { BackgroundDecorations } from "@/components/ui/BackgroundDecorations";
@@ -18,6 +20,7 @@ import { useNavigate } from "react-router-dom";
 import { killActiveScroll, scrollToTarget } from "@/lib/scroll";
 import { useAuth } from "@/lib/auth";
 import { useTranslation } from "react-i18next";
+import { useLevelNotification } from "@/hooks/useLevelNotification";
 
 interface PersonalDashboardProps {
   userId?: string;
@@ -27,6 +30,32 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { t } = useTranslation();
+
+  // Fetch data using hooks
+  const {
+    statistics,
+    isLoading: statsLoading,
+    error: statsError,
+  } = useDashboardStats(userId);
+  const {
+    trendData,
+    isLoading: trendLoading,
+    error: trendError,
+  } = useProgressTrend(userId);
+  const {
+    recentAttempts,
+    isLoading: recentLoading,
+    error: recentError,
+  } = useRecentQuizzes(userId, 50);
+  const {
+    createdQuizzes,
+    isLoading: createdLoading,
+    error: createdError,
+    refetch: refetchCreated,
+  } = useCreatedQuizzes(userId);
+
+  // Check for level up events
+  useLevelNotification(statistics);
 
   // Navigate to homepage and scroll to quiz generator
   const handleCreateQuiz = () => {
@@ -62,25 +91,10 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
     });
   };
 
-  // Fetch data using hooks
-  const {
-    statistics,
-    isLoading: statsLoading,
-    error: statsError,
-  } = useDashboardStats(userId);
-  const {
-    trendData,
-    isLoading: trendLoading,
-    error: trendError,
-  } = useProgressTrend(userId);
-  const {
-    recentAttempts,
-    isLoading: recentLoading,
-    error: recentError,
-  } = useRecentQuizzes(userId, 50);
 
-  const isLoading = statsLoading || trendLoading || recentLoading;
-  const hasError = statsError || trendError || recentError;
+
+  const isLoading = statsLoading || trendLoading || recentLoading || createdLoading;
+  const hasError = statsError || trendError || recentError || createdError;
 
   // Check if user has any data
   const hasNoData =
@@ -224,6 +238,14 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
         <div className="space-y-6 lg:space-y-8">
           <div className="w-full transform hover:translate-y-[-4px] transition-transform duration-300">
             <ProgressTrendline trendData={trendData} isLoading={trendLoading} />
+          </div>
+
+          <div className="w-full">
+            <CreatedQuizzes
+              quizzes={createdQuizzes}
+              isLoading={createdLoading}
+              onRefresh={refetchCreated}
+            />
           </div>
 
           <div className="w-full">

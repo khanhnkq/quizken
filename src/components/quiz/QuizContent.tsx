@@ -20,6 +20,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useFlashcardPersistence } from "@/hooks/useFlashcardPersistence";
 import FlashcardView from "@/components/flashcard/FlashcardView";
 import { useTranslation } from "react-i18next";
+import { useDashboardStats } from "@/hooks/useDashboardStats";
+import { calculateXP, calculateLevel, calculateAttemptReward } from "@/utils/levelSystem";
+import { useToast } from "@/hooks/use-toast";
 
 interface TokenUsage {
   prompt: number;
@@ -40,42 +43,57 @@ interface QuizContentProps {
   userId?: string;
 }
 
-// Move saveQuizAttempt outside component
+// Submit quiz attempt via Edge Function for SERVER-SIDE score validation
+// This prevents client-side score manipulation (cheating)
 async function saveQuizAttempt(
   quizId: string,
   userId: string,
-  score: number,
-  totalQuestions: number,
-  correctAnswers: number,
+  _score: number, // Unused - calculated server-side
+  _totalQuestions: number, // Unused - calculated server-side
+  _correctAnswers: number, // Unused - calculated server-side
   answers: number[],
   timeTakenSeconds: number
-) {
+): Promise<{ success: boolean; score?: number; correct_answers?: number; total_questions?: number }> {
   try {
-    const { data, error } = await supabase.from("quiz_attempts").insert([
-      {
-        quiz_id: quizId,
-        user_id: userId,
-        score: Math.round((correctAnswers / totalQuestions) * 100),
-        total_questions: totalQuestions,
-        correct_answers: correctAnswers,
-        answers: answers,
-        time_taken_seconds: timeTakenSeconds,
-        completed_at: new Date().toISOString(),
-      },
-    ]);
+    // Get current session for auth token
+    const { data: sessionData } = await supabase.auth.getSession();
+    const accessToken = sessionData?.session?.access_token;
 
-    if (error) {
-      console.error("Error saving quiz attempt:", error);
-      return false;
+    if (!accessToken) {
+      console.error("No access token available");
+      return { success: false };
     }
 
-    console.log("Quiz attempt saved:", data);
-    return true;
+    // Call Edge Function for server-side validation
+    const { data, error } = await supabase.functions.invoke("submit-quiz-attempt", {
+      body: {
+        quiz_id: quizId,
+        answers: answers,
+        time_taken_seconds: timeTakenSeconds,
+      },
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (error) {
+      console.error("Error submitting quiz attempt:", error);
+      return { success: false };
+    }
+
+    console.log("✅ Quiz attempt saved (server-validated):", data);
+    return {
+      success: true,
+      score: data.score,
+      correct_answers: data.correct_answers,
+      total_questions: data.total_questions,
+    };
   } catch (err) {
     console.error("Unexpected error:", err);
-    return false;
+    return { success: false };
   }
 }
+
 
 export const QuizContent: React.FC<QuizContentProps> = ({
   quiz,
@@ -90,7 +108,14 @@ export const QuizContent: React.FC<QuizContentProps> = ({
   userId,
 }) => {
   const { t } = useTranslation();
-  const { activateFlashcard, deactivateFlashcard } =
+  const { toast } = useToast();
+  const { statistics, refetch: refetchStats } = useDashboardStats(userId);
+  const {
+    activateFlashcard,
+    deactivateFlashcard,
+    saveFlashcardProgress,
+    getFlashcardProgress,
+  } =
     useFlashcardPersistence(null);
   const [showFlashcard, setShowFlashcard] = React.useState(false);
   const questionRefs = React.useRef<(HTMLDivElement | null)[]>([]);
@@ -499,46 +524,59 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                 {!showResults ? (
                   <Button
                     onClick={async () => {
-                      if (userId && answeredCount === quiz.questions.length) {
-                        const score = calculateScore();
-                        const correctAnswers = userAnswers.reduce(
+                      // OPTIMISTIC UI: Grade immediately, save to server in background
+                      // This provides instant feedback to the user
+
+                      // 1. Show results IMMEDIATELY (don't wait for server)
+                      onGrade();
+                      scrollToTop();
+
+                      // 2. Save to server in background (non-blocking)
+                      if (userId && answeredCount === quiz.questions.length && quiz.id) {
+                        const timeTaken = Math.floor(Math.random() * 300) + 60;
+
+                        // Calculate score locally for reward notification
+                        const localCorrectCount = userAnswers.reduce(
                           (count, answer, idx) => {
                             const question = quiz.questions[idx];
-                            return (
-                              count +
-                              (answer === question.correctAnswer ? 1 : 0)
-                            );
+                            return count + (answer === question.correctAnswer ? 1 : 0);
                           },
                           0
                         );
+                        const localScore = Math.round((localCorrectCount / quiz.questions.length) * 100);
 
-                        const timeTaken = Math.floor(Math.random() * 300) + 60;
+                        // Fire and forget - don't await
+                        saveQuizAttempt(
+                          quiz.id,
+                          userId,
+                          localScore,
+                          quiz.questions.length,
+                          localCorrectCount,
+                          userAnswers,
+                          timeTaken
+                        ).then((result) => {
+                          if (result.success) {
+                            console.log("✅ Quiz attempt saved (server-validated)");
 
-                        if (!quiz.id) {
-                          console.error(
-                            "Error: quiz.id is missing! Cannot save quiz attempt."
-                          );
-                        } else {
-                          const saved = await saveQuizAttempt(
-                            quiz.id,
-                            userId,
-                            score,
-                            quiz.questions.length,
-                            correctAnswers,
-                            userAnswers,
-                            timeTaken
-                          );
+                            // Use local score for reward (server validates but we trust local for display)
+                            const currentXP = calculateXP(statistics);
+                            const currentLevel = calculateLevel(currentXP);
+                            const zcoinReward = calculateAttemptReward(currentLevel, result.score ?? localScore);
 
-                          if (saved) {
-                            console.log("✅ Quiz attempt saved successfully");
+                            // Refresh stats to trigger global level up check
+                            refetchStats();
+
+                            toast({
+                              title: t('notifications.zcoinReward.attempt', { amount: zcoinReward, xp: result.score ?? localScore }),
+                              description: t('quizDetail.quizResult'),
+                              variant: "success",
+                              duration: 3000,
+                            });
                           } else {
                             console.log("❌ Failed to save quiz attempt");
                           }
-                        }
+                        });
                       }
-
-                      onGrade();
-                      scrollToTop();
                     }}
                     disabled={answeredCount !== quiz.questions.length}
                     variant={answeredCount === quiz.questions.length ? "hero" : "outline"}
@@ -583,7 +621,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
           </div>
         </div>
       </div>
-    </section>
+    </section >
   );
 };
 

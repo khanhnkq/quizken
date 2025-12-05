@@ -31,6 +31,7 @@ export function RecentQuizzes({
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   // Pagination Logic
   const totalPages = Math.ceil((recentAttempts?.length || 0) / ITEMS_PER_PAGE);
@@ -114,23 +115,28 @@ export function RecentQuizzes({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between px-2">
-        <h3 className="text-2xl font-heading font-bold flex items-center gap-3 text-gray-800">
+      <div className="flex items-center justify-between px-2 cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}>
+        <h3 className="text-2xl font-heading font-bold flex items-center gap-3 text-gray-800 group select-none">
           <div className="p-2 bg-purple-100 rounded-xl text-purple-600">
             <ClockIcon className="h-6 w-6" />
           </div>
           {t('dashboard.recentQuizzes.title')}
+          <Badge variant="secondary" className="ml-2 rounded-lg">
+            {recentAttempts.length}
+          </Badge>
+          <div className={`ml-2 p-1 rounded-full text-gray-400 transition-transform duration-300 ${isExpanded ? 'rotate-180 bg-gray-100' : ''}`}>
+            <ChevronLeftIcon className="w-5 h-5 -rotate-90" />
+          </div>
         </h3>
 
-        {/* Top Pagination Info (Optional) */}
-        {recentAttempts.length > ITEMS_PER_PAGE && (
+        {isExpanded && recentAttempts.length > ITEMS_PER_PAGE && (
           <span className="text-sm font-medium text-gray-500 bg-white px-3 py-1 rounded-full shadow-sm">
             {t('common.page')} {currentPage} / {totalPages}
           </span>
         )}
       </div>
 
-      <div className="grid gap-4">
+      <div className={`grid gap-4 transition-all duration-300 ease-in-out origin-top ${isExpanded ? 'opacity-100 max-h-[5000px]' : 'opacity-0 max-h-0 overflow-hidden'}`}>
         {currentItems.map((attempt) => {
           const { color, label, icon: BadgeIcon } = getScoreBadge(attempt.score);
 
@@ -192,47 +198,47 @@ export function RecentQuizzes({
             </div>
           );
         })}
-      </div>
 
-      {/* Pagination Controls */}
-      {recentAttempts.length > ITEMS_PER_PAGE && (
-        <div className="flex justify-center items-center gap-4 pt-4">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handlePrevPage}
-            disabled={currentPage === 1}
-            className="rounded-xl border-2 hover:bg-white hover:text-primary hover:border-primary disabled:opacity-50 transition-all"
-          >
-            <ChevronLeftIcon className="w-4 h-4 mr-1" />
-            {t('common.previous')}
-          </Button>
+        {/* Pagination Controls */}
+        {recentAttempts.length > ITEMS_PER_PAGE && (
+          <div className="flex justify-center items-center gap-4 pt-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handlePrevPage}
+              disabled={currentPage === 1}
+              className="rounded-xl border-2 hover:bg-white hover:text-primary hover:border-primary disabled:opacity-50 transition-all"
+            >
+              <ChevronLeftIcon className="w-4 h-4 mr-1" />
+              {t('common.previous')}
+            </Button>
 
-          <div className="flex items-center gap-2">
-            {[...Array(totalPages)].map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrentPage(i + 1)}
-                className={`h-2.5 rounded-full transition-all duration-300 ${currentPage === i + 1
-                  ? "bg-primary w-8 shadow-sm"
-                  : "bg-gray-200 w-2.5 hover:bg-primary hover:scale-125"
-                  }`}
-              />
-            ))}
+            <div className="flex items-center gap-2">
+              {[...Array(totalPages)].map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentPage(i + 1)}
+                  className={`h-2.5 rounded-full transition-all duration-300 ${currentPage === i + 1
+                    ? "bg-primary w-8 shadow-sm"
+                    : "bg-gray-200 w-2.5 hover:bg-primary hover:scale-125"
+                    }`}
+                />
+              ))}
+            </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleNextPage}
+              disabled={currentPage === totalPages}
+              className="rounded-xl border-2 hover:bg-white hover:text-primary hover:border-primary disabled:opacity-50 transition-all"
+            >
+              {t('common.next')}
+              <ChevronRightIcon className="w-4 h-4 ml-1" />
+            </Button>
           </div>
-
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleNextPage}
-            disabled={currentPage === totalPages}
-            className="rounded-xl border-2 hover:bg-white hover:text-primary hover:border-primary disabled:opacity-50 transition-all"
-          >
-            {t('common.next')}
-            <ChevronRightIcon className="w-4 h-4 ml-1" />
-          </Button>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

@@ -4,6 +4,7 @@ export interface UserStatistics {
   highest_score: number;
   average_score: number;
   total_time_taken_seconds: number;
+  zcoin?: number;
 }
 
 export interface ProgressTrendData {
@@ -21,6 +22,20 @@ export interface RecentQuizAttempt {
   correct_answers: number;
   completed_at: string;
   time_taken_seconds?: number;
+}
+
+export interface CreatedQuiz {
+  id: string;
+  title: string;
+  description: string | null;
+  questions: unknown; /* JSONB */
+  created_at: string;
+  is_public: boolean;
+  usage_count: number;
+  pdf_download_count: number;
+  category: string;
+  tags: string[] | null;
+  difficulty: string;
 }
 
 export interface DashboardData {

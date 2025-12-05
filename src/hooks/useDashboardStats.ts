@@ -1,48 +1,34 @@
-import { useState, useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { UserStatistics } from "@/types/dashboard";
 
 export function useDashboardStats(userId?: string) {
-  const [statistics, setStatistics] = useState<UserStatistics | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+  const queryKey = ["dashboard-stats", userId];
 
-  const fetchStatistics = async (uid: string) => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
+  const { data: statistics, isLoading, error } = useQuery({
+    queryKey,
+    queryFn: async () => {
+      if (!userId) return null;
       const { data, error } = await supabase.rpc("get_user_statistics", {
-        user_uuid: uid,
+        user_uuid: userId,
       });
 
       if (error) {
-        console.error("Error fetching user statistics:", error);
-        setError(error.message);
-        return;
+        throw new Error(error.message);
       }
 
-      if (data && data.length > 0) {
-        setStatistics(data[0]);
-      }
-    } catch (err) {
-      console.error("Unexpected error:", err);
-      setError("Failed to fetch statistics");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (userId) {
-      fetchStatistics(userId);
-    }
-  }, [userId]);
+      return (data && data.length > 0) ? data[0] : null;
+    },
+    enabled: !!userId,
+    // Stale time 5 minutes to avoid spamming refetches on focus refetch
+    staleTime: 1000 * 60 * 5,
+  });
 
   return {
-    statistics,
+    statistics: statistics as UserStatistics | null,
     isLoading,
-    error,
-    refetch: () => userId && fetchStatistics(userId),
+    error: error ? (error as Error).message : null,
+    refetch: () => queryClient.invalidateQueries({ queryKey }),
   };
 }

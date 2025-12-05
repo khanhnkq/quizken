@@ -76,6 +76,8 @@ import {
   type ShuffledQuizData,
 } from "@/lib/quizShuffle";
 import { useTranslation } from "react-i18next";
+import { useDashboardStats } from "@/hooks/useDashboardStats";
+import { calculateXP, calculateLevel, calculateCreateReward } from "@/utils/levelSystem";
 
 type TokenUsage = { prompt: number; candidates: number; total: number };
 
@@ -127,6 +129,7 @@ const QuizGenerator = () => {
   const { toast } = useToast();
   const { user, loading: authLoading } = useAuth();
   const { t, i18n } = useTranslation(); // Add i18n support
+  const { statistics, refetch: refetchStats } = useDashboardStats(user?.id);
   const [userApiKey, setUserApiKey] = useState<string | null>(null);
   const [questionCount, setQuestionCount] = useState<string>("");
   const [isQuestionCountSelected, setIsQuestionCountSelected] =
@@ -141,6 +144,12 @@ const QuizGenerator = () => {
   const isMobile = useIsMobile();
   const abortControllerRef = React.useRef<AbortController | null>(null);
   const isMountedRef = React.useRef<boolean>(true);
+  const userRef = React.useRef(user);
+
+  useEffect(() => {
+    userRef.current = user;
+  }, [user]);
+
   // Double-submit protection refs
   const isSubmittingRef = React.useRef<boolean>(false);
   const lastSubmitTimeRef = React.useRef<number>(0);
@@ -416,8 +425,21 @@ const QuizGenerator = () => {
             setLoading(false);
             localStorage.removeItem("currentQuizGeneration");
             localStorage.removeItem("currentQuizId");
+
+            // Calculate Reward
+            let title = t('quizGenerator.success.title');
+            if (userRef.current) {
+              const xp = calculateXP(statistics);
+              const level = calculateLevel(xp);
+              const reward = calculateCreateReward(level);
+              title = t('notifications.zcoinReward.create', { amount: reward, xp: 100 });
+            }
+
+            // Refresh global stats to trigger level up notification if applicable
+            refetchStats();
+
             toast({
-              title: t('quizGenerator.success.title'),
+              title: title,
               description: t('quizGenerator.success.description', { title: quiz.title, count: quiz.questions.length }),
               variant: "success",
               duration: 3000,
@@ -425,7 +447,7 @@ const QuizGenerator = () => {
             const channel = new BroadcastChannel("quiz-notifications");
             channel.postMessage({
               type: "quiz-complete",
-              title: t('quizGenerator.success.title'),
+              title: title,
               description: t('quizGenerator.success.description', { title: quiz.title, count: quiz.questions.length }),
               variant: "success",
             });
@@ -835,8 +857,8 @@ const QuizGenerator = () => {
       if (startResponse.duplicate) {
         console.log("🔄 Duplicate request detected, using existing quiz");
         toast({
-          title: "Yêu cầu đã được xử lý",
-          description: "Quiz này đang được tạo từ yêu cầu trước đó",
+          title: t('quizGenerator.toasts.requestProcessed'),
+          description: t('quizGenerator.toasts.requestProcessedDesc'),
           variant: "info",
         });
       }
@@ -875,17 +897,26 @@ const QuizGenerator = () => {
           }
           clearPersist();
 
+          // Calculate Reward
+          let title = t('quizGenerator.success.title');
+          if (userRef.current) {
+            const xp = calculateXP(statistics);
+            const level = calculateLevel(xp);
+            const reward = calculateCreateReward(level);
+            title = t('notifications.zcoinReward.create', { amount: reward, xp: 100 });
+          }
+
           toast({
-            title: "Tạo câu hỏi thành công!",
-            description: `Đã tạo "${quiz.title}" với ${quiz.questions.length} câu hỏi`,
+            title: title,
+            description: t('quizGenerator.success.description', { title: quiz.title, count: quiz.questions.length }),
             variant: "success",
             duration: 3000,
           });
           const channel = new BroadcastChannel("quiz-notifications");
           channel.postMessage({
             type: "quiz-complete",
-            title: "Tạo câu hỏi thành công!",
-            description: `Đã tạo "${quiz.title}" với ${quiz.questions.length} câu hỏi`,
+            title: title,
+            description: t('quizGenerator.success.description', { title: quiz.title, count: quiz.questions.length }),
             variant: "success",
           });
           channel.close();
@@ -897,9 +928,9 @@ const QuizGenerator = () => {
           setLoading(false);
           localStorage.removeItem("currentQuizGeneration");
           localStorage.removeItem("currentQuizId");
-          const msg = errorMessage || "Có lỗi xảy ra khi tạo quiz";
+          const msg = errorMessage || t('quizGenerator.toasts.genericError');
           toast({
-            title: "Tạo câu hỏi thất bại",
+            title: t('quizGenerator.toasts.failedTitle'),
             description: msg,
             variant: "destructive",
           });
@@ -923,7 +954,7 @@ const QuizGenerator = () => {
           const channel = new BroadcastChannel("quiz-notifications");
           channel.postMessage({
             type: "quiz-failed",
-            title: "Tạo câu hỏi thất bại",
+            title: t('quizGenerator.toasts.failedTitle'),
             description: msg,
             variant: "destructive",
           });
@@ -937,15 +968,15 @@ const QuizGenerator = () => {
           localStorage.removeItem("currentQuizGeneration");
           localStorage.removeItem("currentQuizId");
           toast({
-            title: "Quiz đã hết hạn",
-            description: "Quiz này đã hết hạn. Vui lòng tạo quiz mới",
+            title: t('quizGenerator.toasts.expiredTitle'),
+            description: t('quizGenerator.expired.description'),
             variant: "warning",
           });
           const channel = new BroadcastChannel("quiz-notifications");
           channel.postMessage({
             type: "quiz-failed",
-            title: "Quiz đã hết hạn",
-            description: "Quiz này đã hết hạn. Vui lòng tạo quiz mới",
+            title: t('quizGenerator.toasts.expiredTitle'),
+            description: t('quizGenerator.expired.description'),
             variant: "warning",
           });
           channel.close();
@@ -1012,7 +1043,7 @@ const QuizGenerator = () => {
         "⏱️ Submission in progress or too soon after last submission"
       );
       toast({
-        title: "Vui chờ",
+        title: t('quizGenerator.toasts.pleaseWait'),
         description:
           t('quizGenerator.toasts.processing'),
         variant: "warning",
@@ -1042,8 +1073,8 @@ const QuizGenerator = () => {
       // Handle edge case 1: No quiz data
       if (!quiz) {
         toast({
-          title: "Không có bài kiểm tra",
-          description: t('quizGenerator.toasts.createFirst'),
+          title: t('quizGenerator.toasts.noQuiz'),
+          description: t('quizGenerator.toasts.noQuizDesc'),
           variant: "destructive",
         });
         return;
@@ -1052,8 +1083,8 @@ const QuizGenerator = () => {
       // Handle edge case 2: Invalid quiz structure
       if (!quiz.questions || !Array.isArray(quiz.questions)) {
         toast({
-          title: "Dữ liệu quiz không hợp lệ",
-          description: t('quizGenerator.toasts.invalidStructure'),
+          title: t('quizGenerator.toasts.invalidQuizData'),
+          description: t('quizGenerator.toasts.invalidQuizDataDesc'),
           variant: "destructive",
         });
         return;
@@ -1062,8 +1093,8 @@ const QuizGenerator = () => {
       // Handle edge case 3: No questions in quiz
       if (quiz.questions.length === 0) {
         toast({
-          title: "Quiz trống",
-          description: t('quizGenerator.toasts.noQuestions'),
+          title: t('quizGenerator.toasts.emptyQuiz'),
+          description: t('quizGenerator.toasts.emptyQuizDesc'),
           variant: "destructive",
         });
         return;
@@ -1075,8 +1106,8 @@ const QuizGenerator = () => {
       ).length;
       if (answeredCount !== quiz.questions.length) {
         toast({
-          title: "Chưa hoàn thành bài kiểm tra",
-          description: t('quizGenerator.toasts.incomplete', { answered: answeredCount, total: quiz.questions.length }),
+          title: t('quizGenerator.toasts.incompleteQuiz'),
+          description: t('quizGenerator.toasts.incompleteQuizDesc', { answered: answeredCount, total: quiz.questions.length }),
           variant: "destructive",
         });
         return;
@@ -1098,8 +1129,8 @@ const QuizGenerator = () => {
     } catch (error) {
       console.error("Error grading quiz:", error);
       toast({
-        title: "Lỗi chấm điểm",
-        description: t('quizGenerator.toasts.gradeError'),
+        title: t('quizGenerator.toasts.gradeErrorTitle'),
+        description: t('quizGenerator.toasts.gradeErrorDesc'),
         variant: "destructive",
       });
     }
@@ -1136,8 +1167,8 @@ const QuizGenerator = () => {
 
     // Show cancellation toast
     toast({
-      title: "Đã hủy tạo quiz",
-      description: "Bạn có thể tạo quiz mới bất cứ lúc nào",
+      title: t('quizGenerator.toasts.cancelledTitle'),
+      description: t('quizGenerator.toasts.cancelledDesc'),
       variant: "info",
     });
 
@@ -1183,8 +1214,8 @@ const QuizGenerator = () => {
 
     try {
       toast({
-        title: "Đang tạo PDF...",
-        description: "Tệp sẽ tải xuống ngay khi sẵn sàng",
+        title: t('quizGenerator.toasts.pdfCreating'),
+        description: t('quizGenerator.toasts.pdfCreatingDesc'),
         variant: "info",
         duration: 1500,
       });
@@ -1205,8 +1236,8 @@ const QuizGenerator = () => {
       });
 
       toast({
-        title: "Đã tải xuống PDF",
-        description: `Đã lưu tệp ${filename}`,
+        title: t('quizGenerator.toasts.pdfSuccess'),
+        description: t('quizGenerator.toasts.pdfSuccessDesc'),
         variant: "success",
         duration: 2500,
       });
@@ -1214,9 +1245,9 @@ const QuizGenerator = () => {
       const message =
         error instanceof Error
           ? error.message
-          : "Không thể tạo hoặc tải xuống PDF.";
+          : t('quizGenerator.toasts.pdfFailedDesc');
       toast({
-        title: "Tải xuống thất bại",
+        title: t('quizGenerator.toasts.pdfFailed'),
         description: message,
         variant: "destructive",
       });

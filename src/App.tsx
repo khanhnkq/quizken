@@ -18,6 +18,7 @@ import { SoundProvider } from "@/contexts/SoundContext";
 import { ChillMusicProvider } from "@/contexts/ChillMusicContext";
 import { Analytics } from "@vercel/analytics/react";
 import "@/i18n"; // Initialize i18n
+import { GlobalLevelNotification } from "@/components/common/GlobalLevelNotification";
 
 // GSAP plugins are loaded dynamically in useLayoutEffect to reduce initial bundle size
 
@@ -203,6 +204,7 @@ const App = () => {
           <ChillMusicProvider>
             {/* 👇 Toaster nằm ngoài ScrollSmoother */}
             <HotToaster />
+            <GlobalLevelNotification />
             <ToastBroadcastReceiver />
             <BrowserRouter
               future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>

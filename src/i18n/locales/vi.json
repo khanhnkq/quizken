@@ -67,7 +67,7 @@
         "promptPlaceholder": "Ví dụ: Lịch sử Việt Nam, Toán học lớp 10...",
         "questionCountLabel": "Số câu hỏi",
         "selectQuestionCount": "Chọn số câu hỏi",
-        "generateButton": "Tạo Quiz",
+        "createButton": "Tạo Quiz Ngay",
         "generating": "Đang tạo...",
         "resetButton": "Tạo mới",
         "downloadPDF": "Tải PDF",
@@ -124,7 +124,45 @@
             "restoreSuccessTitle": "Đã khôi phục quiz",
             "restoreSuccessDesc": "Đã tải lại quiz trước đó từ bộ nhớ tạm",
             "restoreFailedTitle": "Quiz trước đó thất bại",
-            "restoreFailedDesc": "Bắt đầu tạo mới"
+            "restoreFailedDesc": "Bắt đầu tạo mới",
+            "cancelledTitle": "Đã hủy tạo quiz",
+            "cancelledDesc": "Bạn có thể bắt đầu tạo quiz mới bất cứ lúc nào",
+            "requestProcessed": "Yêu cầu đã được xử lý",
+            "requestProcessedDesc": "Yêu cầu trước đó đã được xử lý xong",
+            "pleaseWait": "Vui lòng chờ",
+            "pleaseWaitDesc": "Đang tạo quiz, vui lòng chờ...",
+            "noQuiz": "Không có bài kiểm tra",
+            "noQuizDesc": "Vui lòng tạo quiz trước khi chấm điểm",
+            "invalidQuizData": "Dữ liệu quiz không hợp lệ",
+            "invalidQuizDataDesc": "Cấu trúc dữ liệu quiz không hợp lệ. Vui lòng tạo quiz mới",
+            "emptyQuiz": "Quiz trống",
+            "emptyQuizDesc": "Quiz này không có câu hỏi. Không thể chấm điểm",
+            "incompleteQuiz": "Chưa hoàn thành bài kiểm tra",
+            "incompleteQuizDesc": "Bạn đã trả lời {{answered}}/{{total}} câu. Vui lòng hoàn thành tất cả",
+            "gradeErrorTitle": "Lỗi chấm điểm",
+            "gradeErrorDesc": "Có lỗi xảy ra khi chấm điểm. Vui lòng thử lại",
+            "pdfCreating": "Đang tạo PDF...",
+            "pdfCreatingDesc": "Vui lòng chờ trong khi tạo file PDF",
+            "pdfSuccess": "Đã tải xuống PDF",
+            "pdfSuccessDesc": "Quiz đã được lưu dưới dạng PDF",
+            "pdfFailed": "Tải xuống thất bại",
+            "pdfFailedDesc": "Không thể tạo PDF. Vui lòng thử lại"
+        },
+        "generationProgress": {
+            "title": "Đang tạo câu hỏi AI...",
+            "titleFailed": "❌ Không thể tạo quiz",
+            "titleExpired": "⏰ Quiz đã hết hạn",
+            "processing": "Đang xử lý...",
+            "backgroundNote": "Bạn có thể tiếp tục thao tác khác; tiến trình chạy nền và sẽ hiển thị khi hoàn tất.",
+            "cancelButton": "Hủy tạo quiz",
+            "progressLabel": "Tiến độ tạo quiz",
+            "steps": {
+                "init": "Khởi tạo",
+                "auth": "Xác thực",
+                "limit": "Giới hạn",
+                "generate": "Sinh AI",
+                "done": "Hoàn tất"
+            }
         },
         "confirmDialog": {
             "title": "Xác nhận tạo quiz mới",
@@ -408,14 +446,25 @@
             "needsImprovement": "Cần cải thiện"
         },
         "progressTrend": {
-            "title": "Xu hướng tiến bộ (30 ngày)",
-            "titleShort": "Tiến bộ (30 ngày)",
+            "title": "Xu hướng học tập (30 ngày)",
+            "titleShort": "Xu hướng (30 ngày)",
             "empty": "Chưa có dữ liệu xu hướng",
-            "emptyDescription": "Hãy làm thêm quiz để xem biểu đồ tiến bộ của bạn",
-            "score": "Điểm",
-            "avgScore": "Điểm TB",
-            "quizCount": "Số quiz",
+            "emptyDescription": "Hãy làm thêm quiz để xem biểu đồ tiến trình",
+            "score": "Điểm số",
+            "quizCount": "Số bài quiz",
+            "avgScore": "Điểm trung bình",
             "scoreAxis": "Điểm (%)"
+        },
+        "createdQuizzes": {
+            "title": "Quiz đã tạo",
+            "empty": "Bạn chưa tạo quiz nào",
+            "emptyDescription": "Hãy bắt đầu tạo quiz đầu tiên của bạn!",
+            "questions": "câu hỏi",
+            "usageCount": "lượt dùng",
+            "downloads": "lượt tải",
+            "deleteConfirm": "Bạn có chắc muốn xoá quiz này không?",
+            "deleteSuccess": "Đã xoá quiz thành công",
+            "deleteError": "Xoá quiz thất bại"
         }
     },
     "footer": {
@@ -545,6 +594,16 @@
         "buttons": {
             "close": "Đóng",
             "login": "Đăng nhập"
+        }
+    },
+    "notifications": {
+        "levelUp": {
+            "title": "Thăng Cấp! 🎉",
+            "message": "Bạn đã đạt Level {{level}}! Nhận thưởng nóng +{{zcoin}} ZCoin!"
+        },
+        "zcoinReward": {
+            "create": "Tạo Quiz thành công! +{{amount}} ZCoin, +{{xp}} XP",
+            "attempt": "Hoàn thành Quiz! +{{amount}} ZCoin, +{{xp}} XP"
         }
     }
 }

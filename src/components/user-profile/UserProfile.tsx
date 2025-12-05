@@ -5,6 +5,7 @@ import { shouldReduceAnimations } from "@/utils/deviceDetection";
 import type { UserProfileProps } from "@/types/user";
 import { Sparkles, Calendar, Zap, User as UserIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { calculateXP, calculateLevel, calculateNextLevelXP, calculateCurrentLevelBaseXP } from "@/utils/levelSystem";
 
 /**
  * Main UserProfile component - Redesigned for "Playful & Cute" aesthetic
@@ -116,8 +117,13 @@ export const UserProfile: React.FC<UserProfileProps> = ({
     ? new Date(user.created_at).toLocaleDateString(i18n.language === 'en' ? "en-US" : "vi-VN", { month: "long", year: "numeric" })
     : "";
 
-  // Calculate Level based on quizzes taken
-  const level = statistics ? Math.floor(statistics.total_quizzes_taken / 10) + 1 : 1;
+  // Calculate XP and Level using shared utility
+  const totalXP = calculateXP(statistics);
+  const level = calculateLevel(totalXP);
+
+  const nextLevelXP = calculateNextLevelXP(level);
+  const currentLevelBaseXP = calculateCurrentLevelBaseXP(level);
+  const levelProgressPercent = Math.min(100, Math.max(0, ((totalXP - currentLevelBaseXP) / (nextLevelXP - currentLevelBaseXP)) * 100));
 
   return (
     <div
@@ -164,6 +170,11 @@ export const UserProfile: React.FC<UserProfileProps> = ({
             {t('profile.member')}
           </div>
 
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-yellow-400/20 backdrop-blur-sm rounded-full text-yellow-700 text-xs font-bold uppercase tracking-wider mb-1 shadow-sm ml-2 border border-yellow-200">
+            <span className="text-sm">🪙</span>
+            {statistics?.zcoin || 0} ZCoin
+          </div>
+
           <h2 className="text-3xl md:text-4xl font-heading font-black text-gray-800 tracking-tight leading-none">
             {userName}
           </h2>
@@ -182,15 +193,20 @@ export const UserProfile: React.FC<UserProfileProps> = ({
           </div>
 
           {/* Experience Bar */}
-          <div className="mt-4 max-w-xs mx-auto md:mx-0">
+          <div className="mt-4 max-w-xs mx-auto md:mx-0 group relative">
+            {/* Tooltip for XP Logic */}
+            <div className="absolute bottom-full left-1/2 md:left-0 -translate-x-1/2 md:translate-x-0 mb-2 w-48 p-2 bg-gray-800 text-white text-[10px] rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-30">
+              100 XP / Quiz Created <br /> + Score XP
+            </div>
+
             <div className="flex justify-between text-xs font-bold text-gray-500 mb-1">
               <span>{t('profile.exp')}</span>
-              <span>{(statistics?.total_quizzes_taken || 0) % 10} / 10</span>
+              <span className="text-blue-600">{totalXP} <span className="text-gray-400">/ {nextLevelXP}</span></span>
             </div>
             <div className="h-3 w-full bg-white rounded-full overflow-hidden shadow-inner border border-white/50">
               <div
                 className="h-full bg-gradient-to-r from-yellow-300 to-orange-400 rounded-full transition-all duration-1000 ease-out relative"
-                style={{ width: `${((statistics?.total_quizzes_taken || 0) % 10) * 10}%` }}
+                style={{ width: `${levelProgressPercent}%` }}
               >
                 <div className="absolute inset-0 bg-white/20 animate-shimmer" />
               </div>
