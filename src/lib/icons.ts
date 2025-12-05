@@ -97,9 +97,8 @@ export const PanelLeft = L.PanelLeft;
 export const MousePointer = L.MousePointer;
 export const GripVertical = L.GripVertical;
 
-export const Cat = L.Cat;
-export const Dog = L.Dog;
-export const Rabbit = L.Rabbit;
+// Removed failing icons
+
 
 /**
  * Generic maker to get an icon by name if needed.

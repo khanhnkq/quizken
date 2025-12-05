@@ -1397,7 +1397,7 @@ const QuizGenerator = () => {
             </AlertDialogContent>
           </AlertDialog>
 
-          <Card className="mb-8 border-2 border-primary/20 bg-white/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 rounded-3xl overflow-hidden">
+          <Card className="mb-8 border-4 border-primary/30 bg-white/80 backdrop-blur-sm shadow-[0_8px_30px_rgba(0,0,0,0.08),inset_0_2px_0_rgba(255,255,255,0.9)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.12)] transition-all duration-300 rounded-3xl overflow-hidden">
             <CardContent className="p-6 md:p-10 space-y-8">
               {/* Show Form OR Loading Progress */}
               {loading ? (
@@ -1411,7 +1411,7 @@ const QuizGenerator = () => {
                 <>
                   {/* Quota indicator for anonymous users */}
                   {!user && (
-                    <div className="flex items-center justify-between p-4 bg-secondary/50 border-2 border-secondary rounded-2xl">
+                    <div className="flex items-center justify-between p-4 bg-gradient-to-r from-pink-50 via-amber-50 to-emerald-50 border-4 border-primary/20 rounded-2xl shadow-inner">
                       <div className="flex items-center gap-3">
                         <div className="p-2 bg-white rounded-xl">
                           <Target className="w-5 h-5 text-primary" />
@@ -1452,7 +1452,7 @@ const QuizGenerator = () => {
                         placeholder={t('quizGenerator.ui.examplePlaceholder')}
                         value={prompt}
                         onChange={(e) => setPrompt(e.target.value)}
-                        className={`min-h-[140px] md:min-h-[160px] resize-none text-lg p-6 rounded-2xl border-2 shadow-sm transition-all text-base leading-relaxed ${promptError
+                        className={`min-h-[140px] md:min-h-[160px] resize-none text-lg p-6 rounded-2xl border-4 shadow-sm transition-all text-base leading-relaxed ${promptError
                           ? "border-destructive/50 focus-visible:ring-destructive/20 focus-visible:border-destructive"
                           : isPromptValid
                             ? "border-primary/50 focus-visible:ring-primary/20 focus-visible:border-primary bg-primary/5"
@@ -1489,7 +1489,8 @@ const QuizGenerator = () => {
                       <div className="w-full border-t-2 border-dashed border-border/60"></div>
                     </div>
                     <div className="relative flex justify-center text-xs font-medium uppercase tracking-wider text-muted-foreground/70">
-                      <span className="bg-white/80 backdrop-blur-sm px-4 py-1 rounded-full border border-border/50">
+                      <span className="bg-white/80 backdrop-blur-sm px-4 py-1.5 rounded-full border-2 border-border/50 flex items-center gap-2">
+                        <Sparkles className="w-3 h-3 text-primary" />
                         {t('quizGenerator.ui.optional')}
                       </span>
                     </div>
@@ -1516,7 +1517,7 @@ const QuizGenerator = () => {
                         }}>
                         <SelectTrigger
                           id="question-count"
-                          className="w-full h-14 rounded-2xl border-2 text-base px-4 font-medium transition-all hover:border-primary/50 focus:ring-primary/20 bg-background text-foreground shadow-sm">
+                          className="w-full h-14 rounded-2xl border-4 text-base px-4 font-medium transition-all hover:border-primary/50 focus:ring-primary/20 bg-background text-foreground shadow-sm">
                           <SelectValue placeholder={t('quizGenerator.ui.selectPlaceholder')} />
                         </SelectTrigger>
                         <SelectContent className="rounded-xl border-2">

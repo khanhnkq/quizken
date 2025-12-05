@@ -133,7 +133,7 @@ const Navbar = () => {
                     <DropdownMenuTrigger asChild>
                       <Button
                         variant="outline"
-                        className="flex items-center gap-0">
+                        className="flex items-center gap-0 rounded-3xl border-4 border-border hover:border-primary hover:text-primary active:scale-95 transition-all duration-200">
                         <User className="h-4 w-4" />
                         {user.email?.split("@")[0] || "Tài khoản"}
                       </Button>
@@ -172,7 +172,7 @@ const Navbar = () => {
                   <Button
                     variant="outline"
                     onClick={() => setShowAuthModal(true)}
-                    className="hover:bg-primary hover:text-primary-foreground hover:border-foreground transition-colors">
+                    className="rounded-3xl border-4 border-border hover:border-primary hover:text-primary hover:bg-primary/10 transition-all duration-200 active:scale-95">
                     {t('nav.login')}
                   </Button>
                 )}
@@ -224,7 +224,7 @@ const Navbar = () => {
                       <Link to="/dashboard" onClick={() => setIsOpen(false)}>
                         <Button
                           variant="outline"
-                          className="w-full justify-start"
+                          className="w-full justify-start rounded-3xl border-4 border-border hover:border-primary hover:text-primary active:scale-95 transition-all duration-200"
                           onPointerDown={playClick}>
                           <LayoutDashboard className="h-4 w-4 mr-2" />
                           {t('nav.dashboard')}
@@ -233,7 +233,7 @@ const Navbar = () => {
                       <Button
                         variant="outline"
                         onClick={() => setShowApiSettings(true)}
-                        className="w-full justify-start"
+                        className="w-full justify-start rounded-3xl border-4 border-border hover:border-primary hover:text-primary active:scale-95 transition-all duration-200"
                         onPointerDown={playClick}>
                         <Settings className="h-4 w-4 mr-2" />
                         Cài đặt API
@@ -241,7 +241,7 @@ const Navbar = () => {
                       <Button
                         variant="outline"
                         onClick={handleSignOut}
-                        className="w-full text-red-600 border-red-200 hover:bg-red-50 justify-start">
+                        className="w-full text-red-600 border-4 border-red-200 hover:bg-red-50 hover:border-red-400 justify-start rounded-3xl active:scale-95 transition-all duration-200">
                         <LogOut className="h-4 w-4 mr-2" />
                         {t('nav.logout')}
                       </Button>
@@ -250,7 +250,7 @@ const Navbar = () => {
                     <Button
                       variant="outline"
                       onClick={() => setShowAuthModal(true)}
-                      className="w-full hover:bg-primary hover:text-primary-foreground hover:border-foreground transition-colors">
+                      className="w-full hover:bg-primary/10 hover:text-primary hover:border-primary rounded-3xl border-4 border-border transition-all duration-200 active:scale-95">
                       {t('nav.login')}
                     </Button>
                   )}
