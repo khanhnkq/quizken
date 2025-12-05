@@ -4,6 +4,7 @@ import {
   AboutHero,
   AboutMissionVision,
   AboutStory,
+  AboutFeatures,
   AboutValues,
   AboutShopFavorites,
   AboutSocialLinks,
@@ -108,6 +109,7 @@ const About = () => {
           </div>
           <AboutHero />
           <AboutStory />
+          <AboutFeatures />
           <AboutMissionVision />
           <AboutValues />
           <AboutShopFavorites products={shopFavorites} />

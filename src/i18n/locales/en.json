@@ -342,9 +342,34 @@
         "answerAll": "Please answer all {{total}} questions ({{answered}}/{{total}} answered)",
         "grade": "Grade"
     },
+    "quizDetail": {
+        "notFound": {
+            "title": "Oops! Not Found",
+            "description": "This quiz result does not exist or has been deleted."
+        },
+        "backToDashboard": "Back to Dashboard",
+        "quizResult": "Quiz Result",
+        "answerDetail": "Answer Details",
+        "totalScore": "Total Score",
+        "correct": "Correct",
+        "totalQuestions": "Total Questions",
+        "duration": "Duration",
+        "avgSpeed": "Avg Speed",
+        "difficulty": "Difficulty",
+        "yourAnswer": "Your Answer",
+        "correctAnswer": "Correct Answer",
+        "explanation": "Explanation"
+    },
+    "profile": {
+        "exp": "EXP",
+        "joined": "Joined",
+        "level": "Level",
+        "member": "Member"
+    },
     "dashboard": {
         "title": "Personal Dashboard",
         "subtitle": "Track your learning progress and achievements",
+        "welcomeBack": "Welcome back!",
         "createQuiz": "Create New Quiz",
         "error": "An error occurred while loading dashboard data. Please try again later.",
         "welcome": {
@@ -417,7 +442,9 @@
         "back": "Back",
         "next": "Next",
         "previous": "Previous",
-        "or": "or"
+        "or": "or",
+        "untitledQuiz": "Untitled Quiz",
+        "page": "Page"
     },
     "auth": {
         "redirecting": "Redirecting to Google...",

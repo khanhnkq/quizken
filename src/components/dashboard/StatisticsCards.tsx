@@ -30,30 +30,42 @@ export function StatisticsCards({
     {
       title: t('dashboard.statistics.quizzesCreated'),
       icon: FileTextIcon,
-      bgColor: "bg-[#B5CC89]/20",
-      iconBg: "bg-[#B5CC89]",
-      iconColor: "text-black",
+      // Pink Theme
+      bgColor: "bg-pink-100",
+      iconBg: "bg-pink-200",
+      iconColor: "text-pink-600",
+      borderColor: "border-pink-200",
       description: t('dashboard.statistics.createdDesc'),
       ref: totalCreatedRef,
+      rotate: "rotate-[-2deg]",
+      delay: "delay-0",
     },
     {
       title: t('dashboard.statistics.quizzesTaken'),
       icon: CheckCircleIcon,
-      bgColor: "bg-[#B5CC89]/20",
-      iconBg: "bg-[#B5CC89]",
-      iconColor: "text-black",
+      // Blue Theme
+      bgColor: "bg-blue-100",
+      iconBg: "bg-blue-200",
+      iconColor: "text-blue-600",
+      borderColor: "border-blue-200",
       description: t('dashboard.statistics.takenDesc'),
       ref: totalTakenRef,
+      rotate: "rotate-[2deg]",
+      delay: "delay-100",
     },
     {
       title: t('dashboard.statistics.highestScore'),
       icon: TrophyIcon,
-      bgColor: "bg-[#B5CC89]/20",
-      iconBg: "bg-[#B5CC89]",
-      iconColor: "text-black",
+      // Yellow Theme
+      bgColor: "bg-yellow-100",
+      iconBg: "bg-yellow-200",
+      iconColor: "text-yellow-700",
+      borderColor: "border-yellow-200",
       description: t('dashboard.statistics.highestScoreDesc'),
       ref: highestScoreRef,
       suffix: "%",
+      rotate: "rotate-[-1deg]",
+      delay: "delay-200",
     },
   ];
 
@@ -61,13 +73,13 @@ export function StatisticsCards({
     return (
       <>
         {[1, 2, 3].map((i) => (
-          <Card key={i}>
-            <CardContent className="p-4 md:p-6">
+          <Card key={i} className="rounded-[2.5rem] border-0 shadow-sm bg-white/50">
+            <CardContent className="p-6 md:p-8">
               <div className="flex items-center space-x-3 md:space-x-4">
-                <Skeleton className="h-10 w-10 md:h-12 md:w-12 rounded-lg" />
+                <Skeleton className="h-14 w-14 rounded-2xl" />
                 <div className="space-y-2 flex-1">
-                  <Skeleton className="h-3 w-16 md:h-4 md:w-20" />
-                  <Skeleton className="h-6 w-12 md:h-8 md:w-16" />
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-8 w-16" />
                 </div>
               </div>
             </CardContent>
@@ -84,23 +96,32 @@ export function StatisticsCards({
         return (
           <Card
             key={index}
-            className={`rounded-2xl border-2 hover:border-[#B5CC89] transition-all duration-300 hover:shadow-lg bg-white`}>
-            <CardContent className="p-4 md:p-6 lg:p-8 text-center space-y-3 md:space-y-4">
+            className={`
+              rounded-[2.5rem] border-4 ${card.borderColor} ${card.bgColor}
+              transform transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] hover:shadow-xl hover:rotate-0
+              ${card.rotate} cursor-default group overflow-hidden relative
+            `}
+          >
+            {/* Background Decor */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/30 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
+
+            <CardContent className="p-6 md:p-8 relative z-10 flex flex-col md:flex-row items-center md:items-start text-center md:text-left gap-4">
               <div
-                className={`inline-flex p-3 md:p-4 ${card.iconBg} rounded-2xl`}>
-                <Icon className={`w-6 h-6 md:w-8 md:h-8 ${card.iconColor}`} />
+                className={`
+                  p-4 rounded-3xl ${card.iconBg} ${card.iconColor} 
+                  shadow-sm transform group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300
+                `}>
+                <Icon className="w-8 h-8 md:w-10 md:h-10" />
               </div>
-              <div>
-                <p className="text-2xl md:text-3xl font-bold text-gray-900 mb-1 md:mb-2">
+
+              <div className="flex-1">
+                <p className={`text-4xl md:text-5xl font-heading font-bold ${card.iconColor} mb-1 tracking-tight`}>
                   <span ref={card.ref}>0</span>
                   {card.suffix}
                 </p>
-                <h3 className="text-base md:text-lg font-bold text-gray-900 mb-1">
+                <h3 className="text-base md:text-lg font-bold text-gray-800 opacity-80">
                   {card.title}
                 </h3>
-                <p className="text-xs md:text-sm text-muted-foreground">
-                  {card.description}
-                </p>
               </div>
             </CardContent>
           </Card>

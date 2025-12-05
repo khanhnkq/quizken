@@ -107,85 +107,83 @@ export function ProgressTrendline({
   };
 
   return (
-    <Card className="rounded-2xl border-2 hover:border-[#B5CC89] transition-all hover:shadow-lg">
-      <CardHeader className="border-b bg-[#B5CC89]/5">
-        <CardTitle className="flex items-center gap-2 text-gray-900 text-base md:text-lg">
-          <TrendingUpIcon className="h-4 w-4 md:h-5 md:w-5" />
+    <Card className="rounded-[2.5rem] border-2 border-gray-100 shadow-xl bg-white overflow-hidden relative group transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
+      {/* Background Decor */}
+      <div className="absolute top-0 right-0 w-64 h-64 bg-green-50 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none opacity-50"></div>
+
+      <CardHeader className="border-b-0 pb-0 relative z-10">
+        <CardTitle className="flex items-center gap-3 text-2xl font-heading font-bold text-gray-800">
+          <div className="p-2 bg-green-100 rounded-xl text-green-600">
+            <TrendingUpIcon className="h-6 w-6" />
+          </div>
           <span className="hidden sm:inline">{t('dashboard.progressTrend.title')}</span>
           <span className="sm:inline">{t('dashboard.progressTrend.titleShort')}</span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-4 md:pt-6">
+
+      <CardContent className="pt-6 relative z-10">
         <ResponsiveContainer width="100%" height={250} minHeight={200}>
-          <LineChart data={chartData}>
+          <LineChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="scoreGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#B5CC89" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#B5CC89" stopOpacity={0} />
+                <stop offset="5%" stopColor="#84cc16" stopOpacity={0.2} />
+                <stop offset="95%" stopColor="#84cc16" stopOpacity={0} />
               </linearGradient>
               <linearGradient id="countGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#6b7280" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#6b7280" stopOpacity={0} />
+                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2} />
+                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+
             <XAxis
               dataKey="date"
-              tick={{ fontSize: 10, fill: "#6b7280" }}
+              tick={{ fontSize: 11, fill: "#9ca3af", fontWeight: 500 }}
+              tickLine={false}
+              axisLine={false}
               interval="preserveStartEnd"
-              stroke="#d1d5db"
-              angle={-45}
-              textAnchor="end"
-              height={60}
+              dy={10}
             />
             <YAxis
               yAxisId="score"
               orientation="left"
-              tick={{ fontSize: 10, fill: "#6b7280" }}
+              tick={{ fontSize: 11, fill: "#9ca3af", fontWeight: 500 }}
+              tickLine={false}
+              axisLine={false}
               domain={[0, 100]}
-              label={{
-                value: t('dashboard.progressTrend.scoreAxis'),
-                angle: -90,
-                position: "insideLeft",
-                fill: "#B5CC89",
-                fontWeight: 600,
-                style: { fontSize: 10 },
-              }}
-              stroke="#d1d5db"
+              width={30}
             />
             <YAxis
               yAxisId="count"
               orientation="right"
-              tick={{ fontSize: 10, fill: "#6b7280" }}
-              label={{
-                value: t('dashboard.progressTrend.quizCount'),
-                angle: 90,
-                position: "insideRight",
-                fill: "#6b7280",
-                fontWeight: 600,
-                style: { fontSize: 10 },
-              }}
-              stroke="#d1d5db"
+              tick={{ fontSize: 11, fill: "#9ca3af", fontWeight: 500 }}
+              tickLine={false}
+              axisLine={false}
+              width={30}
             />
-            <Tooltip content={<CustomTooltip />} />
+
+            <Tooltip
+              content={<CustomTooltip />}
+              cursor={{ stroke: '#e5e7eb', strokeWidth: 2, strokeDasharray: '4 4' }}
+            />
+
             <Line
               yAxisId="score"
               type="monotone"
               dataKey={t('dashboard.progressTrend.score')}
-              stroke="#B5CC89"
-              strokeWidth={2}
-              dot={{ fill: "#B5CC89", strokeWidth: 1, r: 3 }}
-              activeDot={{ r: 5, fill: "#A0B878" }}
+              stroke="#84cc16"
+              strokeWidth={4}
+              dot={{ fill: "#fff", stroke: "#84cc16", strokeWidth: 3, r: 4 }}
+              activeDot={{ r: 6, fill: "#84cc16", stroke: "#fff", strokeWidth: 2 }}
               fill="url(#scoreGradient)"
             />
             <Line
               yAxisId="count"
               type="monotone"
               dataKey={t('dashboard.progressTrend.quizCount')}
-              stroke="#6b7280"
-              strokeWidth={2}
-              dot={{ fill: "#6b7280", strokeWidth: 1, r: 2 }}
-              activeDot={{ r: 4, fill: "#4b5563" }}
+              stroke="#3b82f6"
+              strokeWidth={3}
+              dot={{ fill: "#fff", stroke: "#3b82f6", strokeWidth: 3, r: 3 }}
+              activeDot={{ r: 5, fill: "#3b82f6", stroke: "#fff", strokeWidth: 2 }}
               fill="url(#countGradient)"
             />
           </LineChart>

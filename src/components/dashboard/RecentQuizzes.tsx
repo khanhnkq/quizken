@@ -1,21 +1,20 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import type { RecentQuizAttempt } from "@/types/dashboard";
-import { ClockIcon, ExternalLinkIcon, CheckCircleIcon } from "lucide-react";
-import { gsap } from "gsap";
-import { shouldReduceAnimations } from "@/utils/deviceDetection";
+import {
+  ClockIcon,
+  ArrowRightIcon,
+  CalendarIcon,
+  CheckCircleIcon,
+  AlertCircleIcon,
+  TrophyIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import type { MouseEvent } from "react";
 import { useTranslation } from "react-i18next";
 
 interface RecentQuizzesProps {
@@ -23,12 +22,29 @@ interface RecentQuizzesProps {
   isLoading: boolean;
 }
 
+const ITEMS_PER_PAGE = 5;
+
 export function RecentQuizzes({
   recentAttempts,
   isLoading,
 }: RecentQuizzesProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Pagination Logic
+  const totalPages = Math.ceil((recentAttempts?.length || 0) / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const currentItems = recentAttempts?.slice(startIndex, startIndex + ITEMS_PER_PAGE) || [];
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) setCurrentPage((prev) => prev - 1);
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
+  };
+
   const formatTime = (seconds?: number) => {
     if (!seconds) return "N/A";
     const minutes = Math.floor(seconds / 60);
@@ -37,7 +53,7 @@ export function RecentQuizzes({
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString("vi-VN", {
+    return new Date(dateString).toLocaleString(i18n.language === 'en' ? "en-US" : "vi-VN", {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
@@ -46,66 +62,36 @@ export function RecentQuizzes({
     });
   };
 
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return "bg-green-100 text-green-800";
-    if (score >= 60) return "bg-yellow-100 text-yellow-800";
-    return "bg-red-100 text-red-800";
+  const getScoreBadge = (score: number) => {
+    if (score >= 80) return {
+      color: "bg-green-100 text-green-700",
+      label: t('dashboard.recentQuizzes.excellent', "Excellent"),
+      icon: TrophyIcon
+    };
+    if (score >= 50) return {
+      color: "bg-yellow-100 text-yellow-700",
+      label: t('dashboard.recentQuizzes.good', "Good"),
+      icon: CheckCircleIcon
+    };
+    return {
+      color: "bg-red-100 text-red-700",
+      label: t('dashboard.recentQuizzes.needsImprovement', "Keep Trying"),
+      icon: AlertCircleIcon
+    };
   };
 
-  const getScoreLabel = (score: number) => {
-    if (score >= 80) return t('dashboard.recentQuizzes.excellent');
-    if (score >= 60) return t('dashboard.recentQuizzes.good');
-    return t('dashboard.recentQuizzes.needsImprovement');
-  };
-
-  // GSAP hover effects like homepage
-  const handleHoverEnter = (e: MouseEvent<HTMLButtonElement>) => {
-    if (shouldReduceAnimations()) return;
-    const target = e.currentTarget as HTMLButtonElement;
-    gsap.to(target, {
-      y: -2,
-      scale: 1.04,
-      boxShadow: "0 12px 30px rgba(0,0,0,0.45)",
-      duration: 0.18,
-      ease: "power3.out",
-    });
-  };
-
-  const handleHoverLeave = (e: MouseEvent<HTMLButtonElement>) => {
-    const target = e.currentTarget as HTMLButtonElement;
-    gsap.to(target, {
-      y: 0,
-      scale: 1,
-      boxShadow: "0 0 0 rgba(0,0,0,0)",
-      duration: 0.22,
-      ease: "power3.inOut",
-    });
+  const formatQuizTitle = (title?: string) => {
+    return title || t('common.untitledQuiz');
   };
 
   if (isLoading) {
     return (
-      <Card className="border-2 hover:border-[#B5CC89] transition-colors">
-        <CardHeader className="border-b bg-[#B5CC89]/5">
-          <CardTitle className="flex items-center gap-2 text-gray-900 text-base md:text-lg">
-            <ClockIcon className="h-4 w-4 md:h-5 md:w-5" />
-            {t('dashboard.recentQuizzes.title')}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="pt-4 md:pt-6">
-          <div className="space-y-3 md:space-y-4">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <div
-                key={i}
-                className="flex items-center space-x-3 md:space-x-4 p-3 md:p-4 border-2 border-gray-100 rounded-xl">
-                <Skeleton className="h-8 w-8 md:h-10 md:w-10 rounded-lg" />
-                <div className="flex-1 space-y-2">
-                  <Skeleton className="h-4 w-32 md:h-5 md:w-48" />
-                  <Skeleton className="h-3 w-24 md:h-4 md:w-32" />
-                </div>
-                <Skeleton className="h-6 w-16 md:h-8 md:w-20 rounded-lg" />
-              </div>
-            ))}
-          </div>
+      <Card className="rounded-[2.5rem] border-0 shadow-sm bg-white/50">
+        <CardContent className="p-6 md:p-8 space-y-4">
+          <Skeleton className="h-8 w-48 rounded-lg" />
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-20 w-full rounded-2xl" />
+          ))}
         </CardContent>
       </Card>
     );
@@ -113,22 +99,13 @@ export function RecentQuizzes({
 
   if (!recentAttempts || recentAttempts.length === 0) {
     return (
-      <Card className="border-2 border-dashed hover:border-[#B5CC89] transition-colors">
-        <CardHeader className="border-b bg-[#B5CC89]/5">
-          <CardTitle className="flex items-center gap-2 text-gray-900 text-base md:text-lg">
-            <ClockIcon className="h-4 w-4 md:h-5 md:w-5" />
-            {t('dashboard.recentQuizzes.title')}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col items-center justify-center h-48 md:h-64 text-center p-4">
-          <div className="p-3 md:p-4 rounded-full bg-[#B5CC89]/20 mb-3 md:mb-4">
-            <ClockIcon className="h-10 w-10 md:h-12 md:w-12 text-[#B5CC89]" />
+      <Card className="rounded-[2.5rem] border-0 shadow-sm bg-white/50 text-center py-12">
+        <CardContent>
+          <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-float">
+            <ClockIcon className="w-10 h-10 text-gray-400" />
           </div>
-          <p className="text-gray-700 font-semibold mb-2 text-sm md:text-base">
+          <p className="text-gray-500 font-medium">
             {t('dashboard.recentQuizzes.empty')}
-          </p>
-          <p className="text-gray-500 text-xs md:text-sm">
-            {t('dashboard.recentQuizzes.emptyDescription')}
           </p>
         </CardContent>
       </Card>
@@ -136,166 +113,126 @@ export function RecentQuizzes({
   }
 
   return (
-    <Card className="rounded-2xl border-2 hover:border-[#B5CC89] transition-all hover:shadow-lg">
-      <CardHeader className="border-b bg-[#B5CC89]/5">
-        <CardTitle className="flex items-center gap-2 text-gray-900 text-base md:text-lg">
-          <ClockIcon className="h-4 w-4 md:h-5 md:w-5" />
+    <div className="space-y-6">
+      <div className="flex items-center justify-between px-2">
+        <h3 className="text-2xl font-heading font-bold flex items-center gap-3 text-gray-800">
+          <div className="p-2 bg-purple-100 rounded-xl text-purple-600">
+            <ClockIcon className="h-6 w-6" />
+          </div>
           {t('dashboard.recentQuizzes.title')}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="pt-4 md:pt-6">
-        {/* Mobile Card View */}
-        <div className="block md:hidden space-y-3">
-          {recentAttempts.map((attempt, index) => (
+        </h3>
+
+        {/* Top Pagination Info (Optional) */}
+        {recentAttempts.length > ITEMS_PER_PAGE && (
+          <span className="text-sm font-medium text-gray-500 bg-white px-3 py-1 rounded-full shadow-sm">
+            {t('common.page')} {currentPage} / {totalPages}
+          </span>
+        )}
+      </div>
+
+      <div className="grid gap-4">
+        {currentItems.map((attempt) => {
+          const { color, label, icon: BadgeIcon } = getScoreBadge(attempt.score);
+
+          return (
             <div
               key={attempt.attempt_id}
-              className={`border-2 rounded-xl p-3 transition-colors ${index % 2 === 0
-                ? "bg-white border-gray-100"
-                : "bg-gray-50/50 border-gray-100"
-                }`}>
-              <div className="space-y-2">
-                <div>
-                  <p className="font-bold text-sm text-gray-900 truncate">
-                    {attempt.quiz_title}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    {attempt.correct_answers}/{attempt.total_questions} câu đúng
-                  </p>
+              onClick={() => navigate(`/quiz/${attempt.attempt_id}`)}
+              className="group bg-white rounded-[1.25rem] p-3 md:p-4 shadow-md border-2 border-gray-100/60 hover:border-primary/50 hover:shadow-xl transition-all duration-300 cursor-pointer hover:-translate-y-1 relative overflow-hidden"
+            >
+              {/* Background Highlight on Hover */}
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+              <div className="flex flex-col md:flex-row items-start md:items-center gap-3 relative z-10">
+                {/* Score Circle - Smaller */}
+                <div className={`
+                    w-12 h-12 md:w-14 md:h-14 rounded-xl flex flex-col items-center justify-center shrink-0
+                    ${attempt.score >= 80 ? 'bg-green-100 text-green-700' :
+                    attempt.score >= 50 ? 'bg-yellow-100 text-yellow-700' :
+                      'bg-red-100 text-red-700'}
+                  `}>
+                  <span className="text-lg md:text-xl font-heading font-bold">{attempt.score}</span>
+                  <span className="text-[9px] md:text-[10px] font-bold uppercase opacity-80">%</span>
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-lg text-gray-900">
-                      {attempt.score.toFixed(1)}%
+                {/* Content - Compact */}
+                <div className="flex-1 min-w-0 space-y-0.5">
+                  <h4 className="font-bold text-base md:text-lg truncate pr-4 text-gray-900 group-hover:text-primary transition-colors">
+                    {formatQuizTitle(attempt.quiz_title)}
+                  </h4>
+
+                  <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500 font-medium">
+                    <span className="flex items-center gap-1 bg-gray-50 px-2 py-0.5 rounded-md">
+                      <CalendarIcon className="w-3 h-3" />
+                      {formatDate(attempt.completed_at)}
                     </span>
-                    <Badge
-                      className={`${getScoreColor(
-                        attempt.score
-                      )} font-semibold text-xs`}>
-                      {getScoreLabel(attempt.score)}
-                    </Badge>
-                  </div>
-
-                  <div className="flex items-center gap-1 text-xs text-gray-600">
-                    <ClockIcon className="h-3 w-3" />
-                    {formatTime(attempt.time_taken_seconds)}
+                    <span className="flex items-center gap-1 bg-gray-50 px-2 py-0.5 rounded-md">
+                      <ClockIcon className="w-3 h-3" />
+                      {formatTime(attempt.time_taken_seconds)}
+                    </span>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-500">
-                    {formatDate(attempt.completed_at)}
-                  </span>
+                {/* Action Button & Badge - Compact */}
+                <div className="flex items-center justify-between w-full md:w-auto md:flex-col md:items-end gap-2 mt-2 md:mt-0">
+                  <div className={`px-2 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1 ${color}`}>
+                    <BadgeIcon className="w-3 h-3" />
+                    {label}
+                  </div>
+
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     size="sm"
-                    onClick={() => navigate(`/quiz/${attempt.attempt_id}`)}
-                    className="border-2 hover:bg-primary hover:text-primary-foreground transition-colors font-semibold text-xs h-7 px-2"
-                    onMouseEnter={handleHoverEnter}
-                    onMouseLeave={handleHoverLeave}>
-                    <ExternalLinkIcon className="h-3 w-3 mr-1" />
-                    Xem
+                    className="rounded-lg text-primary font-bold hover:bg-primary/10 hover:text-primary group-hover:scale-105 transition-all text-xs h-7 px-2"
+                  >
+                    {t('common.view')} <ArrowRightIcon className="w-3 h-3 ml-1" />
                   </Button>
                 </div>
               </div>
             </div>
-          ))}
-        </div>
+          );
+        })}
+      </div>
 
-        {/* Desktop Table View */}
-        <div className="hidden md:block rounded-xl border-2 border-gray-100 overflow-auto h-[400px] lg:h-[600px]">
-          <div className="min-w-[800px]">
-            <Table className="table-fixed">
-              <TableHeader className="bg-[#B5CC89]/10 sticky top-0 z-10">
-                <TableRow className="hover:bg-[#B5CC89]/10">
-                  <TableHead className="font-bold text-gray-900 whitespace-nowrap text-left min-w-[240px] w-auto">
-                    Quiz
-                  </TableHead>
-                  <TableHead className="text-center font-bold text-gray-900 whitespace-nowrap w-[96px]">
-                    Điểm
-                  </TableHead>
-                  <TableHead className="text-center font-bold text-gray-900 whitespace-nowrap w-[120px]">
-                    Kết quả
-                  </TableHead>
-                  <TableHead className="text-center font-bold text-gray-900 whitespace-nowrap w-[120px]">
-                    Thời gian
-                  </TableHead>
-                  <TableHead className="text-center font-bold text-gray-900 whitespace-nowrap w-[160px]">
-                    Ngày làm
-                  </TableHead>
-                  <TableHead className="text-center font-bold text-gray-900 whitespace-nowrap w-[100px]">
-                    Hành động
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {recentAttempts.map((attempt, index) => (
-                  <TableRow
-                    key={attempt.attempt_id}
-                    className={`hover:bg-[#B5CC89]/5 transition-colors ${index % 2 === 0 ? "bg-white" : "bg-gray-50/50"
-                      }`}>
-                    <TableCell className="font-medium">
-                      <div>
-                        <p className="font-bold text-gray-900">
-                          {attempt.quiz_title}
-                        </p>
-                        <p className="text-sm text-gray-500 mt-0.5">
-                          {attempt.correct_answers}/{attempt.total_questions}{" "}
-                          câu đúng
-                        </p>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <div className="flex flex-col items-center gap-1.5">
-                        <span className="font-bold text-xl text-gray-900">
-                          {attempt.score.toFixed(1)}%
-                        </span>
-                        <Badge
-                          className={`${getScoreColor(
-                            attempt.score
-                          )} font-semibold`}>
-                          {getScoreLabel(attempt.score)}
-                        </Badge>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <div className="flex justify-center">
-                        <div className="p-2 rounded-full bg-green-100">
-                          <CheckCircleIcon className="h-5 w-5 text-green-600" />
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <div className="flex items-center justify-center text-sm font-medium text-gray-700 gap-1.5">
-                        <ClockIcon className="h-4 w-4 text-gray-500" />
-                        {formatTime(attempt.time_taken_seconds)}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-center text-sm text-gray-600 font-medium">
-                      {formatDate(attempt.completed_at)}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          // Navigate to quiz attempt details
-                          navigate(`/quiz/${attempt.attempt_id}`);
-                        }}
-                        className="border-2 hover:bg-primary hover:text-primary-foreground transition-colors font-semibold"
-                        onMouseEnter={handleHoverEnter}
-                        onMouseLeave={handleHoverLeave}>
-                        <ExternalLinkIcon className="h-4 w-4 mr-1.5" />
-                        Xem
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+      {/* Pagination Controls */}
+      {recentAttempts.length > ITEMS_PER_PAGE && (
+        <div className="flex justify-center items-center gap-4 pt-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handlePrevPage}
+            disabled={currentPage === 1}
+            className="rounded-xl border-2 hover:bg-white hover:text-primary hover:border-primary disabled:opacity-50 transition-all"
+          >
+            <ChevronLeftIcon className="w-4 h-4 mr-1" />
+            {t('common.previous')}
+          </Button>
+
+          <div className="flex items-center gap-2">
+            {[...Array(totalPages)].map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrentPage(i + 1)}
+                className={`h-2.5 rounded-full transition-all duration-300 ${currentPage === i + 1
+                  ? "bg-primary w-8 shadow-sm"
+                  : "bg-gray-200 w-2.5 hover:bg-primary hover:scale-125"
+                  }`}
+              />
+            ))}
           </div>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleNextPage}
+            disabled={currentPage === totalPages}
+            className="rounded-xl border-2 hover:bg-white hover:text-primary hover:border-primary disabled:opacity-50 transition-all"
+          >
+            {t('common.next')}
+            <ChevronRightIcon className="w-4 h-4 ml-1" />
+          </Button>
         </div>
-      </CardContent>
-    </Card>
+      )}
+    </div>
   );
 }

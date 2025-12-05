@@ -97,6 +97,9 @@ export const Filter = L.Filter;
 export const PanelLeft = L.PanelLeft;
 export const MousePointer = L.MousePointer;
 export const GripVertical = L.GripVertical;
+export const Facebook = L.Facebook || L.Link;
+export const Github = L.Github || L.Link;
+export const Mail = L.Mail || L.Link;
 
 // Removed failing icons
 
