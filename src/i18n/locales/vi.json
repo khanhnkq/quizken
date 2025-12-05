@@ -378,7 +378,7 @@
         "explanation": "Giải thích",
         "displayError": "Lỗi hiển thị câu hỏi",
         "unknownError": "Lỗi không xác định",
-        "answerAll": "Vui lòng trả lời hết tất cả {{total}} câu hỏi ({{answered}}/{{total}} đã trả lời)",
+        "answerAll": "Hãy trả lời hết tất cả {{total}} câu hỏi (Đã trả lời {{answered}}/{{total}})",
         "grade": "Chấm điểm"
     },
     "quizDetail": {
@@ -604,6 +604,18 @@
         "zcoinReward": {
             "create": "Tạo Quiz thành công! +{{amount}} ZCoin, +{{xp}} XP",
             "attempt": "Hoàn thành Quiz! +{{amount}} ZCoin, +{{xp}} XP"
+        }
+    },
+    "inventory": {
+        "title": "Túi đồ",
+        "empty": {
+            "title": "Kho đồ trống rỗng",
+            "description": "Bạn chưa sở hữu vật phẩm nào. Hãy ghé qua \"Cửa hàng ZCoin\" để sắm sửa nhé!"
+        },
+        "item": {
+            "owned": "Đã sở hữu",
+            "unknown": "Vật phẩm ẩn",
+            "noData": "Không có dữ liệu"
         }
     }
 }

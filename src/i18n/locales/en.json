@@ -604,5 +604,17 @@
             "create": "Quiz Created! +{{amount}} ZCoin, +{{xp}} XP",
             "attempt": "Quiz Completed! +{{amount}} ZCoin, +{{xp}} XP"
         }
+    },
+    "inventory": {
+        "title": "Inventory",
+        "empty": {
+            "title": "Empty Inventory",
+            "description": "You don't own any items yet. Visit the \"ZCoin Store\" to buy some!"
+        },
+        "item": {
+            "owned": "Owned",
+            "unknown": "Unknown Item",
+            "noData": "No data found"
+        }
     }
 }

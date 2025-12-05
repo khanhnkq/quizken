@@ -582,7 +582,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                     variant={answeredCount === quiz.questions.length ? "hero" : "outline"}
                     size="xl"
                     sound="success"
-                    className={`w-full sm:w-auto text-base sm:text-lg min-h-[3.5rem] py-4 rounded-3xl border-4 shadow-xl transition-all duration-200 active:scale-95 ${answeredCount === quiz.questions.length
+                    className={`w-full sm:w-auto text-sm sm:text-base md:text-lg min-h-[3rem] sm:min-h-[3.5rem] py-3 sm:py-4 px-4 sm:px-6 rounded-2xl sm:rounded-3xl border-2 sm:border-4 shadow-xl transition-all duration-200 active:scale-95 ${answeredCount === quiz.questions.length
                       ? "border-primary hover:shadow-2xl hover:border-primary-foreground/20"
                       : "border-border opacity-50 cursor-not-allowed"
                       }`}>

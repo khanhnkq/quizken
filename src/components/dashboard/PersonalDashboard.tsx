@@ -12,7 +12,16 @@ import { useProgressTrend } from "@/hooks/useProgressTrend";
 import { useRecentQuizzes } from "@/hooks/useRecentQuizzes";
 import { useCreatedQuizzes } from "@/hooks/useCreatedQuizzes";
 import { supabase } from "@/integrations/supabase/client";
-import { BarChart3Icon, PlusCircleIcon, UserIcon, Sparkles, ChevronLeftIcon } from "lucide-react";
+import {
+  BarChart3Icon,
+  PlusCircleIcon,
+  UserIcon,
+  Sparkles,
+  ChevronLeftIcon,
+  LayoutDashboard,
+  Store,
+  Package
+} from "lucide-react";
 import { BackgroundDecorations } from "@/components/ui/BackgroundDecorations";
 import { gsap } from "gsap";
 import { shouldReduceAnimations } from "@/utils/deviceDetection";
@@ -21,6 +30,9 @@ import { killActiveScroll, scrollToTarget } from "@/lib/scroll";
 import { useAuth } from "@/lib/auth";
 import { useTranslation } from "react-i18next";
 import { useLevelNotification } from "@/hooks/useLevelNotification";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ExchangeTab } from "@/components/exchange/ExchangeTab";
+import { InventoryTab } from "@/components/exchange/InventoryTab";
 
 interface PersonalDashboardProps {
   userId?: string;
@@ -90,8 +102,6 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
       ease: "power3.inOut",
     });
   };
-
-
 
   const isLoading = statsLoading || trendLoading || recentLoading || createdLoading;
   const hasError = statsError || trendError || recentError || createdError;
@@ -171,90 +181,126 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
           </Button>
         </div>
 
-        {/* Welcome message for new users - Playful Style */}
-        {hasNoData && (
-          <div className="relative group animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-blue-200/20 rounded-[2.5rem] transform rotate-1 transition-transform group-hover:rotate-0"></div>
-            <Card className="relative rounded-[2.5rem] border-4 border-white shadow-[0_8px_30px_rgba(0,0,0,0.05)] bg-white/80 backdrop-blur-md overflow-hidden hover:-translate-y-1 transition-transform duration-300">
-              <CardContent className="p-8 md:p-12 text-center relative z-10">
-                {/* Decoration Circles */}
-                <div className="absolute top-0 right-0 w-64 h-64 bg-yellow-100 rounded-full mix-blend-multiply filter blur-3xl opacity-50 -translate-y-1/2 translate-x-1/2"></div>
-                <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-50 translate-y-1/2 -translate-x-1/2"></div>
+        {/* Tabs for Overview and Exchange */}
+        <Tabs defaultValue="overview" className="space-y-6">
+          <TabsList className="bg-white/80 backdrop-blur-md p-1 h-auto rounded-full border-2 border-white shadow-sm inline-flex">
+            <TabsTrigger
+              value="overview"
+              className="rounded-full px-6 py-3 data-[state=active]:bg-primary data-[state=active]:text-white font-bold transition-all text-gray-500 flex items-center gap-2"
+            >
+              <LayoutDashboard className="w-4 h-4" />
+              Tổng quan
+            </TabsTrigger>
+            <TabsTrigger
+              value="exchange"
+              className="rounded-full px-6 py-3 data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-500 data-[state=active]:to-indigo-500 data-[state=active]:text-white font-bold transition-all text-gray-500 flex items-center gap-2"
+            >
+              <Store className="w-4 h-4" />
+              Cửa hàng ZCoin
+            </TabsTrigger>
+            <TabsTrigger
+              value="inventory"
+              className="rounded-full px-6 py-3 data-[state=active]:bg-teal-500 data-[state=active]:text-white font-bold transition-all text-gray-500 flex items-center gap-2"
+            >
+              <Package className="w-4 h-4" />
+              {t('inventory.title')}
+            </TabsTrigger>
+          </TabsList>
 
-                <div className="relative z-10">
-                  <div className="w-20 h-20 mx-auto bg-primary/20 rounded-full flex items-center justify-center mb-6 animate-bounce-slow">
-                    <Sparkles className="h-10 w-10 text-primary" />
-                  </div>
+          <TabsContent value="overview" className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            {/* Welcome message for new users - Playful Style */}
+            {hasNoData && (
+              <div className="relative group animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-blue-200/20 rounded-[2.5rem] transform rotate-1 transition-transform group-hover:rotate-0"></div>
+                <Card className="relative rounded-[2.5rem] border-4 border-white shadow-[0_8px_30px_rgba(0,0,0,0.05)] bg-white/80 backdrop-blur-md overflow-hidden hover:-translate-y-1 transition-transform duration-300">
+                  <CardContent className="p-8 md:p-12 text-center relative z-10">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-yellow-100 rounded-full mix-blend-multiply filter blur-3xl opacity-50 -translate-y-1/2 translate-x-1/2"></div>
+                    <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-50 translate-y-1/2 -translate-x-1/2"></div>
 
-                  <h2 className="text-3xl md:text-4xl font-heading font-bold mb-4 text-foreground">
-                    {t('dashboard.welcome.title')}
-                  </h2>
-                  <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
-                    {t('dashboard.welcome.description')}
-                  </p>
+                    <div className="relative z-10">
+                      <div className="w-20 h-20 mx-auto bg-primary/20 rounded-full flex items-center justify-center mb-6 animate-bounce-slow">
+                        <Sparkles className="h-10 w-10 text-primary" />
+                      </div>
 
-                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <Button
-                      size="lg"
-                      onClick={() => (window.location.href = "/#quiz-generator")}
-                      className="rounded-2xl shadow-lg bg-primary text-white font-bold hover:bg-primary/90 hover:-translate-y-0.5 transition-all"
-                      onMouseEnter={handleHoverEnter}
-                      onMouseLeave={handleHoverLeave}>
-                      {t('dashboard.welcome.createButton')}
-                    </Button>
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      onClick={() => (window.location.href = "/#quiz-library")}
-                      className="rounded-2xl border-2 hover:border-primary/50 font-bold hover:bg-secondary transition-all"
-                      onMouseEnter={handleHoverEnter}
-                      onMouseLeave={handleHoverLeave}>
-                      {t('dashboard.welcome.exploreButton')}
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
+                      <h2 className="text-3xl md:text-4xl font-heading font-bold mb-4 text-foreground">
+                        {t('dashboard.welcome.title')}
+                      </h2>
+                      <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
+                        {t('dashboard.welcome.description')}
+                      </p>
 
-        {/* Bento Grid Layout - Soft & Rounded */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
-          {/* Profile Card */}
-          <div className="w-full h-full transform hover:scale-[1.01] transition-transform duration-300">
-            <UserProfile
-              user={user}
-              statistics={statistics}
-              isLoading={statsLoading}
-              className="w-full h-full rounded-[2rem] shadow-lg border-2 border-white bg-white/60 backdrop-blur-sm"
-            />
-          </div>
+                      <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                        <Button
+                          size="lg"
+                          onClick={() => (window.location.href = "/#quiz-generator")}
+                          className="rounded-2xl shadow-lg bg-primary text-white font-bold hover:bg-primary/90 hover:-translate-y-0.5 transition-all"
+                          onMouseEnter={handleHoverEnter}
+                          onMouseLeave={handleHoverLeave}>
+                          {t('dashboard.welcome.createButton')}
+                        </Button>
+                        <Button
+                          size="lg"
+                          variant="outline"
+                          onClick={() => (window.location.href = "/#quiz-library")}
+                          className="rounded-2xl border-2 hover:border-primary/50 font-bold hover:bg-secondary transition-all"
+                          onMouseEnter={handleHoverEnter}
+                          onMouseLeave={handleHoverLeave}>
+                          {t('dashboard.welcome.exploreButton')}
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
 
-          {/* Statistics Cards */}
-          <StatisticsCards statistics={statistics} isLoading={statsLoading} />
-        </div>
+            {/* Bento Grid Layout - Soft & Rounded */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+              {/* Profile Card */}
+              <div className="w-full h-full transform hover:scale-[1.01] transition-transform duration-300">
+                <UserProfile
+                  user={user}
+                  statistics={statistics}
+                  isLoading={statsLoading}
+                  className="w-full h-full rounded-[2rem] shadow-lg border-2 border-white bg-white/60 backdrop-blur-sm"
+                />
+              </div>
 
-        {/* Charts & Lists */}
-        <div className="space-y-6 lg:space-y-8">
-          <div className="w-full transform hover:translate-y-[-4px] transition-transform duration-300">
-            <ProgressTrendline trendData={trendData} isLoading={trendLoading} />
-          </div>
+              {/* Statistics Cards */}
+              <StatisticsCards statistics={statistics} isLoading={statsLoading} />
+            </div>
 
-          <div className="w-full">
-            <CreatedQuizzes
-              quizzes={createdQuizzes}
-              isLoading={createdLoading}
-              onRefresh={refetchCreated}
-            />
-          </div>
+            {/* Charts & Lists */}
+            <div className="space-y-6 lg:space-y-8">
+              <div className="w-full transform hover:translate-y-[-4px] transition-transform duration-300">
+                <ProgressTrendline trendData={trendData} isLoading={trendLoading} />
+              </div>
 
-          <div className="w-full">
-            <RecentQuizzes
-              recentAttempts={recentAttempts}
-              isLoading={recentLoading}
-            />
-          </div>
-        </div>
+              <div className="w-full">
+                <CreatedQuizzes
+                  quizzes={createdQuizzes}
+                  isLoading={createdLoading}
+                  onRefresh={refetchCreated}
+                />
+              </div>
+
+              <div className="w-full">
+                <RecentQuizzes
+                  recentAttempts={recentAttempts}
+                  isLoading={recentLoading}
+                />
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="exchange" className="min-h-[500px]">
+            <ExchangeTab />
+          </TabsContent>
+
+          <TabsContent value="inventory" className="min-h-[500px]">
+            <InventoryTab />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
