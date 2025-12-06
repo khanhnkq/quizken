@@ -20,7 +20,8 @@ import {
   ChevronLeftIcon,
   LayoutDashboard,
   Store,
-  Package
+  Package,
+  Settings
 } from "lucide-react";
 import { BackgroundDecorations } from "@/components/ui/BackgroundDecorations";
 import { gsap } from "gsap";
@@ -33,6 +34,7 @@ import { useLevelNotification } from "@/hooks/useLevelNotification";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ExchangeTab } from "@/components/exchange/ExchangeTab";
 import { InventoryTab } from "@/components/exchange/InventoryTab";
+import ApiKeySettings from "@/components/ApiKeySettings";
 
 interface PersonalDashboardProps {
   userId?: string;
@@ -126,88 +128,108 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <div className="min-h-screen relative overflow-hidden bg-slate-50/50">
       {/* Playful Background */}
       <BackgroundDecorations />
 
-      <div className="container mx-auto py-8 px-4 md:px-6 relative z-10 space-y-8">
+      <Tabs defaultValue="overview" className="relative z-10">
 
-        {/* Navigation */}
-        <div className="flex justify-start">
-          <Button
-            variant="ghost"
-            onClick={() => navigate('/')}
-            className="rounded-full bg-white/80 backdrop-blur-sm shadow-sm hover:bg-white hover:shadow-md text-gray-600 hover:text-primary transition-all duration-300 group"
-          >
-            <ChevronLeftIcon className="w-5 h-5 mr-1 group-hover:-translate-x-1 transition-transform" />
-            {t('nav.home')}
-          </Button>
-        </div>
-
-        {/* Playful Header Section */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
-          <div className="text-center md:text-left space-y-2">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 backdrop-blur-sm border-2 border-[#B5CC89] text-[#B5CC89] font-bold text-sm shadow-sm animate-fade-in">
-              <Sparkles className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-              <span>{t('dashboard.welcomeBack')}</span>
+        {/* Fixed Top Navbar */}
+        <div className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 shadow-sm transition-all duration-300">
+          <div className="container mx-auto px-4 h-16 flex items-center justify-between gap-4">
+            {/* Left: Home Button / Brand */}
+            <div className="flex items-center shrink-0">
+              <Button
+                variant="ghost"
+                onClick={() => navigate('/')}
+                className="rounded-full hover:bg-slate-100 text-slate-600 hover:text-primary transition-all duration-300 gap-2 px-3"
+              >
+                <ChevronLeftIcon className="w-5 h-5" />
+                <span className="hidden md:inline font-bold">{t('nav.home')}</span>
+              </Button>
             </div>
 
-            <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground drop-shadow-sm">
-              Hello, <span className="text-primary relative inline-block">
-                {user?.user_metadata?.full_name || user?.email?.split('@')[0] || "Quizzer"}
-                <svg className="absolute -bottom-2 left-0 w-full h-3 text-yellow-300 -z-10 opacity-60" viewBox="0 0 100 10" preserveAspectRatio="none">
-                  <path d="M0 5 Q 50 15 100 5" stroke="currentColor" strokeWidth="12" fill="none" />
-                </svg>
-              </span>
-              <span className="inline-block animate-wave ml-2 origin-[70%_70%]">👋</span>
-            </h1>
+            {/* Center: Tabs Navigation */}
+            <TabsList className="flex-1 max-w-2xl mx-auto flex items-center justify-center bg-transparent border-0 p-0 shadow-none gap-1 sm:gap-4 h-full">
+              <TabsTrigger
+                value="overview"
+                className="flex-1 sm:flex-none relative h-16 rounded-none border-b-2 border-transparent px-2 sm:px-6 hover:bg-slate-50 hover:text-primary data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 transition-all flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 text-[10px] sm:text-sm uppercase tracking-wide sm:normal-case sm:tracking-normal"
+              >
+                <LayoutDashboard className="w-5 h-5 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">Tổng quan</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="exchange"
+                className="flex-1 sm:flex-none relative h-16 rounded-none border-b-2 border-transparent px-2 sm:px-6 hover:bg-slate-50 hover:text-violet-600 data-[state=active]:border-violet-600 data-[state=active]:text-violet-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 transition-all flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 text-[10px] sm:text-sm uppercase tracking-wide sm:normal-case sm:tracking-normal"
+              >
+                <Store className="w-5 h-5 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">Cửa hàng</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="inventory"
+                className="flex-1 sm:flex-none relative h-16 rounded-none border-b-2 border-transparent px-2 sm:px-6 hover:bg-slate-50 hover:text-teal-600 data-[state=active]:border-teal-600 data-[state=active]:text-teal-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 transition-all flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 text-[10px] sm:text-sm uppercase tracking-wide sm:normal-case sm:tracking-normal"
+              >
+                <Package className="w-5 h-5 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">{t('inventory.title')}</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="settings"
+                className="flex-1 sm:flex-none relative h-16 rounded-none border-b-2 border-transparent px-2 sm:px-6 hover:bg-slate-50 hover:text-slate-600 data-[state=active]:border-slate-600 data-[state=active]:text-slate-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 transition-all flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 text-[10px] sm:text-sm uppercase tracking-wide sm:normal-case sm:tracking-normal"
+              >
+                <Settings className="w-5 h-5 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">Cài đặt</span>
+              </TabsTrigger>
+            </TabsList>
 
-            <p className="text-lg text-muted-foreground font-medium max-w-lg">
-              {t('dashboard.subtitle')}
-            </p>
+            {/* Right: Placeholder or User Profile (future) */}
+            <div className="w-[88px] shrink-0 hidden md:block"></div>
           </div>
-
-          <Button
-            onClick={handleCreateQuiz}
-            size="xl"
-            variant="hero"
-            className="group rounded-3xl shadow-xl border-4 border-primary hover:border-primary-foreground/20 bg-primary text-white font-heading text-lg px-8 py-6 h-auto transition-all duration-200 active:scale-95"
-            onMouseEnter={handleHoverEnter}
-            onMouseLeave={handleHoverLeave}>
-            <span className="mr-2">{t('dashboard.createQuiz')}</span>
-            <div className="bg-white/20 p-1.5 rounded-xl group-hover:rotate-12 transition-transform">
-              <PlusCircleIcon className="w-6 h-6 text-white" />
-            </div>
-          </Button>
         </div>
 
-        {/* Tabs for Overview and Exchange */}
-        <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="bg-white/80 backdrop-blur-md p-1 h-auto rounded-full border-2 border-white shadow-sm inline-flex">
-            <TabsTrigger
-              value="overview"
-              className="rounded-full px-6 py-3 data-[state=active]:bg-primary data-[state=active]:text-white font-bold transition-all text-gray-500 flex items-center gap-2"
-            >
-              <LayoutDashboard className="w-4 h-4" />
-              Tổng quan
-            </TabsTrigger>
-            <TabsTrigger
-              value="exchange"
-              className="rounded-full px-6 py-3 data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-500 data-[state=active]:to-indigo-500 data-[state=active]:text-white font-bold transition-all text-gray-500 flex items-center gap-2"
-            >
-              <Store className="w-4 h-4" />
-              Cửa hàng ZCoin
-            </TabsTrigger>
-            <TabsTrigger
-              value="inventory"
-              className="rounded-full px-6 py-3 data-[state=active]:bg-teal-500 data-[state=active]:text-white font-bold transition-all text-gray-500 flex items-center gap-2"
-            >
-              <Package className="w-4 h-4" />
-              {t('inventory.title')}
-            </TabsTrigger>
-          </TabsList>
+        {/* Main Content Container */}
+        <div className="container mx-auto py-8 px-4 md:px-6 mt-16 space-y-8">
 
-          <TabsContent value="overview" className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          {/* OVERVIEW CONTENT */}
+          <TabsContent value="overview" className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 focus-visible:outline-none">
+
+            {/* Playful Header Section (Moved inside Overview) */}
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-8 pt-6">
+              <div className="text-center md:text-left space-y-2">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 backdrop-blur-sm border-2 border-[#B5CC89] text-[#B5CC89] font-bold text-sm shadow-sm animate-fade-in">
+                  <Sparkles className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                  <span>{t('dashboard.welcomeBack')}</span>
+                </div>
+
+                <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground drop-shadow-sm">
+                  Hello, <span className="text-primary relative inline-block">
+                    {user?.user_metadata?.full_name || user?.email?.split('@')[0] || "Quizzer"}
+                    <svg className="absolute -bottom-2 left-0 w-full h-3 text-yellow-300 -z-10 opacity-60" viewBox="0 0 100 10" preserveAspectRatio="none">
+                      <path d="M0 5 Q 50 15 100 5" stroke="currentColor" strokeWidth="12" fill="none" />
+                    </svg>
+                  </span>
+                  <span className="inline-block animate-wave ml-2 origin-[70%_70%]">👋</span>
+                </h1>
+
+                <p className="text-lg text-muted-foreground font-medium max-w-lg">
+                  {t('dashboard.subtitle')}
+                </p>
+              </div>
+
+              <Button
+                onClick={handleCreateQuiz}
+                size="xl"
+                variant="hero"
+                className="group rounded-3xl shadow-xl border-4 border-primary hover:border-primary-foreground/20 bg-primary text-white font-heading text-lg px-8 py-6 h-auto transition-all duration-200 active:scale-95"
+                onMouseEnter={handleHoverEnter}
+                onMouseLeave={handleHoverLeave}>
+                <span className="mr-2">{t('dashboard.createQuiz')}</span>
+                <div className="bg-white/20 p-1.5 rounded-xl group-hover:rotate-12 transition-transform">
+                  <PlusCircleIcon className="w-6 h-6 text-white" />
+                </div>
+              </Button>
+            </div>
+
+
             {/* Welcome message for new users - Playful Style */}
             {hasNoData && (
               <div className="relative group animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -293,15 +315,32 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
             </div>
           </TabsContent>
 
-          <TabsContent value="exchange" className="min-h-[500px]">
+          <TabsContent value="exchange" className="min-h-[500px] pt-4 focus-visible:outline-none">
             <ExchangeTab />
           </TabsContent>
 
-          <TabsContent value="inventory" className="min-h-[500px]">
+          <TabsContent value="inventory" className="min-h-[500px] pt-4 focus-visible:outline-none">
             <InventoryTab />
           </TabsContent>
-        </Tabs>
-      </div>
+
+          <TabsContent value="settings" className="min-h-[500px] pt-4 focus-visible:outline-none">
+            <div className="max-w-4xl mx-auto">
+              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-6">
+                <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
+                  <div className="p-2 bg-slate-100 rounded-xl">
+                    <Settings className="w-5 h-5 text-slate-600" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-slate-800">Cài đặt API</h2>
+                    <p className="text-sm text-slate-500">Quản lý các API key cho dịch vụ AI</p>
+                  </div>
+                </div>
+                <ApiKeySettings />
+              </div>
+            </div>
+          </TabsContent>
+        </div>
+      </Tabs>
     </div>
   );
 }

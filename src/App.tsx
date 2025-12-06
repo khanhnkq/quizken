@@ -2,9 +2,8 @@ import { useLayoutEffect, useEffect, lazy, Suspense } from "react";
 import { Toaster as HotToaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { gsap } from "gsap";
-import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "@/hooks/use-toast";
 import { shouldDisableScrollSmoother } from "@/utils/deviceDetection";
 import { PageSkeleton } from "@/components/ui/loading-skeleton";
@@ -14,6 +13,16 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const QuizLibrary = lazy(() => import("./components/library/QuizLibrary"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const QuizDetailPage = lazy(() => import("./pages/QuizDetailPage"));
+
+// Preload functions for faster navigation
+const preloadRoutes = () => {
+  // Preload main routes after initial render
+  import("./pages/Index");
+  import("./pages/About");
+  import("./components/library/QuizLibrary");
+  import("./pages/Dashboard");
+};
+
 import { SoundProvider } from "@/contexts/SoundContext";
 import { ChillMusicProvider } from "@/contexts/ChillMusicContext";
 import { Analytics } from "@vercel/analytics/react";
@@ -46,56 +55,33 @@ const ToastBroadcastReceiver = () => {
   return null; // Invisible component
 };
 
-// Page transitions wrapper component
-const AnimatedRoutes = () => {
-  const location = useLocation();
-
-  // Page transition variants - ultra-light for performance
-  const pageVariants = {
-    initial: {
-      opacity: 0,
-    },
-    in: {
-      opacity: 1,
-    },
-    out: {
-      opacity: 0,
-    },
-  };
-
-  const pageTransition = {
-    duration: 0.15,
-  };
-
+// Simple Routes wrapper - no animations for maximum performance
+const AppRoutes = () => {
   return (
-    <AnimatePresence mode="wait" initial={false}>
-      <motion.div
-        key={location.pathname}
-        initial="initial"
-        animate="in"
-        exit="out"
-        variants={pageVariants}
-        transition={pageTransition}
-        className="min-h-screen">
-        <Suspense fallback={<PageSkeleton />}>
-          <Routes location={location} key={location.pathname}>
-            <Route path="/" element={<Index />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/library" element={<QuizLibrary />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/quiz/:attemptId" element={<QuizDetailPage />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
-      </motion.div>
-    </AnimatePresence>
+    <Suspense fallback={<PageSkeleton />}>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/library" element={<QuizLibrary />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/quiz/:attemptId" element={<QuizDetailPage />} />
+        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Suspense>
   );
 };
 
 const queryClient = new QueryClient();
 
 const App = () => {
+  // Preload routes after initial render for faster navigation
+  useEffect(() => {
+    // Delay preload to not block initial render
+    const timer = setTimeout(preloadRoutes, 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
   useLayoutEffect(() => {
     // Skip ScrollSmoother on mobile devices for better performance
     if (shouldDisableScrollSmoother()) {
@@ -208,7 +194,7 @@ const App = () => {
             <ToastBroadcastReceiver />
             <BrowserRouter
               future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-              <AnimatedRoutes />
+              <AppRoutes />
             </BrowserRouter>
             <Analytics />
           </ChillMusicProvider>

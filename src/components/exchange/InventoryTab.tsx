@@ -2,9 +2,10 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useUserItems } from '@/hooks/useUserItems';
 import { useItems } from '@/hooks/useItems';
-import { Loader2, PackageOpen } from 'lucide-react';
+import { Loader2, PackageOpen, Download, FileText } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 
 export function InventoryTab() {
@@ -22,9 +23,11 @@ export function InventoryTab() {
                 id: 'unknown',
                 price: 0,
                 icon: '❓',
-                type: owned.item_type,
+                type: owned.item_type as 'theme' | 'avatar' | 'powerup' | 'document',
                 color: 'bg-gray-100',
-                description: 'Item data not found'
+                description: 'Item data not found',
+                download_url: null,
+                image_url: null
             }
         };
     });
@@ -53,6 +56,10 @@ export function InventoryTab() {
         );
     }
 
+    const handleDownload = (url: string) => {
+        window.open(url, '_blank', 'noopener,noreferrer');
+    };
+
     return (
         <div className="space-y-6 animate-in fade-in duration-500">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -65,9 +72,18 @@ export function InventoryTab() {
                     >
                         <Card className={`overflow-hidden border-2 hover:border-primary/50 transition-all duration-300 ${item.details.color ? item.details.color.replace('bg-', 'bg-opacity-20 bg-') : ''}`}>
                             <CardHeader className={`p-6 flex flex-col items-center justify-center ${item.details.color || 'bg-gray-50'}`}>
-                                <div className="text-6xl mb-2 drop-shadow-sm filter">
-                                    {item.details.icon}
-                                </div>
+                                {/* Display image if image_url exists, otherwise show emoji icon */}
+                                {item.details.image_url ? (
+                                    <img
+                                        src={item.details.image_url}
+                                        alt={item.details.name}
+                                        className="w-20 h-20 object-cover rounded-2xl mb-2 drop-shadow-sm"
+                                    />
+                                ) : (
+                                    <div className="text-6xl mb-2 drop-shadow-sm filter">
+                                        {item.details.icon}
+                                    </div>
+                                )}
                                 <Badge variant="secondary" className="uppercase text-xs font-bold tracking-wider opacity-80">
                                     {item.item_type}
                                 </Badge>
@@ -79,6 +95,18 @@ export function InventoryTab() {
                                 <p className="text-sm text-center text-muted-foreground line-clamp-2 min-h-[2.5rem]">
                                     {item.details.description}
                                 </p>
+
+                                {/* Download Button for Document Items */}
+                                {item.details.type === 'document' && item.details.download_url && (
+                                    <Button
+                                        onClick={() => handleDownload(item.details.download_url!)}
+                                        className="w-full mt-4 bg-green-500 hover:bg-green-600 text-white rounded-xl"
+                                        size="sm"
+                                    >
+                                        <Download className="w-4 h-4 mr-2" />
+                                        Tải xuống
+                                    </Button>
+                                )}
 
                                 <div className="mt-4 pt-4 border-t border-gray-100 text-xs text-center text-gray-400">
                                     {t('inventory.item.owned')} • {new Date(item.purchased_at).toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'vi-VN')}

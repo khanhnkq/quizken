@@ -29,9 +29,11 @@ CREATE TABLE IF NOT EXISTS public.items (
     name TEXT NOT NULL,
     description TEXT,
     price INTEGER NOT NULL CHECK (price >= 0),
-    type TEXT NOT NULL, -- 'theme', 'avatar', 'powerup'
+    type TEXT NOT NULL, -- 'theme', 'avatar', 'powerup', 'document'
     icon TEXT,
     color TEXT,
+    download_url TEXT, -- URL to external file (Drive, etc.) for document items
+    image_url TEXT,    -- URL to image for avatar items
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
@@ -43,14 +45,26 @@ CREATE POLICY "Public can view items"
     ON public.items FOR SELECT
     USING (true);
 
+-- Add new columns if they don't exist (for existing tables)
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'items' AND column_name = 'download_url') THEN
+        ALTER TABLE public.items ADD COLUMN download_url TEXT;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'items' AND column_name = 'image_url') THEN
+        ALTER TABLE public.items ADD COLUMN image_url TEXT;
+    END IF;
+END $$;
+
 -- Seed Initial Items (Upsert to allow updates)
-INSERT INTO public.items (id, name, description, price, type, icon, color)
+INSERT INTO public.items (id, name, description, price, type, icon, color, download_url, image_url)
 VALUES
-    ('theme_neon_night', 'Neon Night', 'Biến giao diện thành phong cách Cyberpunk cực ngầu!', 500, 'theme', '🌃', 'bg-slate-900 border-purple-500'),
-    ('theme_pastel_dream', 'Pastel Dream', 'Thế giới mộng mơ với màu sắc dịu nhẹ.', 500, 'theme', '🦄', 'bg-pink-50 border-pink-300'),
-    ('avatar_cool_cat', 'Cool Cat', 'Avatar Mèo đeo kính râm.', 200, 'avatar', '😎', 'bg-orange-100 border-orange-300'),
-    ('avatar_quiz_king', 'Quiz King', 'Vương miện cho người chiến thắng.', 1000, 'avatar', '👑', 'bg-yellow-100 border-yellow-300'),
-    ('powerup_double_xp_1h', 'X2 XP (1h)', 'Nhân đôi XP trong vòng 1 giờ!', 300, 'powerup', '⚡', 'bg-blue-100 border-blue-300')
+    ('theme_neon_night', 'Neon Night', 'Biến giao diện thành phong cách Cyberpunk cực ngầu!', 500, 'theme', '🌃', 'bg-slate-900 border-purple-500', NULL, NULL),
+    ('theme_pastel_dream', 'Pastel Dream', 'Thế giới mộng mơ với màu sắc dịu nhẹ.', 500, 'theme', '🦄', 'bg-pink-50 border-pink-300', NULL, NULL),
+    ('avatar_cool_cat', 'Cool Cat', 'Avatar Mèo đeo kính râm siêu ngầu.', 200, 'avatar', '😎', 'bg-orange-100 border-orange-300', NULL, NULL),
+    ('avatar_quiz_king', 'Quiz King', 'Vương miện dành cho người chiến thắng.', 1000, 'avatar', '👑', 'bg-yellow-100 border-yellow-300', NULL, NULL),
+    ('powerup_double_xp_1h', 'X2 XP (1h)', 'Nhân đôi XP trong vòng 1 giờ!', 300, 'powerup', '⚡', 'bg-blue-100 border-blue-300', NULL, NULL),
+    ('doc_sample_exercises', 'Bài Tập Mẫu', 'Bộ bài tập luyện đề cực chất!', 150, 'document', '📄', 'bg-green-100 border-green-300', 'https://example.com/sample.pdf', NULL)
 ON CONFLICT (id) DO UPDATE
 SET
     name = EXCLUDED.name,
@@ -58,7 +72,9 @@ SET
     price = EXCLUDED.price,
     type = EXCLUDED.type,
     icon = EXCLUDED.icon,
-    color = EXCLUDED.color;
+    color = EXCLUDED.color,
+    download_url = EXCLUDED.download_url,
+    image_url = EXCLUDED.image_url;
 
 
 -- Function to handle item purchase (deduct ZCoin + add item)

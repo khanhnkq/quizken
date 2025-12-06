@@ -17,7 +17,6 @@ export function useItems() {
             }
 
             // Cast database response to ExchangeItem interface
-            // Ensure the type matches what the UI expects
             return data as unknown as ExchangeItem[];
         },
         staleTime: 1000 * 60 * 5, // Cache for 5 minutes

@@ -89,6 +89,8 @@ export const Music = L.Music;
 export const Music4 = L.Music;
 export const FileDownAlt = L.FileDown;
 export const RefreshCw = L.RefreshCw;
+export const Store = L.Store;
+export const Package = L.Package;
 
 export const TrendingUp = L.TrendingUp;
 

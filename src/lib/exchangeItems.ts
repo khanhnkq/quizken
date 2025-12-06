@@ -3,9 +3,11 @@ export interface ExchangeItem {
     name: string;
     description: string;
     price: number;
-    type: 'theme' | 'avatar' | 'powerup';
+    type: 'theme' | 'avatar' | 'powerup' | 'document';
     icon: string; // Emoji or image URL
     color: string; // Tailwind color class for card background
+    download_url?: string | null; // URL to downloadable file (for 'document' type)
+    image_url?: string | null;    // URL to image (for 'avatar' type with custom images)
 }
 
 export const EXCHANGE_ITEMS: ExchangeItem[] = [
