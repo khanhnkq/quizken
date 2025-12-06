@@ -13,6 +13,7 @@ export interface GeneratePayload {
   questions: Question[];
   showResults: boolean;
   userAnswers?: number[];
+  locale?: string; // 'vi' or 'en'
 }
 
 interface GenerateMessage {

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useState, useEffect, useCallback, type MouseEvent } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { BackgroundDecorations } from "@/components/ui/BackgroundDecorations";
@@ -56,8 +56,9 @@ import type { Quiz, Question } from "@/types/quiz";
 import { GenerationProgress } from "@/components/quiz/GenerationProgress";
 import { QuotaLimitDialog } from "@/components/quiz/QuotaLimitDialog";
 import { ApiKeyErrorDialog } from "@/components/quiz/ApiKeyErrorDialog";
-import { QuizContent } from "@/components/quiz/QuizContent";
+
 import { useQuizStore } from "@/hooks/useQuizStore";
+import AuthModal from "@/components/AuthModal";
 import {
   Tooltip,
   TooltipTrigger,
@@ -94,6 +95,7 @@ const QuizGenerator = () => {
     containsVietnameseBadwords(String(input || ""));
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const [debugData, setDebugData] = useState<unknown>(null);
   const {
     quiz,
@@ -138,6 +140,7 @@ const QuizGenerator = () => {
     null
   );
   const location = useLocation();
+  const navigate = useNavigate();
   const cameFromLibraryRef = React.useRef<boolean>(
     !!(location.state as { scrollToQuiz?: boolean } | null)?.scrollToQuiz
   );
@@ -416,9 +419,6 @@ const QuizGenerator = () => {
         // Resume polling via hook
         startPollingHook(quizId, {
           onCompleted: ({ quiz, tokenUsage }) => {
-            // 🔧 FIX: Ensure quiz has ID from backend
-            const quizWithId = { ...quiz, id: quizId };
-            setQuiz(quizWithId);
             if (tokenUsage) setTokenUsage(tokenUsage as TokenUsage);
             setGenerationStatus(null);
             setGenerationProgress("");
@@ -452,6 +452,9 @@ const QuizGenerator = () => {
               variant: "success",
             });
             channel.close();
+
+            // Redirect to play page instead of inline display
+            navigate(`/quiz/play/${quizId}`);
           },
           onFailed: (errorMessage?: string) => {
             setGenerationStatus(null);
@@ -586,9 +589,6 @@ const QuizGenerator = () => {
             setQuizId(savedQuizId);
             startPollingHook(savedQuizId, {
               onCompleted: ({ quiz, tokenUsage }) => {
-                // 🔧 FIX: Ensure quiz has ID from backend
-                const quizWithId = { ...quiz, id: savedQuizId };
-                setQuiz(quizWithId);
                 if (tokenUsage) setTokenUsage(tokenUsage as TokenUsage);
                 setGenerationStatus(null);
                 setGenerationProgress("");
@@ -608,6 +608,9 @@ const QuizGenerator = () => {
                   variant: "success",
                 });
                 channel.close();
+
+                // Redirect to play page instead of inline display
+                navigate(`/quiz/play/${savedQuizId}`);
               },
               onFailed: (errorMessage?: string) => {
                 setGenerationStatus(null);
@@ -669,6 +672,7 @@ const QuizGenerator = () => {
                 channel.close();
               },
               onProgress: (status, progress) => {
+                if (status === "completed" || status === "failed" || status === "expired") return;
                 setGenerationStatus(status);
                 setGenerationProgress(progress || t('quizGenerator.toasts.processingStatus'));
                 persistGenerationState({
@@ -878,23 +882,10 @@ const QuizGenerator = () => {
       startPollingHook(quizId, {
         onCompleted: ({ quiz, tokenUsage }) => {
           isSubmittingRef.current = false;
-          // 🔧 FIX: Ensure quiz has ID from backend
-          const quizWithId = { ...quiz, id: quizId };
-          setQuiz(quizWithId);
           if (tokenUsage) setTokenUsage(tokenUsage as TokenUsage);
           setGenerationStatus(null);
           setGenerationProgress("");
           setLoading(false);
-          // Auto-scroll to quiz section after creation (robust for sticky navbar)
-          try {
-            const el = document.getElementById("quiz");
-            if (el) {
-              killActiveScroll();
-              scrollToTarget(el, { align: "top" });
-            }
-          } catch (e) {
-            console.debug("scrollTo quiz fallback failed", e);
-          }
           clearPersist();
 
           // Calculate Reward
@@ -905,6 +896,9 @@ const QuizGenerator = () => {
             const reward = calculateCreateReward(level);
             title = t('notifications.zcoinReward.create', { amount: reward, xp: 100 });
           }
+
+          // Refresh global stats to trigger level up notification if applicable
+          refetchStats();
 
           toast({
             title: title,
@@ -920,6 +914,9 @@ const QuizGenerator = () => {
             variant: "success",
           });
           channel.close();
+
+          // Redirect to play page instead of inline display
+          navigate(`/quiz/play/${quizId}`);
         },
         onFailed: (errorMessage?: string) => {
           isSubmittingRef.current = false;
@@ -982,6 +979,7 @@ const QuizGenerator = () => {
           channel.close();
         },
         onProgress: (status, progress) => {
+          if (status === "completed" || status === "failed" || status === "expired") return;
           setGenerationStatus(status);
           setGenerationProgress(progress || "Đang xử lý...");
           persistGenerationState({
@@ -1036,6 +1034,17 @@ const QuizGenerator = () => {
   };
 
   const handleGenerateClick = (e: MouseEvent<HTMLButtonElement>) => {
+    // Check authentication first
+    if (!user) {
+      toast({
+        title: t("library.toasts.loginRequired"),
+        description: t("library.toasts.loginDesc"),
+        variant: "warning",
+      });
+      setShowAuthModal(true);
+      return;
+    }
+
     // Double-submit protection check
     const now = Date.now();
     if (isSubmittingRef.current || now - lastSubmitTimeRef.current < 5000) {
@@ -1062,89 +1071,7 @@ const QuizGenerator = () => {
     void generateQuiz();
   };
 
-  const handleAnswerSelect = (questionIndex: number, answerIndex: number) => {
-    const newAnswers = [...userAnswers];
-    newAnswers[questionIndex] = answerIndex;
-    setUserAnswers(newAnswers);
-  };
 
-  const gradeQuiz = () => {
-    try {
-      // Handle edge case 1: No quiz data
-      if (!quiz) {
-        toast({
-          title: t('quizGenerator.toasts.noQuiz'),
-          description: t('quizGenerator.toasts.noQuizDesc'),
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Handle edge case 2: Invalid quiz structure
-      if (!quiz.questions || !Array.isArray(quiz.questions)) {
-        toast({
-          title: t('quizGenerator.toasts.invalidQuizData'),
-          description: t('quizGenerator.toasts.invalidQuizDataDesc'),
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Handle edge case 3: No questions in quiz
-      if (quiz.questions.length === 0) {
-        toast({
-          title: t('quizGenerator.toasts.emptyQuiz'),
-          description: t('quizGenerator.toasts.emptyQuizDesc'),
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Handle edge case 4: Not all questions answered
-      const answeredCount = userAnswers.filter(
-        (answer) => answer !== undefined
-      ).length;
-      if (answeredCount !== quiz.questions.length) {
-        toast({
-          title: t('quizGenerator.toasts.incompleteQuiz'),
-          description: t('quizGenerator.toasts.incompleteQuizDesc', { answered: answeredCount, total: quiz.questions.length }),
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Handle edge case 5: All answers are undefined (shouldn't happen after above check)
-      if (answeredCount === 0) {
-        toast({
-          title: t('quizGenerator.toasts.noAnswers'),
-          description:
-            t('quizGenerator.toasts.noAnswersDesc'),
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // All checks passed, show results
-      setShowResults(true);
-    } catch (error) {
-      console.error("Error grading quiz:", error);
-      toast({
-        title: t('quizGenerator.toasts.gradeErrorTitle'),
-        description: t('quizGenerator.toasts.gradeErrorDesc'),
-        variant: "destructive",
-      });
-    }
-  };
-
-  const resetQuiz = () => {
-    if (quiz) {
-      const data = createShuffledQuiz(quiz);
-      setShuffledData(data);
-      setQuiz(data.shuffledQuiz);
-    }
-    setUserAnswers([]);
-    setShowResults(false);
-  };
 
   const cancelQuizGeneration = () => {
     // Abort the ongoing request
@@ -1176,19 +1103,7 @@ const QuizGenerator = () => {
     abortControllerRef.current = new AbortController();
   };
 
-  const calculateScore = () => {
-    if (!quiz) return 0;
-    if (shuffledData) {
-      return computeScoreFromShuffled(shuffledData, userAnswers);
-    }
-    let correct = 0;
-    userAnswers.forEach((answer, index) => {
-      if (answer === quiz.questions[index].correctAnswer) {
-        correct++;
-      }
-    });
-    return correct;
-  };
+
 
   // Toggle chill background music via hook
   const handleToggleChill = async () => {
@@ -1209,51 +1124,7 @@ const QuizGenerator = () => {
     warmupPdfWorker().catch(() => { });
   }, []);
 
-  const downloadQuiz = async () => {
-    if (!quiz) return;
 
-    try {
-      toast({
-        title: t('quizGenerator.toasts.pdfCreating'),
-        description: t('quizGenerator.toasts.pdfCreatingDesc'),
-        variant: "info",
-        duration: 1500,
-      });
-
-      const title = quiz.title || "quiz";
-      const filename = `${title.replace(/\s+/g, "-").toLowerCase()}.pdf`;
-
-      // Ensure worker and fonts are warm before generation (no-op if already warmed)
-      await warmupPdfWorker().catch(() => { });
-
-      await generateAndDownloadPdf({
-        filename,
-        title,
-        description: quiz.description || "",
-        questions: quiz.questions || [],
-        showResults,
-        userAnswers,
-      });
-
-      toast({
-        title: t('quizGenerator.toasts.pdfSuccess'),
-        description: t('quizGenerator.toasts.pdfSuccessDesc'),
-        variant: "success",
-        duration: 2500,
-      });
-    } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : t('quizGenerator.toasts.pdfFailedDesc');
-      toast({
-        title: t('quizGenerator.toasts.pdfFailed'),
-        description: message,
-        variant: "destructive",
-      });
-      console.error("PDF download error:", error);
-    }
-  };
 
   return (
     <>
@@ -1319,7 +1190,7 @@ const QuizGenerator = () => {
 
           <div className="text-center mb-12">
             <div className="flex justify-center mb-6">
-              <Sparkles className="w-16 h-16 text-[#B5CC89]" />
+              <Sparkles className="w-16 h-16 text-primary" />
             </div>
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
               {t('quizGenerator.header')}
@@ -1351,8 +1222,8 @@ const QuizGenerator = () => {
                 </span>
                 {isChillPlaying && (
                   <span className="flex items-end gap-0.5" aria-hidden="true">
-                    <span className="w-1 h-3 bg-[#B5CC89] rounded-sm animate-pulse group-hover:bg-primary-foreground" />
-                    <span className="w-1 h-2 bg-[#B5CC89] rounded-sm animate-pulse delay-150 group-hover:bg-primary-foreground/80" />
+                    <span className="w-1 h-3 bg-primary rounded-sm animate-pulse group-hover:bg-primary-foreground" />
+                    <span className="w-1 h-2 bg-primary rounded-sm animate-pulse delay-150 group-hover:bg-primary-foreground/80" />
                   </span>
                 )}
               </Button>
@@ -1366,11 +1237,13 @@ const QuizGenerator = () => {
             getTimeUntilReset={getTimeUntilReset}
           />
 
+          {/* Auth Modal for checking login status */}
+          <AuthModal open={showAuthModal} onOpenChange={setShowAuthModal} />
           {/* API Key Error Dialog */}
           <ApiKeyErrorDialog
             open={showApiKeyErrorDialog}
-            errorMessage={apiKeyError}
             onOpenChange={setShowApiKeyErrorDialog}
+            errorMessage={apiKeyError}
           />
 
           {/* Confirm Reset Dialog */}
@@ -1406,7 +1279,7 @@ const QuizGenerator = () => {
                       void generateQuiz();
                     }}>
                     {t('quizGenerator.confirmDialog.confirm')}
-                    <div className="bg-[#B5CC89] p-1 rounded-lg">
+                    <div className="bg-primary p-1 rounded-lg">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         className="w-5 h-5 text-black group-hover:text-white"
@@ -1627,21 +1500,7 @@ const QuizGenerator = () => {
         </div>
       </section >
 
-      {quiz && (
-        <QuizContent
-          quiz={quiz}
-          userAnswers={userAnswers}
-          showResults={showResults}
-          tokenUsage={tokenUsage}
-          onAnswerSelect={handleAnswerSelect}
-          onGrade={gradeQuiz}
-          onReset={resetQuiz}
-          calculateScore={calculateScore}
-          onDownload={downloadQuiz}
-          userId={user?.id}
-        />
-      )
-      }
+
     </>
   );
 };

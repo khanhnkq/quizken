@@ -23,7 +23,7 @@ export const QuotaLimitDialog: React.FC<QuotaLimitDialogProps> = ({ open, onOpen
       <DialogContent className="max-w-md bg-gradient-to-br from-card to-secondary/20 border-2 border-border">
         <DialogHeader className="pb-3">
           <div className="flex items-center justify-center gap-2 mb-2">
-            <div className="bg-[#B5CC89] p-1 rounded-md">
+            <div className="bg-primary p-1 rounded-md">
               <Shield className="w-4 h-4 text-black" />
             </div>
             <DialogTitle className="text-lg font-bold text-primary">{t("quotaDialog.title")}</DialogTitle>
@@ -34,11 +34,11 @@ export const QuotaLimitDialog: React.FC<QuotaLimitDialogProps> = ({ open, onOpen
         </DialogHeader>
 
         <div className="mt-3 space-y-3">
-          <div className="p-3 bg-[#B5CC89]/10 border border-[#B5CC89]/20 rounded-lg">
-            <div className="flex items-center gap-1.5 mb-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-[#B5CC89]" />
+          <div className="p-3 bg-primary/10 border border-primary/20 rounded-lg">
+            <h4 className="font-semibold text-foreground flex items-center gap-2 mb-1">
+              <Sparkles className="w-3.5 h-3.5 text-primary" />
               <p className="text-xs font-medium text-foreground">{t("quotaDialog.loginPrompt")}</p>
-            </div>
+            </h4>
             <ul className="text-[11px] text-muted-foreground leading-relaxed list-disc list-inside space-y-1">
               <li>{t("quotaDialog.benefits.save")}</li>
               <li>{t("quotaDialog.benefits.download")}</li>

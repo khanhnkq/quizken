@@ -28,8 +28,8 @@ export function ProgressTrendline({
 
   if (isLoading) {
     return (
-      <Card className="border-2 hover:border-[#B5CC89] transition-colors">
-        <CardHeader className="border-b bg-[#B5CC89]/5">
+      <Card className="border-2 hover:border-primary transition-colors">
+        <CardHeader className="border-b bg-primary/5">
           <CardTitle className="flex items-center gap-2 text-gray-900 text-base md:text-lg">
             <TrendingUpIcon className="h-4 w-4 md:h-5 md:w-5" />
             <span className="sm:inline">{t('dashboard.progressTrend.titleShort')}</span>
@@ -44,8 +44,8 @@ export function ProgressTrendline({
 
   if (!trendData || trendData.length === 0) {
     return (
-      <Card className="border-2 border-dashed hover:border-[#B5CC89] transition-colors">
-        <CardHeader className="border-b bg-[#B5CC89]/5">
+      <Card className="border-2 border-dashed hover:border-primary transition-colors">
+        <CardHeader className="border-b bg-primary/5">
           <CardTitle className="flex items-center gap-2 text-gray-900 text-base md:text-lg">
             <TrendingUpIcon className="h-4 w-4 md:h-5 md:w-5" />
             <span className="hidden sm:inline">{t('dashboard.progressTrend.title')}</span>
@@ -53,8 +53,8 @@ export function ProgressTrendline({
           </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col items-center justify-center h-48 md:h-64 text-center p-4">
-          <div className="p-3 md:p-4 rounded-full bg-[#B5CC89]/20 mb-3 md:mb-4">
-            <TrendingUpIcon className="h-10 w-10 md:h-12 md:w-12 text-[#B5CC89]" />
+          <div className="p-3 md:p-4 rounded-full bg-primary/20 mb-3 md:mb-4">
+            <TrendingUpIcon className="h-10 w-10 md:h-12 md:w-12 text-primary" />
           </div>
           <p className="text-gray-700 font-semibold mb-2 text-sm md:text-base">
             {t('dashboard.progressTrend.empty')}
@@ -88,11 +88,15 @@ export function ProgressTrendline({
   }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white p-4 border-2 border-[#B5CC89] rounded-xl shadow-xl">
-          <p className="font-bold text-gray-900 mb-2 text-sm">{label}</p>
+        <div className="bg-white p-4 border-2 border-primary rounded-xl shadow-xl">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <p className="font-bold text-gray-900 text-sm">{label}</p>
+            </div>
+          </div>
           <div className="space-y-1">
-            <p className="text-sm font-semibold text-[#B5CC89] flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-[#B5CC89]"></span>
+            <p className="text-sm font-semibold text-primary flex items-center gap-2">
+              <span className="w-3 h-3 rounded-full bg-primary"></span>
               {t('dashboard.progressTrend.avgScore')}: {payload[0]?.value?.toFixed(1)}%
             </p>
             <p className="text-sm font-semibold text-gray-600 flex items-center gap-2">

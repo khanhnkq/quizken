@@ -143,7 +143,7 @@ export function RecentQuizzes({
           return (
             <div
               key={attempt.attempt_id}
-              onClick={() => navigate(`/quiz/${attempt.attempt_id}`)}
+              onClick={() => navigate(`/quiz/result/${attempt.attempt_id}`)}
               className="group bg-white rounded-[1.25rem] p-3 md:p-4 shadow-md border-2 border-gray-100/60 hover:border-primary/50 hover:shadow-xl transition-all duration-300 cursor-pointer hover:-translate-y-1 relative overflow-hidden"
             >
               {/* Background Highlight on Hover */}

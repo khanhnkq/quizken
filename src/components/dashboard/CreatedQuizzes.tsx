@@ -98,17 +98,7 @@ export function CreatedQuizzes({
 
     // Preview / Use Quiz
     const handleUseQuiz = (quiz: CreatedQuiz) => {
-        // Navigate strictly to home with state to open generator
-        // Mapping CreatedQuiz to PublicQuiz shape minimal requirement
-        const quizData = {
-            ...quiz,
-            questions: quiz.questions,
-            difficulty: quiz.difficulty as any,
-            category: quiz.category as any,
-            prompt: "", // Not available in CreatedQuiz but needed for type, can be empty
-        };
-
-        navigate("/?scrollTo=quiz", { state: { quiz: quizData, scrollToQuiz: true } });
+        navigate(`/quiz/play/${quiz.id}`);
     };
 
     const handleDownloadPDF = async (quiz: CreatedQuiz) => {

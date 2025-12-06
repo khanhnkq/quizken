@@ -1,45 +1,22 @@
 import * as React from "react";
-import {  useEffect, useState, useCallback  } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import { gsap } from "gsap";
 import ScrollSmoother from "gsap/ScrollSmoother";
 import { ArrowUp, Sparkles } from '@/lib/icons';
 import { Button } from "@/components/ui/button";
-import { shouldDisableScrollSmoother } from "@/utils/deviceDetection";
+import { scrollToTarget } from "@/lib/scroll";
+import { useTranslation } from "react-i18next";
 
 const ScrollToGeneratorButtonWrapper: React.FC = () => {
+  const { t } = useTranslation();
   const location = useLocation();
   const [position, setPosition] = useState({ top: 0, right: 16 });
   const [isScrolledPast, setIsScrolledPast] = useState(false);
 
-  // Scroll to generator function with improved logic
+  // Scroll to generator function using unified utility
   const scrollToSection = useCallback(() => {
-    const element = document.getElementById("generator");
-    if (element) {
-      // Try ScrollSmoother first (only on desktop)
-      if (!shouldDisableScrollSmoother()) {
-        try {
-          const { default: ScrollSmoother } = import("gsap/ScrollSmoother");
-          const smoother = ScrollSmoother.get();
-          
-          if (smoother) {
-            smoother.scrollTo(element, true, "top 20px");
-            return;
-          }
-        } catch (e) {
-          // ScrollSmoother not available, fallback to native scroll
-        }
-      }
-      
-      // Fallback to native scroll
-      const yOffset = -100;
-      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
-
-      window.scrollTo({
-        top: y,
-        behavior: "smooth",
-      });
-    }
+    scrollToTarget("generator", { align: "top", offset: 100 });
   }, []);
 
   // Check if scrolled past generator section
@@ -51,15 +28,14 @@ const ScrollToGeneratorButtonWrapper: React.FC = () => {
       if (generatorElement) {
         const rect = generatorElement.getBoundingClientRect();
         const viewportHeight = window.innerHeight;
-        
+
         // Show button when bottom of generator section has scrolled past the top of viewport
-        // This means user has scrolled past the generator section
         const hasScrolledPastGenerator = rect.bottom < 0;
-        
+
         // Also check if user is currently in any section below generator
         const sectionsBelow = ['quiz', 'features', 'testimonials', 'stats', 'footer'];
         let isInSectionBelow = false;
-        
+
         for (const sectionId of sectionsBelow) {
           const sectionElement = document.getElementById(sectionId);
           if (sectionElement) {
@@ -71,8 +47,7 @@ const ScrollToGeneratorButtonWrapper: React.FC = () => {
             }
           }
         }
-        
-        // Show button if scrolled past generator AND currently in a section below
+
         setIsScrolledPast(hasScrolledPastGenerator && isInSectionBelow);
       }
     };
@@ -98,12 +73,30 @@ const ScrollToGeneratorButtonWrapper: React.FC = () => {
   // Only show on Index page and when scrolled past generator
   const shouldShow = location.pathname === "/" && isScrolledPast;
 
-  // Update position based on ScrollSmoother
+  // Update position based on ScrollSmoother or native scroll
   useEffect(() => {
     const updatePosition = () => {
-      const smoother = ScrollSmoother.get();
+      // Try to get smoother instance if available
+      const smoother = ScrollSmoother && ScrollSmoother.get ? ScrollSmoother.get() : null;
+
       if (!smoother) {
-        setPosition({ top: window.innerHeight - 80, right: 16 });
+        // Native scroll positioning (fixed relative to viewport)
+        // We use state to force re-render but positioning is handled via style top/right relative to document is wrong for fixed
+        // Wait, the original code used absolute positioning with top calculated from virtualScrollTop
+        // If no smoother, we should probably use fixed positioning or calculate based on window.scrollY
+
+        // For native scroll, we want fixed position at bottom right
+        // But the component uses absolute positioning. 
+        // Let's stick to the original logic: absolute positioning for GSAP, but maybe fixed for native?
+        // Actually, if smoother is null, original code set top: window.innerHeight - 80. 
+        // This puts it at bottom of FIRST viewport page if absolute 0,0 is top-left of document.
+        // But if position is absolute, it scrolls WITH the page unless updated constantly.
+
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        setPosition({
+          top: scrollTop + window.innerHeight - 80,
+          right: 16
+        });
         return;
       }
 
@@ -111,13 +104,14 @@ const ScrollToGeneratorButtonWrapper: React.FC = () => {
       const viewportHeight = window.innerHeight;
 
       setPosition({
-        top: virtualScrollTop + viewportHeight - 80, // 80px from bottom
-        right: 24, // 24px from right
+        top: virtualScrollTop + viewportHeight - 80,
+        right: 24,
       });
     };
 
     if (shouldShow) {
       updatePosition();
+      // Use GSAP ticker for high performance updates
       gsap.ticker.add(updatePosition);
 
       return () => {
@@ -142,14 +136,14 @@ const ScrollToGeneratorButtonWrapper: React.FC = () => {
       <Button
         onClick={scrollToSection}
         size="lg"
-        className="group relative overflow-hidden bg-gradient-to-r from-[#B5CC89] to-[#9BB76A] hover:from-[#9BB76A] hover:to-[#8AA659] text-black hover:text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-full p-4 h-auto min-w-[60px] md:min-w-auto md:px-6 hover:scale-105 active:scale-95"
-        aria-label="Trở về section tạo quiz">
+        className="group relative overflow-hidden bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-black hover:text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-full p-4 h-auto min-w-[60px] md:min-w-auto md:px-6 hover:scale-105 active:scale-95"
+        aria-label={t("common.scrollToGenerator", "Cuộn tới trình tạo quiz")}>
         {/* Background animation */}
         <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity duration-300 rounded-full" />
-        
+
         {/* Pulse effect for attention */}
-        <div className="absolute inset-0 rounded-full bg-[#B5CC89] opacity-20 animate-ping" />
-        
+        <div className="absolute inset-0 rounded-full bg-primary opacity-20 animate-ping" />
+
         {/* Mobile: Only icons */}
         <div className="flex items-center gap-2 md:hidden relative z-10">
           <Sparkles className="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" />
@@ -159,7 +153,7 @@ const ScrollToGeneratorButtonWrapper: React.FC = () => {
         {/* Desktop: Icons + text */}
         <div className="hidden md:flex items-center gap-2 relative z-10">
           <Sparkles className="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" />
-          <span className="font-medium">Tạo Quiz</span>
+          <span className="font-medium">{t("common.createQuiz", "Tạo Quiz")}</span>
           <ArrowUp className="w-4 h-4 group-hover:translate-y-[-2px] transition-transform duration-200" />
         </div>
       </Button>

@@ -29,7 +29,7 @@ export const FlashcardControls: React.FC<FlashcardControlsProps> = ({
           {Array.from({ length: totalCards }, (_, index) => {
             const isCurrent = index === currentIndex;
             const stateClasses = isCurrent
-              ? "border-[#B5CC89] text-[#B5CC89] hover:bg-[#B5CC89]/10"
+              ? "border-primary text-primary hover:bg-primary/10"
               : "border-border text-muted-foreground hover:bg-accent";
 
             return (
@@ -57,7 +57,7 @@ export const FlashcardControls: React.FC<FlashcardControlsProps> = ({
                   }`}>
                 <span className="relative z-10">{index + 1}</span>
                 {isCurrent && (
-                  <span className="pointer-events-none absolute -right-1 -top-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-[#B5CC89] text-white text-[10px] font-bold shadow-sm">
+                  <span className="pointer-events-none absolute -right-1 -top-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-primary text-white text-[10px] font-bold shadow-sm">
                     ✓
                   </span>
                 )}

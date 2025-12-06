@@ -67,7 +67,7 @@ export interface DifficultyInfo {
 
 // Single Color for All Categories
 // Differentiate by icons and labels only
-export const CATEGORY_COLOR = '#3B82F6'; // Single blue color for all categories
+export const CATEGORY_COLOR = '#22c55e'; // Single green color for all categories to match theme
 
 // SUGGESTED/COMMON CATEGORIES - AI có thể tạo category mới ngoài danh sách này
 // These are used for UI filtering and display suggestions

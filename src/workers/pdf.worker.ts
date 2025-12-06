@@ -1,27 +1,15 @@
 /// <reference lib="webworker" />
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-// BƯỚC 1: Import toàn bộ module UMD
-import * as jsPDFAll from "jspdf/dist/jspdf.umd.min.js";
-
-// BƯỚC 2: "Đánh lừa" trình tree-shaker (Vite)
-// Bằng cách truy cập các plugin, chúng ta báo cho Vite
-// rằng chúng ta cần chúng, để nó không vứt bỏ.
-// Dòng 'as any' là để TypeScript không báo lỗi.
-const _touch = (jsPDFAll as any).Unicode; // <--- Quan trọng nhất!
-const _touch2 = (jsPDFAll as any).VFS;
-const _touch3 = (jsPDFAll as any).TTFFont;
-
-// BƯỚC 3: Lấy constructor jsPDF (hàm new)
-// Trong file UMD, nó thường nằm ở .jsPDF hoặc .default
-const jsPDF = (jsPDFAll as any).jsPDF || jsPDFAll.default;
+// jsPDF v3 is an ESM package. Import the named export directly.
+import { jsPDF } from "jspdf";
 
 //
 // Giữ lại các import không liên quan đến jspdf (nếu có)
 //
 
 declare const self: DedicatedWorkerGlobalScope;
-export {};
+export { };
 
 //
 // ... Toàn bộ code còn lại của bạn (type Question, ...)
@@ -42,7 +30,29 @@ interface GeneratePayload {
   questions: Question[];
   showResults: boolean;
   userAnswers?: number[];
+  locale?: string; // 'vi' or 'en'
 }
+
+// PDF Translations
+const pdfTranslations: Record<string, Record<string, string>> = {
+  vi: {
+    description: "Mô tả:",
+    downloaded: "Tải xuống:",
+    result: "Kết quả:",
+    explanation: "Giải thích:",
+  },
+  en: {
+    description: "Description:",
+    downloaded: "Downloaded:",
+    result: "Result:",
+    explanation: "Explanation:",
+  },
+};
+
+const getPdfText = (locale: string | undefined, key: string) => {
+  const lang = locale === 'en' ? 'en' : 'vi';
+  return pdfTranslations[lang]?.[key] || pdfTranslations.vi[key] || key;
+};
 
 interface GenerateMessage {
   type: "generate";
@@ -528,9 +538,10 @@ const buildPdfArrayBuffer = async (
   // Header
   addBlock(payload.title || "quiz", 16, "bold", 2);
   if (payload.description) {
-    addBlock(`Mô tả: ${payload.description}`, 10, "normal", 4);
+    addBlock(`${getPdfText(payload.locale, 'description')} ${payload.description}`, 10, "normal", 4);
   }
-  addBlock(`Tải xuống: ${new Date().toLocaleString("vi-VN")}`, 10, "normal", 4);
+  const dateLocale = payload.locale === 'en' ? 'en-US' : 'vi-VN';
+  addBlock(`${getPdfText(payload.locale, 'downloaded')} ${new Date().toLocaleString(dateLocale)}`, 10, "normal", 4);
 
   // Divider
   addPageIfNeeded(2);
@@ -546,7 +557,7 @@ const buildPdfArrayBuffer = async (
       if (answer === payload.questions[idx]?.correctAnswer) correct++;
     });
     const percent = total ? Math.round((correct / total) * 100) : 0;
-    addBlock(`Kết quả: ${correct}/${total} (${percent}%)`, 12, "bold", 4);
+    addBlock(`${getPdfText(payload.locale, 'result')} ${correct}/${total} (${percent}%)`, 12, "bold", 4);
   }
 
   // Questions
@@ -573,7 +584,7 @@ const buildPdfArrayBuffer = async (
 
     // Explanation
     if (payload.showResults && q.explanation) {
-      addBlock(`Giải thích: ${q.explanation}`, 10, "normal", 4);
+      addBlock(`${getPdfText(payload.locale, 'explanation')} ${q.explanation}`, 10, "normal", 4);
     } else {
       y += 2;
     }

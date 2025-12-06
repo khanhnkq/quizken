@@ -113,7 +113,7 @@ const Index = () => {
       } catch (e) {
         console.error("Error in scroll:", e);
       }
-      return () => {};
+      return () => { };
     }
   }, [location, navigate]);
 
@@ -154,7 +154,7 @@ const Index = () => {
       />
       {/* Navbar outside ScrollSmoother for proper sticky behavior */}
       <Navbar />
-      <div className="min-h-screen" id="smooth-wrapper">
+      <div className="min-h-screen pt-16" id="smooth-wrapper">
         <div id="smooth-content">
           <Hero />
           <QuizGenerator />

@@ -14,7 +14,7 @@ const Stats = () => {
         <div className="space-y-12">
           <div className="text-center">
             <div className="flex justify-center mb-6">
-              <Users className="w-12 h-12 text-[#B5CC89]" />
+              <Users className="w-12 h-12 text-primary" />
             </div>
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
               Được tin dùng bởi nhà giáo trên toàn thế giới

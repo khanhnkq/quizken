@@ -19,8 +19,10 @@ import {
   generateLocalBusinessSchema,
   generateBreadcrumbSchema,
 } from "@/lib/seoSchemas";
+import { useTranslation } from "react-i18next";
 
 const About = () => {
+  const { t } = useTranslation();
   const breadcrumbSchema = generateBreadcrumbSchema([
     { name: "Home", url: "/" },
     { name: "About", url: "/about" },
@@ -29,28 +31,21 @@ const About = () => {
   return (
     <>
       <SeoMeta
-        title="Về QuizKen - Nền Tảng Quiz AI Miễn Phí"
-        description="Tìm hiểu về QuizKen, sứ mệnh cung cấp công cụ tạo bài kiểm tra AI dành cho mọi người. Công nghệ, giá trị cốt lõi, và câu chuyện phía sau ứng dụng."
+        title={t('about.meta.title')}
+        description={t('about.meta.description')}
         canonical="/about"
-        keywords={[
-          "về quizken",
-          "giới thiệu",
-          "quiz ai generator",
-          "công cụ giáo dục",
-          "AI giáo dục việt nam",
-        ]}
+        keywords={t('about.meta.keywords').split(',')}
         openGraph={{
-          title: "Về QuizKen - AI Quiz Generator",
-          description: "Tìm hiểu hành trình và sứ mệnh của QuizKen",
+          title: t('about.meta.title'),
+          description: t('about.meta.description'),
           image: "https://quizken.vercel.app/image/seo.jpg",
           url: "/about",
           type: "website",
         }}
         twitter={{
           card: "summary_large_image",
-          title: "Về QuizKen",
-          description:
-            "Nền tảng tạo bài trắc nghiệm bằng AI hàng đầu tại Việt Nam",
+          title: t('about.meta.title'),
+          description: t('about.meta.description'),
         }}
         structuredData={[
           generateOrganizationSchema(),
@@ -61,7 +56,7 @@ const About = () => {
       {/* Navbar outside ScrollSmoother for proper sticky behavior */}
       <Navbar />
 
-      <div id="smooth-wrapper">
+      <div id="smooth-wrapper" className="pt-16">
         <div id="smooth-content" className="relative">
           <div className="absolute inset-0 -z-10 opacity-5 hidden md:block">
             <ScrollVelocityContainer className="text-6xl md:text-8xl font-bold">

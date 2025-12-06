@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { ExchangeItem } from '@/lib/exchangeItems';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -14,6 +15,7 @@ interface ExchangeItemCardProps {
 }
 
 export function ExchangeItemCard({ item, userZCoin, isOwned, isPurchasing, onBuy }: ExchangeItemCardProps) {
+    const { t } = useTranslation();
     const canAfford = userZCoin >= item.price;
     const isAffordable = !isOwned && canAfford;
 
@@ -45,7 +47,7 @@ export function ExchangeItemCard({ item, userZCoin, isOwned, isPurchasing, onBuy
                                 item.type === 'powerup' ? 'bg-amber-100 text-amber-600' :
                                     'bg-emerald-100 text-emerald-600'}
                    `}>
-                        {item.type}
+                        {t(`exchange.filter.${item.type}`)}
                     </div>
                 </div>
 
@@ -56,7 +58,7 @@ export function ExchangeItemCard({ item, userZCoin, isOwned, isPurchasing, onBuy
                             <Check className="w-4 h-4 stroke-[3]" />
                         </div>
                     ) : !canAfford ? (
-                        <div className="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-400 shadow-sm" title="Không đủ coin">
+                        <div className="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-400 shadow-sm" title={t('exchange.noZCoin')}>
                             <Lock className="w-4 h-4 stroke-[3]" />
                         </div>
                     ) : null}
@@ -110,10 +112,10 @@ export function ExchangeItemCard({ item, userZCoin, isOwned, isPurchasing, onBuy
                         {isPurchasing ? (
                             <Loader2 className="w-4 h-4 animate-spin" />
                         ) : isOwned ? (
-                            "Đã sở hữu"
+                            t('exchange.owned')
                         ) : (
                             <div className="flex items-center gap-1.5">
-                                <span className={canAfford ? 'text-violet-100' : 'text-slate-500'}>Mua với</span>
+                                <span className={canAfford ? 'text-violet-100' : 'text-slate-500'}>{t('exchange.buyWith')}</span>
                                 <span className="text-lg">{item.price}</span>
                                 <Coins className={`w-4 h-4 ${canAfford ? 'text-yellow-300 fill-yellow-300' : 'text-slate-500'}`} />
                             </div>

@@ -215,7 +215,15 @@
     "library": {
         "hero": {
             "title": "Public Quiz Library",
-            "description": "Explore and use thousands of quizzes shared by the community. Learn, practice, and expand your knowledge."
+            "description": "Explore and use thousands of quizzes shared by the community. Learn, practice, and expand your knowledge.",
+            "badge": "Discover Knowledge",
+            "titlePart1": "Quiz Library",
+            "titlePart2": "AI Powered"
+        },
+        "meta": {
+            "title": "Free AI Quiz Library",
+            "description": "Explore hundreds of AI-generated quizzes on QuizKen, filter by topic and difficulty for effective practice.",
+            "keywords": "quiz library, ai quiz, free quiz, multiple choice"
         },
         "stats": {
             "quizzes": "Quizzes",
@@ -338,6 +346,7 @@
         "hard": "Hard"
     },
     "quiz": {
+        "noDescription": "No description",
         "question": "Question {{number}}",
         "of": "/ {{total}}",
         "nextButton": "Next Question",
@@ -360,6 +369,9 @@
         "studying": "Studying",
         "study": "Study",
         "card": "Card",
+        "modeTitleQuiz": "It's Quiz Time!",
+        "modeTitleFlashcard": "Flashcard Mode",
+        "topicPrefix": "Topic:",
         "downloadPDF": "Download PDF",
         "pdf": "PDF",
         "progress": "Progress",
@@ -380,7 +392,20 @@
         "answerAll": "Please answer all {{total}} questions ({{answered}}/{{total}} answered)",
         "grade": "Grade"
     },
+    "playQuiz": {
+        "notFound": {
+            "title": "Quiz Not Found",
+            "description": "This quiz may have been deleted or is not public."
+        },
+        "backToLibrary": "Back to Library",
+        "cancelQuiz": "Cancel Quiz",
+        "error": "Error",
+        "failedToLoad": "Failed to load quiz",
+        "quizIdNotFound": "Quiz ID not found"
+    },
     "quizDetail": {
+        "previewContent": "Preview Content",
+        "previewMode": "Preview Mode",
         "notFound": {
             "title": "Oops! Not Found",
             "description": "This quiz result does not exist or has been deleted."
@@ -410,6 +435,19 @@
         "welcomeBack": "Welcome back!",
         "createQuiz": "Create New Quiz",
         "error": "An error occurred while loading dashboard data. Please try again later.",
+        "loginRequired": "Login Required",
+        "loginDescription": "You need to login to view your personal dashboard.",
+        "goHome": "Go to Home",
+        "tabs": {
+            "overview": "Overview",
+            "exchange": "Shop",
+            "inventory": "Inventory",
+            "settings": "Settings"
+        },
+        "settings": {
+            "title": "API Settings",
+            "description": "Manage your AI service API keys"
+        },
         "welcome": {
             "title": "Welcome to Dashboard!",
             "description": "You don't have any learning data yet. Get started by creating a new quiz or taking existing quizzes to track your progress.",
@@ -466,6 +504,46 @@
             "deleteError": "Failed to delete quiz"
         }
     },
+    "exchange": {
+        "badge": "Magic Shop",
+        "welcome": "Welcome to",
+        "subtitle": "Shop & customize your profile.",
+        "wallet": "ZCoin Wallet",
+        "searchPlaceholder": "Search items...",
+        "noZCoin": "Not enough ZCoin",
+        "noZCoinDesc": "Earn more ZCoin!",
+        "purchaseSuccess": "Purchased successfully",
+        "purchaseSuccessDesc": "Check your inventory.",
+        "purchaseError": "Transaction error",
+        "noResults": "No items found",
+        "noResultsDesc": "Try another keyword!",
+        "owned": "Owned",
+        "buyWith": "Buy with",
+        "filter": {
+            "all": "All",
+            "avatar": "Avatar",
+            "theme": "Theme",
+            "powerup": "Power-up",
+            "document": "Documents"
+        }
+    },
+    "inventory": {
+        "title": "Inventory",
+        "badge": "Personal Inventory",
+        "welcomeTitle": "Your Bag",
+        "subtitle": "View your collected items from the shop.",
+        "itemCount": "Items",
+        "download": "Download",
+        "noResults": "No items found",
+        "noResultsDesc": "Try another keyword!",
+        "empty": {
+            "title": "Your inventory is empty",
+            "description": "Visit the shop to get some items!"
+        },
+        "item": {
+            "owned": "Owned"
+        }
+    },
     "footer": {
         "description": "Create multiple-choice quizzes with AI",
         "quickLinks": "Quick Links",
@@ -475,12 +553,22 @@
         "copyright": "© 2024 QuizKen. All rights reserved.",
         "ctaTitle": "Start creating amazing quizzes today",
         "ctaButton": "Create your first quiz",
-        "ctaSubtitle": "Join and share knowledge"
+        "ctaSubtitle": "Join and share knowledge",
+        "slogan": "\"Grow, learn, and share.\"",
+        "madeWith": "Made with",
+        "by": "by QuizKen Team",
+        "newBadge": "New!"
+    },
+    "quickGenerator": {
+        "title": "Quick Quiz Generator",
+        "description": "Enter a topic and number of questions to create a quiz instantly"
     },
     "common": {
         "loading": "Loading...",
         "error": "An error occurred",
         "success": "Success",
+        "createQuiz": "Create Quiz",
+        "scrollToGenerator": "Scroll to generator",
         "cancel": "Cancel",
         "confirm": "Confirm",
         "save": "Save",
@@ -493,7 +581,9 @@
         "previous": "Previous",
         "or": "or",
         "untitledQuiz": "Untitled Quiz",
-        "page": "Page"
+        "page": "Page",
+        "minutes": "minutes",
+        "morePages": "More pages"
     },
     "auth": {
         "redirecting": "Redirecting to Google...",
@@ -605,16 +695,118 @@
             "attempt": "Quiz Completed! +{{amount}} ZCoin, +{{xp}} XP"
         }
     },
-    "inventory": {
-        "title": "Inventory",
-        "empty": {
-            "title": "Empty Inventory",
-            "description": "You don't own any items yet. Visit the \"ZCoin Store\" to buy some!"
+    "about": {
+        "meta": {
+            "title": "About QuizKen - Free AI Quiz Platform",
+            "description": "Learn about QuizKen, our mission to provide AI-powered quiz creation tools for everyone. Technology, core values, and the story behind the app.",
+            "keywords": "about quizken, introduction, quiz ai generator, educational tools, AI education vietnam"
         },
-        "item": {
-            "owned": "Owned",
-            "unknown": "Unknown Item",
-            "noData": "No data found"
+        "hero": {
+            "greeting": "Hi, I'm",
+            "name": "Nguyen Khanh",
+            "meow": "Meow",
+            "description1": "I built",
+            "quizken": "QuizKen",
+            "description2": "to make learning",
+            "moreFun": "more fun",
+            "easier": "easier",
+            "moreEffective": "more effective",
+            "primaryCta": "Try creating a quiz",
+            "secondaryCta": "Browse the library"
+        },
+        "story": {
+            "title": "HERE'S THE STORY...",
+            "chatHeader": "Nguyen Khanh",
+            "online": "ONLINE",
+            "msg1": "Back in school, the scariest thing was hearing the teacher say:",
+            "msg1Highlight": "\"15-minute quiz!\"",
+            "msg2": "Heart pounding, mind blank... Why does testing have to be so scary?",
+            "msg2Highlight": "Why can't it be fun like a game?",
+            "msg3Part1": "And so",
+            "msg3Quizken": "Quizken",
+            "msg3Part2": "was born!",
+            "msg3Desc": "Create quizzes as fast as ordering bubble tea, learn while having fun!",
+            "inputPlaceholder": "Write a message..."
+        },
+        "features": {
+            "title": "The Elite Squad",
+            "subtitle": "Join Quizken to unlock these superpowers!",
+            "pow": "POW!",
+            "boom": "BOOM!",
+            "badge": "Special Power",
+            "items": [
+                {
+                    "title": "Lazy Learners",
+                    "desc": "The fastest way to pass without breaking a sweat."
+                },
+                {
+                    "title": "Gamers Unite",
+                    "desc": "Climb the knowledge ranks, top the classroom server."
+                },
+                {
+                    "title": "Test Anxiety Club",
+                    "desc": "A certified \"lifesaver\" community."
+                }
+            ]
+        },
+        "missionVision": {
+            "title": "NEXT CHAPTER",
+            "missionStart": "MISSION START!",
+            "missionTitle1": "Maximum",
+            "missionTitle2": "Mission",
+            "mission1": "Turn learning into an inspiring",
+            "mission1Highlight": "GAME",
+            "mission2Part1": "Use",
+            "mission2Highlight": "AI Power",
+            "mission2Part2": "to create quizzes at lightning speed (faster than flash!).",
+            "mission3": "Connect friends everywhere to share secrets.",
+            "futureSight": "FUTURE SIGHT",
+            "visionTitle1": "Unlimited",
+            "visionTitle2": "Vision",
+            "visionQuote": "\"We will build an OPEN MULTIVERSE LIBRARY! Where knowledge is not just to remember, but to...\"",
+            "visionHighlight": "OPEN MULTIVERSE LIBRARY",
+            "visionCta": "FIGHT & WIN!"
+        },
+        "values": {
+            "title": "Core Values",
+            "items": [
+                {
+                    "title": "Speed",
+                    "desc": "Fast as a Ninja! Create quizzes in a flash.",
+                    "sfx": "SWOOSH!"
+                },
+                {
+                    "title": "Passion",
+                    "desc": "Love learning like you love your crush!",
+                    "sfx": "DOKI DOKI"
+                },
+                {
+                    "title": "Community",
+                    "desc": "As lively as an Anime convention.",
+                    "sfx": "WAKU WAKU"
+                },
+                {
+                    "title": "Creativity",
+                    "desc": "Ideas exploding like fireworks.",
+                    "sfx": "KABOOM!"
+                }
+            ]
+        },
+        "shopFavorites": {
+            "title": "SHOP ITEMS",
+            "subtitle": "\"Developer's Ultimate Weapons\"",
+            "gold": "GOLD: ∞",
+            "rareItem": "RARE ITEM",
+            "new": "NEW!",
+            "clickToEquip": "CLICK TO EQUIP",
+            "emptyTitle": "Inventory is empty...",
+            "viewOnShopee": "View on Shopee"
+        },
+        "socialLinks": {
+            "title": "Connect With Me!",
+            "subtitle": "\"Don't be shy to say hi! I don't bite (probably)\"",
+            "signature": "Nguyen Khanh",
+            "signatureRole": "Creator of Quizken"
         }
     }
 }

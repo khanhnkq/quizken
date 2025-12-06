@@ -216,7 +216,15 @@
     "library": {
         "hero": {
             "title": "Thư viện Quiz Chung",
-            "description": "Khám phá và sử dụng hàng nghìn bài quiz do cộng đồng chia sẻ. Học tập, ôn luyện và mở rộng kiến thức của bạn."
+            "description": "Khám phá và sử dụng hàng nghìn bài quiz do cộng đồng chia sẻ. Học tập, ôn luyện và mở rộng kiến thức của bạn.",
+            "badge": "Khám phá tri thức",
+            "titlePart1": "Thư Viện",
+            "titlePart2": "Quiz AI"
+        },
+        "meta": {
+            "title": "Thư viện các bài tập trắc nghiệm miễn phí",
+            "description": "Khám phá hàng trăm quiz trắc nghiệm được tạo bằng AI trên QuizKen, lọc theo chủ đề và độ khó để luyện tập hiệu quả.",
+            "keywords": "thư viện quiz, quiz ai, quiz miễn phí, trắc nghiệm"
         },
         "stats": {
             "quizzes": "Quiz",
@@ -294,7 +302,7 @@
             "downloadCount": "Số lần tải PDF",
             "questions": "câu",
             "preview": "Xem trước",
-            "use": "Sử dụng"
+            "use": "Làm bài"
         }
     },
     "categories": {
@@ -339,6 +347,7 @@
         "hard": "Khó"
     },
     "quiz": {
+        "noDescription": "Không có mô tả",
         "question": "Câu {{number}}",
         "of": "/ {{total}}",
         "nextButton": "Câu tiếp theo",
@@ -360,7 +369,10 @@
         "flashcard": "Flashcard",
         "studying": "Đang học",
         "study": "Học",
-        "card": "Card",
+        "card": "Thẻ",
+        "modeTitleQuiz": "Giờ Làm Bài!",
+        "modeTitleFlashcard": "Chế Độ Thẻ",
+        "topicPrefix": "Chủ đề:",
         "downloadPDF": "Tải PDF",
         "pdf": "PDF",
         "progress": "Tiến độ",
@@ -381,7 +393,20 @@
         "answerAll": "Hãy trả lời hết tất cả {{total}} câu hỏi (Đã trả lời {{answered}}/{{total}})",
         "grade": "Chấm điểm"
     },
+    "playQuiz": {
+        "notFound": {
+            "title": "Không tìm thấy Quiz",
+            "description": "Quiz này có thể đã bị xóa hoặc không công khai."
+        },
+        "backToLibrary": "Về Thư viện",
+        "cancelQuiz": "Hủy bài làm",
+        "error": "Lỗi",
+        "failedToLoad": "Không thể tải quiz",
+        "quizIdNotFound": "Không tìm thấy ID quiz"
+    },
     "quizDetail": {
+        "previewContent": "Xem trước nội dung",
+        "previewMode": "Chế độ xem trước",
         "notFound": {
             "title": "Oops! Không tìm thấy",
             "description": "Kết quả quiz này không tồn tại hoặc đã bị xóa."
@@ -411,6 +436,19 @@
         "welcomeBack": "Chào mừng trở lại!",
         "createQuiz": "Tạo Quiz Mới",
         "error": "Đã có lỗi xảy ra khi tải dữ liệu dashboard. Vui lòng thử lại sau.",
+        "loginRequired": "Yêu cầu đăng nhập",
+        "loginDescription": "Bạn cần đăng nhập để xem dashboard cá nhân.",
+        "goHome": "Về trang chủ",
+        "tabs": {
+            "overview": "Tổng quan",
+            "exchange": "Cửa hàng",
+            "inventory": "Kho đồ",
+            "settings": "Cài đặt"
+        },
+        "settings": {
+            "title": "Cài đặt API",
+            "description": "Quản lý các API key cho dịch vụ AI"
+        },
         "welcome": {
             "title": "Chào mừng đến với Dashboard!",
             "description": "Bạn chưa có dữ liệu học tập nào. Hãy bắt đầu bằng cách tạo quiz mới hoặc làm các quiz có sẵn để theo dõi tiến trình của bạn.",
@@ -467,21 +505,71 @@
             "deleteError": "Xoá quiz thất bại"
         }
     },
+    "exchange": {
+        "badge": "Cửa hàng phép thuật",
+        "welcome": "Chào mừng đến",
+        "subtitle": "Mua sắm & trang trí hồ sơ của bạn.",
+        "wallet": "Ví ZCoin",
+        "searchPlaceholder": "Tìm vật phẩm...",
+        "noZCoin": "Không đủ ZCoin",
+        "noZCoinDesc": "Bạn cần tích thêm ZCoin nhé!",
+        "purchaseSuccess": "Đã mua thành công",
+        "purchaseSuccessDesc": "Kiểm tra kho đồ của bạn nhé.",
+        "purchaseError": "Lỗi giao dịch",
+        "noResults": "Không tìm thấy món đồ nào",
+        "noResultsDesc": "Thử tìm từ khóa khác xem sao nhé!",
+        "owned": "Đã sở hữu",
+        "buyWith": "Mua với",
+        "filter": {
+            "all": "Tất cả",
+            "avatar": "Avatar",
+            "theme": "Theme",
+            "powerup": "Power-up",
+            "document": "Tài liệu"
+        }
+    },
+    "inventory": {
+        "title": "Kho đồ",
+        "badge": "Kho đồ cá nhân",
+        "welcomeTitle": "Túi đồ của bạn",
+        "subtitle": "Xem lại các vật phẩm bạn đã sưu tầm từ cửa hàng.",
+        "itemCount": "Vật phẩm",
+        "download": "Tải xuống",
+        "noResults": "Không tìm thấy vật phẩm nào",
+        "noResultsDesc": "Thử tìm từ khóa khác xem sao nhé!",
+        "empty": {
+            "title": "Kho đồ trống",
+            "description": "Ghé cửa hàng để sắm vật phẩm nhé!"
+        },
+        "item": {
+            "owned": "Đã sở hữu"
+        }
+    },
     "footer": {
         "description": "Tạo bài kiểm tra trắc nghiệm với AI",
         "quickLinks": "Liên kết",
         "legal": "Pháp lý",
         "privacy": "Chính sách bảo mật",
         "terms": "Điều khoản sử dụng",
-        "copyright": "© 2024 QuizKen. Bảo lưu mọi quyền.",
+        "copyright": "© {{year}} QuizKen. Bảo lưu mọi quyền.",
+        "slogan": "\"Cùng nhau phát triển, học tập và chia sẻ.\"",
+        "madeWith": "Được làm bằng",
+        "by": "bởi QuizKen Team",
+        "newBadge": "Mới!",
         "ctaTitle": "Bắt đầu tạo các bài kiểm tra tuyệt vời ngay hôm nay",
         "ctaButton": "Tạo bài kiểm tra đầu tiên của bạn",
         "ctaSubtitle": "Cùng tham gia và chia sẻ kiến thức"
+    },
+    "quickGenerator": {
+        "title": "Tạo Quiz Nhanh",
+        "description": "Nhập chủ đề và số câu hỏi để tạo quiz ngay lập tức"
     },
     "common": {
         "loading": "Đang tải...",
         "error": "Có lỗi xảy ra",
         "success": "Thành công",
+        "createQuiz": "Tạo Quiz",
+        "scrollToGenerator": "Cuộn tới trình tạo quiz",
         "cancel": "Hủy",
         "confirm": "Xác nhận",
         "save": "Lưu",
@@ -494,7 +582,9 @@
         "previous": "Trước",
         "or": "hoặc",
         "untitledQuiz": "Bài kiểm tra không tên",
-        "page": "Trang"
+        "page": "Trang",
+        "minutes": "phút",
+        "morePages": "Trang khác"
     },
     "auth": {
         "redirecting": "Đang chuyển đến Google...",
@@ -606,16 +696,118 @@
             "attempt": "Hoàn thành Quiz! +{{amount}} ZCoin, +{{xp}} XP"
         }
     },
-    "inventory": {
-        "title": "Túi đồ",
-        "empty": {
-            "title": "Kho đồ trống rỗng",
-            "description": "Bạn chưa sở hữu vật phẩm nào. Hãy ghé qua \"Cửa hàng ZCoin\" để sắm sửa nhé!"
+    "about": {
+        "meta": {
+            "title": "Về QuizKen - Nền Tảng Quiz AI Miễn Phí",
+            "description": "Tìm hiểu về QuizKen, sứ mệnh cung cấp công cụ tạo bài kiểm tra AI dành cho mọi người. Công nghệ, giá trị cốt lõi, và câu chuyện phía sau ứng dụng.",
+            "keywords": "về quizken, giới thiệu, quiz ai generator, công cụ giáo dục, AI giáo dục việt nam"
         },
-        "item": {
-            "owned": "Đã sở hữu",
-            "unknown": "Vật phẩm ẩn",
-            "noData": "Không có dữ liệu"
+        "hero": {
+            "greeting": "Xin chào, mình là",
+            "name": "Nguyễn Khánh",
+            "meow": "Meow",
+            "description1": "Mình xây dựng",
+            "quizken": "QuizKen",
+            "description2": "để việc học trở nên",
+            "moreFun": "vui hơn",
+            "easier": "dễ hơn",
+            "moreEffective": "hiệu quả hơn",
+            "primaryCta": "Thử tạo bài trắc nghiệm",
+            "secondaryCta": "Dạo quanh thư viện"
+        },
+        "story": {
+            "title": "CHUYỆN LÀ THẾ NÀY...",
+            "chatHeader": "Nguyễn Khánh",
+            "online": "ONLINE",
+            "msg1": "Ngày xưa đi học, sợ nhất là nghe cô giáo nói:",
+            "msg1Highlight": "\"Kiểm tra 15 phút!\"",
+            "msg2": "Tim đập chân run, chữ nghĩa bay sạch... Tại sao kiểm tra cứ phải đáng sợ thế nhỉ?",
+            "msg2Highlight": "Sao không vui như chơi game?",
+            "msg3Part1": "Thế là",
+            "msg3Quizken": "Quizken",
+            "msg3Part2": "ra đời!",
+            "msg3Desc": "Tạo quiz nhanh như order trà sữa, vừa học vừa chơi!",
+            "inputPlaceholder": "Viết tin nhắn..."
+        },
+        "features": {
+            "title": "Biệt Đội Siêu Đẳng",
+            "subtitle": "Gia nhập Quizken để mở khóa những siêu năng lực này nhé!",
+            "pow": "POW!",
+            "boom": "BOOM!",
+            "badge": "Special Power",
+            "items": [
+                {
+                    "title": "Team Lười Học",
+                    "desc": "Cách nhanh nhất để qua môn mà không tốn sức."
+                },
+                {
+                    "title": "Team Mê Game",
+                    "desc": "Leo rank kiến thức, đua top server lớp học."
+                },
+                {
+                    "title": "Hội Sợ Thi",
+                    "desc": "Cộng đồng \"phao cứu sinh\" chính hiệu."
+                }
+            ]
+        },
+        "missionVision": {
+            "title": "CHƯƠNG TIẾP THEO",
+            "missionStart": "MISSION START!",
+            "missionTitle1": "Sứ Mệnh",
+            "missionTitle2": "Cực Đại",
+            "mission1": "Biến việc học thành",
+            "mission1Highlight": "TRÒ CHƠI",
+            "mission2Part1": "Dùng",
+            "mission2Highlight": "AI Power",
+            "mission2Part2": "tạo đề siêu tốc (nhanh hơn flash!).",
+            "mission3": "Kết nối anh em bốn phương cùng chia sẻ bí kíp.",
+            "futureSight": "FUTURE SIGHT",
+            "visionTitle1": "Tầm Nhìn",
+            "visionTitle2": "Vô Hạn",
+            "visionQuote": "\"Chúng ta sẽ xây dựng một THƯ VIỆN MỞ ĐA VŨ TRỤ! Nơi kiến thức không chỉ để nhớ, mà là để...\"",
+            "visionHighlight": "THƯ VIỆN MỞ ĐA VŨ TRỤ",
+            "visionCta": "CHIẾN & THẮNG!"
+        },
+        "values": {
+            "title": "Giá Trị Cốt Lõi",
+            "items": [
+                {
+                    "title": "Tốc Độ",
+                    "desc": "Nhanh như Ninja! Tạo đề trong tíc tắc.",
+                    "sfx": "SWOOSH!"
+                },
+                {
+                    "title": "Đam Mê",
+                    "desc": "Yêu việc học như yêu Crush!",
+                    "sfx": "DOKI DOKI"
+                },
+                {
+                    "title": "Cộng Đồng",
+                    "desc": "Đông vui như hội chợ Anime.",
+                    "sfx": "WAKU WAKU"
+                },
+                {
+                    "title": "Sáng Tạo",
+                    "desc": "Ý tưởng nổ tung như pháo hoa.",
+                    "sfx": "KABOOM!"
+                }
+            ]
+        },
+        "shopFavorites": {
+            "title": "SHOP ITEMS",
+            "subtitle": "\"Vũ khí tối thượng của Developer\"",
+            "gold": "GOLD: ∞",
+            "rareItem": "RARE ITEM",
+            "new": "NEW!",
+            "clickToEquip": "CLICK TO EQUIP",
+            "emptyTitle": "Kho hàng đang trống...",
+            "viewOnShopee": "Xem trên Shopee"
+        },
+        "socialLinks": {
+            "title": "Connect With Me!",
+            "subtitle": "\"Đừng ngại say hi! Mình không cắn đâu (chắc thế)\"",
+            "signature": "Nguyễn Khánh",
+            "signatureRole": "Creator of Quizken"
         }
     }
 }

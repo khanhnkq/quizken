@@ -12,6 +12,7 @@ import { useProgressTrend } from "@/hooks/useProgressTrend";
 import { useRecentQuizzes } from "@/hooks/useRecentQuizzes";
 import { useCreatedQuizzes } from "@/hooks/useCreatedQuizzes";
 import { supabase } from "@/integrations/supabase/client";
+import { clearQuizProgress } from "@/hooks/useQuizProgress";
 import {
   BarChart3Icon,
   PlusCircleIcon,
@@ -21,7 +22,8 @@ import {
   LayoutDashboard,
   Store,
   Package,
-  Settings
+  Settings,
+  LogOut
 } from "lucide-react";
 import { BackgroundDecorations } from "@/components/ui/BackgroundDecorations";
 import { gsap } from "gsap";
@@ -42,7 +44,7 @@ interface PersonalDashboardProps {
 
 export function PersonalDashboard({ userId }: PersonalDashboardProps) {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const { t } = useTranslation();
 
   // Fetch data using hooks
@@ -156,14 +158,14 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
                 className="flex-1 sm:flex-none relative h-16 rounded-none border-b-2 border-transparent px-2 sm:px-6 hover:bg-slate-50 hover:text-primary data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 transition-all flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 text-[10px] sm:text-sm uppercase tracking-wide sm:normal-case sm:tracking-normal"
               >
                 <LayoutDashboard className="w-5 h-5 sm:w-4 sm:h-4" />
-                <span className="hidden sm:inline">Tổng quan</span>
+                <span className="hidden sm:inline">{t('dashboard.tabs.overview')}</span>
               </TabsTrigger>
               <TabsTrigger
                 value="exchange"
                 className="flex-1 sm:flex-none relative h-16 rounded-none border-b-2 border-transparent px-2 sm:px-6 hover:bg-slate-50 hover:text-violet-600 data-[state=active]:border-violet-600 data-[state=active]:text-violet-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 transition-all flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 text-[10px] sm:text-sm uppercase tracking-wide sm:normal-case sm:tracking-normal"
               >
                 <Store className="w-5 h-5 sm:w-4 sm:h-4" />
-                <span className="hidden sm:inline">Cửa hàng</span>
+                <span className="hidden sm:inline">{t('dashboard.tabs.exchange')}</span>
               </TabsTrigger>
               <TabsTrigger
                 value="inventory"
@@ -177,11 +179,22 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
                 className="flex-1 sm:flex-none relative h-16 rounded-none border-b-2 border-transparent px-2 sm:px-6 hover:bg-slate-50 hover:text-slate-600 data-[state=active]:border-slate-600 data-[state=active]:text-slate-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 transition-all flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 text-[10px] sm:text-sm uppercase tracking-wide sm:normal-case sm:tracking-normal"
               >
                 <Settings className="w-5 h-5 sm:w-4 sm:h-4" />
-                <span className="hidden sm:inline">Cài đặt</span>
+                <span className="hidden sm:inline">{t('dashboard.tabs.settings')}</span>
               </TabsTrigger>
+              <button
+                onClick={async () => {
+                  await signOut();
+                  clearQuizProgress();
+                  navigate("/");
+                }}
+                className="flex-1 sm:flex-none relative h-16 rounded-none border-b-2 border-transparent px-2 sm:px-6 hover:bg-slate-50 hover:text-slate-600 font-bold text-slate-500 transition-all flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 text-[10px] sm:text-sm uppercase tracking-wide sm:normal-case sm:tracking-normal"
+              >
+                <LogOut className="w-5 h-5 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">{t('nav.logout')}</span>
+              </button>
             </TabsList>
 
-            {/* Right: Placeholder or User Profile (future) */}
+            {/* Right: Placeholder for balance */}
             <div className="w-[88px] shrink-0 hidden md:block"></div>
           </div>
         </div>
@@ -195,7 +208,7 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
             {/* Playful Header Section (Moved inside Overview) */}
             <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-8 pt-6">
               <div className="text-center md:text-left space-y-2">
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 backdrop-blur-sm border-2 border-[#B5CC89] text-[#B5CC89] font-bold text-sm shadow-sm animate-fade-in">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 backdrop-blur-sm border-2 border-primary text-primary font-bold text-sm shadow-sm animate-fade-in">
                   <Sparkles className="w-4 h-4 text-yellow-400 fill-yellow-400" />
                   <span>{t('dashboard.welcomeBack')}</span>
                 </div>
@@ -331,8 +344,8 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
                     <Settings className="w-5 h-5 text-slate-600" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-slate-800">Cài đặt API</h2>
-                    <p className="text-sm text-slate-500">Quản lý các API key cho dịch vụ AI</p>
+                    <h2 className="text-xl font-bold text-slate-800">{t('dashboard.settings.title')}</h2>
+                    <p className="text-sm text-slate-500">{t('dashboard.settings.description')}</p>
                   </div>
                 </div>
                 <ApiKeySettings />

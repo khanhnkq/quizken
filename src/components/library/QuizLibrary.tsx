@@ -1,6 +1,7 @@
 import * as React from "react";
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { BackgroundDecorations } from "@/components/ui/BackgroundDecorations";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -13,7 +14,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+
 import {
   Select,
   SelectContent,
@@ -39,7 +40,7 @@ import {
   ArrowDown,
 } from "@/lib/icons";
 import { warmupPdfWorker, generateAndDownloadPdf } from "@/lib/pdfWorkerClient";
-import type { Question } from "@/types/quiz";
+import type { Question, Quiz } from "@/types/quiz";
 import {
   ScrollVelocityContainer,
   ScrollVelocityRow,
@@ -63,7 +64,7 @@ import {
 import { QuizCard } from "@/components/library/QuizCard";
 import { QuizCardSkeleton } from "@/components/library/QuizCardSkeleton";
 import { useAudio } from "@/contexts/SoundContext";
-import ScrollSmoother from "gsap/ScrollSmoother";
+
 import { Eye } from "lucide-react";
 import SeoMeta from "@/components/SeoMeta";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -77,6 +78,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { PreviewModal } from "@/components/quiz/PreviewModal";
 
 interface PublicQuiz {
   id: string;
@@ -105,13 +107,14 @@ interface QuizQuestion {
 }
 
 const QuizLibrary: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const { toast } = useToast();
   const [quizzes, setQuizzes] = useState<PublicQuiz[]>([]);
   const [loading, setLoading] = useState(true);
+  const [previewQuiz, setPreviewQuiz] = useState<Quiz | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedQuiz, setSelectedQuiz] = useState<PublicQuiz | null>(null);
+
   const [sortBy, setSortBy] = useState<"usage" | "downloads" | "date">("usage");
   const [searchIn, setSearchIn] = useState<"all" | "title" | "content">("all");
   const [selectedCategory, setSelectedCategory] = useState<QuizCategory | "all">("all");
@@ -158,15 +161,7 @@ const QuizLibrary: React.FC = () => {
   const [totalItems, setTotalItems] = useState(0);
 
   const searchInputRef = React.useRef<HTMLInputElement>(null);
-  const bodyOverflowRef = React.useRef<{
-    body: string;
-    html: string;
-    touch: string;
-  }>({
-    body: "",
-    html: "",
-    touch: "",
-  });
+  /* Removed bodyOverflowRef */
 
   const [showAuthModal, setShowAuthModal] = useState(false);
   const navigate = useNavigate();
@@ -174,61 +169,10 @@ const QuizLibrary: React.FC = () => {
   const isMobile = useIsMobile();
 
   // Lock body scroll when modal is open
-  useEffect(() => {
-    if (selectedQuiz) {
-      if (
-        !bodyOverflowRef.current.body &&
-        !bodyOverflowRef.current.html &&
-        !bodyOverflowRef.current.touch
-      ) {
-        bodyOverflowRef.current = {
-          body: document.body.style.overflow,
-          html: document.documentElement.style.overflow,
-          touch: document.body.style.touchAction,
-        };
-      }
-      document.body.style.overflow = "hidden";
-      document.documentElement.style.overflow = "hidden";
-      document.body.style.touchAction = "none";
-    } else {
-      document.body.style.overflow = bodyOverflowRef.current.body || "";
-      document.documentElement.style.overflow = bodyOverflowRef.current.html || "";
-      document.body.style.touchAction = bodyOverflowRef.current.touch || "";
-      bodyOverflowRef.current = { body: "", html: "", touch: "" };
-    }
 
-    return () => {
-      document.body.style.overflow = bodyOverflowRef.current.body || "";
-      document.documentElement.style.overflow = bodyOverflowRef.current.html || "";
-      document.body.style.touchAction = bodyOverflowRef.current.touch || "";
-    };
-  }, [selectedQuiz]);
 
   // GSAP ScrollSmoother handling
-  useEffect(() => {
-    type ScrollSmootherInterface = {
-      get?: () => {
-        paused?: (v?: boolean) => void;
-        pause?: () => void;
-        resume?: () => void;
-      };
-    };
-    const smoother = (
-      ScrollSmoother as unknown as ScrollSmootherInterface
-    ).get?.();
-    if (!smoother) return;
-    try {
-      if (selectedQuiz) {
-        if (typeof smoother.paused === "function") smoother.paused(true);
-        else if (typeof smoother.pause === "function") smoother.pause();
-      } else {
-        if (typeof smoother.paused === "function") smoother.paused(false);
-        else if (typeof smoother.resume === "function") smoother.resume();
-      }
-    } catch {
-      // no-op
-    }
-  }, [selectedQuiz]);
+
 
   // Total stats from database
   const [totalStats, setTotalStats] = useState({
@@ -429,180 +373,91 @@ const QuizLibrary: React.FC = () => {
   const handleUseQuiz = async (quiz: PublicQuiz) => {
     if (!user) {
       toast({
-        title: t('library.toasts.loginRequired'),
-        description: t('library.toasts.loginDesc'),
+        title: t("library.toasts.loginRequired"),
+        description: t("library.toasts.loginDesc"),
         variant: "warning",
       });
       setShowAuthModal(true);
       return;
     }
 
-    // Increment usage count
-    try {
-      await supabase.rpc("increment_quiz_usage", { quiz_id: quiz.id });
-    } catch (error) {
-      console.error("Failed to increment usage count:", error);
-    }
-
-    // Navigate to home and open the quiz generator with selected quiz data
-    // Add scrollToQuiz flag to trigger auto-scroll
-    // Dùng query param để tránh hành vi auto-scroll mặc định của hash gây giật
-    navigate("/?scrollTo=quiz", { state: { quiz, scrollToQuiz: true } });
-
-    // Provide quick confirmation
-    toast({
-      title: t('library.toasts.openingQuiz'),
-      description: t('library.toasts.openingDesc', { title: quiz.title }),
-      variant: "success",
-    });
+    // Navigate directly to play the quiz
+    play("success");
+    navigate(`/quiz/play/${quiz.id}`);
   };
 
   return (
     <>
       <SeoMeta
-        title="Thư viện các bài tập trắc nghiệm miễn phí"
-        description="Khám phá hàng trăm quiz trắc nghiệm được tạo bằng AI trên QuizKen, lọc theo chủ đề và độ khó để luyện tập hiệu quả."
-        canonical="/library"
-        keywords={["thư viện quiz", "quiz ai", "quiz miễn phí", "trắc nghiệm"]}
+        title={t('library.meta.title')}
+        description={t('library.meta.description')}
+        canonical="/quiz/library"
+        keywords={t('library.meta.keywords').split(',')}
       />
       <Navbar />
 
-      <div className="min-h-screen" id="smooth-wrapper">
-        <div id="smooth-content">
+      <div className="min-h-screen pt-16 relative" id="smooth-wrapper">
+        <div className="fixed inset-0 z-0 pointer-events-none">
+          <BackgroundDecorations density="medium" />
+        </div>
+        <div id="smooth-content" className="relative z-10">
           {/* Hero Section */}
           <section className="relative overflow-hidden bg-gradient-to-b from-secondary/30 via-background to-background min-h-[60vh] flex flex-col justify-center py-20 px-4">
             {/* Enhanced Background Decorations */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-              {/* Animated Gradient Blobs */}
-              <div className="absolute top-10 left-[5%] w-72 h-72 bg-gradient-to-br from-primary/30 to-green-200/40 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-blob"></div>
-              <div className="absolute top-40 right-[10%] w-80 h-80 bg-gradient-to-br from-yellow-200/50 to-orange-200/30 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-2000"></div>
-              <div className="absolute bottom-20 left-[20%] w-64 h-64 bg-gradient-to-br from-pink-200/40 to-purple-200/30 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-4000"></div>
-              <div className="absolute -bottom-20 right-[25%] w-96 h-96 bg-gradient-to-br from-blue-200/30 to-cyan-200/20 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob animation-delay-3000"></div>
+              {/* Animated Gradient Blobs - Matched with Main Hero */}
+              <div className="absolute top-0 left-1/4 w-72 h-72 bg-primary/20 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>
+              <div className="absolute top-0 right-1/4 w-72 h-72 bg-purple-300/30 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
+              <div className="absolute -bottom-8 left-1/3 w-72 h-72 bg-pink-300/30 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-4000"></div>
 
-              {/* Dot Grid Pattern */}
-              <div className="absolute inset-0 opacity-[0.03] bg-[radial-gradient(circle_at_1px_1px,hsl(var(--primary))_1px,transparent_0)] bg-[length:24px_24px]"></div>
-
-              {/* Floating Geometric Shapes */}
-              <div className="absolute top-[15%] left-[8%] w-4 h-4 bg-primary/40 rounded-full animate-float" style={{ animationDelay: '0s' }}></div>
-              <div className="absolute top-[25%] right-[15%] w-3 h-3 bg-yellow-400/50 rounded-full animate-float" style={{ animationDelay: '1s' }}></div>
-              <div className="absolute top-[45%] left-[12%] w-2 h-2 bg-pink-400/40 rounded-full animate-float" style={{ animationDelay: '2s' }}></div>
-              <div className="absolute top-[35%] right-[8%] w-5 h-5 bg-green-400/30 rounded-full animate-float" style={{ animationDelay: '0.5s' }}></div>
-              <div className="absolute bottom-[30%] left-[25%] w-3 h-3 bg-purple-400/40 rounded-full animate-float" style={{ animationDelay: '1.5s' }}></div>
-              <div className="absolute bottom-[20%] right-[20%] w-4 h-4 bg-blue-400/30 rounded-full animate-float" style={{ animationDelay: '2.5s' }}></div>
-
-              {/* Decorative Rings */}
-              <div className="absolute top-[20%] right-[5%] w-24 h-24 border-2 border-primary/10 rounded-full animate-spin-slow hidden lg:block"></div>
-              <div className="absolute bottom-[25%] left-[5%] w-32 h-32 border-2 border-dashed border-yellow-300/20 rounded-full animate-spin-reverse hidden lg:block"></div>
-
-              {/* Gradient Line Accents */}
-              <div className="absolute top-[40%] left-0 w-1/3 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent"></div>
-              <div className="absolute top-[60%] right-0 w-1/4 h-px bg-gradient-to-l from-transparent via-yellow-400/20 to-transparent"></div>
-            </div>
-            {!isMobile && (
-              <div className="absolute inset-0 -z-10 opacity-5 hidden md:block">
-                <ScrollVelocityContainer className="text-6xl md:text-8xl font-bold">
-                  <ScrollVelocityRow
-                    baseVelocity={75}
-                    rowIndex={0}
-                    paused={!!selectedQuiz}>
-                    AI Education Smart Learning Intelligent Teaching Digital
-                    Classroom
-                  </ScrollVelocityRow>
-                  <ScrollVelocityRow
-                    baseVelocity={75}
-                    rowIndex={1}
-                    paused={!!selectedQuiz}>
-                    Adaptive Assessment Personalized Learning Virtual Teacher
-                    Cognitive Training
-                  </ScrollVelocityRow>
-                  <ScrollVelocityRow
-                    baseVelocity={75}
-                    rowIndex={2}
-                    paused={!!selectedQuiz}>
-                    Educational Analytics Student Engagement Knowledge Discovery
-                    Learning Analytics
-                  </ScrollVelocityRow>
-                  <ScrollVelocityRow
-                    baseVelocity={75}
-                    rowIndex={3}
-                    paused={!!selectedQuiz}>
-                    Artificial Intelligence Machine Learning Neural Networks
-                    Cognitive Computing
-                  </ScrollVelocityRow>
-                  <ScrollVelocityRow
-                    baseVelocity={75}
-                    rowIndex={4}
-                    paused={!!selectedQuiz}>
-                    Interactive Assessment Educational Technology Intelligent
-                    Tutoring Automated Grading
-                  </ScrollVelocityRow>
-                  <ScrollVelocityRow
-                    baseVelocity={75}
-                    rowIndex={5}
-                    paused={!!selectedQuiz}>
-                    AI Education Smart Learning Intelligent Teaching Digital
-                    Classroom
-                  </ScrollVelocityRow>
-                  <ScrollVelocityRow
-                    baseVelocity={75}
-                    rowIndex={6}
-                    paused={!!selectedQuiz}>
-                    Adaptive Assessment Personalized Learning Virtual Teacher
-                    Cognitive Training
-                  </ScrollVelocityRow>
-                  <ScrollVelocityRow
-                    baseVelocity={75}
-                    rowIndex={7}
-                    paused={!!selectedQuiz}>
-                    Educational Analytics Student Engagement Knowledge Discovery
-                    Learning Analytics
-                  </ScrollVelocityRow>
-                  <ScrollVelocityRow
-                    baseVelocity={75}
-                    rowIndex={8}
-                    paused={!!selectedQuiz}>
-                    Artificial Intelligence Machine Learning Neural Networks
-                    Cognitive Computing
-                  </ScrollVelocityRow>
-                  <ScrollVelocityRow
-                    baseVelocity={75}
-                    rowIndex={9}
-                    paused={!!selectedQuiz}>
-                    Interactive Assessment Educational Technology Intelligent
-                    Tutoring Automated Grading
-                  </ScrollVelocityRow>
-                </ScrollVelocityContainer>
+              {/* Floating Icons Style from Hero.tsx */}
+              <div className="hidden lg:block absolute inset-0">
+                <div className="absolute top-[10%] left-[15%] animate-float hover:scale-110 transition-transform duration-1000">
+                  <div className="bg-white p-4 rounded-2xl shadow-lg border border-border/50 rotate-[-10deg]">
+                    <div className="w-8 h-8 text-primary flex items-center justify-center text-3xl">🧠</div>
+                  </div>
+                </div>
+                <div className="absolute top-[20%] right-[15%] animate-float animation-delay-2000 hover:scale-110 transition-transform duration-1000">
+                  <div className="bg-white p-4 rounded-2xl shadow-lg border border-border/50 rotate-[10deg]">
+                    <div className="w-8 h-8 text-yellow-400 flex items-center justify-center text-3xl">✨</div>
+                  </div>
+                </div>
+                <div className="absolute bottom-[40%] left-[20%] animate-float animation-delay-4000 hover:scale-110 transition-transform duration-1000">
+                  <div className="bg-white p-4 rounded-2xl shadow-lg border border-border/50 rotate-[5deg]">
+                    <div className="w-8 h-8 text-blue-400 flex items-center justify-center text-3xl">🧩</div>
+                  </div>
+                </div>
               </div>
-            )}
-            {/* Peeking Mascots - Just like Footer */}
-            <div className="absolute top-24 left-[8%] opacity-30 hidden md:block animate-bounce-slow" style={{ animationDelay: '0s' }}>
-              <Star className="w-20 h-20 text-primary rotate-[-12deg]" />
-            </div>
-            <div className="absolute top-32 right-[12%] opacity-30 hidden md:block animate-bounce-slow" style={{ animationDelay: '1s' }}>
-              <Sparkles className="w-16 h-16 text-[#B5CC89] rotate-[12deg]" />
-            </div>
-            <div className="absolute bottom-48 left-[15%] opacity-20 hidden lg:block animate-bounce-slow" style={{ animationDelay: '0.5s' }}>
-              <TrendingUp className="w-14 h-14 text-primary rotate-[6deg]" />
-            </div>
-            <div className="absolute bottom-56 right-[18%] opacity-20 hidden lg:block animate-bounce-slow" style={{ animationDelay: '1.5s' }}>
-              <BookOpen className="w-18 h-18 text-[#B5CC89] rotate-[-8deg]" />
             </div>
 
             <div className="container mx-auto max-w-4xl text-center relative z-10">
-              {/* Bouncy Icon Badge - Like Footer */}
-              <div className="inline-flex justify-center p-5 bg-white/60 backdrop-blur-sm rounded-full shadow-xl mb-6 animate-bounce-slow border-4 border-white/50">
-                <BookOpen className="w-14 h-14 text-[#B5CC89]" />
+              {/* Badge */}
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary font-medium text-sm animate-fade-in mx-auto mb-8">
+                <span className="text-lg">✨</span>
+                <span>{t('library.hero.badge')}</span>
               </div>
 
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold font-heading bg-gradient-to-br from-primary to-primary/60 bg-clip-text text-transparent mb-4">
-                {t('library.hero.title')}
+              <h1 className="font-heading text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[1.1] md:leading-tight text-foreground drop-shadow-sm mb-6">
+                <span className="relative inline-block">
+                  {t('library.hero.titlePart1')}
+                  <svg className="absolute -bottom-2 left-0 w-full h-3 text-yellow-300 -z-10" viewBox="0 0 100 10" preserveAspectRatio="none">
+                    <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="8" fill="none" />
+                  </svg>
+                </span>{" "}
+                <span className="text-primary relative inline-block">
+                  {t('library.hero.titlePart2')}
+                  <svg className="absolute -bottom-2 left-0 w-full h-3 text-pink-300 -z-10 opacity-70" viewBox="0 0 100 10" preserveAspectRatio="none">
+                    <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="8" fill="none" />
+                  </svg>
+                </span>
               </h1>
-              <p className="text-xl text-muted-foreground font-medium max-w-2xl mx-auto mb-8">
+
+              <p className="text-xl md:text-2xl text-muted-foreground font-medium max-w-2xl mx-auto mb-10 leading-relaxed">
                 {t('library.hero.description')}
               </p>
             </div>
 
-            <div className="container mx-auto max-w-6xl">
+            <div className="container mx-auto max-w-6xl relative z-10">
               {/* Stats - Playful Cards */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
                 {/* Quizzes Card */}
@@ -661,7 +516,7 @@ const QuizLibrary: React.FC = () => {
               </div>
 
               {/* Search & Filters */}
-              <div className="max-w-4xl mx-auto mb-12 space-y-4">
+              <div className="max-w-4xl mx-auto mb-12 space-y-4 relative z-10">
                 {/* Search Bar */}
                 <div className="relative">
                   <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-8 w-8 text-primary/40" />
@@ -751,7 +606,7 @@ const QuizLibrary: React.FC = () => {
                   {debouncedQuery && (
                     <Badge
                       variant="secondary"
-                      className="bg-[#B5CC89]/20 text-[#B5CC89] px-4 py-2">
+                      className="bg-primary/20 text-primary px-4 py-2">
                       {t('library.search.resultsCount', { count: totalItems })}
                     </Badge>
                   )}
@@ -762,7 +617,7 @@ const QuizLibrary: React.FC = () => {
               {loading ? (
                 <div
                   data-lib-list
-                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-500">
+                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-500 relative z-10">
                   {[...Array(6)].map((_, i) => (
                     <QuizCardSkeleton key={i} />
                   ))}
@@ -770,7 +625,7 @@ const QuizLibrary: React.FC = () => {
               ) : (
                 <div
                   data-lib-list
-                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-500">
+                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-500 relative z-10">
                   {quizzes.map((quiz, index) => (
                     <div
                       key={quiz.id}
@@ -779,9 +634,28 @@ const QuizLibrary: React.FC = () => {
                     >
                       <QuizCard
                         quiz={quiz}
-                        onPreview={() => setSelectedQuiz(quiz)}
+                        onPreview={() => {
+                          const normalizedQuestions = normalizeToQuestions(
+                            Array.isArray(quiz.questions)
+                              ? quiz.questions
+                              : JSON.parse(String(quiz.questions || "[]"))
+                          );
+                          setPreviewQuiz({
+                            ...quiz,
+                            questions: normalizedQuestions,
+                          } as Quiz);
+                        }}
                         onUse={() => handleUseQuiz(quiz)}
                         onDownload={async () => {
+                          if (!user) {
+                            toast({
+                              title: t("library.toasts.loginRequired"),
+                              description: t("library.toasts.loginDesc"),
+                              variant: "warning",
+                            });
+                            setShowAuthModal(true);
+                            return;
+                          }
                           try {
                             // Increment PDF download count
                             await supabase.rpc("increment_quiz_pdf_download", {
@@ -809,6 +683,7 @@ const QuizLibrary: React.FC = () => {
                               questions: questionsArray,
                               showResults: false,
                               userAnswers: [],
+                              locale: i18n.language,
                             });
 
                             toast({
@@ -942,221 +817,17 @@ const QuizLibrary: React.FC = () => {
             </div>
           </section >
 
-          {/* Selected Quiz Preview Modal */}
-          <Dialog
-            open={!!selectedQuiz}
-            onOpenChange={(open) => {
-              if (!open) setSelectedQuiz(null);
-            }}>
-            <DialogContent className="p-0 w-full max-w-4xl rounded-3xl border-4 border-primary/20 overflow-hidden shadow-2xl bg-card sm:max-h-[90vh] max-h-[95vh] flex flex-col">
-              <DialogTitle className="sr-only">
-                {selectedQuiz
-                  ? t('library.preview.titleWithName', { name: selectedQuiz.title })
-                  : t('library.preview.title')}
-              </DialogTitle>
 
-              {/* Header - Game Cartridge Style */}
-              <div className="relative overflow-hidden bg-gradient-to-br from-secondary/50 to-secondary/20 p-6 sm:p-8 border-b-2 border-border/30 flex-shrink-0">
-                {/* Decorative Pattern */}
-                <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_1px_1px,hsl(var(--primary))_1px,transparent_0)] bg-[length:16px_16px]" />
+          <PreviewModal
+            quiz={previewQuiz}
+            open={!!previewQuiz}
+            onOpenChange={(open) => !open && setPreviewQuiz(null)}
+            onPlay={(quiz) => handleUseQuiz(quiz as unknown as PublicQuiz)}
+          />
 
-                {/* Floating Icon */}
-                <div className="absolute -right-6 -bottom-6 text-primary/10 transform rotate-12">
-                  <BookOpen className="w-32 h-32" />
-                </div>
-
-                {/* Close Button */}
-                <div className="absolute top-4 right-4 z-20">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedQuiz(null);
-                    }}
-                    className="h-12 w-12 rounded-full border-4 border-border bg-white text-muted-foreground hover:border-destructive/50 hover:bg-destructive/10 hover:text-destructive active:scale-95 transition-all duration-200 shadow-lg"
-                    aria-label={t('common.close')}>
-                    <X className="w-6 h-6" />
-                  </Button>
-                </div>
-
-                <div className="pr-16 relative z-10">
-                  {/* Badges */}
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    {selectedQuiz && (
-                      <Badge variant="secondary" className="rounded-xl border-2 border-white/50 shadow-sm bg-white/80 backdrop-blur-sm text-primary hover:bg-white">
-                        {t(getCategoryLabel(selectedQuiz.category))}
-                      </Badge>
-                    )}
-                    {selectedQuiz && selectedQuiz.difficulty && (
-                      <Badge className={cn(
-                        "rounded-full border-2 px-3 py-1 font-heading uppercase text-[10px] tracking-wider shadow-sm",
-                        selectedQuiz.difficulty === "easy" && "bg-green-100 text-green-700 border-green-200",
-                        selectedQuiz.difficulty === "medium" && "bg-yellow-100 text-yellow-700 border-yellow-200",
-                        selectedQuiz.difficulty === "hard" && "bg-red-100 text-red-700 border-red-200"
-                      )}>
-                        {t(getDifficultyLabel(selectedQuiz.difficulty))}
-                      </Badge>
-                    )}
-                  </div>
-
-                  {/* Title */}
-                  <h2 className="text-2xl sm:text-3xl font-heading font-bold text-foreground mb-2 leading-tight">
-                    {selectedQuiz?.title}
-                  </h2>
-
-                  {/* Description */}
-                  {selectedQuiz?.description && (
-                    <p className="text-muted-foreground font-medium text-base">
-                      {selectedQuiz.description}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              {/* Scrollable Content */}
-              <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-6 bg-card">
-                {selectedQuiz && (
-                  <>
-                    {/* Stats Bubbles */}
-                    <div className="flex flex-wrap gap-3">
-                      <div className="flex items-center gap-1.5 bg-secondary/40 rounded-full px-4 py-2 text-sm font-medium text-muted-foreground">
-                        <BookOpen className="w-4 h-4" />
-                        <span>{Array.isArray(selectedQuiz.questions) ? selectedQuiz.questions.length : 0} {t('library.preview.questions')}</span>
-                      </div>
-                      <div className="flex items-center gap-1.5 bg-green-50 text-green-600 rounded-full px-4 py-2 text-sm font-medium">
-                        <TrendingUp className="w-4 h-4" />
-                        <span>{selectedQuiz.usage_count || 0} {t('library.preview.plays')}</span>
-                      </div>
-                      <div className="flex items-center gap-1.5 bg-blue-50 text-blue-600 rounded-full px-4 py-2 text-sm font-medium">
-                        <Clock className="w-4 h-4" />
-                        <span>{formatDate(selectedQuiz.created_at)}</span>
-                      </div>
-                    </div>
-
-                    {/* Tags */}
-                    {selectedQuiz.tags && selectedQuiz.tags.length > 0 && (
-                      <div>
-                        <QuizTags tags={selectedQuiz.tags} maxTags={5} />
-                      </div>
-                    )}
-
-                    {/* Questions List */}
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-2 mb-4">
-                        <div className="h-0.5 flex-1 bg-border rounded-full"></div>
-                        <span className="text-xs font-heading uppercase tracking-widest text-muted-foreground">{t('library.preview.questionsPreview')}</span>
-                        <div className="h-0.5 flex-1 bg-border rounded-full"></div>
-                      </div>
-
-                      {Array.isArray(selectedQuiz.questions) && selectedQuiz.questions.length > 0 ? (
-                        (selectedQuiz.questions as QuizQuestion[]).map((q, idx) => (
-                          <div
-                            key={idx}
-                            className="group bg-white border-2 border-border/50 rounded-2xl p-5 hover:border-primary/40 hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
-                          >
-                            <div className="flex gap-4">
-                              <div className="flex-shrink-0 w-10 h-10 bg-primary text-white rounded-xl flex items-center justify-center font-heading font-bold text-lg group-hover:scale-110 transition-transform">
-                                {idx + 1}
-                              </div>
-                              <div className="flex-1 space-y-3">
-                                <h4 className="font-heading font-semibold text-base text-foreground leading-snug">
-                                  {q.question || t('library.preview.noQuestionContent')}
-                                </h4>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                  {Array.isArray(q.options) && q.options.map((opt, optIdx) => (
-                                    <div key={optIdx} className="flex items-start gap-2 text-sm font-medium text-muted-foreground bg-secondary/30 p-2 rounded-lg">
-                                      <span className="w-5 h-5 bg-white border-2 border-border rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0">
-                                        {String.fromCharCode(65 + optIdx)}
-                                      </span>
-                                      <span>{opt}</span>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        ))
-                      ) : (
-                        <div className="text-center py-12 text-muted-foreground italic bg-secondary/20 rounded-2xl border-2 border-dashed border-border">
-                          {t('library.preview.noQuestions')}
-                        </div>
-                      )}
-                    </div>
-                  </>
-                )}
-              </div>
-
-              {/* Action Footer */}
-              <div className="p-5 border-t-2 border-border/30 bg-secondary/10 flex flex-col sm:flex-row gap-3 items-center justify-between flex-shrink-0">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={async () => {
-                    if (!selectedQuiz) return;
-                    try {
-                      await supabase.rpc("increment_quiz_pdf_download", { quiz_id: selectedQuiz.id });
-                      // @ts-ignore
-                      const questionsArray: Question[] = selectedQuiz.questions || [];
-                      const title = selectedQuiz.title || "quiz";
-                      const filename = `${title.replace(/\s+/g, "-").toLowerCase() || "quiz"}.pdf`;
-                      await warmupPdfWorker().catch(() => { });
-                      await generateAndDownloadPdf({
-                        filename,
-                        title,
-                        description: selectedQuiz.description || "",
-                        questions: questionsArray,
-                        showResults: false,
-                        userAnswers: [],
-                      });
-                      toast({ title: t("library.toasts.pdfDownloaded"), description: t("library.toasts.pdfSaved", { filename }), variant: "default" });
-                    } catch (e) {
-                      console.error("Download quiz PDF error:", e);
-                      toast({ title: t("library.toasts.pdfError"), description: t("library.toasts.pdfErrorDesc"), variant: "destructive" });
-                    }
-                  }}
-                  className="h-12 w-12 rounded-3xl border-4 border-border bg-white text-muted-foreground hover:border-blue-400 hover:bg-blue-50 hover:text-blue-500 active:scale-95 transition-all duration-200"
-                  title={t("library.tooltips.downloadPdf")}
-                >
-                  <Download className="w-5 h-5" />
-                </Button>
-
-                <div className="flex gap-3 w-full sm:w-auto">
-                  <Button
-                    variant="ghost"
-                    onClick={() => {
-                      if (selectedQuiz) {
-                        play("click");
-                        navigate(`/quiz/${selectedQuiz.id}?mode=flashcard`);
-                      }
-                    }}
-                    className="flex-1 sm:flex-none h-12 px-6 rounded-3xl border-4 border-border bg-white text-muted-foreground hover:border-primary/50 hover:bg-primary/10 hover:text-primary active:scale-95 transition-all duration-200 font-heading"
-                  >
-                    <BookOpen className="w-4 h-4 mr-2" />
-                    Flashcard
-                  </Button>
-
-                  <Button
-                    variant="hero"
-                    onClick={() => {
-                      if (selectedQuiz) {
-                        play("success");
-                        navigate(`/quiz/${selectedQuiz.id}`);
-                      }
-                    }}
-                    className="flex-1 sm:flex-none rounded-3xl font-heading shadow-xl border-4 border-primary hover:border-primary-foreground/50 active:scale-95 transition-all duration-200 text-sm bg-primary text-white"
-                    size="lg"
-                  >
-                    <Sparkles className="w-4 h-4 mr-1.5" />
-                    {t('library.preview.startQuiz')}
-                  </Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
           <AuthModal open={showAuthModal} onOpenChange={setShowAuthModal} />
-        </div >
-      </div >
+        </div>
+      </div>
     </>
   );
 };

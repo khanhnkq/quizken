@@ -38,7 +38,7 @@ const Footer = () => {
         <Star className="w-24 h-24 text-primary rotate-[-12deg]" />
       </div>
       <div className="absolute top-20 right-[15%] opacity-20 hidden md:block animate-bounce-slow" style={{ animationDelay: '1s' }}>
-        <Music className="w-20 h-20 text-[#B5CC89] rotate-[12deg]" />
+        <Music className="w-20 h-20 text-primary rotate-[12deg]" />
       </div>
       <div className="absolute bottom-32 left-[20%] opacity-10 hidden lg:block animate-bounce-slow" style={{ animationDelay: '0.5s' }}>
         <Heart className="w-16 h-16 text-primary rotate-[6deg]" />
@@ -48,7 +48,7 @@ const Footer = () => {
       <div className="relative container mx-auto px-4 z-10">
         <div className="max-w-3xl mx-auto text-center space-y-8">
           <div className="inline-flex justify-center p-4 bg-white/50 backdrop-blur-sm rounded-full shadow-lg mb-4 animate-bounce-slow">
-            <Sparkles className="w-12 h-12 text-[#B5CC89]" />
+            <Sparkles className="w-12 h-12 text-primary" />
           </div>
 
           <div className="space-y-4">
@@ -69,7 +69,7 @@ const Footer = () => {
               className="relative z-10 px-10 py-8 text-xl rounded-[2rem] shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border-[6px] border-white/50 hover:border-white ring-4 ring-primary/20 hover:ring-primary/40 group overflow-visible"
             >
               <span className="mr-3">{t('footer.ctaButton')}</span>
-              <div className="bg-[#B5CC89] p-1.5 rounded-xl group-hover:rotate-12 transition-transform duration-300 shadow-sm">
+              <div className="bg-primary p-1.5 rounded-xl group-hover:rotate-12 transition-transform duration-300 shadow-sm">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="w-6 h-6 text-white group-hover:scale-110 transition-transform"
@@ -87,7 +87,7 @@ const Footer = () => {
 
               {/* Cute Badge floating on button */}
               <div className="absolute -top-3 -right-3 bg-red-400 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md transform rotate-12 animate-pulse">
-                New!
+                {t('footer.newBadge', 'New!')}
               </div>
             </Button>
           </div>
@@ -98,12 +98,12 @@ const Footer = () => {
       <div className="relative container mx-auto px-4 mt-24">
         <div className="border-t-2 border-dashed border-primary/20 pt-8 flex flex-col items-center justify-center gap-3">
           <p className="flex items-center gap-2 text-muted-foreground font-medium">
-            <span>Made with</span>
+            <span>{t('footer.madeWith')}</span>
             <Heart className="w-5 h-5 text-red-500 fill-red-500 animate-heart-beat" />
-            <span>by Quizken Team</span>
+            <span>{t('footer.by')}</span>
           </p>
           <p className="text-sm text-muted-foreground/60">
-            © {new Date().getFullYear()} Quizken. "Grow, learn, and share."
+            {t('footer.copyright', { year: new Date().getFullYear() })} {t('footer.slogan')}
           </p>
         </div>
       </div>

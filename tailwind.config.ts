@@ -115,12 +115,18 @@ export default {
             transform: "translateY(0px)",
           },
         },
+        marquee: {
+          from: { transform: "translateX(0)" },
+          to: { transform: "translateX(-100%)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         blob: "blob 7s infinite",
         float: "float 6s ease-in-out infinite",
+        marquee: "marquee 25s linear infinite",
+        "marquee-slow": "marquee 45s linear infinite",
       },
     },
   },

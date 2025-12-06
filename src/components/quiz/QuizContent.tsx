@@ -2,7 +2,7 @@ import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Download, Sparkles, BookOpen, Brain } from "@/lib/icons";
+import { Download, Sparkles, BookOpen, Brain, Clock } from "@/lib/icons";
 import { BackgroundDecorations } from "@/components/ui/BackgroundDecorations";
 import {
   Card,
@@ -41,6 +41,7 @@ interface QuizContentProps {
   calculateScore: () => number;
   onDownload: () => Promise<void> | void;
   userId?: string;
+  startTime?: number;
 }
 
 // Submit quiz attempt via Edge Function for SERVER-SIDE score validation
@@ -106,6 +107,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
   calculateScore,
   onDownload,
   userId,
+  startTime,
 }) => {
   const { t } = useTranslation();
   const { toast } = useToast();
@@ -113,8 +115,6 @@ export const QuizContent: React.FC<QuizContentProps> = ({
   const {
     activateFlashcard,
     deactivateFlashcard,
-    saveFlashcardProgress,
-    getFlashcardProgress,
   } =
     useFlashcardPersistence(null);
   const [showFlashcard, setShowFlashcard] = React.useState(false);
@@ -132,8 +132,52 @@ export const QuizContent: React.FC<QuizContentProps> = ({
     }
   }, []);
 
+  const [timerSeconds, setTimerSeconds] = React.useState(0);
+
+  // Timer logic: Sync with real startTime and run interval
+  React.useEffect(() => {
+    const hasStarted = userAnswers.some(a => a !== -1);
+
+    // If we have a startTime and the quiz has started (or we have previous answers), sync the timer
+    if (startTime && hasStarted) {
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      setTimerSeconds(elapsed > 0 ? elapsed : 0);
+    } else {
+      setTimerSeconds(0);
+    }
+
+    let interval: NodeJS.Timeout;
+
+    if (hasStarted && !showResults) {
+      interval = setInterval(() => {
+        // We calculate from startTime if available to be robust against drift
+        if (startTime) {
+          const elapsed = Math.floor((Date.now() - startTime) / 1000);
+          setTimerSeconds(elapsed > 0 ? elapsed : 0);
+        } else {
+          setTimerSeconds(prev => prev + 1);
+        }
+      }, 1000);
+    }
+
+    return () => clearInterval(interval);
+  }, [userAnswers, showResults, startTime]);
+
+  // Reset timer on reset
+  React.useEffect(() => {
+    if (!userAnswers.some(a => a !== -1)) {
+      setTimerSeconds(0);
+    }
+  }, [userAnswers]);
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
   const answeredCount = React.useMemo(
-    () => userAnswers.filter((ans) => ans !== undefined).length,
+    () => userAnswers.filter((ans) => ans !== undefined && ans !== -1).length,
     [userAnswers]
   );
 
@@ -158,13 +202,13 @@ export const QuizContent: React.FC<QuizContentProps> = ({
   const handleNavigateQuestion = (index: number, highlight: boolean = true) => {
     const target = questionRefs.current[index];
     if (target) {
-      killActiveScroll();
-      scrollToTarget(target, { align: "center" });
+      // Use native scrollIntoView with smooth behavior - reliable and respects scroll-padding
+      target.scrollIntoView({ behavior: "smooth", block: "center" });
 
       if (highlight) {
-        target.classList.add("ring", "ring-[#B5CC89]", "ring-offset-2");
+        target.classList.add("ring", "ring-primary", "ring-offset-2");
         window.setTimeout(() => {
-          target.classList.remove("ring", "ring-[#B5CC89]", "ring-offset-2");
+          target.classList.remove("ring", "ring-primary", "ring-offset-2");
         }, 1200);
       }
     }
@@ -220,17 +264,53 @@ export const QuizContent: React.FC<QuizContentProps> = ({
     <section
       ref={sectionRef}
       id="quiz"
-      className="quiz-content relative overflow-hidden bg-gradient-to-b from-background to-secondary/20 py-20 px-0 sm:px-4">
-
-      <BackgroundDecorations />
+      className="quiz-content relative py-20 px-0 sm:px-4">
 
       <div className="mx-auto max-w-4xl px-2 sm:px-4 relative z-10">
-        <div className="text-center mb-12">
-          <div className="flex justify-center mb-6">
-            <Sparkles className="w-12 h-12 text-[#B5CC89]" />
+        <div className="text-center mb-12 relative py-4">
+          {/* Animated Background Blobs - Playful Colors */}
+          <div className="absolute top-1/2 left-1/4 w-48 h-48 bg-yellow-200/40 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-blob"></div>
+          <div className="absolute top-0 right-1/4 w-48 h-48 bg-purple-200/40 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-blob animation-delay-2000"></div>
+          <div className="absolute -bottom-8 left-1/3 w-48 h-48 bg-pink-200/40 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-blob animation-delay-4000"></div>
+
+          {/* Floating Cute Icons */}
+          <div className="absolute top-0 left-[15%] hidden md:block animate-float">
+            <div className="bg-white p-3 rounded-2xl shadow-lg border-2 border-primary/20 rotate-[-12deg]">
+              <Brain className="w-6 h-6 text-primary" />
+            </div>
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold">{quiz.title}</h2>
-          <p className="text-lg text-muted-foreground">
+          <div className="absolute bottom-10 right-[15%] hidden md:block animate-float animation-delay-2000">
+            <div className="bg-white p-3 rounded-2xl shadow-lg border-2 border-yellow-400/20 rotate-[12deg]">
+              <Sparkles className="w-6 h-6 text-yellow-400" />
+            </div>
+          </div>
+
+          {/* TOP ENTRY: Badge / Topic Name - High Visibilty */}
+          <div className="relative z-20 flex flex-col items-center justify-center -mt-4 mb-4">
+            <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/90 backdrop-blur-sm border-2 border-primary/20 text-primary font-bold shadow-sm hover:scale-105 transition-transform duration-300 cursor-default">
+              <span className="text-sm uppercase tracking-wider text-muted-foreground mr-1">{t('quizContent.topicPrefix')}</span>
+              <span className="text-base">{quiz.title}</span>
+              <div className="w-px h-4 bg-border mx-1"></div>
+              <Badge variant="secondary" className="text-xs font-bold rounded-lg px-2">
+                {quiz.questions.length} {t('quizContent.questions')}
+              </Badge>
+            </div>
+          </div>
+
+          {/* Main Playful Title */}
+          <h1 className="font-heading text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight text-foreground drop-shadow-sm mb-4 relative inline-block z-10">
+            <span className="relative z-10 bg-gradient-to-r from-primary to-emerald-600 bg-clip-text text-transparent">
+              {showFlashcard ? t('quizContent.modeTitleFlashcard') : t('quizContent.modeTitleQuiz')}
+            </span>
+            {/* Cute wavy underline */}
+            <svg className="absolute -bottom-3 left-0 w-full h-4 text-yellow-300 -z-10 opacity-80" viewBox="0 0 100 10" preserveAspectRatio="none">
+              <path d="M0 5 Q 25 10 50 5 T 100 5" stroke="currentColor" strokeWidth="8" fill="none" strokeLinecap="round" />
+            </svg>
+            {/* Cute Sparkle Decor */}
+            <Sparkles className="absolute -top-6 -right-8 w-10 h-10 text-yellow-400 animate-bounce-slow" />
+          </h1>
+
+          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto font-medium leading-relaxed relative z-10">
             {quiz.description || t('quizContent.defaultDescription')}
           </p>
         </div>
@@ -246,27 +326,14 @@ export const QuizContent: React.FC<QuizContentProps> = ({
               ref={cardRef}
               className="border-4 border-primary/20 rounded-3xl shadow-2xl bg-white/90 backdrop-blur-md overflow-hidden">
               <CardHeader className="pb-6">
-                <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="flex flex-wrap items-center gap-2 mb-2">
-                      <Badge variant="secondary" className="font-heading rounded-xl px-3 py-1">{t('quizContent.badge')}</Badge>
-                      <Badge className="text-xs font-heading rounded-xl px-3 py-1">
-                        {quiz.questions.length} {t('quizContent.questions')}
-                        {tokenUsage && (
-                          <span className="ml-1 opacity-75 font-sans">
-                            ({tokenUsage.total} token)
-                          </span>
-                        )}
-                      </Badge>
-                    </div>
-                    <CardTitle className="text-3xl md:text-4xl font-heading text-primary">
-                      {quiz.title}
-                    </CardTitle>
-                    <CardDescription className="mt-1">
-                      {quiz.description}
-                    </CardDescription>
+                <div className="flex flex-col-reverse sm:flex-row items-center justify-between gap-4 mb-6">
+                  {/* Left: Stopwatch Timer */}
+                  <div className={`flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/50 border-2 border-border/50 transition-opacity duration-500 ${userAnswers.some(a => a !== -1) ? 'opacity-100' : 'opacity-40'}`}>
+                    <Clock className="w-5 h-5 text-primary animate-pulse" />
+                    <span className="font-mono font-bold text-lg text-primary">{formatTime(timerSeconds)}</span>
                   </div>
-                  <div className="flex gap-2 w-full lg:w-auto">
+
+                  <div className="flex flex-wrap justify-center sm:justify-end gap-2 w-full sm:w-auto">
                     {showResults && (
                       <Button
                         onClick={() => {
@@ -276,7 +343,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                         variant="outline"
                         size="default"
                         sound="alert"
-                        className="flex-1 lg:flex-initial rounded-3xl border-4 border-border hover:bg-destructive hover:text-white hover:border-destructive transition-all duration-200 active:scale-95">
+                        className="flex-1 sm:flex-none rounded-3xl border-4 border-border hover:bg-destructive hover:text-white hover:border-destructive transition-all duration-200 active:scale-95">
                         {t('quizContent.retake')}
                       </Button>
                     )}
@@ -287,9 +354,9 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                       variant={showFlashcard ? "default" : "outline"}
                       size="default"
                       sound="success"
-                      className={`flex-1 lg:flex-initial rounded-3xl border-4 transition-all duration-200 active:scale-95 ${showFlashcard
-                        ? "bg-[#B5CC89] text-white border-[#B5CC89] hover:bg-[#B5CC89]/90 shadow-lg scale-105"
-                        : "border-border hover:border-[#B5CC89] text-muted-foreground hover:text-[#B5CC89] hover:bg-[#B5CC89]/10"
+                      className={`flex-1 sm:flex-none rounded-3xl border-4 transition-all duration-200 active:scale-95 ${showFlashcard
+                        ? "bg-primary text-white border-primary hover:bg-primary/90 shadow-lg scale-105"
+                        : "border-border hover:border-primary text-muted-foreground hover:text-primary hover:bg-primary/10"
                         }`}>
                       <BookOpen className="mr-2 h-4 w-4" />
                       <span className="hidden xs:inline">
@@ -304,7 +371,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                       variant="outline"
                       size="default"
                       sound="success"
-                      className="flex-1 lg:flex-initial rounded-3xl border-4 border-border hover:border-primary hover:text-primary hover:bg-primary/10 transition-all duration-200 active:scale-95">
+                      className="flex-1 sm:flex-none rounded-3xl border-4 border-border hover:border-primary hover:text-primary hover:bg-primary/10 transition-all duration-200 active:scale-95">
                       <Download className="mr-2 h-4 w-4" />
                       <span className="hidden xs:inline">{t('quizContent.downloadPDF')}</span>
                       <span className="xs:hidden">{t('quizContent.pdf')}</span>
@@ -312,19 +379,26 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                   </div>
                 </div>
 
-                <div className="mt-4">
+                <div className="mt-0">
                   <div className="flex items-center justify-between mb-2 text-sm text-muted-foreground">
                     <span>{t('quizContent.progress')}</span>
                     <span>
                       {answeredCount}/{quiz.questions.length}
                     </span>
                   </div>
-                  <Progress value={completionPercent} />
+                  <div className="w-full bg-secondary/50 rounded-full h-3">
+                    <div
+                      className="bg-primary h-3 rounded-full transition-all duration-300 relative overflow-hidden"
+                      style={{ width: `${completionPercent}%` }}
+                    >
+                      <div className="absolute inset-0 bg-white/20 animate-progress-indeterminate w-full h-full" />
+                    </div>
+                  </div>
                   {showResults && (
                     <div
                       ref={scoreRef}
                       data-score-display
-                      className="mt-4 p-4 bg-[#B5CC89]/10 rounded-lg">
+                      className="mt-4 p-4 bg-primary/10 rounded-lg">
                       <h4 className="text-lg font-semibold">
                         {t('quizContent.yourScore')}: {calculateScore()}/{quiz.questions.length}{" "}
                         (
@@ -352,7 +426,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                         : isIncorrect
                           ? "border-red-500 text-red-600 hover:bg-red-50"
                           : isAnswered
-                            ? "border-[#B5CC89] text-[#B5CC89] hover:bg-[#B5CC89]/10"
+                            ? "border-primary text-primary hover:bg-primary/10"
                             : "border-border text-muted-foreground hover:bg-accent";
 
                       return (
@@ -409,7 +483,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                         ref={(element) => {
                           questionRefs.current[idx] = element;
                         }}
-                        className="border-2 rounded-2xl hover:border-[#B5CC89] transition-all duration-300 hover:-translate-y-1 hover:shadow-lg scroll-mt-[var(--navbar-height,64px)]">
+                        className="border-2 rounded-2xl hover:border-primary transition-all duration-300 hover:-translate-y-1 hover:shadow-lg scroll-mt-[var(--navbar-height,64px)]">
                         <CardContent className="p-4 sm:p-6 md:p-8 space-y-3 sm:space-y-4">
                           <div className="space-y-4">
                             {q.question && (
@@ -533,7 +607,10 @@ export const QuizContent: React.FC<QuizContentProps> = ({
 
                       // 2. Save to server in background (non-blocking)
                       if (userId && answeredCount === quiz.questions.length && quiz.id) {
-                        const timeTaken = Math.floor(Math.random() * 300) + 60;
+                        // Calculate actual time taken based on startTime (or fallback to timerSeconds)
+                        const timeTaken = startTime
+                          ? Math.floor((Date.now() - startTime) / 1000)
+                          : timerSeconds;
 
                         // Calculate score locally for reward notification
                         const localCorrectCount = userAnswers.reduce(

@@ -2,9 +2,8 @@ import { useLayoutEffect, useEffect, lazy, Suspense } from "react";
 import { Toaster as HotToaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { gsap } from "gsap";
-import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "@/hooks/use-toast";
 import { shouldDisableScrollSmoother } from "@/utils/deviceDetection";
 import { PageSkeleton } from "@/components/ui/loading-skeleton";
@@ -14,6 +13,7 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const QuizLibrary = lazy(() => import("./components/library/QuizLibrary"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const QuizDetailPage = lazy(() => import("./pages/QuizDetailPage"));
+const PlayQuizPage = lazy(() => import("./pages/PlayQuizPage"));
 
 // Preload functions for faster navigation
 const preloadRoutes = () => {
@@ -29,6 +29,8 @@ import { ChillMusicProvider } from "@/contexts/ChillMusicContext";
 import { Analytics } from "@vercel/analytics/react";
 import "@/i18n"; // Initialize i18n
 import { GlobalLevelNotification } from "@/components/common/GlobalLevelNotification";
+import { GlobalResumeButton } from "@/components/common/GlobalResumeButton";
+import { GlobalCreateButton } from "@/components/common/GlobalCreateButton";
 
 // GSAP plugins are loaded dynamically in useLayoutEffect to reduce initial bundle size
 
@@ -56,54 +58,28 @@ const ToastBroadcastReceiver = () => {
   return null; // Invisible component
 };
 
-// Page transitions wrapper component
-const AnimatedRoutes = () => {
-  const location = useLocation();
-
-  // Page transition variants - optimized for speed
-  const pageVariants = {
-    initial: {
-      opacity: 0,
-      y: 8,
-    },
-    in: {
-      opacity: 1,
-      y: 0,
-    },
-    out: {
-      opacity: 0,
-    },
-  };
-
-  const pageTransition = {
-    type: "tween" as const,
-    ease: "easeOut" as const,
-    duration: 0.15,
-  };
-
+// Simple routes component without heavy transitions
+const AppRoutes = () => {
   return (
-    <AnimatePresence mode="popLayout" initial={false}>
-      <motion.div
-        key={location.pathname}
-        initial="initial"
-        animate="in"
-        exit="out"
-        variants={pageVariants}
-        transition={pageTransition}
-        className="min-h-screen">
-        <Suspense fallback={<PageSkeleton />}>
-          <Routes location={location} key={location.pathname}>
-            <Route path="/" element={<Index />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/library" element={<QuizLibrary />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/quiz/:attemptId" element={<QuizDetailPage />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
-      </motion.div>
-    </AnimatePresence>
+    <Suspense fallback={<PageSkeleton />}>
+      <Routes>
+        {/* Static Pages */}
+        <Route path="/" element={<Index />} />
+        <Route path="/about" element={<About />} />
+
+        {/* Quiz Domain */}
+        <Route path="/quiz/library" element={<QuizLibrary />} />
+        <Route path="/quiz/play/:quizId" element={<PlayQuizPage />} />
+        <Route path="/quiz/result/:attemptId" element={<QuizDetailPage />} />
+
+        {/* User Domain */}
+        <Route path="/user/dashboard" element={<Dashboard />} />
+
+        {/* Legacy redirects (optional - can remove later) */}
+        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Suspense>
   );
 };
 
@@ -229,7 +205,9 @@ const App = () => {
             <ToastBroadcastReceiver />
             <BrowserRouter
               future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-              <AnimatedRoutes />
+              <AppRoutes />
+              <GlobalResumeButton />
+              <GlobalCreateButton />
             </BrowserRouter>
             <Analytics />
           </ChillMusicProvider>

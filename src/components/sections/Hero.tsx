@@ -183,7 +183,7 @@ const Hero = () => {
               variant="outline"
               size="xl"
               className="text-lg px-8 py-6 rounded-3xl border-4 border-border hover:border-primary/50 hover:bg-secondary hover:text-secondary-foreground active:scale-95 transition-all duration-200 font-heading w-full sm:w-auto"
-              onClick={() => navigate("/library")}>
+              onClick={() => navigate("/quiz/library")}>
               {t("hero.viewExamplesButton")}
             </Button>
           </div>

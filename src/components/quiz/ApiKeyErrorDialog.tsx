@@ -18,7 +18,7 @@ export const ApiKeyErrorDialog: React.FC<ApiKeyErrorDialogProps> = ({ open, erro
       <DialogContent className="max-w-lg bg-gradient-to-br from-card to-secondary/20 border-2 border-border">
         <DialogHeader className="pb-3">
           <div className="flex items-center justify-center mb-3">
-            <div className="bg-[#B5CC89] p-2 rounded-full">
+            <div className="bg-primary p-2 rounded-full">
               <Shield className="w-6 h-6 text-black" />
             </div>
           </div>
@@ -29,7 +29,7 @@ export const ApiKeyErrorDialog: React.FC<ApiKeyErrorDialogProps> = ({ open, erro
         </DialogHeader>
 
         <div className="space-y-4">
-          <div className="bg-[#B5CC89]/10 border border-[#B5CC89]/30 rounded-lg p-4">
+          <div className="bg-primary/10 border border-primary/30 rounded-lg p-4">
             <div className="text-sm font-medium text-foreground mb-2">{t("apiKeyErrorDialog.errorLabel")} {errorMessage}</div>
             <div className="text-sm text-muted-foreground space-y-1">
               <div>• {t("apiKeyErrorDialog.reasons.invalid")}</div>

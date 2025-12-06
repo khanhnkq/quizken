@@ -141,7 +141,7 @@ export default function QuizDetailPage() {
           </div>
           <h2 className="text-xl font-heading font-bold text-gray-800 mb-2">{t('quizDetail.notFound.title')}</h2>
           <p className="text-gray-500 mb-6">{t('quizDetail.notFound.description')}</p>
-          <Button onClick={() => navigate("/dashboard")} className="rounded-full">
+          <Button onClick={() => navigate("/user/dashboard")} className="rounded-full">
             {t('quizDetail.backToDashboard')}
           </Button>
         </Card>
@@ -159,7 +159,7 @@ export default function QuizDetailPage() {
         <div className="flex justify-between items-center mb-8">
           <Button
             variant="ghost"
-            onClick={() => navigate("/dashboard")}
+            onClick={() => navigate("/user/dashboard")}
             className="rounded-full bg-white/80 hover:bg-white shadow-sm hover:shadow-md transition-all group px-4"
           >
             <ArrowLeftIcon className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform text-gray-500" />
@@ -221,8 +221,8 @@ export default function QuizDetailPage() {
                     <div
                       key={index}
                       className={`group relative overflow-hidden rounded-[2.5rem] p-0 shadow-sm border-2 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${isCorrect
-                          ? "bg-white border-green-100"
-                          : "bg-white border-red-100"
+                        ? "bg-white border-green-100"
+                        : "bg-white border-red-100"
                         }`}
                       onMouseEnter={handleHoverEnter as any}
                       onMouseLeave={handleHoverLeave as any}
@@ -303,8 +303,8 @@ export default function QuizDetailPage() {
                   <div className="w-48 h-48 rounded-full bg-gradient-to-tr from-gray-50 to-white shadow-[inset_0_4px_10px_rgba(0,0,0,0.05)] flex items-center justify-center border-[12px] border-white ring-4 ring-gray-100">
                     <div className="flex flex-col items-center">
                       <span className={`text-6xl md:text-7xl font-heading font-black tracking-tighter ${attemptDetail.score >= 80 ? 'text-transparent bg-clip-text bg-gradient-to-b from-green-400 to-emerald-600' :
-                          attemptDetail.score >= 50 ? 'text-transparent bg-clip-text bg-gradient-to-b from-yellow-400 to-orange-500' :
-                            'text-transparent bg-clip-text bg-gradient-to-b from-red-400 to-pink-600'
+                        attemptDetail.score >= 50 ? 'text-transparent bg-clip-text bg-gradient-to-b from-yellow-400 to-orange-500' :
+                          'text-transparent bg-clip-text bg-gradient-to-b from-red-400 to-pink-600'
                         }`}>
                         {Math.round(attemptDetail.score)}
                       </span>

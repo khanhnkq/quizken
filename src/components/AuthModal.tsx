@@ -54,7 +54,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onOpenChange }) => {
         <DialogContent className="max-w-xs bg-gradient-to-br from-card to-secondary/20 border-2 border-border">
           <DialogHeader className="pb-3">
             <div className="flex items-center justify-center gap-2 mb-2">
-              <div className="bg-[#B5CC89] p-1 rounded-md">
+              <div className="bg-primary p-1 rounded-md">
                 <Shield className="w-4 h-4 text-black" />
               </div>
               <DialogTitle className="text-lg font-bold text-primary">

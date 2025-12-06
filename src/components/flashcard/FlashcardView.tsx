@@ -181,7 +181,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
   if (isLoading) {
     return (
       <div className="text-center space-y-4 py-12">
-        <div className="loading-spinner rounded-full h-12 w-12 border-b-2 border-[#B5CC89] mx-auto"></div>
+        <div className="loading-spinner rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
         <p className="text-muted-foreground">{t('quizGenerator.flashcard.loading')}</p>
       </div>
     );
@@ -206,7 +206,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
   if (!currentFlashcard) {
     return (
       <div className="text-center space-y-4 py-12">
-        <BookOpen className="w-16 h-16 text-[#B5CC89] mx-auto" />
+        <BookOpen className="w-16 h-16 text-primary mx-auto" />
         <h2 className="text-xl font-semibold text-foreground">
           {t('quizGenerator.flashcard.noCards')}
         </h2>
@@ -228,7 +228,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
             <div className="flex-1">
               <div className="flex flex-wrap items-center gap-2 mb-2">
-                <span className="inline-flex items-center px-3 py-1 rounded-xl text-xs font-heading font-medium bg-[#B5CC89]/10 text-[#B5CC89] border border-[#B5CC89]/20">
+                <span className="inline-flex items-center px-3 py-1 rounded-xl text-xs font-heading font-medium bg-primary/10 text-primary border border-primary/20">
                   Flashcard
                 </span>
                 <span className="inline-flex items-center px-3 py-1 rounded-xl text-xs font-heading font-medium bg-secondary text-secondary-foreground border border-border">
@@ -262,7 +262,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
             </div>
             <div className="w-full bg-secondary/50 rounded-full h-3">
               <div
-                className="bg-[#B5CC89] h-3 rounded-full transition-all duration-300 relative overflow-hidden"
+                className="bg-primary h-3 rounded-full transition-all duration-300 relative overflow-hidden"
                 style={{ width: `${progressPercent}%` }}
               >
                 <div className="absolute inset-0 bg-white/20 animate-progress-indeterminate w-full h-full" />

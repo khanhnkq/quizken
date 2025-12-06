@@ -31,8 +31,8 @@ export function ExchangeTab() {
 
     const handleBuy = async (item: ExchangeItem) => {
         if (!stats || stats.zcoin < item.price) {
-            toast.error(t('Không đủ ZCoin'), {
-                description: 'Bạn cần tích thêm ZCoin nhé!',
+            toast.error(t('exchange.noZCoin'), {
+                description: t('exchange.noZCoinDesc'),
                 icon: "🪙"
             });
             return;
@@ -57,8 +57,8 @@ export function ExchangeTab() {
                     colors: ['#FFD700', '#FFA500', '#FF4500'] // Gold colors
                 });
 
-                toast.success(`Đã mua thành công ${item.name}!`, {
-                    description: "Kiểm tra kho đồ của bạn nhé.",
+                toast.success(t('exchange.purchaseSuccess', { name: item.name }), {
+                    description: t('exchange.purchaseSuccessDesc'),
                     icon: "🎉"
                 });
 
@@ -68,7 +68,7 @@ export function ExchangeTab() {
             }
         } catch (err: any) {
             console.error('Purchase error:', err);
-            toast.error('Lỗi giao dịch', {
+            toast.error(t('exchange.purchaseError'), {
                 description: err.message
             });
         } finally {
@@ -86,11 +86,11 @@ export function ExchangeTab() {
     });
 
     const categories = [
-        { id: 'all', label: 'Tất cả', icon: Store, color: 'bg-violet-100 text-violet-600' },
-        { id: 'avatar', label: 'Avatar', icon: Shirt, color: 'bg-blue-100 text-blue-600' },
-        { id: 'theme', label: 'Theme', icon: Palette, color: 'bg-pink-100 text-pink-600' },
-        { id: 'powerup', label: 'Power-up', icon: Zap, color: 'bg-amber-100 text-amber-600' },
-        { id: 'document', label: 'Tài liệu', icon: FileText, color: 'bg-emerald-100 text-emerald-600' },
+        { id: 'all', label: t('exchange.filter.all'), icon: Store, color: 'bg-violet-100 text-violet-600' },
+        { id: 'avatar', label: t('exchange.filter.avatar'), icon: Shirt, color: 'bg-blue-100 text-blue-600' },
+        { id: 'theme', label: t('exchange.filter.theme'), icon: Palette, color: 'bg-pink-100 text-pink-600' },
+        { id: 'powerup', label: t('exchange.filter.powerup'), icon: Zap, color: 'bg-amber-100 text-amber-600' },
+        { id: 'document', label: t('exchange.filter.document'), icon: FileText, color: 'bg-emerald-100 text-emerald-600' },
     ];
 
     if (isLoadingItems) {
@@ -103,36 +103,53 @@ export function ExchangeTab() {
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500 pb-10">
-            {/* Top Header Row - Symmetric like Dashboard */}
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                {/* Title Section */}
-                <div className="text-center md:text-left">
-                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-violet-100 text-violet-700 font-bold text-sm mb-3 shadow-sm border border-violet-200">
-                        <Sparkles className="w-4 h-4" />
-                        <span>Cửa hàng phép thuật</span>
+            {/* Top Header Row - Matching Dashboard "Hello" Style */}
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-6">
+                {/* Title Section - Matching Dashboard Style */}
+                <div className="text-center md:text-left space-y-2">
+                    {/* Badge - Same style as Dashboard "Welcome Back" badge */}
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 backdrop-blur-sm border-2 border-violet-400 text-violet-600 font-bold text-sm shadow-sm animate-fade-in">
+                        <Sparkles className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                        <span>{t('exchange.badge')}</span>
                     </div>
-                    <h2 className="text-4xl md:text-5xl font-black text-slate-800 tracking-tight drop-shadow-sm mb-2"
-                        style={{ fontFamily: '"Nunito", "Quicksand", sans-serif' }}>
-                        ZCoin Bazaar
-                    </h2>
-                    <p className="text-slate-500 text-lg font-medium">
-                        Biến coin thành niềm vui! 🛍️
+
+                    {/* Title - Same style as Dashboard "Hello, {name}" */}
+                    <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground drop-shadow-sm">
+                        {t('exchange.welcome')}{' '}
+                        <span className="text-violet-600 relative inline-block">
+                            ZCoin Bazaar
+                            <svg className="absolute -bottom-2 left-0 w-full h-3 text-violet-300 -z-10 opacity-60" viewBox="0 0 100 10" preserveAspectRatio="none">
+                                <path d="M0 5 Q 50 15 100 5" stroke="currentColor" strokeWidth="12" fill="none" />
+                            </svg>
+                        </span>
+                        <span className="inline-block animate-wave ml-2 origin-[70%_70%]">🛍️</span>
+                    </h1>
+
+                    {/* Subtitle - Same style as Dashboard */}
+                    <p className="text-lg text-muted-foreground font-medium max-w-lg">
+                        {t('exchange.subtitle')}
                     </p>
                 </div>
 
-                {/* Wallet Badge - High Visibility */}
-                <div className="flex flex-col items-center md:items-end">
-                    <div className="bg-white/80 backdrop-blur-md px-6 py-4 rounded-3xl border-2 border-orange-100 shadow-xl flex items-center gap-4 hover:scale-105 transition-transform duration-300">
+                {/* Wallet Card - Redesigned to match Dashboard button style */}
+                <div className="group">
+                    <div className="relative bg-gradient-to-br from-violet-500 to-purple-600 px-8 py-5 rounded-3xl shadow-xl border-4 border-violet-400/50 flex items-center gap-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl cursor-default">
+                        {/* Decorative background elements */}
+                        <div className="absolute inset-0 bg-white/10 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+
+                        {/* Wallet Icon */}
                         <div className="relative">
-                            <div className="w-14 h-14 bg-gradient-to-br from-yellow-300 to-orange-400 rounded-full flex items-center justify-center shadow-md border-4 border-white">
-                                <Wallet className="w-8 h-8 text-white drop-shadow-sm" />
+                            <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center shadow-inner backdrop-blur-sm group-hover:rotate-12 transition-transform duration-300">
+                                <Wallet className="w-9 h-9 text-white drop-shadow-md" />
                             </div>
-                            <Sparkles className="absolute -top-1 -right-1 w-6 h-6 text-yellow-500 animate-pulse" />
+                            <Sparkles className="absolute -top-2 -right-2 w-6 h-6 text-yellow-300 animate-pulse drop-shadow-md" />
                         </div>
-                        <div className="flex flex-col">
-                            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Ví ZCoin</span>
-                            <span className="text-4xl font-black text-slate-700 tabular-nums leading-none">
-                                {stats?.zcoin?.toLocaleString()}
+
+                        {/* Balance */}
+                        <div className="flex flex-col relative z-10">
+                            <span className="text-xs font-bold text-white/70 uppercase tracking-wider">{t('exchange.wallet')}</span>
+                            <span className="text-4xl font-black text-white tabular-nums leading-none drop-shadow-sm">
+                                {stats?.zcoin?.toLocaleString() || 0}
                             </span>
                         </div>
                     </div>
@@ -167,7 +184,7 @@ export function ExchangeTab() {
                 <div className="relative w-full md:w-64 px-2 md:px-0">
                     <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                     <Input
-                        placeholder="Tìm vật phẩm..."
+                        placeholder={t('exchange.searchPlaceholder')}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="pl-10 h-11 rounded-xl border-slate-200 bg-slate-50 focus:bg-white transition-all shadow-inner"
@@ -205,8 +222,8 @@ export function ExchangeTab() {
                     <div className="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
                         <Search className="w-10 h-10 text-slate-300" />
                     </div>
-                    <h3 className="text-xl font-bold text-slate-600">Không tìm thấy món đồ nào</h3>
-                    <p className="text-slate-400">Thử tìm từ khóa khác xem sao nhé!</p>
+                    <h3 className="text-xl font-bold text-slate-600">{t('exchange.noResults')}</h3>
+                    <p className="text-slate-400">{t('exchange.noResultsDesc')}</p>
                 </div>
             )}
         </div>

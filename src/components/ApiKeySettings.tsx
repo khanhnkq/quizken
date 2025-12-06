@@ -338,14 +338,29 @@ const ApiKeySettings: React.FC = () => {
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-4">
-      {/* Header - Compact */}
-      <div className="text-center space-y-1">
-        <div className="inline-flex items-center justify-center p-2.5 bg-secondary/40 rounded-2xl">
-          <Shield className="w-6 h-6 text-primary-foreground" />
+    <div className="max-w-2xl mx-auto space-y-8 pb-10">
+      {/* Header - Matching Dashboard "Hello" Style */}
+      <div className="flex flex-col items-center text-center space-y-3 pt-6">
+        {/* Badge */}
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 backdrop-blur-sm border-2 border-slate-400 text-slate-600 font-bold text-sm shadow-sm animate-fade-in">
+          <Sparkles className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+          <span>Cài đặt nâng cao</span>
         </div>
-        <h2 className="text-2xl font-bold font-heading text-primary">{t("apiKeySettings.title")}</h2>
-        <p className="text-sm text-muted-foreground font-medium max-w-md mx-auto">
+
+        {/* Title with SVG underline */}
+        <h1 className="font-heading text-4xl md:text-5xl font-bold tracking-tight text-foreground drop-shadow-sm">
+          API{' '}
+          <span className="text-slate-600 relative inline-block">
+            Settings
+            <svg className="absolute -bottom-2 left-0 w-full h-3 text-slate-300 -z-10 opacity-60" viewBox="0 0 100 10" preserveAspectRatio="none">
+              <path d="M0 5 Q 50 15 100 5" stroke="currentColor" strokeWidth="12" fill="none" />
+            </svg>
+          </span>
+          <span className="inline-block animate-wave ml-2 origin-[70%_70%]">🔑</span>
+        </h1>
+
+        {/* Subtitle */}
+        <p className="text-lg text-muted-foreground font-medium max-w-lg">
           {t("apiKeySettings.description")}
         </p>
       </div>
@@ -501,10 +516,10 @@ const ApiKeySettings: React.FC = () => {
       </Card>
 
       {/* Quick Setup Tip - Compact */}
-      <Card className="bg-gradient-to-br from-[#B5CC89]/20 to-primary/5 border-2 border-[#B5CC89]/30 rounded-2xl shadow-sm">
+      <Card className="bg-gradient-to-br from-primary/20 to-primary/5 border-2 border-primary/30 rounded-2xl shadow-sm">
         <CardContent className="p-3 flex items-center gap-3">
           <div className="p-2 bg-white rounded-xl shadow-sm">
-            <Sparkles className="w-4 h-4 text-[#B5CC89]" />
+            <Sparkles className="w-4 h-4 text-primary" />
           </div>
           <div>
             <h4 className="font-bold font-heading text-sm text-foreground">{t("apiKeySettings.tip.title")}</h4>
@@ -514,7 +529,7 @@ const ApiKeySettings: React.FC = () => {
           </div>
         </CardContent>
       </Card>
-    </div>
+    </div >
   );
 };
 

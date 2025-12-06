@@ -15,6 +15,7 @@ import {
 import logo from "@/assets/logo/logo.png";
 import { useEffect, useState, type MouseEvent } from "react";
 import { gsap } from "gsap";
+import { useTranslation } from "react-i18next";
 
 type Cta = {
   label: string;
@@ -25,6 +26,7 @@ type Cta = {
 };
 
 export const AboutHero = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const handlePrimary = () => {
     window.dispatchEvent(
@@ -61,7 +63,7 @@ export const AboutHero = () => {
     <section className="relative overflow-hidden bg-transparent min-h-[85vh] pt-16 pb-24 px-4 flex items-center justify-center">
       {/* Animated Background Blobs - Matched with Main Hero */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-72 h-72 bg-[#B5CC89]/30 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>
+        <div className="absolute top-0 left-1/4 w-72 h-72 bg-primary/30 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>
         <div className="absolute top-0 right-1/4 w-72 h-72 bg-blue-300/30 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
         <div className="absolute -bottom-8 left-1/3 w-72 h-72 bg-orange-200/40 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-4000"></div>
       </div>
@@ -83,8 +85,8 @@ export const AboutHero = () => {
       <div className="container mx-auto max-w-5xl relative z-10 text-center space-y-10 -translate-y-12">
         {/* Avatar Badge */}
         <div className="relative inline-block animate-fade-in group cursor-pointer">
-          <div className="absolute -inset-1 bg-gradient-to-r from-[#B5CC89] to-primary rounded-full blur opacity-25 group-hover:opacity-50 transition duration-500"></div>
-          <div className="relative w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-white shadow-xl ring-4 ring-[#B5CC89]/20 transform transition duration-500 hover:scale-105">
+          <div className="absolute -inset-1 bg-gradient-to-r from-primary to-primary rounded-full blur opacity-25 group-hover:opacity-50 transition duration-500"></div>
+          <div className="relative w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-white shadow-xl ring-4 ring-primary/20 transform transition duration-500 hover:scale-105">
             <img
               src={logo}
               alt="Khánh"
@@ -92,26 +94,26 @@ export const AboutHero = () => {
             />
           </div>
           <div className="absolute -bottom-2 right-2 bg-white px-3 py-1 rounded-full shadow-lg border border-border text-xs font-bold animate-bounce">
-            Meow
+            {t('about.hero.meow')}
           </div>
         </div>
 
         <div className="max-w-4xl mx-auto space-y-6">
           <h1 className="font-heading text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[1.1] text-foreground drop-shadow-sm">
-            Xin chào, mình là<br className="hidden md:block" />{" "}
+            {t('about.hero.greeting')}<br className="hidden md:block" />{" "}
             <span className="text-primary relative inline-block mt-2 md:mt-0">
-              Nguyễn Khánh
-              <svg className="absolute -bottom-2 left-0 w-full h-4 text-[#B5CC89] -z-10 opacity-60" viewBox="0 0 100 10" preserveAspectRatio="none">
+              {t('about.hero.name')}
+              <svg className="absolute -bottom-2 left-0 w-full h-4 text-primary -z-10 opacity-60" viewBox="0 0 100 10" preserveAspectRatio="none">
                 <path d="M0 5 Q 50 15 100 5" stroke="currentColor" strokeWidth="12" fill="none" />
               </svg>
             </span>
           </h1>
 
           <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto font-medium leading-relaxed">
-            Mình xây dựng <span className="font-bold text-foreground">QuizKen</span> để việc học trở nên{" "}
-            <span className="inline-block px-2 py-1 rounded-lg bg-orange-100 text-orange-700 -rotate-2 transform hover:rotate-0 transition-transform">vui hơn</span>,{" "}
-            <span className="inline-block px-2 py-1 rounded-lg bg-blue-100 text-blue-700 rotate-1 transform hover:rotate-0 transition-transform">dễ hơn</span> và{" "}
-            <span className="inline-block px-2 py-1 rounded-lg bg-green-100 text-green-700 -rotate-1 transform hover:rotate-0 transition-transform">hiệu quả hơn</span>.
+            {t('about.hero.description1')} <span className="font-bold text-foreground">{t('about.hero.quizken')}</span> {t('about.hero.description2')}{" "}
+            <span className="inline-block px-2 py-1 rounded-lg bg-orange-100 text-orange-700 -rotate-2 transform hover:rotate-0 transition-transform">{t('about.hero.moreFun')}</span>,{" "}
+            <span className="inline-block px-2 py-1 rounded-lg bg-blue-100 text-blue-700 rotate-1 transform hover:rotate-0 transition-transform">{t('about.hero.easier')}</span> &{" "}
+            <span className="inline-block px-2 py-1 rounded-lg bg-green-100 text-green-700 -rotate-1 transform hover:rotate-0 transition-transform">{t('about.hero.moreEffective')}</span>.
           </p>
         </div>
 
@@ -123,19 +125,19 @@ export const AboutHero = () => {
             onClick={handlePrimary}
             onMouseEnter={handleHoverEnter}
             onMouseLeave={handleHoverLeave}>
-            Thử tạo bài trắc nghiệm
+            {t('about.hero.primaryCta')}
             <div className="bg-white/20 p-1.5 rounded-xl ml-3 group-hover:rotate-12 transition-transform">
               <Sparkles className="w-6 h-6 text-white" />
             </div>
           </Button>
 
-          <Link to="/library" className="w-full sm:w-auto">
+          <Link to="/quiz/library" className="w-full sm:w-auto">
             <Button
               variant="outline"
               size="xl"
               className="text-lg px-8 py-6 rounded-3xl border-4 border-border hover:border-primary/50 hover:bg-secondary hover:text-secondary-foreground active:scale-95 transition-all duration-200 font-heading w-full h-auto"
             >
-              Dạo quanh thư viện
+              {t('about.hero.secondaryCta')}
             </Button>
           </Link>
         </div>
@@ -150,6 +152,7 @@ export const AboutHero = () => {
 };
 
 export const AboutMissionVision = () => {
+  const { t } = useTranslation();
   return (
     <section className="py-24 px-4 bg-transparent relative overflow-hidden">
       <div className="container mx-auto max-w-7xl">
@@ -158,7 +161,7 @@ export const AboutMissionVision = () => {
         <div className="flex items-center justify-center mb-16 relative">
           <div className="bg-white border-4 border-black px-8 py-4 shadow-[8px_8px_0px_#000] transform -rotate-2 relative z-10 transition-transform hover:rotate-0 duration-300">
             <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter">
-              CHƯƠNG TIẾP THEO <span className="text-primary text-5xl md:text-7xl">!?</span>
+              {t('about.missionVision.title')} <span className="text-primary text-5xl md:text-7xl">!?</span>
             </h2>
           </div>
           {/* Decorative Ink Splat or Shape */}
@@ -182,13 +185,13 @@ export const AboutMissionVision = () => {
                 {/* Panel Header */}
                 <div className="flex items-start justify-between mb-8">
                   <div className="bg-black text-white px-4 py-1 text-xl font-black uppercase italic -rotate-2 inline-block shadow-[2px_2px_0px_rgba(0,0,0,0.5)]">
-                    MISSION START!
+                    {t('about.missionVision.missionStart')}
                   </div>
                   <div className="text-5xl animate-bounce">🎯</div>
                 </div>
 
                 <h3 className="text-4xl font-black uppercase mb-6 leading-none drop-shadow-[2px_2px_0px_rgba(0,0,0,0.2)]">
-                  Sứ Mệnh <br /><span className="text-red-500 text-5xl">Cực Đại</span>
+                  {t('about.missionVision.missionTitle1')} <br /><span className="text-red-500 text-5xl">{t('about.missionVision.missionTitle2')}</span>
                 </h3>
 
                 <div className="space-y-4 flex-1">
@@ -196,19 +199,19 @@ export const AboutMissionVision = () => {
                   <div className="flex items-center gap-4 border-b-2 border-black/10 pb-4 group/item hover:bg-yellow-50 transition-colors p-2 rounded-lg">
                     <span className="text-3xl font-black text-gray-200 group-hover/item:text-black transition-colors">01</span>
                     <p className="text-lg font-bold text-gray-800">
-                      Biến việc học thành <span className="bg-yellow-300 px-1 border border-black transform inline-block -rotate-1">TRÒ CHƠI</span> đầy cảm hứng!
+                      {t('about.missionVision.mission1')} <span className="bg-yellow-300 px-1 border border-black transform inline-block -rotate-1">{t('about.missionVision.mission1Highlight')}</span>!
                     </p>
                   </div>
                   <div className="flex items-center gap-4 border-b-2 border-black/10 pb-4 group/item hover:bg-blue-50 transition-colors p-2 rounded-lg">
                     <span className="text-3xl font-black text-gray-200 group-hover/item:text-black transition-colors">02</span>
                     <p className="text-lg font-bold text-gray-800">
-                      Dùng <span className="text-blue-600 underline decoration-wavy">AI Power</span> tạo đề siêu tốc (nhanh hơn flash!).
+                      {t('about.missionVision.mission2Part1')} <span className="text-blue-600 underline decoration-wavy">{t('about.missionVision.mission2Highlight')}</span> {t('about.missionVision.mission2Part2')}
                     </p>
                   </div>
                   <div className="flex items-center gap-4 group/item hover:bg-green-50 transition-colors p-2 rounded-lg">
                     <span className="text-3xl font-black text-gray-200 group-hover/item:text-black transition-colors">03</span>
                     <p className="text-lg font-bold text-gray-800">
-                      Kết nối anh em bốn phương cùng chia sẻ bí kíp.
+                      {t('about.missionVision.mission3')}
                     </p>
                   </div>
                 </div>
@@ -233,22 +236,22 @@ export const AboutMissionVision = () => {
                 <div className="flex items-start justify-between mb-8">
                   <div className="text-5xl animate-pulse delay-700">✨</div>
                   <div className="bg-white border-2 border-black text-black px-4 py-1 text-xl font-black uppercase italic rotate-2 inline-block shadow-[4px_4px_0px_#000]">
-                    FUTURE SIGHT
+                    {t('about.missionVision.futureSight')}
                   </div>
                 </div>
 
                 <h3 className="text-4xl font-black uppercase mb-6 leading-none text-right">
-                  Tầm Nhìn <br /><span className="text-blue-500 text-5xl">Vô Hạn</span>
+                  {t('about.missionVision.visionTitle1')} <br /><span className="text-blue-500 text-5xl">{t('about.missionVision.visionTitle2')}</span>
                 </h3>
 
                 <div className="flex-1 flex flex-col justify-end text-right">
                   {/* Thought Bubble Style */}
                   <div className="relative bg-gray-100 border-2 border-black p-6 rounded-2xl rounded-tr-none shadow-[4px_4px_0px_#ccc] transform hover:scale-105 transition-transform">
                     <p className="text-xl font-bold italic text-gray-800 leading-relaxed">
-                      "Chúng ta sẽ xây dựng một <span className="text-purple-600 font-black">THƯ VIỆN MỞ ĐA VŨ TRỤ</span>! Nơi kiến thức không chỉ để nhớ, mà là để..."
+                      {t('about.missionVision.visionQuote').replace(t('about.missionVision.visionHighlight'), `<span class="text-purple-600 font-black">${t('about.missionVision.visionHighlight')}</span>`)}
                     </p>
                     <div className="mt-2 text-2xl font-black text-black uppercase transform -rotate-1 inline-block bg-yellow-300 px-2 mt-4 border border-black">
-                      CHIẾN & THẮNG! 🏆
+                      {t('about.missionVision.visionCta')} 🏆
                     </div>
 
                     {/* Bubble Tail */}
@@ -267,6 +270,7 @@ export const AboutMissionVision = () => {
 };
 
 export const AboutStory = () => {
+  const { t } = useTranslation();
   return (
     <section className="relative py-24 px-4 overflow-hidden">
       {/* Background Elements */}
@@ -278,7 +282,7 @@ export const AboutStory = () => {
         <div className="text-center mb-16 relative z-10">
           <div className="inline-block transform rotate-1 hover:-rotate-1 transition-transform duration-300">
             <h2 className="text-4xl md:text-6xl font-black tracking-tight text-white drop-shadow-[4px_4px_0px_#000] stroke-black" style={{ WebkitTextStroke: '2px black' }}>
-              CHUYỆN LÀ THẾ NÀY... <span className="text-yellow-400">🤔</span>
+              {t('about.story.title')} <span className="text-yellow-400">🤔</span>
             </h2>
           </div>
         </div>
@@ -304,9 +308,9 @@ export const AboutStory = () => {
                     👋
                   </div>
                   <div>
-                    <h4 className="font-bold text-black text-lg uppercase tracking-wider">Nguyễn Khánh</h4>
+                    <h4 className="font-bold text-black text-lg uppercase tracking-wider">{t('about.story.chatHeader')}</h4>
                     <div className="bg-green-400 border border-black px-2 rounded-full text-[10px] font-bold inline-block text-black shadow-[1px_1px_0px_#000]">
-                      ONLINE
+                      {t('about.story.online')}
                     </div>
                   </div>
                 </div>
@@ -328,7 +332,7 @@ export const AboutStory = () => {
                   <div className="w-10 h-10 rounded-full border-2 border-black bg-gray-100 flex items-center justify-center shrink-0 text-xl shadow-[2px_2px_0px_#000]">😰</div>
                   <div className="relative group">
                     <div className="bg-white p-5 rounded-2xl rounded-bl-sm border-2 border-black shadow-[4px_4px_0px_#000] text-gray-800 font-bold text-lg relative z-10">
-                      Ngày xưa đi học, sợ nhất là nghe cô giáo nói: <span className="text-red-500 font-black uppercase">"Kiểm tra 15 phút!"</span> 😭
+                      {t('about.story.msg1')} <span className="text-red-500 font-black uppercase">{t('about.story.msg1Highlight')}</span> 😭
                     </div>
                   </div>
                 </div>
@@ -338,8 +342,8 @@ export const AboutStory = () => {
                   <div className="w-10 h-10 rounded-full border-2 border-black bg-gray-100 flex items-center justify-center shrink-0 text-xl shadow-[2px_2px_0px_#000]">🤔</div>
                   <div className="relative group">
                     <div className="bg-white p-5 rounded-2xl rounded-bl-sm border-2 border-black shadow-[4px_4px_0px_#000] text-gray-800 font-medium">
-                      Tim đập chân run, chữ nghĩa bay sạch... Tại sao kiểm tra cứ phải đáng sợ thế nhỉ? <br />
-                      <span className="font-black">Sao không vui như chơi game? 🎮</span>
+                      {t('about.story.msg2')} <br />
+                      <span className="font-black">{t('about.story.msg2Highlight')} 🎮</span>
                     </div>
                   </div>
                 </div>
@@ -351,8 +355,8 @@ export const AboutStory = () => {
                   </div>
                   <div className="relative group text-right">
                     <div className="bg-primary text-white p-5 rounded-2xl rounded-br-sm border-2 border-black shadow-[4px_4px_0px_#000] text-lg">
-                      Thế là <span className="font-black text-yellow-300 uppercase italic">Quizken</span> ra đời! 🚀<br />
-                      <span className="font-bold">Tạo quiz nhanh như order trà sữa, vừa học vừa chơi!</span>
+                      {t('about.story.msg3Part1')} <span className="font-black text-yellow-300 uppercase italic">{t('about.story.msg3Quizken')}</span> {t('about.story.msg3Part2')} 🚀<br />
+                      <span className="font-bold">{t('about.story.msg3Desc')}</span>
                     </div>
                   </div>
                 </div>
@@ -364,7 +368,7 @@ export const AboutStory = () => {
                   <div className="w-8 h-8 rounded-full border-2 border-black flex items-center justify-center text-black font-black cursor-pointer hover:bg-gray-100 transition-colors">
                     +
                   </div>
-                  <div className="flex-1 text-gray-400 font-bold italic">Viết tin nhắn...</div>
+                  <div className="flex-1 text-gray-400 font-bold italic">{t('about.story.inputPlaceholder')}</div>
                   <div className="text-black cursor-pointer transform hover:scale-110 transition-transform">
                     <h4 className="font-black text-sm bg-primary text-white px-3 py-1 border-2 border-black rounded-lg shadow-[2px_2px_0px_#000]">SEND</h4>
                   </div>
@@ -380,29 +384,16 @@ export const AboutStory = () => {
 };
 
 export const AboutFeatures = () => {
-  const features = [
-    {
-      title: "Team Lười Học",
-      icon: "😴",
-      desc: "Cách nhanh nhất để qua môn mà không tốn sức.",
-      color: "bg-orange-400",
-      rotate: "-rotate-2"
-    },
-    {
-      title: "Team Mê Game",
-      icon: "🎮",
-      desc: "Leo rank kiến thức, đua top server lớp học.",
-      color: "bg-blue-400",
-      rotate: "rotate-2"
-    },
-    {
-      title: "Hội Sợ Thi",
-      icon: "👻",
-      desc: "Cộng đồng \"phao cứu sinh\" chính hiệu.",
-      color: "bg-purple-400",
-      rotate: "-rotate-1"
-    }
-  ];
+  const { t } = useTranslation();
+  const featuresData = t('about.features.items', { returnObjects: true }) as { title: string; desc: string }[];
+
+  const features = featuresData.map((item, index) => ({
+    title: item.title,
+    icon: ["😴", "🎮", "👻"][index],
+    desc: item.desc,
+    color: ["bg-orange-400", "bg-blue-400", "bg-purple-400"][index],
+    rotate: ["-rotate-2", "rotate-2", "-rotate-1"][index]
+  }));
 
   return (
     <section className="py-24 px-4 bg-transparent">
@@ -413,19 +404,19 @@ export const AboutFeatures = () => {
           <div className="inline-block transform -rotate-2 hover:rotate-1 transition-transform duration-300">
             <h2 className="text-5xl md:text-7xl font-black uppercase italic tracking-tighter text-white drop-shadow-[4px_4px_0px_#000] stroke-black"
               style={{ WebkitTextStroke: '2px black' }}>
-              Biệt Đội <span className="text-[#FFD700]">Siêu Đẳng</span>
+              {t('about.features.title')}
             </h2>
           </div>
           <p className="mt-4 text-xl md:text-2xl font-bold text-gray-800 max-w-2xl mx-auto bg-white border-2 border-black p-3 rounded-xl shadow-[4px_4px_0px_rgba(0,0,0,0.2)] transform rotate-1">
-            Gia nhập Quizken để mở khóa những <span className="text-purple-600">siêu năng lực</span> này nhé! ⚡️
+            {t('about.features.subtitle')} ⚡️
           </p>
 
           {/* Decorative Comic Elements */}
           <div className="absolute top-[-20px] right-[20%] w-12 h-12 bg-yellow-400 border-2 border-black rounded-full flex items-center justify-center font-bold text-xs animate-bounce shadow-[3px_3px_0px_#000]">
-            POW!
+            {t('about.features.pow')}
           </div>
           <div className="absolute top-[10px] left-[20%] w-16 h-10 bg-blue-400 border-2 border-black flex items-center justify-center font-bold text-xs -rotate-12 animate-pulse shadow-[3px_3px_0px_#000]">
-            BOOM!
+            {t('about.features.boom')}
           </div>
         </div>
 
@@ -461,7 +452,7 @@ export const AboutFeatures = () => {
 
                 {/* Comic Badge */}
                 <div className="mt-auto bg-black text-white px-4 py-1 rounded-full font-bold text-xs uppercase tracking-widest">
-                  Special Power
+                  {t('about.features.badge')}
                 </div>
 
               </div>
@@ -474,40 +465,17 @@ export const AboutFeatures = () => {
 };
 
 export const AboutValues = () => {
-  const values = [
-    {
-      icon: Zap,
-      title: "Tốc Độ",
-      desc: "Nhanh như Ninja! Tạo đề trong tíc tắc.",
-      color: "bg-yellow-400",
-      sfx: "SWOOSH!",
-      rotate: "-rotate-3"
-    },
-    {
-      icon: Heart,
-      title: "Đam Mê",
-      desc: "Yêu việc học như yêu Crush!",
-      color: "bg-red-400",
-      sfx: "DOKI DOKI",
-      rotate: "rotate-2"
-    },
-    {
-      icon: Users,
-      title: "Cộng Đồng",
-      desc: "Đông vui như hội chợ Anime.",
-      color: "bg-blue-400",
-      sfx: "WAKU WAKU",
-      rotate: "-rotate-1"
-    },
-    {
-      icon: Sparkles,
-      title: "Sáng Tạo",
-      desc: "Ý tưởng nổ tung như pháo hoa.",
-      color: "bg-purple-400",
-      sfx: "KABOOM!",
-      rotate: "rotate-3"
-    },
-  ];
+  const { t } = useTranslation();
+  const valuesData = t('about.values.items', { returnObjects: true }) as { title: string; desc: string; sfx: string }[];
+
+  const values = valuesData.map((item, index) => ({
+    icon: [Zap, Heart, Users, Sparkles][index],
+    title: item.title,
+    desc: item.desc,
+    color: ["bg-yellow-400", "bg-red-400", "bg-blue-400", "bg-purple-400"][index],
+    sfx: item.sfx,
+    rotate: ["-rotate-3", "rotate-2", "-rotate-1", "rotate-3"][index]
+  }));
 
   return (
     <section className="py-24 px-4 bg-transparent overflow-hidden">
@@ -515,7 +483,7 @@ export const AboutValues = () => {
         <div className="text-center space-y-4 mb-20 relative z-10">
           <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter inline-block relative">
             <span className="relative z-10 text-black drop-shadow-[4px_4px_0px_rgba(255,255,255,1)]">
-              Giá Trị Cốt Lõi
+              {t('about.values.title')}
             </span>
             <div className="absolute inset-0 bg-yellow-300 transform scale-110 -rotate-2 -z-0 border-4 border-black"></div>
           </h2>
@@ -579,11 +547,12 @@ export const AboutShopFavorites = ({
   }[];
   shopeeUrl?: string;
 }) => {
+  const { t } = useTranslation();
   const items =
     products && products.length > 0
       ? products
       : shopeeUrl
-        ? [{ title: "Xem trên Shopee", href: shopeeUrl }]
+        ? [{ title: t('about.shopFavorites.viewOnShopee'), href: shopeeUrl }]
         : [];
   const hasItems = items.length > 0;
 
@@ -599,15 +568,15 @@ export const AboutShopFavorites = ({
             </div>
             <div>
               <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tight">
-                SHOP ITEMS
+                {t('about.shopFavorites.title')}
               </h2>
               <p className="font-mono text-gray-600 font-bold">
-                "Vũ khí tối thượng của Developer"
+                {t('about.shopFavorites.subtitle')}
               </p>
             </div>
           </div>
           <div className="hidden md:block bg-black text-white px-6 py-2 font-mono font-bold text-xl -skew-x-12 shadow-[4px_4px_0px_#888]">
-            GOLD: ∞
+            {t('about.shopFavorites.gold')}
           </div>
         </div>
 
@@ -654,7 +623,7 @@ export const AboutShopFavorites = ({
 
                     {/* "EQUIP" Badge on Hover */}
                     <div className="absolute inset-x-0 bottom-0 bg-black/80 text-white font-mono text-center text-xs py-1 translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-20">
-                      CLICK TO EQUIP
+                      {t('about.shopFavorites.clickToEquip')}
                     </div>
                   </div>
 
@@ -671,7 +640,7 @@ export const AboutShopFavorites = ({
                         </span>
                       )}
                       {!item.price && (
-                        <span className="font-mono text-xs text-gray-400">RARE ITEM</span>
+                        <span className="font-mono text-xs text-gray-400">{t('about.shopFavorites.rareItem')}</span>
                       )}
 
                       {/* Arrow Icon */}
@@ -685,7 +654,7 @@ export const AboutShopFavorites = ({
 
                 {/* New Status Label */}
                 <div className="absolute -top-3 -right-3 bg-red-500 text-white text-xs font-bold px-2 py-1 border-2 border-black rotate-12 shadow-sm group-hover:rotate-0 transition-transform z-20">
-                  NEW!
+                  {t('about.shopFavorites.new')}
                 </div>
               </a>
             ))}
@@ -693,7 +662,7 @@ export const AboutShopFavorites = ({
         ) : (
           <div className="text-center py-20 border-4 border-dashed border-black/20 rounded-3xl bg-gray-50">
             <div className="text-6xl mb-4 opacity-30">🕸️</div>
-            <p className="text-xl font-bold text-gray-400">Kho hàng đang trống...</p>
+            <p className="text-xl font-bold text-gray-400">{t('about.shopFavorites.emptyTitle')}</p>
           </div>
         )}
       </div>
@@ -702,6 +671,7 @@ export const AboutShopFavorites = ({
 };
 
 export const AboutSocialLinks = () => {
+  const { t } = useTranslation();
   const links = [
     { label: "Facebook", href: "https://www.facebook.com/qkanengk30825", color: "bg-[#1877F2]", rotate: "rotate-3" },
     { label: "GitHub", href: "https://github.com/khanhnkq", color: "bg-[#24292e]", rotate: "-rotate-2" },
@@ -727,7 +697,7 @@ export const AboutSocialLinks = () => {
           <div className="space-y-6 relative z-10">
             <div className="inline-block transform -rotate-2">
               <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-black drop-shadow-[2px_2px_0px_rgba(0,0,0,0.2)]">
-                Connect With Me!
+                {t('about.socialLinks.title')}
               </h2>
               {/* Underline Scribble */}
               <svg className="w-full h-4 mt-2 text-yellow-400" viewBox="0 0 200 10" preserveAspectRatio="none">
@@ -736,7 +706,7 @@ export const AboutSocialLinks = () => {
             </div>
 
             <p className="text-xl font-bold text-gray-600 max-w-lg mx-auto font-mono">
-              "Đừng ngại say hi! Mình không cắn đâu (chắc thế) 🐶"
+              {t('about.socialLinks.subtitle')} 🐶
             </p>
 
             <div className="flex flex-wrap gap-8 justify-center pt-8">
@@ -769,8 +739,8 @@ export const AboutSocialLinks = () => {
 
             {/* Signature Area */}
             <div className="mt-12 opacity-60 rotate-2">
-              <div className="font-script text-3xl text-gray-400">Nguyễn Khánh</div>
-              <div className="text-xs font-bold uppercase tracking-widest text-gray-300">Creator of Quizken</div>
+              <div className="font-script text-3xl text-gray-400">{t('about.socialLinks.signature')}</div>
+              <div className="text-xs font-bold uppercase tracking-widest text-gray-300">{t('about.socialLinks.signatureRole')}</div>
             </div>
           </div>
         </div>

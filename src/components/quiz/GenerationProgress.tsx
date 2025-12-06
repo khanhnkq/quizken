@@ -57,7 +57,7 @@ export const GenerationProgress: React.FC<GenerationProgressProps> = ({
   return (
     <div className="space-y-6 py-4 md:py-8">
       <div className="flex justify-center">
-        <Loader2 className="w-10 h-10 md:w-12 md:h-12 text-[#B5CC89] animate-spin" />
+        <Loader2 className="w-10 h-10 md:w-12 md:h-12 text-primary animate-spin" />
       </div>
 
       <div className="space-y-1 text-center px-4">
@@ -75,7 +75,7 @@ export const GenerationProgress: React.FC<GenerationProgressProps> = ({
             const active = getActiveStep(generationProgress) >= i;
             return (
               <div key={key} className="flex flex-col items-center">
-                <div className={`h-2 w-full rounded-full ${active ? "bg-[#B5CC89] animate-pulse" : "bg-secondary"}`} />
+                <div className={`h-2 w-full rounded-full ${active ? "bg-primary animate-pulse" : "bg-secondary"}`} />
                 <span
                   className={`mt-1 md:mt-2 text-[10px] md:text-[11px] text-center ${active ? "text-foreground" : "text-muted-foreground"
                     }`}>
