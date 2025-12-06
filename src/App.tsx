@@ -2,8 +2,9 @@ import { useLayoutEffect, useEffect, lazy, Suspense } from "react";
 import { Toaster as HotToaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { gsap } from "gsap";
+import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "@/hooks/use-toast";
 import { shouldDisableScrollSmoother } from "@/utils/deviceDetection";
 import { PageSkeleton } from "@/components/ui/loading-skeleton";
@@ -55,20 +56,54 @@ const ToastBroadcastReceiver = () => {
   return null; // Invisible component
 };
 
-// Simple Routes wrapper - no animations for maximum performance
-const AppRoutes = () => {
+// Page transitions wrapper component
+const AnimatedRoutes = () => {
+  const location = useLocation();
+
+  // Page transition variants - optimized for speed
+  const pageVariants = {
+    initial: {
+      opacity: 0,
+      y: 8,
+    },
+    in: {
+      opacity: 1,
+      y: 0,
+    },
+    out: {
+      opacity: 0,
+    },
+  };
+
+  const pageTransition = {
+    type: "tween" as const,
+    ease: "easeOut" as const,
+    duration: 0.15,
+  };
+
   return (
-    <Suspense fallback={<PageSkeleton />}>
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/library" element={<QuizLibrary />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/quiz/:attemptId" element={<QuizDetailPage />} />
-        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </Suspense>
+    <AnimatePresence mode="popLayout" initial={false}>
+      <motion.div
+        key={location.pathname}
+        initial="initial"
+        animate="in"
+        exit="out"
+        variants={pageVariants}
+        transition={pageTransition}
+        className="min-h-screen">
+        <Suspense fallback={<PageSkeleton />}>
+          <Routes location={location} key={location.pathname}>
+            <Route path="/" element={<Index />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/library" element={<QuizLibrary />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/quiz/:attemptId" element={<QuizDetailPage />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
+      </motion.div>
+    </AnimatePresence>
   );
 };
 
@@ -194,7 +229,7 @@ const App = () => {
             <ToastBroadcastReceiver />
             <BrowserRouter
               future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-              <AppRoutes />
+              <AnimatedRoutes />
             </BrowserRouter>
             <Analytics />
           </ChillMusicProvider>
