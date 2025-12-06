@@ -281,9 +281,9 @@ export default function PlayQuizPage() {
             </div>
 
 
-            <div className="container mx-auto px-4 md:px-6 relative z-10">
+            <div className="container mx-auto px-0 sm:px-6 relative z-10">
                 {/* Navigation - STICKY */}
-                <div className="sticky top-0 z-50 flex justify-between items-center py-6 mb-4">
+                <div className="sticky top-0 z-50 flex justify-between items-center py-4 px-4 sm:px-0 mb-4">
                     {/* Backdrop for sticky header */}
                     <div className="absolute inset-x-[-100vw] inset-y-0 bg-gradient-to-b from-indigo-50/95 via-white/80 to-transparent backdrop-blur-[2px] -z-10 pointer-events-none h-[120%]"></div>
 

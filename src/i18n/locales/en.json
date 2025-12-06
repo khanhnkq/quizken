@@ -92,6 +92,7 @@
             "description": "Log in to continue creating unlimited quizzes",
             "loginButton": "Log in now",
             "limitMessage": "You have reached the daily limit of 5 quizzes per day.",
+            "exceeded": "You have reached your quiz creation limit for today.",
             "usage": "Remaining Usage",
             "apiKey": "API Key",
             "unlimited": "Unlimited",
@@ -182,8 +183,10 @@
         "confirmDialog": {
             "title": "Confirm Create New Quiz",
             "titleCancel": "Cancel Quiz Creation?",
+            "titleNewQuiz": "Create New Quiz?",
             "description": "The current quiz will be removed from screen and any ongoing process will be cancelled. Do you want to continue creating a new quiz?",
             "descriptionCancel": "Are you sure you want to cancel the quiz generation? This process cannot be undone.",
+            "descriptionNewQuiz": "You have an unfinished quiz. Creating a new quiz will lose your current progress.",
             "cancel": "Cancel",
             "confirm": "Confirm"
         },

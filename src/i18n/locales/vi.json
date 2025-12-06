@@ -102,6 +102,7 @@
             "description": "Đăng nhập để tiếp tục tạo quiz không giới hạn",
             "loginButton": "Đăng nhập ngay",
             "limitMessage": "Bạn đã đạt giới hạn tạo 5 bài trắc nghiệm mỗi ngày.",
+            "exceeded": "Bạn đã hết lượt tạo quiz hôm nay.",
             "usage": "Lượt còn lại",
             "apiKey": "API Key",
             "unlimited": "Không giới hạn",
@@ -192,8 +193,10 @@
         "confirmDialog": {
             "title": "Xác nhận tạo quiz mới",
             "titleCancel": "Hủy tạo quiz?",
+            "titleNewQuiz": "Tạo Quiz mới?",
             "description": "Bài quiz hiện tại sẽ bị xóa khỏi màn hình và tiến trình đang chạy (nếu có) sẽ được hủy. Bạn có muốn tiếp tục tạo quiz mới?",
             "descriptionCancel": "Bạn có chắc chắn muốn hủy quá trình tạo quiz? Thao tác này không thể hoàn tác.",
+            "descriptionNewQuiz": "Bạn đang có quiz chưa hoàn thành. Tạo quiz mới sẽ mất tiến trình quiz cũ.",
             "cancel": "Hủy",
             "confirm": "Xác nhận"
         },

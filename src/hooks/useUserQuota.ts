@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -12,7 +13,7 @@ export function useUserQuota(userId?: string) {
     const queryClient = useQueryClient();
     const queryKey = ["user-quota", userId];
 
-    const { data, isLoading, error } = useQuery({
+    const { data, isLoading, error, refetch: queryRefetch } = useQuery({
         queryKey,
         queryFn: async () => {
             if (!userId) return null;
@@ -45,8 +46,54 @@ export function useUserQuota(userId?: string) {
             };
         },
         enabled: !!userId,
-        staleTime: 1000 * 60 * 5, // 5 minutes
+        staleTime: 1000 * 30, // 30 seconds (reduced for more responsive updates)
     });
+
+    // Real-time subscription for profiles and API keys changes
+    useEffect(() => {
+        if (!userId) return;
+
+        // Subscribe to profiles table changes for this user
+        const profilesChannel = supabase
+            .channel(`profiles-quota-${userId}`)
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'profiles',
+                    filter: `id=eq.${userId}`
+                },
+                () => {
+                    // Refetch when profile quota changes
+                    queryClient.invalidateQueries({ queryKey });
+                }
+            )
+            .subscribe();
+
+        // Subscribe to user_api_keys table changes for this user
+        const apiKeysChannel = supabase
+            .channel(`api-keys-quota-${userId}`)
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'user_api_keys',
+                    filter: `user_id=eq.${userId}`
+                },
+                () => {
+                    // Refetch when API key changes
+                    queryClient.invalidateQueries({ queryKey });
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(profilesChannel);
+            supabase.removeChannel(apiKeysChannel);
+        };
+    }, [userId, queryClient, queryKey]);
 
     // Calculate generic usage stats
     const dailyCount = data?.daily_count || 0;

@@ -266,7 +266,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
       id="quiz"
       className="quiz-content relative py-20 px-0 sm:px-4">
 
-      <div className="mx-auto max-w-4xl px-2 sm:px-4 relative z-10">
+      <div className="mx-auto max-w-4xl px-0 sm:px-4 relative z-10">
         <div className="text-center mb-12 relative py-4">
           {/* Animated Background Blobs - Playful Colors */}
           <div className="absolute top-1/2 left-1/4 w-48 h-48 bg-yellow-200/40 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-blob"></div>

@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
+import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Loader2,
@@ -1192,7 +1193,7 @@ const QuizGenerator = () => {
 
         {/* Floating Icons - Replaced with BackgroundDecorations component */}
 
-        <div className="container mx-auto max-w-4xl relative z-10">
+        <div className="container mx-auto max-w-4xl px-0 sm:px-4 relative z-10">
 
 
 
@@ -1310,7 +1311,7 @@ const QuizGenerator = () => {
 
 
           <Card className="mb-8 border-4 border-primary/30 bg-white/80 backdrop-blur-sm shadow-[0_8px_30px_rgba(0,0,0,0.08),inset_0_2px_0_rgba(255,255,255,0.9)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.12)] transition-all duration-300 rounded-3xl overflow-hidden">
-            <CardContent className="p-6 md:p-10 space-y-8">
+            <CardContent className="p-4 sm:p-6 md:p-10 space-y-8">
               {/* Show Form OR Loading Progress */}
               {loading ? (
                 <GenerationProgress
@@ -1321,84 +1322,40 @@ const QuizGenerator = () => {
               ) : (
                 /* Form Input State */
                 <>
-                  {/* Authenticated User Quota UI - Playful Redesign */}
+                  {/* Compact Quota UI */}
                   {user && (
-                    <div className="relative overflow-hidden rounded-2xl border-2 border-purple-100 dark:border-purple-900 bg-gradient-to-r from-pink-50/50 via-purple-50/50 to-indigo-50/50 dark:from-pink-950/20 dark:via-purple-950/20 dark:to-indigo-950/20 p-4 mb-6 shadow-sm">
-                      <div className="flex flex-col gap-3">
-                        <div className="flex items-center justify-between">
-                          {/* Left: Usage Info */}
-                          <div className="flex flex-col">
-                            <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400 mb-0.5">
-                              <Sparkles className="w-3.5 h-3.5" />
-                              {t("quizGenerator.quota.usage")}
-                            </div>
-                            {hasApiKey ? (
-                              <span className="text-xl font-black bg-gradient-to-br from-green-500 to-emerald-600 bg-clip-text text-transparent flex items-center gap-1.5">
-                                <Zap className="w-5 h-5 text-emerald-500" />
-                                {t("quizGenerator.quota.unlimited")}
-                              </span>
-                            ) : (
-                              <div className="flex items-baseline gap-1">
-                                <span className="text-2xl font-black bg-gradient-to-br from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                                  {userRemaining}
-                                </span>
-                                <span className="text-sm font-bold text-muted-foreground/70">
-                                  /{userLimit}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Right: API Key Badge */}
-                          <div className="flex flex-col items-end gap-1">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70">
-                              {t("quizGenerator.quota.apiKey")}
-                            </span>
-                            <Badge
-                              variant="secondary"
-                              className={`rounded-lg px-2.5 py-1 text-xs font-bold border-0 shadow-md transform transition-transform hover:scale-105 ${hasApiKey
-                                ? "bg-gradient-to-r from-emerald-400 to-teal-500 text-white"
-                                : "bg-gradient-to-r from-slate-200 to-slate-300 text-slate-600 dark:from-slate-700 dark:to-slate-800 dark:text-slate-300"
-                                }`}
-                            >
-                              {hasApiKey
-                                ? t("quizGenerator.quota.byok")
-                                : t("quizGenerator.quota.none")}
-                            </Badge>
-                          </div>
-                        </div>
-
-                        {/* Bottom: Progress Bar */}
-                        {!hasApiKey && (
-                          <div className="space-y-2">
-                            <div className="w-full h-2.5 bg-white/50 dark:bg-black/20 rounded-full overflow-hidden border border-purple-100/50 dark:border-purple-900/30">
-                              <div
-                                className={`h-full rounded-full transition-all duration-700 ease-out shadow-[0_0_10px_rgba(168,85,247,0.4)] ${userRemaining === 0
-                                  ? "bg-gradient-to-r from-red-400 to-pink-500"
-                                  : userRemaining === 1
-                                    ? "bg-gradient-to-r from-orange-400 to-amber-500"
-                                    : "bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500"
-                                  }`}
-                                style={{
-                                  width: `${Math.min(
-                                    100,
-                                    (userRemaining / userLimit) * 100
-                                  )}%`,
-                                }}
-                              />
-                            </div>
-                            <div className="flex justify-end">
-                              <Link
-                                to="/dashboard?tab=settings"
-                                className="text-[10px] font-bold text-purple-600 dark:text-purple-400 hover:text-purple-700 hover:underline decoration-dotted underline-offset-2 transition-colors flex items-center gap-1"
-                              >
-                                {t("quizGenerator.quota.tip")}
-                                <span className="text-xl leading-3">→</span>
-                              </Link>
-                            </div>
-                          </div>
-                        )}
+                    <div className="flex items-center justify-between gap-3 p-3 rounded-xl bg-gradient-to-r from-purple-50/80 to-indigo-50/80 dark:from-purple-950/30 dark:to-indigo-950/30 border border-purple-100 dark:border-purple-800 mb-6">
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-purple-500" />
+                        <span className="text-xs font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wide">
+                          {t("quizGenerator.quota.usage")}
+                        </span>
                       </div>
+                      {hasApiKey ? (
+                        <div className="flex items-center gap-1.5 text-sm font-bold text-emerald-600 dark:text-emerald-400">
+                          <Zap className="w-4 h-4" />
+                          {t("quizGenerator.quota.unlimited")}
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <div className="w-16 h-2 bg-white/60 dark:bg-black/30 rounded-full overflow-hidden border border-purple-100 dark:border-purple-800">
+                            <div
+                              className={cn(
+                                "h-full rounded-full transition-all",
+                                userRemaining === 0
+                                  ? "bg-red-400"
+                                  : userRemaining === 1
+                                    ? "bg-orange-400"
+                                    : "bg-gradient-to-r from-purple-400 to-indigo-500"
+                              )}
+                              style={{ width: `${Math.min(100, (userRemaining / userLimit) * 100)}%` }}
+                            />
+                          </div>
+                          <span className="text-sm font-bold text-purple-700 dark:text-purple-300">
+                            {userRemaining}/{userLimit}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   )}
 
