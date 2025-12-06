@@ -11,6 +11,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { Sparkles, Loader2, Target, XCircle, Clock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
@@ -19,6 +26,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { containsVietnameseBadwords } from "@/lib/vnBadwordsFilter";
 import { useAnonQuota } from "@/hooks/useAnonQuota";
 import { QuotaLimitDialog } from "./QuotaLimitDialog";
+import { QuotaExceededDialog } from "./QuotaExceededDialog";
 import { GenerationProgress } from "./GenerationProgress";
 import useQuizGeneration from "@/hooks/useQuizGeneration";
 import { useDashboardStats } from "@/hooks/useDashboardStats";
@@ -31,8 +39,6 @@ interface QuickGeneratorDialogProps {
     onOpenChange: (open: boolean) => void;
 }
 
-const QUESTION_OPTIONS = [5, 10, 15, 20];
-
 export function QuickGeneratorDialog({ open, onOpenChange }: QuickGeneratorDialogProps) {
     const { t, i18n } = useTranslation();
     const navigate = useNavigate();
@@ -43,12 +49,14 @@ export function QuickGeneratorDialog({ open, onOpenChange }: QuickGeneratorDialo
 
     // State
     const [prompt, setPrompt] = useState("");
-    const [questionCount, setQuestionCount] = useState<number | null>(null);
+    const [questionCount, setQuestionCount] = useState<string>("");
     const [loading, setLoading] = useState(false);
     const [generationStatus, setGenerationStatus] = useState<string | null>(null);
     const [generationProgress, setGenerationProgress] = useState("");
     const [promptError, setPromptError] = useState("");
     const [showQuotaDialog, setShowQuotaDialog] = useState(false);
+    const [showUserQuotaDialog, setShowUserQuotaDialog] = useState(false);
+    const [quotaErrorMessage, setQuotaErrorMessage] = useState("");
 
     // Refs
     const userRef = useRef(user);
@@ -82,10 +90,21 @@ export function QuickGeneratorDialog({ open, onOpenChange }: QuickGeneratorDialo
 
     // Handle generate
     const handleGenerate = async () => {
-        if (!user && hasReachedLimit) {
-            setShowQuotaDialog(true);
+        // Strict Auth Check - No more anonymous generation
+        if (!user) {
+            toast({
+                title: t('auth.required'),
+                description: t('auth.loginToCreate'),
+                variant: "warning",
+                duration: 3000,
+            });
+            // Option: Close dialog to let them login, or keep it open.
+            // keeping it open allows them to login and come back (if login is in another modal or page).
+            // But since login is usually in Navbar, maybe closing is better or redirecting.
+            // Let's just show toast for now.
             return;
         }
+
         if (!validatePrompt(prompt)) return;
         if (!questionCount) {
             toast({
@@ -126,7 +145,7 @@ export function QuickGeneratorDialog({ open, onOpenChange }: QuickGeneratorDialo
                 body: {
                     prompt,
                     device: deviceInfo,
-                    questionCount,
+                    questionCount: parseInt(questionCount),
                     idempotencyKey,
                     language: i18n.language,
                 },
@@ -170,9 +189,24 @@ export function QuickGeneratorDialog({ open, onOpenChange }: QuickGeneratorDialo
                     setLoading(false);
                     setGenerationStatus(null);
                     setGenerationProgress("");
+
+                    const msg = errorMessage || t("quizGenerator.toasts.genericError");
+
+                    // Check for User Quota Exceeded
+                    if (msg.toLowerCase().includes("daily quota limit reached")) {
+                        setQuotaErrorMessage(msg);
+                        setShowUserQuotaDialog(true);
+                        toast({
+                            title: t('quizGenerator.toasts.quotaTitle'),
+                            description: msg,
+                            variant: "warning",
+                        });
+                        return;
+                    }
+
                     toast({
                         title: t("quizGenerator.toasts.failedTitle"),
-                        description: errorMessage || t("quizGenerator.toasts.genericError"),
+                        description: msg,
                         variant: "destructive",
                     });
                 },
@@ -208,7 +242,7 @@ export function QuickGeneratorDialog({ open, onOpenChange }: QuickGeneratorDialo
     const handleOpenChange = (newOpen: boolean) => {
         if (!newOpen && !loading) {
             setPrompt("");
-            setQuestionCount(null);
+            setQuestionCount("");
             setPromptError("");
             setGenerationStatus(null);
             setGenerationProgress("");
@@ -277,44 +311,53 @@ export function QuickGeneratorDialog({ open, onOpenChange }: QuickGeneratorDialo
                                 )}
                             </div>
 
-                            {/* Question Count Pills */}
+                            {/* Question Count Selection */}
                             <div className="space-y-3">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-2">
                                         <label className="text-sm font-bold text-foreground">
-                                            {t("quizGenerator.questionCount", "Số câu hỏi")}
+                                            {t("quizGenerator.ui.questionCount", "Số câu hỏi")}
                                         </label>
                                         <Badge variant="secondary" className="rounded-lg px-1.5 py-0.5 text-[10px] font-bold border border-border">
                                             {t("quizGenerator.ui.required", "Bắt buộc")}
                                         </Badge>
                                     </div>
-                                    {questionCount && (
-                                        <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground bg-secondary/30 px-2 py-1 rounded-lg">
-                                            <Clock className="w-3.5 h-3.5" />
-                                            <span>
-                                                ~{Math.ceil(questionCount / 5)} {t("quizGenerator.ui.minutes", "phút")}
-                                            </span>
-                                        </div>
-                                    )}
                                 </div>
-                                <div className="flex flex-wrap gap-3">
-                                    {QUESTION_OPTIONS.map((count) => (
-                                        <Button
-                                            key={count}
-                                            type="button"
-                                            variant="ghost"
-                                            onClick={() => setQuestionCount(count)}
-                                            disabled={loading}
-                                            className={cn(
-                                                "rounded-xl h-11 px-5 font-bold transition-all border-2",
-                                                questionCount === count
-                                                    ? "bg-primary text-white border-primary shadow-md scale-105"
-                                                    : "bg-background border-border text-muted-foreground hover:border-primary/50 hover:text-primary"
-                                            )}
-                                        >
-                                            {count}
-                                        </Button>
-                                    ))}
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                                    <Select
+                                        value={questionCount}
+                                        onValueChange={setQuestionCount}
+                                        disabled={loading}
+                                    >
+                                        <SelectTrigger className="w-full h-12 rounded-xl border-2 text-base px-4 font-medium transition-all hover:border-primary/50 focus:ring-primary/20 bg-background text-foreground shadow-sm">
+                                            <SelectValue placeholder={t('quizGenerator.ui.selectPlaceholder')} />
+                                        </SelectTrigger>
+                                        <SelectContent className="rounded-xl border-2">
+                                            <SelectItem value="10" className="rounded-lg my-1 py-2 cursor-pointer">{t('quizGenerator.ui.10questions')}</SelectItem>
+                                            <SelectItem value="15" className="rounded-lg my-1 py-2 cursor-pointer">{t('quizGenerator.ui.15questions')}</SelectItem>
+                                            <SelectItem value="20" className="rounded-lg my-1 py-2 cursor-pointer">{t('quizGenerator.ui.20questions')}</SelectItem>
+                                            <SelectItem value="25" className="rounded-lg my-1 py-2 cursor-pointer">{t('quizGenerator.ui.25questions')}</SelectItem>
+                                            <SelectItem value="30" className="rounded-lg my-1 py-2 cursor-pointer">{t('quizGenerator.ui.30questions')}</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+
+                                    <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/30 border border-secondary text-muted-foreground h-12">
+                                        <Clock className="w-5 h-5 text-primary" />
+                                        <p className="text-sm font-medium">
+                                            {t('quizGenerator.ui.estimatedTime')}{" "}
+                                            <span className="text-foreground font-bold">
+                                                {questionCount
+                                                    ? Math.ceil(parseInt(questionCount) / 10)
+                                                    : 2}
+                                                -
+                                                {questionCount
+                                                    ? Math.ceil(parseInt(questionCount) / 5)
+                                                    : 4}{" "}
+                                            </span>
+                                            {t('quizGenerator.ui.minutes')}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
 
@@ -367,6 +410,12 @@ export function QuickGeneratorDialog({ open, onOpenChange }: QuickGeneratorDialo
                 open={showQuotaDialog}
                 onOpenChange={setShowQuotaDialog}
                 getTimeUntilReset={getTimeUntilReset}
+            />
+
+            <QuotaExceededDialog
+                open={showUserQuotaDialog}
+                onOpenChange={setShowUserQuotaDialog}
+                message={quotaErrorMessage}
             />
         </>
     );

@@ -5,15 +5,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Key,
   Eye,
@@ -25,7 +20,9 @@ import {
   Sparkles,
   Loader2,
   ClipboardPaste,
-} from '@/lib/icons';
+  Zap,
+  Cpu
+} from 'lucide-react';
 
 // Define types locally since they are missing in generated types
 interface UserApiKey {
@@ -48,6 +45,7 @@ const ApiKeySettings: React.FC = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
   const [apiKeys, setApiKeys] = useState<UserApiKey[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<string | null>(null);
@@ -75,7 +73,6 @@ const ApiKeySettings: React.FC = () => {
 
       if (error) {
         console.error("Error loading API keys:", error);
-        // If table doesn't exist yet, show friendly message
         if (
           error.code === "PGRST116" ||
           error.message.includes("user_api_keys")
@@ -91,17 +88,14 @@ const ApiKeySettings: React.FC = () => {
           });
         }
       } else {
-        // Safely cast the data to avoid type errors
         const apiKeyData = (data || []) as UserApiKey[];
         setApiKeys(apiKeyData);
 
-        // Populate form with existing keys (will be decrypted on backend)
         const geminiKey = apiKeyData.find(
           (k: UserApiKey) => k.provider === "gemini"
         );
         if (geminiKey) {
-          // In production, this would be decrypted on backend
-          setGeminiKey("••••••••••••••••••••••••••••••••"); // Placeholder
+          setGeminiKey("••••••••••••••••••••••••••••••••");
         }
       }
     } catch (error) {
@@ -126,7 +120,7 @@ const ApiKeySettings: React.FC = () => {
       const insertData: UserApiKeyInsert = {
         user_id: user.id,
         provider,
-        encrypted_key: geminiKey, // In production: encrypt this
+        encrypted_key: geminiKey,
         is_active: true,
         updated_at: new Date().toISOString(),
       };
@@ -150,8 +144,9 @@ const ApiKeySettings: React.FC = () => {
           title: t("apiKeySettings.toasts.saveSuccess"),
           description: t("apiKeySettings.toasts.saveSuccessDesc", { provider }),
         });
-        setGeminiKey("••••••••••••••••••••••••••••••••"); // Hide after save
-        loadApiKeys(); // Refresh list
+        setGeminiKey("••••••••••••••••••••••••••••••••");
+        loadApiKeys();
+        queryClient.invalidateQueries({ queryKey: ["user-quota"] });
       }
     } catch (error) {
       console.error("Save API key error:", error);
@@ -187,6 +182,7 @@ const ApiKeySettings: React.FC = () => {
         });
         setGeminiKey("");
         setApiKeys(apiKeys.filter((k) => k.provider !== provider));
+        queryClient.invalidateQueries({ queryKey: ["user-quota"] });
       }
     } catch (error) {
       console.error("Delete API key error:", error);
@@ -205,13 +201,11 @@ const ApiKeySettings: React.FC = () => {
     }));
   };
 
-  // Validate Gemini API key format (basic, client-side)
   const validateGeminiKey = (k: string) => {
     const masked = "••••••••••••••••••••••••••••••••";
     const trimmed = k.trim();
 
     if (trimmed === masked) {
-      // Placeholder shown after load/save - treat as valid display state
       setGeminiKeyError("");
       setIsValid(true);
       return true;
@@ -251,8 +245,7 @@ const ApiKeySettings: React.FC = () => {
     } catch {
       toast({
         title: t("apiKeySettings.toasts.clipboardError"),
-        description:
-          t("apiKeySettings.toasts.clipboardErrorDesc"),
+        description: t("apiKeySettings.toasts.clipboardErrorDesc"),
         variant: "destructive",
       });
     }
@@ -319,217 +312,229 @@ const ApiKeySettings: React.FC = () => {
 
   if (!user) {
     return (
-      <Card>
-        <CardContent className="p-6 text-center">
-          <p className="text-muted-foreground">
-            {t("apiKeySettings.loginRequired")}
-          </p>
-        </CardContent>
-      </Card>
+      <div className="flex justify-center items-center p-12 bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200">
+        <p className="text-muted-foreground font-medium flex items-center gap-2">
+          <Shield className="w-5 h-5" />
+          {t("apiKeySettings.loginRequired")}
+        </p>
+      </div>
     );
   }
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <div className="flex justify-center items-center py-20">
+        <Loader2 className="w-10 h-10 animate-spin text-primary" />
       </div>
     );
   }
 
+  const isGeminiConnected = apiKeys.some((k) => k.provider === "gemini");
+
   return (
-    <div className="max-w-2xl mx-auto space-y-8 pb-10">
-      {/* Header - Matching Dashboard "Hello" Style */}
-      <div className="flex flex-col items-center text-center space-y-3 pt-6">
+    <div className="max-w-3xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
+
+      {/* Header Area */}
+      <div className="flex flex-col items-center text-center space-y-4 pt-2">
         {/* Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 backdrop-blur-sm border-2 border-slate-400 text-slate-600 font-bold text-sm shadow-sm animate-fade-in">
-          <Sparkles className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-          <span>Cài đặt nâng cao</span>
+        <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white border-2 border-violet-200 shadow-[0_4px_12px_rgba(139,92,246,0.1)] animate-bounce-slow">
+          <Sparkles className="w-4 h-4 text-violet-500 fill-violet-500" />
+          <span className="font-bold text-sm text-violet-700">{t('dashboard.settings.title')}</span>
         </div>
 
-        {/* Title with SVG underline */}
-        <h1 className="font-heading text-4xl md:text-5xl font-bold tracking-tight text-foreground drop-shadow-sm">
+        {/* Title */}
+        <h1 className="font-heading text-4xl md:text-5xl font-black tracking-tight text-slate-800 drop-shadow-sm">
           API{' '}
-          <span className="text-slate-600 relative inline-block">
+          <span className="relative inline-block text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-indigo-600">
             Settings
-            <svg className="absolute -bottom-2 left-0 w-full h-3 text-slate-300 -z-10 opacity-60" viewBox="0 0 100 10" preserveAspectRatio="none">
+            <svg className="absolute -bottom-2 left-0 w-full h-3 text-violet-300 -z-10 opacity-50" viewBox="0 0 100 10" preserveAspectRatio="none">
               <path d="M0 5 Q 50 15 100 5" stroke="currentColor" strokeWidth="12" fill="none" />
             </svg>
           </span>
-          <span className="inline-block animate-wave ml-2 origin-[70%_70%]">🔑</span>
+          <span className="inline-block animate-wave ml-3 origin-[70%_70%]">🔑</span>
         </h1>
 
         {/* Subtitle */}
-        <p className="text-lg text-muted-foreground font-medium max-w-lg">
-          {t("apiKeySettings.description")}
+        <p className="text-lg text-slate-500 font-medium max-w-lg">
+          {t('dashboard.settings.description')}
         </p>
       </div>
 
-      {/* Gemini API Key Form - Compact Card */}
-      <Card className="rounded-2xl border-3 border-primary/20 shadow-md overflow-hidden">
-        <CardHeader className="pb-2 pt-4 px-4 bg-gradient-to-r from-secondary/30 to-transparent">
-          <CardTitle className="flex items-center justify-between text-lg font-heading">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-white rounded-lg border-2 border-primary/10">
-                <Key className="w-4 h-4 text-primary" />
+      {/* Main Card - Claymorphism Style */}
+      <div className="relative group">
+        {/* Decorative elements behind */}
+        <div className="absolute -inset-1 bg-gradient-to-r from-violet-200 via-indigo-200 to-cyan-200 rounded-[2.5rem] blur opacity-30 group-hover:opacity-50 transition duration-500"></div>
+
+        <div className="relative bg-white rounded-[2rem] border-2 border-indigo-50 shadow-[0_20px_40px_rgba(0,0,0,0.05),inset_0_-2px_6px_rgba(0,0,0,0.02)] p-6 md:p-10 overflow-hidden">
+
+          {/* Header inside card */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 text-white flex items-center justify-center shadow-lg shadow-violet-200 transform rotate-3">
+                <Cpu className="w-8 h-8" />
               </div>
-              API Key Gemini AI
-            </div>
-            {apiKeys.some((k) => k.provider === "gemini") && (
-              <div className="flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-bold border border-green-200">
-                <Check className="w-3 h-3" />
-                <span>{t("apiKeySettings.connected")}</span>
+              <div>
+                <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
+                  Gemini AI
+                  {isGeminiConnected && (
+                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-600 text-xs font-bold border border-emerald-200 flex items-center gap-1">
+                      <Check className="w-3 h-3 stroke-[3]" />
+                      {t("apiKeySettings.connected")}
+                    </span>
+                  )}
+                </h2>
+                <a
+                  href="https://makersuite.google.com/app/apikey"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm font-semibold text-indigo-500 hover:text-indigo-600 hover:underline flex items-center gap-1 mt-0.5"
+                >
+                  {t("apiKeySettings.getFreeKey")}
+                  <Zap className="w-3 h-3 fill-current" />
+                </a>
               </div>
-            )}
-          </CardTitle>
-          <CardDescription className="text-sm font-medium">
-            {t("apiKeySettings.getFreeKey")}{" "}
-            <a
-              href="https://makersuite.google.com/app/apikey"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary hover:underline font-bold">
-              Google AI Studio
-            </a>
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-3 p-4 pt-3">
-          {/* Input field */}
-          <div className="space-y-1.5">
-            <Label htmlFor="gemini-key" className="text-sm font-heading font-bold text-foreground/80">
-              {t("apiKeySettings.pasteKey")}
-            </Label>
-            <div className="relative group">
-              <Input
-                id="gemini-key"
-                type={showKeys["gemini"] ? "text" : "password"}
-                placeholder={t("apiKeySettings.placeholder")}
-                value={geminiKey}
-                onChange={(e) => setGeminiKey(e.target.value)}
-                className="pr-10 h-11 rounded-xl border-3 border-border focus:border-primary/50 focus:ring-2 focus:ring-primary/10 text-base transition-all duration-200"
-              />
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="absolute right-1.5 top-1.5 h-8 w-8 rounded-lg hover:bg-secondary/50 text-muted-foreground"
-                onClick={() => toggleKeyVisibility("gemini")}>
-                {showKeys["gemini"] ? (
-                  <EyeOff className="h-4 w-4" />
-                ) : (
-                  <Eye className="h-4 w-4" />
-                )}
-              </Button>
-            </div>
-            <div>
-              {geminiKeyError ? (
-                <p className="text-xs font-medium text-red-500 flex items-center gap-1">
-                  <span className="inline-block w-1 h-1 rounded-full bg-red-500" />
-                  {geminiKeyError}
-                </p>
-              ) : (
-                <p className="text-xs font-medium text-muted-foreground">
-                  {t("apiKeySettings.secureNote")}
-                </p>
-              )}
             </div>
           </div>
 
-          {/* Action buttons */}
-          <div className="flex flex-col sm:flex-row gap-2">
-            <Button
-              onClick={() => saveApiKey("gemini")}
-              disabled={
-                saving === "gemini" ||
-                !geminiKey.trim() ||
-                geminiKey === "••••••••••••••••••••••••••••••••" ||
-                !isValid
-              }
-              size="default"
-              variant="hero"
-              className="flex-1 rounded-xl font-heading text-sm shadow-md hover:shadow-lg transition-all duration-200">
-              {saving === "gemini" ? (
-                <>
-                  <div className="animate-spin rounded-full h-3.5 w-3.5 border-b-2 border-white mr-2"></div>
-                  {t("apiKeySettings.saving")}
-                </>
-              ) : (
-                <>
-                  <Save className="h-3.5 w-3.5 mr-1.5" />
-                  {t("apiKeySettings.saveKey")}
-                </>
-              )}
-            </Button>
+          {/* Form */}
+          <div className="space-y-6">
+            <div className="space-y-3">
+              <Label htmlFor="gemini-key" className="text-sm font-bold text-slate-700 uppercase tracking-wide ml-1">
+                {t("apiKeySettings.pasteKey")}
+              </Label>
 
-            <div className="flex gap-2">
-              <Button
-                onClick={testApiKey}
-                disabled={
-                  testLoading ||
-                  geminiKey === "••••••••••••••••••••••••••••••••" ||
-                  !isValid
-                }
-                variant="outline"
-                size="default"
-                className="flex-1 sm:flex-none rounded-xl border-3 border-border hover:border-primary/50 hover:bg-secondary/30 font-heading text-sm">
-                {testLoading ? (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                ) : (
-                  t("apiKeySettings.test")
-                )}
-              </Button>
-
-              <Button
-                type="button"
-                variant="outline"
-                size="default"
-                onClick={handlePasteFromClipboard}
-                className="flex-1 sm:flex-none rounded-xl border-3 border-border hover:border-primary/50 hover:bg-secondary/30 font-heading"
-                title={t("apiKeySettings.pasteFromClipboard")}>
-                <ClipboardPaste className="h-3.5 w-3.5" />
-              </Button>
-
-              {apiKeys.some((k) => k.provider === "gemini") && (
+              <div className="relative group/input">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Key className={`h-5 w-5 transition-colors ${isValid ? 'text-emerald-500' : 'text-slate-400'}`} />
+                </div>
+                <Input
+                  id="gemini-key"
+                  type={showKeys["gemini"] ? "text" : "password"}
+                  placeholder={t("apiKeySettings.placeholder")}
+                  value={geminiKey}
+                  onChange={(e) => setGeminiKey(e.target.value)}
+                  className="pl-12 pr-12 h-14 rounded-2xl border-2 border-slate-200 bg-slate-50 hover:bg-white focus:bg-white focus:border-violet-400 focus:ring-4 focus:ring-violet-100 text-lg transition-all duration-300 font-medium text-slate-800 placeholder:text-slate-400"
+                />
                 <Button
-                  onClick={() => deleteApiKey("gemini")}
-                  variant="outline"
-                  size="default"
-                  className="rounded-xl border-3 border-red-100 text-red-500 hover:bg-red-50 hover:border-red-200 hover:text-red-600">
-                  <Trash2 className="h-3.5 w-3.5" />
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-2 top-2 h-10 w-10 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
+                  onClick={() => toggleKeyVisibility("gemini")}
+                >
+                  {showKeys["gemini"] ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
                 </Button>
-              )}
+              </div>
+
+              {/* Error / Status Message */}
+              <AnimatePresence mode="wait">
+                {geminiKeyError ? (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="flex items-center gap-2 text-rose-500 text-sm font-medium pl-1"
+                  >
+                    <div className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
+                    {geminiKeyError}
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex items-center gap-2 text-slate-400 text-sm font-medium pl-1"
+                  >
+                    <Shield className="w-3.5 h-3.5" />
+                    {t("apiKeySettings.secureNote")}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Actions Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8">
+              {/* Save Button - Large & Hero */}
+              <Button
+                onClick={() => saveApiKey("gemini")}
+                disabled={saving === "gemini" || !geminiKey.trim() || geminiKey === "••••••••••••••••••••••••••••••••" || !isValid}
+                className={`
+                  col-span-1 sm:col-span-2 h-14 rounded-2xl text-base font-bold shadow-lg transition-all duration-300 transform active:scale-[0.98]
+                  bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white
+                  shadow-violet-200 hover:shadow-violet-300
+                `}
+              >
+                {saving === "gemini" ? (
+                  <>
+                    <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                    {t("apiKeySettings.saving")}
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-5 w-5 mr-2" />
+                    {t("apiKeySettings.saveKey")}
+                  </>
+                )}
+              </Button>
+
+              {/* Secondary Actions */}
+              <div className="flex gap-3 col-span-1 sm:col-span-2">
+                <Button
+                  onClick={testApiKey}
+                  disabled={testLoading || geminiKey === "••••••••••••••••••••••••••••••••" || !isValid}
+                  variant="outline"
+                  className="flex-1 h-12 rounded-xl border-2 border-slate-200 hover:border-violet-300 hover:bg-violet-50 text-slate-700 hover:text-violet-700 font-bold transition-all"
+                >
+                  {testLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : t("apiKeySettings.test")}
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handlePasteFromClipboard}
+                  className="flex-1 h-12 rounded-xl border-2 border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-600 font-bold transition-all"
+                  title={t("apiKeySettings.pasteFromClipboard")}
+                >
+                  <ClipboardPaste className="h-4 w-4 mr-2" />
+                  Paste
+                </Button>
+
+                {isGeminiConnected && (
+                  <Button
+                    onClick={() => deleteApiKey("gemini")}
+                    variant="ghost"
+                    className="h-12 w-12 rounded-xl border-2 border-rose-100 bg-rose-50 text-rose-500 hover:bg-rose-100 hover:border-rose-200 hover:text-rose-600 transition-all p-0 flex items-center justify-center shrink-0"
+                    title="Delete Key"
+                  >
+                    <Trash2 className="h-5 w-5" />
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
+        </div>
+      </div>
 
-          {/* Success message */}
-          {apiKeys.some((k) => k.provider === "gemini") && (
-            <div className="flex items-center gap-2 p-2.5 bg-green-50 border border-green-200 rounded-xl text-green-700 text-sm">
-              <div className="p-0.5 bg-green-200 rounded-full">
-                <Check className="h-3 w-3 text-green-700" />
-              </div>
-              <span className="font-bold font-heading">
-                {t("apiKeySettings.apiReady")}
-              </span>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Quick Setup Tip - Compact */}
-      <Card className="bg-gradient-to-br from-primary/20 to-primary/5 border-2 border-primary/30 rounded-2xl shadow-sm">
-        <CardContent className="p-3 flex items-center gap-3">
-          <div className="p-2 bg-white rounded-xl shadow-sm">
-            <Sparkles className="w-4 h-4 text-primary" />
+      {/* Tip Card - Sticky Note Style */}
+      <div className="relative transform rotate-1 hover:rotate-0 transition-transform duration-300 max-w-lg mx-auto">
+        <div className="absolute top-0 left-0 w-full h-full bg-yellow-400 rounded-2xl transform translate-x-2 translate-y-2 -z-10 rounded-br-[3rem]"></div>
+        <div className="bg-gradient-to-br from-yellow-50 to-amber-50 border-2 border-amber-200 rounded-2xl p-5 rounded-br-[3rem] shadow-sm flex items-start gap-4">
+          <div className="bg-yellow-100 p-2.5 rounded-xl border border-yellow-200 shrink-0 transform -rotate-6">
+            <Sparkles className="w-6 h-6 text-amber-500 fill-amber-500" />
           </div>
           <div>
-            <h4 className="font-bold font-heading text-sm text-foreground">{t("apiKeySettings.tip.title")}</h4>
-            <p className="text-xs font-medium text-muted-foreground">
+            <h4 className="font-bold text-amber-800 text-lg mb-1 font-heading">{t("apiKeySettings.tip.title")}</h4>
+            <p className="text-amber-700/80 text-sm font-medium leading-relaxed">
               {t("apiKeySettings.tip.description")}
             </p>
           </div>
-        </CardContent>
-      </Card>
-    </div >
+        </div>
+      </div>
+
+    </div>
   );
 };
 

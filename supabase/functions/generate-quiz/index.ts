@@ -471,50 +471,81 @@ async function processQuizGeneration(quizId, payload, req) {
       ? authHeader.slice(7)
       : null;
     let isAuthenticated = false;
+    let authenticatedUser = null;
     if (adminClient && accessToken) {
       try {
-        const { data, error } = await adminClient.auth.getUser(accessToken);
-        isAuthenticated = !!data?.user && !error;
+        const { data: authData, error } = await adminClient.auth.getUser(accessToken);
+        isAuthenticated = !!authData?.user && !error;
+        authenticatedUser = authData?.user;
       } catch {
         isAuthenticated = false;
+        authenticatedUser = null;
       }
     }
+    // 0. Enforce Authentication - Block Anonymous Users
+    if (!isAuthenticated) {
+      // Return 401 Unauthorized
+      await updateQuizStatus(
+        quizId,
+        QUIZ_STATUS.FAILED,
+        "Authentication required. Please log in to create quizzes."
+      );
+      return new Response(
+        JSON.stringify({
+          error: "Authentication required",
+          message: "Please log in to create quizzes.",
+        }),
+        {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
     // API Key setup and authentication
     const SERVER_GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-    // Allow anonymous users to generate with SERVER key even if they provided an apiKey field
-    if (apiKey && !isAuthenticated) {
-      console.log(
-        "[BACKEND] Unauthenticated user API key provided; falling back to server-managed key"
-      );
-      // Provide clearer progress for frontend UI, but do NOT fail
-      await adminClient
-        .from("quizzes")
-        .update({
-          progress: "Authenticating... Using server key",
-        })
-        .eq("id", quizId);
-      // Continue using server key; do not set usingUserKey/skipUsageLimit
-    }
     let apiKeyToUse = SERVER_GEMINI_API_KEY;
     let usingUserKey = false;
     let skipUsageLimit = false;
-    if (apiKey && apiKey.trim().length > 0 && isAuthenticated) {
+
+    // Try to get user key from payload OR database
+    let userApiKey = apiKey;
+
+    // If no key in payload, check DB for authenticated user
+    if (!userApiKey && isAuthenticated && adminClient && authenticatedUser) {
+      console.log(`🔍 Checking DB for API Key. User ID: ${authenticatedUser.id}`);
       try {
-        const testResponse = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`
-        );
-        if (testResponse.ok) {
-          apiKeyToUse = apiKey;
-          usingUserKey = true;
-          skipUsageLimit = true; // Skip limits when using user key
+        const { data: keyData, error: keyError } = await adminClient
+          .from("user_api_keys")
+          .select("encrypted_key")
+          .eq("user_id", authenticatedUser.id)
+          .eq("provider", "gemini")
+          .eq("is_active", true)
+          .single();
+
+        if (keyError) {
+          console.error("❌ Error querying user_api_keys:", keyError);
         } else {
-          console.log(
-            `User API key invalid (HTTP ${testResponse.status}) - falling back to server key`
-          );
+          console.log("✅ Query result:", keyData ? "Found Data" : "No Data");
         }
-      } catch {
-        // fallback to server key
+
+        if (keyData?.encrypted_key) {
+          userApiKey = keyData.encrypted_key;
+          console.log("🔑 Found active user API key in database");
+        }
+      } catch (e) {
+        console.error("Error fetching user API key:", e);
       }
+    }
+
+    if (userApiKey && userApiKey.trim().length > 0 && isAuthenticated) {
+      // Optimistically trust the user key to avoid "Quota Reached" false positives 
+      // if the verification check fails due to network issues.
+      // If the key is actually invalid, the main generation loop will fail with 401/403.
+      apiKeyToUse = userApiKey;
+      usingUserKey = true;
+      skipUsageLimit = true; // Skip limits when using user key
+      console.log("Using User API Key (Optimistic)");
     }
     if (!apiKeyToUse) {
       console.error("❌ No valid Gemini API key found!");
@@ -537,40 +568,83 @@ async function processQuizGeneration(quizId, payload, req) {
         progress: "Checking rate limits...",
       })
       .eq("id", quizId);
-    // Anonymous usage limiting (skip if using user key)
-    const DAILY_LIMIT = 3;
-    if (!skipUsageLimit && !isAuthenticated && adminClient) {
-      const day = todayDate();
-      // Use atomic UPSERT to prevent race conditions
-      // This ensures only one request can increment the counter at a time
-      const { data: upsertResult, error: usageErr } = await adminClient.rpc(
-        "increment_anonymous_usage",
+    // Authenticated User Quota Check
+    const USER_DAILY_LIMIT = 5;
+
+    // 0. Enforce Authentication - Block Anonymous Users
+    if (!isAuthenticated) {
+      // Return 401 Unauthorized
+      await updateQuizStatus(
+        quizId,
+        QUIZ_STATUS.FAILED,
+        "Authentication required. Please log in to create quizzes."
+      );
+      return new Response(
+        JSON.stringify({
+          error: "Authentication required",
+          message: "Please log in to create quizzes.",
+        }),
         {
-          p_ip: ip,
-          p_fingerprint: fingerprint,
-          p_day_date: day,
-          p_user_agent: userAgent,
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
         }
       );
-      if (usageErr) {
-        console.error("Error incrementing anonymous usage:", usageErr);
+    }
+
+    // 1. Authenticated User Quota Check
+    if (!skipUsageLimit && isAuthenticated && adminClient && authenticatedUser) {
+      const userId = authenticatedUser.id;
+      const day = todayDate();
+
+      // Check user usage
+      const { data: usageData, error: usageError } = await adminClient
+        .from("profiles")
+        .select("daily_quiz_count, last_daily_reset")
+        .eq("id", userId)
+        .single();
+
+      if (usageError) {
+        console.error("Error checking user usage:", usageError);
+        // Fail open or closed? Let's fail open for now but log it, or safe fail.
+      }
+
+      let currentCount = 0;
+      let lastResetDate = day;
+
+      if (usageData) {
+        currentCount = usageData.daily_quiz_count ?? 0;
+        lastResetDate = usageData.last_daily_reset ?? day;
+      }
+
+      // Reset if new day
+      if (lastResetDate !== day) {
+        currentCount = 0;
+      }
+
+      if (currentCount >= USER_DAILY_LIMIT) {
         await updateQuizStatus(
           quizId,
           QUIZ_STATUS.FAILED,
-          "Failed to check usage quota"
+          `Daily quota limit reached (${USER_DAILY_LIMIT}/day). Please add your own API Key in Settings.`
         );
         return;
       }
-      // Check if quota exceeded after atomic increment
-      if (upsertResult && upsertResult.count > DAILY_LIMIT) {
-        await updateQuizStatus(
-          quizId,
-          QUIZ_STATUS.FAILED,
-          "Anonymous quota exceeded"
-        );
-        return;
+
+      // Increment usage (Update profiles)
+      const { error: updateError } = await adminClient
+        .from("profiles")
+        .update({
+          daily_quiz_count: currentCount + 1,
+          last_daily_reset: day
+        })
+        .eq("id", userId);
+
+      if (updateError) {
+        console.error("Error incrementing user usage:", updateError);
       }
     }
+
+
     // Update progress
     await adminClient
       .from("quizzes")
@@ -675,6 +749,16 @@ async function processQuizGeneration(quizId, payload, req) {
     const maxRetries = 5; // increase retries for transient errors
     const baseDelayMs = 1000;
     const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+    // Check for cancellation before starting AI generation loop
+    {
+      const { data: checkQuiz } = await adminClient.from("quizzes").select("status").eq("id", quizId).single();
+      if (checkQuiz?.status === 'cancelled' || checkQuiz?.status === 'failed') {
+        console.log(`🛑 [BACKEND] Quiz ${quizId} was cancelled or failed. Stopping generation.`);
+        return;
+      }
+    }
+
     for (retryCount = 0; retryCount <= maxRetries; retryCount++) {
       const attempt = retryCount + 1;
       try {
@@ -911,6 +995,16 @@ async function processQuizGeneration(quizId, payload, req) {
       };
     });
     // Save original AI output to DB so the UI shows the quiz as generated by AI
+
+    // Check for cancellation before final save (to avoid overwriting 'cancelled' status)
+    {
+      const { data: checkQuiz } = await adminClient.from("quizzes").select("status").eq("id", quizId).single();
+      if (checkQuiz?.status === 'cancelled' || checkQuiz?.status === 'failed') {
+        console.log(`🛑 [BACKEND] Quiz ${quizId} was cancelled/failed during generation. Aborting save.`);
+        return;
+      }
+    }
+
     await adminClient
       .from("quizzes")
       .update({
@@ -1182,6 +1276,7 @@ async function handleGetQuizStatus(req) {
             }
             : null,
         progress: quiz.progress || "Processing...",
+        error: quiz.status === QUIZ_STATUS.FAILED ? quiz.progress : undefined
       }),
       {
         headers: {
@@ -1205,6 +1300,74 @@ async function handleGetQuizStatus(req) {
     );
   }
 }
+
+async function handleCancelQuiz(req) {
+  if (req.method === "OPTIONS")
+    return new Response(null, { headers: corsHeaders });
+
+  if (!adminClient) {
+    return new Response(JSON.stringify({ error: "Database unavailable" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+  }
+
+  // Auth Check
+  const authHeader = req.headers.get("Authorization") || "";
+  const accessToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
+  let user = null;
+
+  if (accessToken) {
+    const { data } = await adminClient.auth.getUser(accessToken);
+    user = data?.user;
+  }
+
+  if (!user) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+  }
+
+  try {
+    const { quiz_id } = await req.json();
+    if (!quiz_id) throw new Error("Missing quiz_id");
+
+    // Check current status
+    const { data: quiz, error: fetchError } = await adminClient
+      .from("quizzes")
+      .select("status, user_id")
+      .eq("id", quiz_id)
+      .single();
+
+    console.log(`[CANCEL-QUIZ] Found quiz: ${quiz_id}, status: ${quiz?.status}`);
+
+    if (fetchError || !quiz) throw new Error("Quiz not found");
+    if (quiz.user_id !== user.id) throw new Error("Unauthorized access to quiz");
+
+    // Only cancel if processing or pending
+    if (quiz.status === QUIZ_STATUS.PROCESSING || quiz.status === QUIZ_STATUS.PENDING) {
+      // 1. Update status
+      console.log(`[CANCEL-QUIZ] Updating status to cancelled for quiz: ${quiz_id}`);
+      const { error: updateError } = await adminClient
+        .from("quizzes")
+        .update({ status: 'cancelled', progress: 'Cancelled by user' })
+        .eq("id", quiz_id);
+
+      if (updateError) {
+        console.error(`[CANCEL-QUIZ] Failed to update status:`, updateError);
+        throw new Error("Failed to update quiz status");
+      }
+      console.log(`[CANCEL-QUIZ] Successfully cancelled quiz: ${quiz_id}`);
+
+      // 2. Refund Logic REMOVED per user request
+      // Cancellation now consumes the quota attempt as the process was initiated.
+      // const { data: profile } = await adminClient.from("profiles").select("daily_quiz_count").eq("id", user.id).single();
+      // if (profile && profile.daily_quiz_count > 0) {
+      //   await adminClient.from("profiles").update({ daily_quiz_count: profile.daily_quiz_count - 1 }).eq("id", user.id);
+      // }
+    }
+
+    return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err.message }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+  }
+}
+
 // Main server function
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -1218,6 +1381,8 @@ serve(async (req) => {
     return handleStartQuiz(req);
   } else if (path === "get-quiz-status") {
     return handleGetQuizStatus(req);
+  } else if (path === "cancel-quiz") {
+    return handleCancelQuiz(req);
   }
   // Default blocking endpoint for backwards compatibility
   return new Response(

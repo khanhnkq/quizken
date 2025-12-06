@@ -58,7 +58,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onOpenChange }) => {
                 <Shield className="w-4 h-4 text-black" />
               </div>
               <DialogTitle className="text-lg font-bold text-primary">
-                QuizGen AI
+                QuizKen
               </DialogTitle>
             </div>
             <DialogDescription className="text-center text-[11px] text-muted-foreground leading-relaxed">

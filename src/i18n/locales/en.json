@@ -6,11 +6,17 @@
         "dashboard": "Dashboard",
         "login": "Log in",
         "logout": "Log out",
-        "signup": "Sign up",
-        "language": "Language",
         "account": "Account",
         "loggedInWith": "Logged in with",
         "apiSettings": "API Settings"
+    },
+    "auth": {
+        "title": "Authentication",
+        "description": "Please sign in to continue",
+        "login": "Sign In",
+        "logout": "Sign Out",
+        "required": "Authentication Required",
+        "loginToCreate": "Please log in to create quizzes."
     },
     "hero": {
         "title": "Create AI Quiz for Free",
@@ -84,7 +90,15 @@
         "quota": {
             "title": "Free quota reached",
             "description": "Log in to continue creating unlimited quizzes",
-            "loginButton": "Log in now"
+            "loginButton": "Log in now",
+            "limitMessage": "You have reached the daily limit of 5 quizzes per day.",
+            "usage": "Remaining Usage",
+            "apiKey": "API Key",
+            "unlimited": "Unlimited",
+            "byok": "BYOK",
+            "none": "NONE",
+            "tip": "Get Unlimited Access",
+            "tipDesc": "Add your own Google Gemini API Key in settings to create unlimited quizzes for free!"
         },
         "success": {
             "title": "Questions created successfully!",
@@ -167,7 +181,9 @@
         },
         "confirmDialog": {
             "title": "Confirm Create New Quiz",
+            "titleCancel": "Cancel Quiz Creation?",
             "description": "The current quiz will be removed from screen and any ongoing process will be cancelled. Do you want to continue creating a new quiz?",
+            "descriptionCancel": "Are you sure you want to cancel the quiz generation? This process cannot be undone.",
             "cancel": "Cancel",
             "confirm": "Confirm"
         },

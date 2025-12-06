@@ -338,18 +338,7 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
 
           <TabsContent value="settings" className="min-h-[500px] pt-4 focus-visible:outline-none">
             <div className="max-w-4xl mx-auto">
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-6">
-                <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
-                  <div className="p-2 bg-slate-100 rounded-xl">
-                    <Settings className="w-5 h-5 text-slate-600" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold text-slate-800">{t('dashboard.settings.title')}</h2>
-                    <p className="text-sm text-slate-500">{t('dashboard.settings.description')}</p>
-                  </div>
-                </div>
-                <ApiKeySettings />
-              </div>
+              <ApiKeySettings />
             </div>
           </TabsContent>
         </div>

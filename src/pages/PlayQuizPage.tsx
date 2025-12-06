@@ -86,20 +86,21 @@ export default function PlayQuizPage() {
                 if (saved && saved.quizId === quizId) {
                     // Restore saved progress
                     setUserAnswers(saved.userAnswers);
-                    startTimeRef.current = saved.startTime;
+                    // Use saved startTime, or null if it wasn't set (although legacy saves might have number)
+                    startTimeRef.current = saved.startTime || 0;
                     console.log("✅ Restored quiz progress");
                 } else {
                     // Start fresh
                     setUserAnswers(new Array(quizData.questions.length).fill(-1));
-                    startTimeRef.current = Date.now();
+                    startTimeRef.current = 0; // 0 indicates not started
 
-                    // Save initial progress
+                    // Save initial progress with null start time
                     saveProgress({
                         quizId: quizId,
                         quizTitle: quizData.title,
                         userAnswers: new Array(quizData.questions.length).fill(-1),
                         currentQuestion: 0,
-                        startTime: Date.now(),
+                        startTime: null,
                         totalQuestions: quizData.questions.length,
                     });
                 }
@@ -123,6 +124,11 @@ export default function PlayQuizPage() {
             setUserAnswers((prev) => {
                 const newAnswers = [...prev];
                 newAnswers[questionIndex] = answerIndex;
+
+                // Start timer if not started
+                if (!startTimeRef.current || startTimeRef.current === 0) {
+                    startTimeRef.current = Date.now();
+                }
 
                 // Save progress
                 if (quiz && quizId) {

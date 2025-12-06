@@ -85,7 +85,7 @@ const Navbar = () => {
           </Link>
 
           {/* Center: Nav Links */}
-          <div className="flex items-center justify-center flex-1 md:flex-none md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 max-w-2xl mx-auto h-full gap-0.5 sm:gap-1">
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center h-full gap-1 sm:gap-1">
             {navItems.map((item) => (
               <Link
                 key={item.path}

@@ -45,7 +45,9 @@ import {
   Shield,
   Music4,
   PauseCircle,
+  Zap,
 } from "@/lib/icons";
+import { Link } from "react-router-dom";
 import {
   ScrollVelocityContainer,
   ScrollVelocityRow,
@@ -55,6 +57,7 @@ import { containsVietnameseBadwords } from "@/lib/vnBadwordsFilter";
 import type { Quiz, Question } from "@/types/quiz";
 import { GenerationProgress } from "@/components/quiz/GenerationProgress";
 import { QuotaLimitDialog } from "@/components/quiz/QuotaLimitDialog";
+import { QuotaExceededDialog } from "@/components/quiz/QuotaExceededDialog";
 import { ApiKeyErrorDialog } from "@/components/quiz/ApiKeyErrorDialog";
 
 import { useQuizStore } from "@/hooks/useQuizStore";
@@ -67,7 +70,11 @@ import {
 } from "@/components/ui/tooltip";
 import useQuizGeneration from "@/hooks/useQuizGeneration";
 import { useGenerationPersistence } from "@/hooks/useGenerationPersistence";
-import { useAnonQuota } from "@/hooks/useAnonQuota";
+import {
+  useAnonQuota,
+  ResetEta, // Added ResetEta
+} from "@/hooks/useAnonQuota";
+import { useUserQuota } from "@/hooks/useUserQuota"; // Added useUserQuota
 import useChillMusic from "@/hooks/useChillMusic";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { killActiveScroll, scrollToTarget } from "@/lib/scroll";
@@ -112,10 +119,15 @@ const QuizGenerator = () => {
   const [promptError, setPromptError] = useState<string>("");
   const [isPromptValid, setIsPromptValid] = useState<boolean>(false);
   const [showQuotaDialog, setShowQuotaDialog] = useState<boolean>(false);
+  const [showUserQuotaDialog, setShowUserQuotaDialog] = useState<boolean>(false);
+  const [quotaErrorMessage, setQuotaErrorMessage] = useState<string>("");
   const [showApiKeyErrorDialog, setShowApiKeyErrorDialog] =
     useState<boolean>(false);
   const [apiKeyError, setApiKeyError] = useState<string>("");
   const [showConfirmDialog, setShowConfirmDialog] = useState<boolean>(false);
+  const [showNewQuizConfirm, setShowNewQuizConfirm] = useState<boolean>(false); // For new quiz overwrite confirmation
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [pendingGenerate, setPendingGenerate] = useState<any>(null); // To store valid generation request while waiting for confirm
 
   // Chill background music via hook
   const {
@@ -132,7 +144,6 @@ const QuizGenerator = () => {
   const { user, loading: authLoading } = useAuth();
   const { t, i18n } = useTranslation(); // Add i18n support
   const { statistics, refetch: refetchStats } = useDashboardStats(user?.id);
-  const [userApiKey, setUserApiKey] = useState<string | null>(null);
   const [questionCount, setQuestionCount] = useState<string>("");
   const [isQuestionCountSelected, setIsQuestionCountSelected] =
     useState<boolean>(false);
@@ -178,30 +189,17 @@ const QuizGenerator = () => {
     DAILY_LIMIT,
   } = useAnonQuota();
 
-  const loadUserApiKey = useCallback(async () => {
-    if (!user) return;
-    try {
-      const { data, error } = await supabase
-        .from("user_api_keys")
-        .select("encrypted_key")
-        .eq("user_id", user.id)
-        .eq("provider", "gemini")
-        .eq("is_active", true)
-        .single();
+  const {
+    dailyCount: userCount,
+    limit: userLimit,
+    remaining: userRemaining,
+    hasReachedLimit: userReachedLimit,
+    hasApiKey,
+    refetch: refetchQuota,
+  } = useUserQuota(user?.id);
 
-      if (error && error.code !== "PGRST116") {
-        console.error("Error loading user API key:", error);
-      } else if (data) {
-        // Decrypt ở production, ở dev dùng trực tiếp
-        setUserApiKey(data.encrypted_key);
-        console.log("✅ Loaded user API key from database");
-      } else {
-        console.log("ℹ️ No active user API key found");
-      }
-    } catch (error) {
-      console.error("Error loading user API key:", error);
-    }
-  }, [user]);
+
+
 
   // Initialize AbortController - No automatic cleanup to allow quiz generation
   // during in-app navigation. Only cancel on explicit page unload signals.
@@ -463,6 +461,21 @@ const QuizGenerator = () => {
             localStorage.removeItem("currentQuizGeneration");
             localStorage.removeItem("currentQuizId");
             const msg = errorMessage || t('quizGenerator.toasts.genericError');
+
+            // Check for User Quota Exceeded
+            if (msg.toLowerCase().includes("daily quota limit reached")) {
+              setQuotaErrorMessage(msg);
+              setShowUserQuotaDialog(true);
+              // Don't show toast for strict limit to force dialog attention, 
+              // or show warning toast as backup
+              toast({
+                title: t('quizGenerator.toasts.quotaTitle'),
+                description: msg,
+                variant: "warning",
+              });
+              return;
+            }
+
             toast({
               title: t('quizGenerator.toasts.failedTitle'),
               description: msg,
@@ -727,19 +740,26 @@ const QuizGenerator = () => {
     for (let i = 0; i < data.length; i++) {
       const char = data.charCodeAt(i);
       hash = (hash << 5) - hash + char;
-      hash = hash & hash; // Convert to 32-bit integer
     }
     return `quiz_${Math.abs(hash).toString(36)}_${timestamp}`;
   };
 
+  // Main Quiz Generation Logic
   const generateQuiz = async () => {
-    if (!user && hasReachedLimit) {
-      setShowQuotaDialog(true);
+    // 1. Strict Auth Check
+    if (!user) {
+      setShowAuthModal(true);
       toast({
-        title: t('quizGenerator.toasts.quotaTitle'),
-        description: t('quizGenerator.quota.description'),
+        title: t('auth.required'),
+        description: t('auth.loginToCreate'),
         variant: "warning",
+        duration: 3000,
       });
+      return;
+    }
+
+    if (userReachedLimit) {
+      setShowUserQuotaDialog(true);
       return;
     }
 
@@ -761,7 +781,7 @@ const QuizGenerator = () => {
       return;
     }
 
-    // Block create if prompt contains sensitive words (client-side validation)
+    // 2. Content Validation
     if (containsVietnameseBadwords(prompt)) {
       setPromptError(t('quizGenerator.errors.profaneContent'));
       setIsPromptValid(false);
@@ -769,32 +789,36 @@ const QuizGenerator = () => {
         title: t('quizGenerator.errors.invalidTopic'),
         description: t('quizGenerator.toasts.sensitiveContent'),
         variant: "destructive",
+        duration: 3000,
       });
       return;
     }
 
-    // Reset any ongoing generation and clear current quiz UI before starting a new one
+    // 3. Reset State & Prepare UI
     stopPolling();
     reset();
     setQuiz(null);
     setUserAnswers([]);
     setShowResults(false);
     setTokenUsage(null);
-    setGenerationStatus("pending");
-    setGenerationProgress(t('quizGenerator.toasts.preparing'));
     setLoading(true);
-    // Clear persisted state for previous generation
-    clearPersist();
+
+    // 4. Determine Params (handling pending confirmation state)
+    const promptToUse = pendingGenerate?.prompt || prompt;
+    const countToUse = pendingGenerate?.questionCount || questionCount;
+    setPendingGenerate(null);
+
+    const idempotencyKey = generateIdempotencyKey(
+      promptToUse,
+      countToUse,
+      user?.id
+    );
 
     console.log("🚀 [FRONTEND] Starting async quiz generation...");
 
-    // Prepare device info for fingerprinting
     const deviceInfo = {
       language: navigator.language,
-      platform:
-        "platform" in navigator
-          ? (navigator as Navigator & { platform?: string }).platform ?? ""
-          : "",
+      platform: "platform" in navigator ? (navigator as Navigator & { platform?: string }).platform ?? "" : "",
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       userAgent: navigator.userAgent,
       screen: {
@@ -804,23 +828,16 @@ const QuizGenerator = () => {
       },
     };
 
-    // Step 1: Call /start-quiz endpoint
+    // 5. Call BE to Start Quiz
     try {
       setLoading(true);
 
-      // Generate idempotency key to prevent duplicate requests
-      const idempotencyKey = generateIdempotencyKey(
-        prompt,
-        questionCount,
-        user?.id
-      );
-
       const startQuizPayload = {
-        prompt,
+        prompt: promptToUse,
         device: deviceInfo,
-        questionCount: parseInt(questionCount),
+        questionCount: parseInt(countToUse),
         idempotencyKey,
-        language: i18n.language, // Add language parameter for AI prompt
+        language: i18n.language,
       };
 
       console.log("▶️ Starting quiz generation request...");
@@ -832,34 +849,23 @@ const QuizGenerator = () => {
         }>("generate-quiz/start-quiz", {
           body: startQuizPayload,
         });
-      // Debug: log the raw response from Supabase Functions to ensure frontend receives quiz id
-      // (Remove these logs after debugging)
-
-      console.log("[DEBUG] generate-quiz/start-quiz response:", {
-        startResponse,
-        startError,
-      });
 
       if (startError) {
         console.error("❌ Start quiz error:", startError);
-        const errMsg =
-          typeof (startError as { message?: unknown }).message === "string"
-            ? (startError as { message: string }).message
-            : "Failed to start quiz generation";
+        const errMsg = typeof (startError as { message?: unknown }).message === "string"
+          ? (startError as { message: string }).message
+          : "Failed to start quiz generation";
         throw new Error(errMsg);
       }
 
       if (!startResponse?.id) {
-        console.error("❌ Invalid start response:", startResponse);
         throw new Error("Invalid response from start-quiz endpoint");
       }
 
       const quizId = startResponse.id;
       console.log(`✅ Quiz started with ID: ${quizId}`);
 
-      // Handle duplicate request response
       if (startResponse.duplicate) {
-        console.log("🔄 Duplicate request detected, using existing quiz");
         toast({
           title: t('quizGenerator.toasts.requestProcessed'),
           description: t('quizGenerator.toasts.requestProcessedDesc'),
@@ -867,7 +873,7 @@ const QuizGenerator = () => {
         });
       }
 
-      // Step 2: Save generation state to localStorage for navigation persistence
+      // 6. Persistence & Polling
       const generationState = {
         quizId,
         loading: true,
@@ -878,7 +884,6 @@ const QuizGenerator = () => {
       writePersist(generationState as GenerationState);
       setLegacyId(quizId);
 
-      // Step 3: Start polling for status via hook
       startPollingHook(quizId, {
         onCompleted: ({ quiz, tokenUsage }) => {
           isSubmittingRef.current = false;
@@ -888,7 +893,7 @@ const QuizGenerator = () => {
           setLoading(false);
           clearPersist();
 
-          // Calculate Reward
+          // XP & Reward
           let title = t('quizGenerator.success.title');
           if (userRef.current) {
             const xp = calculateXP(statistics);
@@ -897,8 +902,15 @@ const QuizGenerator = () => {
             title = t('notifications.zcoinReward.create', { amount: reward, xp: 100 });
           }
 
-          // Refresh global stats to trigger level up notification if applicable
-          refetchStats();
+          // Refetch quota immediately
+          refetchStats(); // Refetch dashboard stats (XP, etc)
+          refetchQuota(); // Refetch user quota (daily limits)
+
+          // And again after a short delay to ensure DB propagation
+          setTimeout(() => {
+            refetchStats();
+            refetchQuota();
+          }, 1000);
 
           toast({
             title: title,
@@ -906,6 +918,7 @@ const QuizGenerator = () => {
             variant: "success",
             duration: 3000,
           });
+
           const channel = new BroadcastChannel("quiz-notifications");
           channel.postMessage({
             type: "quiz-complete",
@@ -915,7 +928,6 @@ const QuizGenerator = () => {
           });
           channel.close();
 
-          // Redirect to play page instead of inline display
           navigate(`/quiz/play/${quizId}`);
         },
         onFailed: (errorMessage?: string) => {
@@ -925,12 +937,27 @@ const QuizGenerator = () => {
           setLoading(false);
           localStorage.removeItem("currentQuizGeneration");
           localStorage.removeItem("currentQuizId");
+
           const msg = errorMessage || t('quizGenerator.toasts.genericError');
+
+          if (msg.toLowerCase().includes("daily quota limit reached")) {
+            setQuotaErrorMessage(msg);
+            setShowUserQuotaDialog(true);
+            toast({
+              title: t('quizGenerator.toasts.quotaTitle'),
+              description: msg,
+              variant: "warning",
+            });
+            return;
+          }
+
           toast({
             title: t('quizGenerator.toasts.failedTitle'),
             description: msg,
             variant: "destructive",
           });
+
+          // Check explicit error types
           try {
             const reasonText = String(errorMessage || "").toLowerCase();
             if (
@@ -946,16 +973,8 @@ const QuizGenerator = () => {
               setShowApiKeyErrorDialog(true);
             }
           } catch (err) {
-            console.debug("classify API key error (generate flow)", err);
+            console.debug("classify error", err);
           }
-          const channel = new BroadcastChannel("quiz-notifications");
-          channel.postMessage({
-            type: "quiz-failed",
-            title: t('quizGenerator.toasts.failedTitle'),
-            description: msg,
-            variant: "destructive",
-          });
-          channel.close();
         },
         onExpired: () => {
           isSubmittingRef.current = false;
@@ -969,14 +988,6 @@ const QuizGenerator = () => {
             description: t('quizGenerator.expired.description'),
             variant: "warning",
           });
-          const channel = new BroadcastChannel("quiz-notifications");
-          channel.postMessage({
-            type: "quiz-failed",
-            title: t('quizGenerator.toasts.expiredTitle'),
-            description: t('quizGenerator.expired.description'),
-            variant: "warning",
-          });
-          channel.close();
         },
         onProgress: (status, progress) => {
           if (status === "completed" || status === "failed" || status === "expired") return;
@@ -991,40 +1002,31 @@ const QuizGenerator = () => {
         },
       });
 
-      // Step 4: Increment anonymous counter (for UI feedback)
-      if (!user) {
-        incrementAnon();
-      }
+      if (!user) incrementAnon();
+
     } catch (error) {
       console.error("❌ Error starting quiz:", error);
-
       isSubmittingRef.current = false;
       setLoading(false);
-
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
-
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
       // Check for quota exceeded
       if (
         errorMessage.includes("anonymous_quota_exceeded") ||
         errorMessage.includes("quota")
       ) {
-        setShowQuotaDialog(true);
+        if (user) {
+          setQuotaErrorMessage(errorMessage);
+          setShowUserQuotaDialog(true);
+        } else {
+          setShowQuotaDialog(true);
+        }
         return;
       }
-
-      // Check for auth errors
-      if (
-        errorMessage.includes("authentication_required") ||
-        errorMessage.includes("invalid") ||
-        errorMessage.includes("unauthorized")
-      ) {
+      if (errorMessage.includes("authentication_required") || errorMessage.includes("invalid") || errorMessage.includes("unauthorized")) {
         setApiKeyError(errorMessage);
         setShowApiKeyErrorDialog(true);
         return;
       }
-
-      // Generic error
       toast({
         title: "Tạo câu hỏi thất bại",
         description: errorMessage,
@@ -1033,8 +1035,7 @@ const QuizGenerator = () => {
     }
   };
 
-  const handleGenerateClick = (e: MouseEvent<HTMLButtonElement>) => {
-    // Check authentication first
+  const handleGenerateClick = (e?: MouseEvent<HTMLButtonElement>) => {
     if (!user) {
       toast({
         title: t("library.toasts.loginRequired"),
@@ -1045,24 +1046,19 @@ const QuizGenerator = () => {
       return;
     }
 
-    // Double-submit protection check
     const now = Date.now();
     if (isSubmittingRef.current || now - lastSubmitTimeRef.current < 5000) {
-      console.log(
-        "⏱️ Submission in progress or too soon after last submission"
-      );
       toast({
         title: t('quizGenerator.toasts.pleaseWait'),
-        description:
-          t('quizGenerator.toasts.processing'),
+        description: t('quizGenerator.toasts.processing'),
         variant: "warning",
       });
       return;
     }
 
-    // Nếu đang có quiz hiển thị hoặc đang có tiến trình tạo dở, yêu cầu xác nhận
     if (quiz || loading || genStatus || generationStatus) {
-      setShowConfirmDialog(true);
+      setPendingGenerate({ prompt, questionCount: questionCount });
+      setShowNewQuizConfirm(true);
       return;
     }
 
@@ -1071,37 +1067,49 @@ const QuizGenerator = () => {
     void generateQuiz();
   };
 
-
-
   const cancelQuizGeneration = () => {
-    // Abort the ongoing request
+    // 1. Backend Cancel
+    const idToCancel = quizId || localStorage.getItem("currentQuizId");
+    if (idToCancel) {
+      supabase.functions.invoke('generate-quiz/cancel-quiz', {
+        body: { quiz_id: idToCancel }
+      }).then(({ data, error }) => {
+        if (error) console.error("❌ Failed to cancel quiz on backend:", error);
+        else console.log("✅ Quiz cancelled on backend");
+      }).catch(err => console.error("❌ Network error cancelling quiz:", err));
+    }
+
+    // 2. Client Cleanup
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
-      console.log("🛑 [USER] Quiz generation cancelled by user");
     }
-    // Stop polling via hook
     stopPolling();
-
-    // Reset all loading states
     setLoading(false);
+    isSubmittingRef.current = false; // Reset submission flag
+    lastSubmitTimeRef.current = 0;   // Reset timestamp to allow immediate retry
     setGenerationStatus(null);
     setGenerationProgress("");
     setQuizId(null);
-
-    // Clear localStorage
     localStorage.removeItem("currentQuizGeneration");
     localStorage.removeItem("currentQuizId");
 
-    // Show cancellation toast
     toast({
       title: t('quizGenerator.toasts.cancelledTitle'),
       description: t('quizGenerator.toasts.cancelledDesc'),
       variant: "info",
     });
 
-    // Reset abort controller for next generation
     abortControllerRef.current = new AbortController();
   };
+
+  const handleCancelGeneration = useCallback(() => {
+    setShowConfirmDialog(true);
+  }, []);
+
+  const confirmCancel = useCallback(() => {
+    cancelQuizGeneration();
+    setShowConfirmDialog(false);
+  }, []);
 
 
 
@@ -1239,17 +1247,24 @@ const QuizGenerator = () => {
 
           {/* Auth Modal for checking login status */}
           <AuthModal open={showAuthModal} onOpenChange={setShowAuthModal} />
-          {/* API Key Error Dialog */}
-          <ApiKeyErrorDialog
-            open={showApiKeyErrorDialog}
-            onOpenChange={setShowApiKeyErrorDialog}
-            errorMessage={apiKeyError}
-          />
+          {/* Confirm Cancel Dialog */}
+          <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>{t('quizGenerator.confirmDialog.titleCancel')}</AlertDialogTitle>
+                <AlertDialogDescription>
+                  {t('quizGenerator.confirmDialog.descriptionCancel')}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>{t('quizGenerator.confirmDialog.cancel')}</AlertDialogCancel>
+                <AlertDialogAction onClick={confirmCancel}>{t('quizGenerator.confirmDialog.confirm')}</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
 
-          {/* Confirm Reset Dialog */}
-          <AlertDialog
-            open={showConfirmDialog}
-            onOpenChange={setShowConfirmDialog}>
+          {/* Confirm New Quiz Dialog */}
+          <AlertDialog open={showNewQuizConfirm} onOpenChange={setShowNewQuizConfirm}>
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle>{t('quizGenerator.confirmDialog.title')}</AlertDialogTitle>
@@ -1258,47 +1273,41 @@ const QuizGenerator = () => {
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel asChild>
-                  <Button variant="secondary" sound="alert">
-                    {t('quizGenerator.confirmDialog.cancel')}
-                  </Button>
+                <AlertDialogCancel onClick={() => {
+                  setShowNewQuizConfirm(false);
+                  setPendingGenerate(null);
+                }}>
+                  {t('common.cancel')}
                 </AlertDialogCancel>
-                <AlertDialogAction asChild>
-                  <Button
-                    data-fast-hover
-                    variant="hero"
-                    size="lg"
-                    className="group text-base flex items-center gap-2 bg-black text-white transition-colors hover:bg-black hover:text-white"
-                    onClick={() => {
-                      setShowConfirmDialog(false);
-                      const el = document.getElementById("generator");
-                      if (el) {
-                        killActiveScroll();
-                        scrollToTarget(el, { align: "top" });
-                      }
-                      void generateQuiz();
-                    }}>
-                    {t('quizGenerator.confirmDialog.confirm')}
-                    <div className="bg-primary p-1 rounded-lg">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="w-5 h-5 text-black group-hover:text-white"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M14 5l7 7m0 0l-7 7m7-7H3"
-                        />
-                      </svg>
-                    </div>
-                  </Button>
+                <AlertDialogAction onClick={() => {
+                  setShowNewQuizConfirm(false);
+                  if (pendingGenerate) {
+                    setPrompt(pendingGenerate.prompt);
+                    setQuestionCount(pendingGenerate.questionCount);
+                    generateQuiz(); // Proceed with pending generation, forcing new
+                    setPendingGenerate(null);
+                  }
+                }}>
+                  {t('common.confirm')}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
+
+          {/* Quota Exceeded Dialog */}
+          <QuotaExceededDialog
+            open={showUserQuotaDialog}
+            onOpenChange={setShowUserQuotaDialog}
+            message={quotaErrorMessage}
+          />
+          {/* API Key Error Dialog */}
+          <ApiKeyErrorDialog
+            open={showApiKeyErrorDialog}
+            onOpenChange={setShowApiKeyErrorDialog}
+            errorMessage={apiKeyError}
+          />
+
+
 
           <Card className="mb-8 border-4 border-primary/30 bg-white/80 backdrop-blur-sm shadow-[0_8px_30px_rgba(0,0,0,0.08),inset_0_2px_0_rgba(255,255,255,0.9)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.12)] transition-all duration-300 rounded-3xl overflow-hidden">
             <CardContent className="p-6 md:p-10 space-y-8">
@@ -1307,33 +1316,89 @@ const QuizGenerator = () => {
                 <GenerationProgress
                   generationStatus={genStatus ?? generationStatus}
                   generationProgress={genProgress || generationProgress}
-                  onCancel={cancelQuizGeneration}
+                  onCancel={handleCancelGeneration}
                 />
               ) : (
                 /* Form Input State */
                 <>
-                  {/* Quota indicator for anonymous users */}
-                  {!user && (
-                    <div className="flex items-center justify-between p-4 bg-gradient-to-r from-pink-50 via-amber-50 to-emerald-50 border-4 border-primary/20 rounded-2xl shadow-inner">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-white rounded-xl">
-                          <Target className="w-5 h-5 text-primary" />
+                  {/* Authenticated User Quota UI - Playful Redesign */}
+                  {user && (
+                    <div className="relative overflow-hidden rounded-2xl border-2 border-purple-100 dark:border-purple-900 bg-gradient-to-r from-pink-50/50 via-purple-50/50 to-indigo-50/50 dark:from-pink-950/20 dark:via-purple-950/20 dark:to-indigo-950/20 p-4 mb-6 shadow-sm">
+                      <div className="flex flex-col gap-3">
+                        <div className="flex items-center justify-between">
+                          {/* Left: Usage Info */}
+                          <div className="flex flex-col">
+                            <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400 mb-0.5">
+                              <Sparkles className="w-3.5 h-3.5" />
+                              {t("quizGenerator.quota.usage")}
+                            </div>
+                            {hasApiKey ? (
+                              <span className="text-xl font-black bg-gradient-to-br from-green-500 to-emerald-600 bg-clip-text text-transparent flex items-center gap-1.5">
+                                <Zap className="w-5 h-5 text-emerald-500" />
+                                {t("quizGenerator.quota.unlimited")}
+                              </span>
+                            ) : (
+                              <div className="flex items-baseline gap-1">
+                                <span className="text-2xl font-black bg-gradient-to-br from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                                  {userRemaining}
+                                </span>
+                                <span className="text-sm font-bold text-muted-foreground/70">
+                                  /{userLimit}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Right: API Key Badge */}
+                          <div className="flex flex-col items-end gap-1">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70">
+                              {t("quizGenerator.quota.apiKey")}
+                            </span>
+                            <Badge
+                              variant="secondary"
+                              className={`rounded-lg px-2.5 py-1 text-xs font-bold border-0 shadow-md transform transition-transform hover:scale-105 ${hasApiKey
+                                ? "bg-gradient-to-r from-emerald-400 to-teal-500 text-white"
+                                : "bg-gradient-to-r from-slate-200 to-slate-300 text-slate-600 dark:from-slate-700 dark:to-slate-800 dark:text-slate-300"
+                                }`}
+                            >
+                              {hasApiKey
+                                ? t("quizGenerator.quota.byok")
+                                : t("quizGenerator.quota.none")}
+                            </Badge>
+                          </div>
                         </div>
-                        <span className="text-sm font-medium">
-                          {t('quizGenerator.ui.freeQuota')}:{" "}
-                          <span className="font-bold text-primary text-base">{Math.max(0, DAILY_LIMIT - anonCount)}</span>
-                          <span className="text-muted-foreground">/{DAILY_LIMIT}</span>
-                        </span>
+
+                        {/* Bottom: Progress Bar */}
+                        {!hasApiKey && (
+                          <div className="space-y-2">
+                            <div className="w-full h-2.5 bg-white/50 dark:bg-black/20 rounded-full overflow-hidden border border-purple-100/50 dark:border-purple-900/30">
+                              <div
+                                className={`h-full rounded-full transition-all duration-700 ease-out shadow-[0_0_10px_rgba(168,85,247,0.4)] ${userRemaining === 0
+                                  ? "bg-gradient-to-r from-red-400 to-pink-500"
+                                  : userRemaining === 1
+                                    ? "bg-gradient-to-r from-orange-400 to-amber-500"
+                                    : "bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500"
+                                  }`}
+                                style={{
+                                  width: `${Math.min(
+                                    100,
+                                    (userRemaining / userLimit) * 100
+                                  )}%`,
+                                }}
+                              />
+                            </div>
+                            <div className="flex justify-end">
+                              <Link
+                                to="/dashboard?tab=settings"
+                                className="text-[10px] font-bold text-purple-600 dark:text-purple-400 hover:text-purple-700 hover:underline decoration-dotted underline-offset-2 transition-colors flex items-center gap-1"
+                              >
+                                {t("quizGenerator.quota.tip")}
+                                <span className="text-xl leading-3">→</span>
+                              </Link>
+                            </div>
+                          </div>
+                        )}
                       </div>
-                      {anonCount > 0 && (
-                        <button
-                          onClick={() => {
-                            window.dispatchEvent(new Event("open-auth-modal"));
-                          }}
-                          className="text-xs md:text-sm text-primary hover:text-primary/80 font-bold hover:underline transition-colors">
-                          {t('quizGenerator.ui.loginUnlimited')}
-                        </button>
-                      )}
                     </div>
                   )}
 
@@ -1451,7 +1516,7 @@ const QuizGenerator = () => {
                     </div>
                   </div>
 
-                  {/* Generate Button */}
+                  {/* Main Action Button */}
                   <div className="pt-4">
                     <Button
                       data-fast-hover

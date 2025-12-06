@@ -10,7 +10,7 @@ export interface QuizProgress {
     quizTitle: string;
     userAnswers: number[];
     currentQuestion: number;
-    startTime: number;
+    startTime: number | null;
     totalQuestions: number;
 }
 

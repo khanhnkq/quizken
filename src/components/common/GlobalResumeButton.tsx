@@ -14,10 +14,13 @@ export const GlobalResumeButton = () => {
 
     // Timer logic
     useEffect(() => {
-        if (!progress?.startTime) return;
+        if (!progress?.startTime || progress.startTime === 0) {
+            setElapsedSeconds(0);
+            return;
+        }
 
         const updateTimer = () => {
-            const seconds = Math.floor((Date.now() - progress.startTime) / 1000);
+            const seconds = Math.floor((Date.now() - progress.startTime!) / 1000); // Assert not-null
             setElapsedSeconds(seconds > 0 ? seconds : 0);
         };
 

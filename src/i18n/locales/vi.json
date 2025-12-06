@@ -12,6 +12,23 @@
         "loggedInWith": "Đã đăng nhập với",
         "apiSettings": "Cài đặt API"
     },
+    "auth": {
+        "title": "Xác thực",
+        "description": "Vui lòng đăng nhập để tiếp tục",
+        "login": "Đăng nhập",
+        "logout": "Đăng xuất",
+        "required": "Yêu cầu đăng nhập",
+        "loginToCreate": "Vui lòng đăng nhập để tạo quiz.",
+        "redirecting": "Đang chuyển đến Google...",
+        "completeLogin": "Vui lòng hoàn tất đăng nhập trên trang Google",
+        "loginError": "Lỗi đăng nhập",
+        "defaultError": "Đã xảy ra lỗi khi đăng nhập Google.",
+        "signInWithGoogle": "Đăng nhập với Google",
+        "redirectingShort": "Đang chuyển hướng...",
+        "googleOnly": "Chỉ hỗ trợ đăng nhập bằng Google",
+        "termsAgreement": "Bằng cách tiếp tục, bạn đồng ý với Điều khoản và Chính sách bảo mật của chúng tôi.",
+        "later": "Để sau"
+    },
     "hero": {
         "title": "Tạo Bài Kiểm Tra AI Miễn Phí",
         "subtitle": "QuizKen giúp giáo viên và học sinh tạo bài kiểm tra trắc nghiệm với AI trong vài giây",
@@ -83,7 +100,15 @@
         "quota": {
             "title": "Đã hết lượt miễn phí",
             "description": "Đăng nhập để tiếp tục tạo quiz không giới hạn",
-            "loginButton": "Đăng nhập ngay"
+            "loginButton": "Đăng nhập ngay",
+            "limitMessage": "Bạn đã đạt giới hạn tạo 5 bài trắc nghiệm mỗi ngày.",
+            "usage": "Lượt còn lại",
+            "apiKey": "API Key",
+            "unlimited": "Không giới hạn",
+            "byok": "BYOK",
+            "none": "NONE",
+            "tip": "Truy cập không giới hạn",
+            "tipDesc": "Thêm Google Gemini API Key của riêng bạn trong cài đặt để tạo trắc nghiệm không giới hạn miễn phí!"
         },
         "success": {
             "title": "Tạo câu hỏi thành công!",
@@ -166,7 +191,9 @@
         },
         "confirmDialog": {
             "title": "Xác nhận tạo quiz mới",
+            "titleCancel": "Hủy tạo quiz?",
             "description": "Bài quiz hiện tại sẽ bị xóa khỏi màn hình và tiến trình đang chạy (nếu có) sẽ được hủy. Bạn có muốn tiếp tục tạo quiz mới?",
+            "descriptionCancel": "Bạn có chắc chắn muốn hủy quá trình tạo quiz? Thao tác này không thể hoàn tác.",
             "cancel": "Hủy",
             "confirm": "Xác nhận"
         },
@@ -585,17 +612,6 @@
         "page": "Trang",
         "minutes": "phút",
         "morePages": "Trang khác"
-    },
-    "auth": {
-        "redirecting": "Đang chuyển đến Google...",
-        "completeLogin": "Vui lòng hoàn tất đăng nhập trên trang Google",
-        "loginError": "Lỗi đăng nhập",
-        "defaultError": "Đã xảy ra lỗi khi đăng nhập Google.",
-        "signInWithGoogle": "Đăng nhập với Google",
-        "redirectingShort": "Đang chuyển hướng...",
-        "googleOnly": "Chỉ hỗ trợ đăng nhập bằng Google",
-        "termsAgreement": "Bằng cách tiếp tục, bạn đồng ý với Điều khoản và Chính sách bảo mật của chúng tôi.",
-        "later": "Để sau"
     },
     "apiKeySettings": {
         "title": "Cài đặt API Key",
