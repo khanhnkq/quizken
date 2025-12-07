@@ -65,6 +65,7 @@ export const Eye = L.Eye;
 export const EyeOff = L.EyeOff;
 export const Save = L.Save;
 export const MessageSquare = L.MessageSquare;
+export const CircleHelp = L.CircleHelp;
 
 export const Book = L.Book;
 export const BookOpen = L.BookOpen;

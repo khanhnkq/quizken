@@ -58,7 +58,7 @@ const Features = () => {
   return (
     <section
       id="features"
-      className="relative overflow-hidden bg-gradient-to-b from-secondary/30 to-background py-24 px-4">
+      className="relative overflow-hidden bg-gradient-to-b from-secondary/30 to-background py-24 px-2 md:px-4">
 
       {/* Floating Background Shapes */}
       <div className="absolute top-20 left-[5%] w-16 h-16 rounded-full bg-pink-200/30 animate-bounce-slow" style={{ animationDelay: '0s' }}></div>
@@ -72,7 +72,7 @@ const Features = () => {
           <div className="inline-flex justify-center p-5 bg-white/60 backdrop-blur-sm rounded-full shadow-lg mb-6 animate-bounce-slow">
             <Star className="w-10 h-10 text-[#B5CC89]" />
           </div>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-heading mb-6 bg-gradient-to-br from-foreground to-foreground/60 bg-clip-text text-transparent">
+          <h2 className="text-3xl md:text-4xl lg:text-6xl font-bold font-heading mb-6 bg-gradient-to-br from-foreground to-foreground/60 bg-clip-text text-transparent">
             {t('features.title')}
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-medium">
@@ -81,7 +81,7 @@ const Features = () => {
         </div>
 
         {/* Feature Cards Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
           {features.map((feature, index) => {
             const color = pastelColors[index % pastelColors.length];
             return (
@@ -97,7 +97,7 @@ const Features = () => {
                   transition-all duration-300 ease-out
                   overflow-hidden
                 `}>
-                <CardContent className="p-8 text-center space-y-5">
+                <CardContent className="p-5 md:p-8 text-center space-y-5">
                   {/* Icon Bubble */}
                   <div className={`
                     inline-flex p-5 rounded-2xl

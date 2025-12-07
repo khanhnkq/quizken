@@ -98,9 +98,9 @@ export const QuizCard: React.FC<QuizCardProps> = ({
         </div>
       </div>
 
-      <CardContent className="flex-grow p-5 pt-6 flex flex-col gap-3">
+      <CardContent className="flex-grow p-3 md:p-5 pt-6 flex flex-col gap-3">
         {/* Title */}
-        <h3 className="text-lg md:text-xl font-heading font-bold text-foreground leading-tight line-clamp-2 min-h-[3rem] group-hover:text-primary transition-colors">
+        <h3 className="text-base md:text-xl font-heading font-bold text-foreground leading-tight line-clamp-2 min-h-[3rem] group-hover:text-primary transition-colors">
           {quiz.title}
         </h3>
 

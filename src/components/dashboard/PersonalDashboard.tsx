@@ -200,7 +200,7 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
         </div>
 
         {/* Main Content Container */}
-        <div className="container mx-auto py-8 px-4 md:px-6 mt-16 space-y-8">
+        <div className="container mx-auto py-8 px-3 md:px-6 mt-16 space-y-8">
 
           {/* OVERVIEW CONTENT */}
           <TabsContent value="overview" className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 focus-visible:outline-none">
@@ -213,7 +213,7 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
                   <span>{t('dashboard.welcomeBack')}</span>
                 </div>
 
-                <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground drop-shadow-sm">
+                <h1 className="font-heading text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground drop-shadow-sm">
                   Hello, <span className="text-primary relative inline-block">
                     {user?.user_metadata?.full_name || user?.email?.split('@')[0] || "Quizzer"}
                     <svg className="absolute -bottom-2 left-0 w-full h-3 text-yellow-300 -z-10 opacity-60" viewBox="0 0 100 10" preserveAspectRatio="none">
@@ -223,7 +223,7 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
                   <span className="inline-block animate-wave ml-2 origin-[70%_70%]">👋</span>
                 </h1>
 
-                <p className="text-lg text-muted-foreground font-medium max-w-lg">
+                <p className="text-base md:text-lg text-muted-foreground font-medium max-w-lg">
                   {t('dashboard.subtitle')}
                 </p>
               </div>

@@ -1,62 +1,77 @@
 import { useTranslation } from 'react-i18next';
-import { Globe } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
+import { useState, useEffect } from 'react';
+
+import { Button } from "@/components/ui/button";
 
 export function LanguageSwitcher() {
     const { i18n } = useTranslation();
+    const [activeLang, setActiveLang] = useState(i18n.language);
+
+    // Sync state with i18n changes
+    useEffect(() => {
+        setActiveLang(i18n.language);
+    }, [i18n.language]);
 
     const changeLanguage = (lng: string) => {
         i18n.changeLanguage(lng);
+        setActiveLang(lng);
     };
 
-    const currentLanguage = i18n.language;
-    const isVietnamese = currentLanguage === 'vi';
+    const toggleLanguage = () => {
+        const newLang = activeLang === 'vi' ? 'en' : 'vi';
+        changeLanguage(newLang);
+    };
 
     return (
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <Button
-                    variant="outline"
-                    size="icon"
-                    className="rounded-3xl border-4 border-border hover:border-primary hover:text-primary hover:bg-primary/10 transition-all duration-200 active:scale-95 w-10 h-10"
-                    aria-label="Change language">
-                    <Globe className="h-5 w-5" />
-                </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48 rounded-3xl border-4 border-primary/20 shadow-xl bg-white/95 backdrop-blur-sm p-2 animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2">
-                <DropdownMenuItem
+        <>
+            {/* Mobile: Single Button Toggle */}
+            <Button
+                variant="outline"
+                size="icon"
+                onClick={toggleLanguage}
+                className="md:hidden rounded-3xl border-4 border-border hover:border-primary hover:text-primary hover:bg-primary/10 transition-all duration-200 active:scale-95 w-10 h-10 text-xs font-bold leading-none"
+            >
+                {activeLang.toUpperCase()}
+            </Button>
+
+            {/* Desktop: Toggle Switch */}
+            <div className="hidden md:flex bg-card items-center p-1 rounded-3xl border-4 border-border h-10 w-[100px] relative gap-1">
+                {/* Background slide animation */}
+                <div className="absolute inset-1 flex items-center pointer-events-none z-0">
+                    <motion.div
+                        layoutId="active-lang-pill"
+                        animate={{
+                            x: activeLang === 'vi' ? 0 : 44,
+                        }}
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                        className="w-10 h-6 bg-primary rounded-2xl shadow-sm"
+                    />
+                </div>
+
+                {/* VI Button */}
+                <button
                     onClick={() => changeLanguage('vi')}
-                    className={`rounded-xl cursor-pointer py-3 px-3 mb-1 transition-colors duration-200 ${isVietnamese ? 'bg-secondary/40' : 'hover:bg-secondary/20'}`}>
-                    <div className="flex items-center gap-3 w-full">
-                        <div className="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold text-xs border-2 border-red-200 shadow-sm">
-                            VI
-                        </div>
-                        <span className={`font-heading flex-1 ${isVietnamese ? 'text-primary font-bold' : 'text-foreground'}`}>
-                            Tiếng Việt
-                        </span>
-                        {isVietnamese && <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />}
-                    </div>
-                </DropdownMenuItem>
-                <DropdownMenuItem
+                    className={cn(
+                        "relative z-10 w-10 h-6 text-xs leading-none font-bold transition-colors duration-200 flex items-center justify-center rounded-2xl",
+                        activeLang === 'vi' ? "text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+                    )}
+                >
+                    VI
+                </button>
+
+                {/* EN Button */}
+                <button
                     onClick={() => changeLanguage('en')}
-                    className={`rounded-xl cursor-pointer py-3 px-3 transition-colors duration-200 ${!isVietnamese ? 'bg-secondary/40' : 'hover:bg-secondary/20'}`}>
-                    <div className="flex items-center gap-3 w-full">
-                        <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs border-2 border-blue-200 shadow-sm">
-                            EN
-                        </div>
-                        <span className={`font-heading flex-1 ${!isVietnamese ? 'text-primary font-bold' : 'text-foreground'}`}>
-                            English
-                        </span>
-                        {!isVietnamese && <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />}
-                    </div>
-                </DropdownMenuItem>
-            </DropdownMenuContent>
-        </DropdownMenu>
+                    className={cn(
+                        "relative z-10 w-10 h-6 text-xs leading-none font-bold transition-colors duration-200 flex items-center justify-center rounded-2xl",
+                        activeLang === 'en' ? "text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+                    )}
+                >
+                    EN
+                </button>
+            </div>
+        </>
     );
 }

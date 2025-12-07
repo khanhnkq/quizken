@@ -50,7 +50,7 @@ export function useQuizProgress() {
                             quizTitle: data.quiz_title || "Unknown Quiz",
                             userAnswers: Array.isArray(data.user_answers) ? data.user_answers as number[] : [],
                             currentQuestion: data.current_question || 0,
-                            startTime: data.start_time || Date.now(),
+                            startTime: data.start_time,
                             totalQuestions: data.total_questions
                         };
                         setProgress(dbProgress);
@@ -65,7 +65,7 @@ export function useQuizProgress() {
                 if (saved) {
                     const parsed = JSON.parse(saved) as QuizProgress;
                     const maxAge = 24 * 60 * 60 * 1000;
-                    if (Date.now() - parsed.startTime < maxAge) {
+                    if (!parsed.startTime || (Date.now() - parsed.startTime < maxAge)) {
                         setProgress(parsed);
                     } else {
                         localStorage.removeItem(STORAGE_KEY);
@@ -199,7 +199,7 @@ export function getQuizProgress(): QuizProgress | null {
         if (!saved) return null;
         const parsed = JSON.parse(saved) as QuizProgress;
         const maxAge = 24 * 60 * 60 * 1000;
-        if (Date.now() - parsed.startTime < maxAge) {
+        if (!parsed.startTime || (Date.now() - parsed.startTime < maxAge)) {
             return parsed;
         }
         localStorage.removeItem(STORAGE_KEY);

@@ -242,7 +242,7 @@ export default function PlayQuizPage() {
     }
 
     return (
-        <div className="min-h-screen relative bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+        <div className="h-screen flex flex-col overflow-hidden relative bg-gradient-to-br from-indigo-50 via-white to-purple-50">
             {/* Base Pattern - FIXED */}
             <div className="fixed inset-0 pointer-events-none z-0">
                 <BackgroundDecorations density="medium" />
@@ -280,17 +280,13 @@ export default function PlayQuizPage() {
                 </div>
             </div>
 
-
-            <div className="container mx-auto px-0 sm:px-6 relative z-10">
-                {/* Navigation - STICKY */}
-                <div className="sticky top-0 z-50 flex justify-between items-center py-4 px-4 sm:px-0 mb-4">
-                    {/* Backdrop for sticky header */}
-                    <div className="absolute inset-x-[-100vw] inset-y-0 bg-gradient-to-b from-indigo-50/95 via-white/80 to-transparent backdrop-blur-[2px] -z-10 pointer-events-none h-[120%]"></div>
-
+            {/* Fixed Header */}
+            <div className="flex-none z-50 w-full px-4 sm:px-6 py-4 bg-gradient-to-b from-white/80 to-transparent backdrop-blur-sm">
+                <div className="container mx-auto flex justify-between items-center">
                     <Button
                         variant="ghost"
                         onClick={() => navigate("/quiz/library")}
-                        className="rounded-full bg-white/80 hover:bg-white shadow-sm hover:shadow-md transition-all group px-4 backdrop-blur-md"
+                        className="rounded-full bg-white/80 hover:bg-white shadow-sm hover:shadow-md transition-all group px-3 sm:px-4 backdrop-blur-md"
                     >
                         <ArrowLeftIcon className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform text-gray-500" />
                         <span className="font-bold text-gray-600">
@@ -298,7 +294,6 @@ export default function PlayQuizPage() {
                         </span>
                     </Button>
 
-                    {/* Cancel Quiz Button */}
                     <div className="flex items-center gap-2">
                         {!showResults && (
                             <Button
@@ -307,7 +302,7 @@ export default function PlayQuizPage() {
                                     clearProgress();
                                     navigate("/quiz/library");
                                 }}
-                                className="rounded-full bg-white/80 hover:bg-red-50 text-red-500 hover:text-red-600 shadow-sm hover:shadow-md transition-all group px-4 backdrop-blur-md"
+                                className="rounded-full bg-white/80 hover:bg-red-50 text-red-500 hover:text-red-600 shadow-sm hover:shadow-md transition-all group px-3 sm:px-4 backdrop-blur-md"
                             >
                                 <XCircleIcon className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
                                 <span className="font-bold">
@@ -317,29 +312,33 @@ export default function PlayQuizPage() {
                         )}
                     </div>
                 </div>
-
-                {/* Quiz Content */}
-                <QuizContent
-                    quiz={quiz}
-                    userAnswers={userAnswers}
-                    showResults={showResults}
-                    tokenUsage={null}
-                    onAnswerSelect={handleAnswerSelect}
-                    onGrade={handleGrade}
-                    onReset={handleReset}
-                    calculateScore={calculateScore}
-                    onDownload={handleDownload}
-                    userId={user?.id}
-                    startTime={startTimeRef.current}
-                />
-                {/* Generator Dialog */}
-                <QuickGeneratorDialog
-                    open={showGeneratorDialog}
-                    onOpenChange={setShowGeneratorDialog}
-                />
-                {/* Auth Modal */}
-                <AuthModal open={showAuthModal} onOpenChange={setShowAuthModal} />
             </div>
+
+            {/* Scrollable Content Area */}
+            <div className="flex-1 overflow-y-auto w-full relative z-10">
+                <div className="container mx-auto px-0 sm:px-6 pb-20"> {/* pb-20 for bottom button space */}
+                    <QuizContent
+                        quiz={quiz}
+                        userAnswers={userAnswers}
+                        showResults={showResults}
+                        tokenUsage={null}
+                        onAnswerSelect={handleAnswerSelect}
+                        onGrade={handleGrade}
+                        onReset={handleReset}
+                        calculateScore={calculateScore}
+                        onDownload={handleDownload}
+                        userId={user?.id}
+                        startTime={startTimeRef.current}
+                    />
+                </div>
+            </div>
+
+            {/* Global/Overlay Components */}
+            <QuickGeneratorDialog
+                open={showGeneratorDialog}
+                onOpenChange={setShowGeneratorDialog}
+            />
+            <AuthModal open={showAuthModal} onOpenChange={setShowAuthModal} />
         </div>
     );
 }

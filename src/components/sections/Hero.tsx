@@ -93,7 +93,7 @@ const Hero = () => {
   return (
     <section
       id="hero"
-      className="relative overflow-hidden bg-background min-h-[90svh] md:min-h-screen pt-10 pb-32 sm:pt-14 sm:pb-40 md:pt-14 md:pb-52 px-4 flex items-center justify-center">
+      className="relative overflow-hidden bg-background min-h-[90svh] md:min-h-screen pt-8 pb-24 sm:pt-14 sm:pb-40 md:pt-14 md:pb-52 px-3 md:px-4 flex items-center justify-center">
       {/* Animated Background Blobs */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
         <div className="absolute top-0 left-1/4 w-72 h-72 bg-primary/20 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>
@@ -128,7 +128,7 @@ const Hero = () => {
             <span>{t("hero.badgeAI")}</span>
           </div>
 
-          <h1 className="font-heading text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[1.1] md:leading-tight text-foreground drop-shadow-sm">
+          <h1 className="font-heading text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[1.1] md:leading-tight text-foreground drop-shadow-sm">
             {t("hero.titlePart1")}{" "}
             <span className="text-primary relative inline-block">
               {t("hero.titlePart2")}

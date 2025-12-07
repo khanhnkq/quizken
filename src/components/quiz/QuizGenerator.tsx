@@ -1311,7 +1311,7 @@ const QuizGenerator = () => {
 
 
           <Card className="mb-8 border-4 border-primary/30 bg-white/80 backdrop-blur-sm shadow-[0_8px_30px_rgba(0,0,0,0.08),inset_0_2px_0_rgba(255,255,255,0.9)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.12)] transition-all duration-300 rounded-3xl overflow-hidden">
-            <CardContent className="p-4 sm:p-6 md:p-10 space-y-8">
+            <CardContent className="p-3 sm:p-6 md:p-10 space-y-8">
               {/* Show Form OR Loading Progress */}
               {loading ? (
                 <GenerationProgress
@@ -1364,7 +1364,7 @@ const QuizGenerator = () => {
                     <div className="flex items-center gap-3">
                       <label
                         htmlFor="quiz-topic"
-                        className="text-lg font-heading font-bold text-foreground">
+                        className="text-base md:text-lg font-heading font-bold text-foreground">
                         {t('quizGenerator.ui.topicLabel')}
                       </label>
                       <Badge variant="secondary" className="rounded-lg px-2 py-0.5 text-xs font-bold border-2 border-border">
@@ -1377,7 +1377,7 @@ const QuizGenerator = () => {
                         placeholder={t('quizGenerator.ui.examplePlaceholder')}
                         value={prompt}
                         onChange={(e) => setPrompt(e.target.value)}
-                        className={`min-h-[140px] md:min-h-[160px] resize-none text-lg p-6 rounded-2xl border-4 shadow-sm transition-all text-base leading-relaxed ${promptError
+                        className={`min-h-[140px] md:min-h-[160px] resize-none p-4 md:p-6 rounded-2xl border-4 shadow-sm transition-all text-base md:text-lg leading-relaxed ${promptError
                           ? "border-destructive/50 focus-visible:ring-destructive/20 focus-visible:border-destructive"
                           : isPromptValid
                             ? "border-primary/50 focus-visible:ring-primary/20 focus-visible:border-primary bg-primary/5"

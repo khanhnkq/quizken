@@ -402,7 +402,7 @@ const QuizLibrary: React.FC = () => {
         </div>
         <div id="smooth-content" className="relative z-10">
           {/* Hero Section */}
-          <section className="relative overflow-hidden bg-gradient-to-b from-secondary/30 via-background to-background min-h-[60vh] flex flex-col justify-center py-20 px-4">
+          <section className="relative overflow-hidden bg-gradient-to-b from-secondary/30 via-background to-background min-h-[60vh] flex flex-col justify-center py-12 px-2 md:py-20 md:px-4">
             {/* Enhanced Background Decorations */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
               {/* Animated Gradient Blobs - Matched with Main Hero */}
@@ -437,7 +437,7 @@ const QuizLibrary: React.FC = () => {
                 <span>{t('library.hero.badge')}</span>
               </div>
 
-              <h1 className="font-heading text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[1.1] md:leading-tight text-foreground drop-shadow-sm mb-6">
+              <h1 className="font-heading text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[1.1] md:leading-tight text-foreground drop-shadow-sm mb-6">
                 <span className="relative inline-block">
                   {t('library.hero.titlePart1')}
                   <svg className="absolute -bottom-2 left-0 w-full h-3 text-yellow-300 -z-10" viewBox="0 0 100 10" preserveAspectRatio="none">
@@ -452,14 +452,14 @@ const QuizLibrary: React.FC = () => {
                 </span>
               </h1>
 
-              <p className="text-xl md:text-2xl text-muted-foreground font-medium max-w-2xl mx-auto mb-10 leading-relaxed">
+              <p className="text-lg md:text-2xl text-muted-foreground font-medium max-w-2xl mx-auto mb-10 leading-relaxed">
                 {t('library.hero.description')}
               </p>
             </div>
 
-            <div className="container mx-auto max-w-6xl relative z-10">
+            <div className="w-full md:container mx-auto max-w-6xl relative z-10">
               {/* Stats - Playful Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6 mb-16">
                 {/* Quizzes Card */}
                 <Card className="rounded-3xl border-4 border-primary/20 bg-gradient-to-br from-green-50 to-white backdrop-blur-md shadow-xl hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 group cursor-pointer overflow-hidden">
                   <CardContent className="p-6 text-center relative">
@@ -519,13 +519,13 @@ const QuizLibrary: React.FC = () => {
               <div className="max-w-4xl mx-auto mb-12 space-y-4 relative z-10">
                 {/* Search Bar */}
                 <div className="relative">
-                  <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-8 w-8 text-primary/40" />
+                  <Search className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 h-5 w-5 md:h-8 md:w-8 text-primary/40" />
                   <Input
                     ref={searchInputRef}
                     placeholder={t('library.search.placeholder')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-16 pr-16 text-xl py-8 h-20 rounded-full border-4 border-primary/20 focus:border-primary shadow-xl hover:shadow-2xl transition-all placeholder:text-muted-foreground/50 font-medium"
+                    className="pl-12 pr-12 md:pl-16 md:pr-16 text-base md:text-xl py-4 md:py-8 h-14 md:h-20 rounded-full border-4 border-primary/20 focus:border-primary shadow-xl hover:shadow-2xl transition-all placeholder:text-muted-foreground/50 font-medium"
                   />
                   <div className="absolute right-3 top-1/2 -translate-y-1/2">
                     {searchQuery ? (
@@ -617,7 +617,7 @@ const QuizLibrary: React.FC = () => {
               {loading ? (
                 <div
                   data-lib-list
-                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-500 relative z-10">
+                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-6 animate-in fade-in duration-500 relative z-10">
                   {[...Array(6)].map((_, i) => (
                     <QuizCardSkeleton key={i} />
                   ))}
@@ -625,7 +625,7 @@ const QuizLibrary: React.FC = () => {
               ) : (
                 <div
                   data-lib-list
-                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-500 relative z-10">
+                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-6 animate-in fade-in duration-500 relative z-10">
                   {quizzes.map((quiz, index) => (
                     <div
                       key={quiz.id}
