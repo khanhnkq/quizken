@@ -28,6 +28,7 @@ import { useAnonQuota } from "@/hooks/useAnonQuota";
 import { QuotaLimitDialog } from "./QuotaLimitDialog";
 import { QuotaExceededDialog } from "./QuotaExceededDialog";
 import { GenerationProgress } from "./GenerationProgress";
+import { ChatInterface } from "./ChatInterface";
 import useQuizGeneration from "@/hooks/useQuizGeneration";
 import { useDashboardStats } from "@/hooks/useDashboardStats";
 import { calculateXP, calculateLevel, calculateCreateReward } from "@/utils/levelSystem";
@@ -79,9 +80,11 @@ export function QuickGeneratorDialog({ open, onOpenChange }: QuickGeneratorDialo
     const [quotaErrorMessage, setQuotaErrorMessage] = useState("");
     const [showCancelConfirm, setShowCancelConfirm] = useState(false);
     const [showNewQuizConfirm, setShowNewQuizConfirm] = useState(false);
+    const [currentQuizId, setCurrentQuizId] = useState<string | null>(null);
 
     // Refs
     const userRef = useRef(user);
+    const currentQuizIdRef = useRef<string | null>(null);
     useEffect(() => { userRef.current = user; }, [user]);
 
     // Quiz generation hook
@@ -140,10 +143,13 @@ export function QuickGeneratorDialog({ open, onOpenChange }: QuickGeneratorDialo
         await proceedWithGeneration();
     };
 
-    // Actual generation logic
-    const proceedWithGeneration = async () => {
-        if (!validatePrompt(prompt)) return;
-        if (!questionCount) {
+    // Actual generation logic - accepts optional overrides from ChatInterface
+    const proceedWithGeneration = async (overridePrompt?: string, overrideCount?: string) => {
+        const activePrompt = overridePrompt ?? prompt;
+        const activeCount = overrideCount ?? questionCount;
+
+        if (!validatePrompt(activePrompt)) return;
+        if (!activeCount) {
             toast({
                 title: t("quizGenerator.toasts.selectCount"),
                 description: t("quizGenerator.toasts.selectCountDesc"),
@@ -180,9 +186,9 @@ export function QuickGeneratorDialog({ open, onOpenChange }: QuickGeneratorDialo
                 duplicate?: boolean;
             }>("generate-quiz/start-quiz", {
                 body: {
-                    prompt,
+                    prompt: activePrompt,
                     device: deviceInfo,
-                    questionCount: parseInt(questionCount),
+                    questionCount: parseInt(activeCount),
                     idempotencyKey,
                     language: i18n.language,
                 },
@@ -193,6 +199,8 @@ export function QuickGeneratorDialog({ open, onOpenChange }: QuickGeneratorDialo
             }
 
             const quizId = startResponse.id;
+            setCurrentQuizId(quizId);
+            currentQuizIdRef.current = quizId;
 
             // Start polling
             startPolling(quizId, {
@@ -293,204 +301,34 @@ export function QuickGeneratorDialog({ open, onOpenChange }: QuickGeneratorDialo
     return (
         <>
             <Dialog open={open} onOpenChange={handleOpenChange}>
-                <DialogContent className="max-w-xl p-0 overflow-hidden bg-transparent border-none shadow-none sm:max-w-xl">
-                    <div className="relative overflow-hidden bg-white/90 backdrop-blur-xl border-4 border-primary/20 shadow-[0_8px_30px_rgba(0,0,0,0.08)] rounded-[2rem]">
-                        <DialogHeader className="p-6 md:p-8 space-y-4 pb-2">
-                            <div className="flex items-center justify-between">
-                                <DialogTitle className="flex items-center gap-3 text-2xl font-bold">
-                                    <div className="p-2.5 bg-primary/10 rounded-xl">
-                                        <Sparkles className="w-6 h-6 text-primary" />
-                                    </div>
-                                    {t("quickGenerator.title")}
-                                </DialogTitle>
-                            </div>
-                            <DialogDescription className="text-base text-muted-foreground">
-                                {t("quickGenerator.description")}
-                            </DialogDescription>
+                <DialogContent className="max-w-2xl p-0 overflow-hidden bg-transparent border-none shadow-none sm:max-w-2xl [&>button]:hidden">
+                    {/* Visually hidden title for accessibility */}
+                    <DialogTitle className="sr-only">{t("quickGenerator.title")}</DialogTitle>
+                    <DialogDescription className="sr-only">{t("quickGenerator.description")}</DialogDescription>
 
-                            {/* Compact Quota UI */}
-                            {user && (
-                                <div className="flex items-center justify-between gap-3 p-3 rounded-xl bg-gradient-to-r from-purple-50/80 to-indigo-50/80 border border-purple-100">
-                                    <div className="flex items-center gap-2">
-                                        <Sparkles className="w-4 h-4 text-purple-500" />
-                                        <span className="text-xs font-bold text-purple-600 uppercase tracking-wide">
-                                            {t("quizGenerator.quota.usage")}
-                                        </span>
-                                    </div>
-                                    {hasApiKey ? (
-                                        <div className="flex items-center gap-1.5 text-sm font-bold text-emerald-600">
-                                            <Zap className="w-4 h-4" />
-                                            {t("quizGenerator.quota.unlimited")}
-                                        </div>
-                                    ) : (
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-16 h-2 bg-white/60 rounded-full overflow-hidden border border-purple-100">
-                                                <div
-                                                    className={cn(
-                                                        "h-full rounded-full transition-all",
-                                                        userRemaining === 0
-                                                            ? "bg-red-400"
-                                                            : userRemaining === 1
-                                                                ? "bg-orange-400"
-                                                                : "bg-gradient-to-r from-purple-400 to-indigo-500"
-                                                    )}
-                                                    style={{ width: `${Math.min(100, (userRemaining / userLimit) * 100)}%` }}
-                                                />
-                                            </div>
-                                            <span className="text-sm font-bold text-purple-700">
-                                                {userRemaining}/{userLimit}
-                                            </span>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-                        </DialogHeader>
-
-                        <div className="p-6 md:p-8 pt-0 space-y-6">
-                            {loading ? (
-                                /* Loading State - Show Progress */
-                                <div className="py-8">
-                                    <GenerationProgress
-                                        generationStatus={genStatus ?? generationStatus ?? "processing"}
-                                        generationProgress={genProgress || generationProgress || t("quizGenerator.toasts.preparing")}
-                                        onCancel={() => setShowCancelConfirm(true)}
-                                    />
-                                </div>
-                            ) : (
-                                /* Form State - Show Input */
-                                <>
-                                    <div className="space-y-3">
-                                        <div className="flex items-center gap-2">
-                                            <label className="text-sm font-bold text-foreground">
-                                                {t("quizGenerator.ui.topicLabel")}
-                                            </label>
-                                            <Badge variant="secondary" className="rounded-lg px-1.5 py-0.5 text-[10px] font-bold border border-border">
-                                                {t("quizGenerator.ui.required")}
-                                            </Badge>
-                                        </div>
-                                        <div className="relative group">
-                                            <Textarea
-                                                placeholder={t("quizGenerator.promptPlaceholder")}
-                                                value={prompt}
-                                                onChange={(e) => {
-                                                    setPrompt(e.target.value);
-                                                    validatePrompt(e.target.value);
-                                                }}
-                                                className={cn(
-                                                    "min-h-[120px] resize-none text-base p-5 rounded-2xl border-4 shadow-sm transition-all leading-relaxed",
-                                                    promptError
-                                                        ? "border-destructive/50 focus-visible:ring-destructive/20 focus-visible:border-destructive"
-                                                        : "border-border hover:border-primary/50 focus-visible:ring-primary/20 focus-visible:border-primary focus:bg-primary/5"
-                                                )}
-                                                disabled={loading}
-                                            />
-                                            {/* Character count */}
-                                            <div className="absolute bottom-3 right-3 text-xs font-medium text-muted-foreground bg-white/80 px-2 py-1 rounded-md backdrop-blur-sm border border-border/50">
-                                                {prompt.length}/500
-                                            </div>
-                                        </div>
-                                        {promptError && (
-                                            <div className="flex items-center gap-2 text-destructive text-sm font-medium animate-in slide-in-from-left-2">
-                                                <XCircle className="w-4 h-4" />
-                                                <span>{promptError}</span>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* Question Count Selection */}
-                                    <div className="space-y-3">
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-2">
-                                                <label className="text-sm font-bold text-foreground">
-                                                    {t("quizGenerator.ui.questionCount")}
-                                                </label>
-                                                <Badge variant="secondary" className="rounded-lg px-1.5 py-0.5 text-[10px] font-bold border border-border">
-                                                    {t("quizGenerator.ui.required")}
-                                                </Badge>
-                                            </div>
-                                        </div>
-
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-                                            <Select
-                                                value={questionCount}
-                                                onValueChange={setQuestionCount}
-                                                disabled={loading}
-                                            >
-                                                <SelectTrigger className="w-full h-12 rounded-xl border-2 text-base px-4 font-medium transition-all hover:border-primary/50 focus:ring-primary/20 bg-background text-foreground shadow-sm">
-                                                    <SelectValue placeholder={t('quizGenerator.ui.selectPlaceholder')} />
-                                                </SelectTrigger>
-                                                <SelectContent className="rounded-xl border-2">
-                                                    <SelectItem value="10" className="rounded-lg my-1 py-2 cursor-pointer">{t('quizGenerator.ui.10questions')}</SelectItem>
-                                                    <SelectItem value="15" className="rounded-lg my-1 py-2 cursor-pointer">{t('quizGenerator.ui.15questions')}</SelectItem>
-                                                    <SelectItem value="20" className="rounded-lg my-1 py-2 cursor-pointer">{t('quizGenerator.ui.20questions')}</SelectItem>
-                                                    <SelectItem value="25" className="rounded-lg my-1 py-2 cursor-pointer">{t('quizGenerator.ui.25questions')}</SelectItem>
-                                                    <SelectItem value="30" className="rounded-lg my-1 py-2 cursor-pointer">{t('quizGenerator.ui.30questions')}</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-
-                                            <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/30 border border-secondary text-muted-foreground h-12">
-                                                <Clock className="w-5 h-5 text-primary" />
-                                                <p className="text-sm font-medium">
-                                                    {t('quizGenerator.ui.estimatedTime')}{" "}
-                                                    <span className="text-foreground font-bold">
-                                                        {questionCount
-                                                            ? Math.ceil(parseInt(questionCount) / 10)
-                                                            : 2}
-                                                        -
-                                                        {questionCount
-                                                            ? Math.ceil(parseInt(questionCount) / 5)
-                                                            : 4}{" "}
-                                                    </span>
-                                                    {t('quizGenerator.ui.minutes')}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Loading Progress */}
-                                    {loading && generationProgress && (
-                                        <div className="rounded-2xl bg-secondary/30 p-4 border border-border/50">
-                                            <GenerationProgress
-                                                generationStatus={generationStatus || "processing"}
-                                                generationProgress={generationProgress}
-                                                onCancel={() => {
-                                                    setLoading(false);
-                                                    setGenerationStatus(null);
-                                                    setGenerationProgress("");
-                                                    stopPolling();
-                                                }}
-                                            />
-                                        </div>
-                                    )}
-
-                                    {/* Generate Button */}
-                                    <Button
-                                        onClick={handleGenerate}
-                                        disabled={loading || !prompt.trim() || !questionCount || !!promptError}
-                                        className={cn(
-                                            "w-full h-14 text-lg rounded-2xl shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 bg-primary text-white font-bold relative overflow-hidden group border-4 border-primary hover:border-primary-foreground/20 active:scale-95",
-                                            loading && "opacity-80 cursor-not-allowed"
-                                        )}
-                                    >
-                                        {loading ? (
-                                            <>
-                                                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                                                {t("quizGenerator.generating")}
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Sparkles className="w-5 h-5 mr-2" />
-                                                {t("quizGenerator.createButton")}
-                                                <div className="bg-white/20 p-1 rounded-md ml-2 group-hover:rotate-12 transition-transform hidden sm:block">
-                                                    <Target className="w-4 h-4 text-white" />
-                                                </div>
-                                            </>
-                                        )}
-                                    </Button>
-                                </>
-                            )}
+                    {loading ? (
+                        /* Loading State - Show Cute Progress */
+                        <div className="relative overflow-hidden bg-white/95 backdrop-blur-xl border-2 border-primary/10 shadow-2xl rounded-3xl p-8">
+                            <GenerationProgress
+                                generationStatus={genStatus ?? generationStatus ?? "processing"}
+                                generationProgress={genProgress || generationProgress || t("quizGenerator.toasts.preparing")}
+                                onCancel={() => setShowCancelConfirm(true)}
+                            />
                         </div>
-                    </div>
+                    ) : (
+                        /* Chat Interface - Full Experience */
+                        <ChatInterface
+                            onComplete={(topic, count) => {
+                                setPrompt(topic);
+                                setQuestionCount(count);
+                                proceedWithGeneration(topic, count);
+                            }}
+                            onCancel={() => onOpenChange(false)}
+                            userRemaining={userRemaining}
+                            userLimit={userLimit}
+                            hasApiKey={hasApiKey}
+                        />
+                    )}
                 </DialogContent>
             </Dialog>
 
@@ -518,11 +356,42 @@ export function QuickGeneratorDialog({ open, onOpenChange }: QuickGeneratorDialo
                     <AlertDialogFooter>
                         <AlertDialogCancel>{t('quizGenerator.confirmDialog.cancel')}</AlertDialogCancel>
                         <AlertDialogAction onClick={() => {
+                            // 1. Backend Cancel - call API to stop generation on server
+                            const idToCancel = currentQuizIdRef.current || currentQuizId;
+                            console.log("🛑 Cancelling quiz with ID:", idToCancel);
+
+                            if (idToCancel) {
+                                supabase.functions.invoke('generate-quiz/cancel-quiz', {
+                                    body: { quiz_id: idToCancel }
+                                }).then(({ error }) => {
+                                    if (error) console.error("❌ Failed to cancel quiz on backend:", error);
+                                    else console.log("✅ Quiz cancelled on backend");
+                                }).catch(err => console.error("❌ Network error cancelling quiz:", err));
+                            } else {
+                                console.warn("⚠️ No quiz ID to cancel");
+                            }
+
+                            // 2. Stop polling first
+                            stopPolling();
+                            reset();
+
+                            // 3. Reset local state
                             setShowCancelConfirm(false);
                             setLoading(false);
                             setGenerationStatus(null);
                             setGenerationProgress("");
-                            stopPolling();
+                            setCurrentQuizId(null);
+                            currentQuizIdRef.current = null;
+
+                            // 4. Show toast
+                            toast({
+                                title: t('quizGenerator.toasts.cancelledTitle'),
+                                description: t('quizGenerator.toasts.cancelledDesc'),
+                                variant: "info",
+                            });
+
+                            // 5. Close dialog
+                            onOpenChange(false);
                         }}>
                             {t('quizGenerator.confirmDialog.confirm')}
                         </AlertDialogAction>

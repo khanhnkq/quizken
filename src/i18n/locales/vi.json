@@ -175,19 +175,43 @@
             "pdfFailedDesc": "Không thể tạo PDF. Vui lòng thử lại"
         },
         "generationProgress": {
-            "title": "Đang tạo câu hỏi AI...",
-            "titleFailed": "❌ Không thể tạo quiz",
-            "titleExpired": "⏰ Quiz đã hết hạn",
-            "processing": "Đang xử lý...",
-            "backgroundNote": "Bạn có thể tiếp tục thao tác khác; tiến trình chạy nền và sẽ hiển thị khi hoàn tất.",
-            "cancelButton": "Hủy tạo quiz",
-            "progressLabel": "Tiến độ tạo quiz",
+            "title": "Đang chuẩn bị phòng thi...",
+            "titleFailed": "Úi! Có lỗi rồi 🥲",
+            "titleExpired": "Hết giờ rùi!",
+            "processing": "Đợi xíu nha...",
             "steps": {
-                "init": "Khởi tạo",
-                "auth": "Xác thực",
-                "limit": "Giới hạn",
-                "generate": "Sinh AI",
-                "done": "Hoàn tất"
+                "init": "Đang pha cà phê cho AI... ☕",
+                "auth": "Xin visa vào server... 🎫",
+                "limit": "Đếm xem còn bao nhiêu lượt... 🔢",
+                "generate": "AI đang vắt óc suy nghĩ... 🤯",
+                "done": "Xong rồi nè! Triển thôi! 🎉"
+            },
+            "backgroundNote": "Bạn có thể đóng cửa sổ này, tụi mình sẽ báo khi xong!",
+            "cancelButton": "Thôi không tạo nữa",
+            "progressLabel": "Tiến độ",
+            "mascot": {
+                "idle": "Chọt em đi! 👇",
+                "active": "Á! Nhột! 🤣"
+            },
+            "funFacts": [
+                "Bạn có biết? Não bộ ghi nhớ tốt hơn 50% khi chúng ta... cười! 😂",
+                "Mỗi lần bạn tạo quiz, một con AI được... thăng chức (đùa đấy)! 🤖",
+                "Học đi đôi với hành, hành đi đôi với tỏi... ủa nhầm, với Quizken! 🧅",
+                "Quizken được code bằng 90% cà phê và 10% nước mắt... ☕",
+                "Kiên trì là chìa khóa của thành công (và chìa khóa mở khóa học)! 🗝️"
+            ]
+        },
+        "chat": {
+            "greeting": "Hé lô! 👋 Hôm nay mình ôn luyện chủ đề gì nào?",
+            "askCount": "Chủ đề hay đó! 🧠 Bạn muốn làm bao nhiêu câu cho \"{{topic}}\"?",
+            "confirming": "Ok chốt đơn! Đang khởi động máy móc... 🍳",
+            "inputPlaceholder": "Nhập chủ đề (vd: Lịch sử VN)...",
+            "inputPlaceholderCount": "Chọn số lượng ở trên...",
+            "questionsCount": "{{count}} câu hỏi",
+            "botName": "Quizken AI",
+            "suggestions": {
+                "python": "Python Cơ bản",
+                "marketing": "Marketing Căn bản"
             }
         },
         "confirmDialog": {
@@ -210,6 +234,7 @@
             "20questions": "20 câu hỏi",
             "25questions": "25 câu hỏi",
             "30questions": "30 câu hỏi",
+            "questions": "câu",
             "estimatedTime": "Thời gian tạo khoảng",
             "loginUnlimited": "Đăng nhập để không giới hạn",
             "fillAllFields": "Vui lòng điền đầy đủ thông tin",

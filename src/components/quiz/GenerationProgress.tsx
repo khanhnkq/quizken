@@ -1,8 +1,10 @@
 import * as React from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { Loader2, XCircle } from '@/lib/icons';
+import { XCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import logo from "@/assets/logo/logo.png";
+import { cn } from "@/lib/utils";
 
 interface GenerationProgressProps {
   generationStatus: string | null;
@@ -13,11 +15,11 @@ interface GenerationProgressProps {
 const progressStepKeys = ["init", "auth", "limit", "generate", "done"] as const;
 
 const progressStepMatches = [
-  ["starting generation", "đang chuẩn bị"],
-  ["authenticating"],
-  ["checking rate limits", "rate limit"],
-  ["generating with ai"],
-  ["completed"],
+  ["starting generation", "đang chuẩn bị", "brewing coffee"],
+  ["authenticating", "getting visa"],
+  ["checking rate limits", "rate limit", "counting"],
+  ["generating with ai", "brainstorming"],
+  ["completed", "all done"],
 ];
 
 const getActiveStep = (progressText: string | undefined): number => {
@@ -35,7 +37,10 @@ export const GenerationProgress: React.FC<GenerationProgressProps> = ({
   onCancel,
 }) => {
   const { t } = useTranslation();
+  const [mascotActive, setMascotActive] = useState(false);
+  const [funFactIndex, setFunFactIndex] = useState(0);
 
+  // Calculate generic progress percentage
   const percent = Math.min(
     Math.max(
       Math.round(((getActiveStep(generationProgress) + 1) / progressStepKeys.length) * 100),
@@ -44,67 +49,130 @@ export const GenerationProgress: React.FC<GenerationProgressProps> = ({
     95
   );
 
+  // Auto-rotate fun facts
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setFunFactIndex((prev) => (prev + 1) % 5); // Assuming 5 facts
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Reset mascot active state
+  useEffect(() => {
+    if (mascotActive) {
+      const timeout = setTimeout(() => setMascotActive(false), 800);
+      return () => clearTimeout(timeout);
+    }
+  }, [mascotActive]);
+
+  const handleMascotClick = () => {
+    setMascotActive(true);
+  };
+
   const getTitle = () => {
-    if (generationStatus === "failed") {
-      return t('quizGenerator.generationProgress.titleFailed');
-    }
-    if (generationStatus === "expired") {
-      return t('quizGenerator.generationProgress.titleExpired');
-    }
+    if (generationStatus === "failed") return t('quizGenerator.generationProgress.titleFailed');
+    if (generationStatus === "expired") return t('quizGenerator.generationProgress.titleExpired');
     return t('quizGenerator.generationProgress.title');
   };
 
+  // Safe access to translated arrays
+  const funFacts = t('quizGenerator.generationProgress.funFacts', { returnObjects: true }) as string[];
+  const currentFact = Array.isArray(funFacts) ? funFacts[funFactIndex] : "";
+
   return (
-    <div className="space-y-6 py-4 md:py-8">
-      <div className="flex justify-center">
-        <Loader2 className="w-10 h-10 md:w-12 md:h-12 text-primary animate-spin" />
+    <div className="relative overflow-hidden py-6 md:py-8 flex flex-col items-center justify-center space-y-8">
+      {/* Background Decoration */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none opacity-30">
+        <div className="absolute top-10 left-10 w-20 h-20 bg-primary/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-10 right-10 w-32 h-32 bg-purple-500/20 rounded-full blur-3xl animate-pulse delay-1000" />
       </div>
 
-      <div className="space-y-1 text-center px-4">
-        <h3 className="text-lg md:text-xl font-semibold">
-          {getTitle()}
-        </h3>
-        <p className="text-sm md:text-base text-muted-foreground" role="status" aria-live="polite">
-          {generationProgress || t('quizGenerator.generationProgress.processing')}
-        </p>
-      </div>
-
-      <div className="max-w-xl mx-auto px-4">
-        <div className="grid grid-cols-5 gap-1 md:gap-2">
-          {progressStepKeys.map((key, i) => {
-            const active = getActiveStep(generationProgress) >= i;
-            return (
-              <div key={key} className="flex flex-col items-center">
-                <div className={`h-2 w-full rounded-full ${active ? "bg-primary animate-pulse" : "bg-secondary"}`} />
-                <span
-                  className={`mt-1 md:mt-2 text-[10px] md:text-[11px] text-center ${active ? "text-foreground" : "text-muted-foreground"
-                    }`}>
-                  {t(`quizGenerator.generationProgress.steps.${key}`)}
-                </span>
-              </div>
-            );
-          })}
+      {/* Mascot Section */}
+      <div className="relative z-10 flex flex-col items-center cursor-pointer group" onClick={handleMascotClick}>
+        <div className={cn(
+          "relative w-24 h-24 md:w-32 md:h-32 transition-transform duration-300",
+          mascotActive ? "scale-110 rotate-12" : "animate-bounce"
+        )}>
+          {/* Glow effect behind mascot */}
+          <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl scale-125 group-hover:scale-150 transition-transform duration-500" />
+          <img
+            src={logo}
+            alt="Quizken Mascot"
+            className={cn(
+              "w-full h-full object-contain drop-shadow-2xl relative z-10",
+              mascotActive && "animate-spin-once" // We'll add a custom utility or style for this if needed, or rely on transform
+            )}
+          />
+          {/* Speech Bubble */}
+          <div className={cn(
+            "absolute -right-16 -top-4 bg-white text-foreground text-xs font-bold py-1 px-3 rounded-xl shadow-lg border border-border/50 animate-in fade-in slide-in-from-bottom-2 duration-300 whitespace-nowrap",
+            mascotActive ? "opacity-100 scale-100" : "opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100"
+          )}>
+            {mascotActive
+              ? t('quizGenerator.generationProgress.mascot.active')
+              : t('quizGenerator.generationProgress.mascot.idle')}
+            <div className="absolute bottom-0 left-[-4px] translate-y-1/2 w-2 h-2 bg-white rotate-45 border-b border-l border-border/50"></div>
+          </div>
         </div>
       </div>
 
-      <div className="max-w-md mx-auto px-4">
-        <Progress value={percent} aria-label={t('quizGenerator.generationProgress.progressLabel')} className="h-2" />
+      {/* Status & Progress */}
+      <div className="w-full max-w-lg space-y-4 px-6 relative z-10 text-center">
+        <div className="space-y-1">
+          <h3 className="text-xl md:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-600 animate-pulse">
+            {getTitle()}
+          </h3>
+          <p className="text-base font-medium text-muted-foreground min-h-[1.5em] transition-all">
+            {generationProgress || t('quizGenerator.generationProgress.processing')}
+          </p>
+        </div>
+
+        {/* Chunky Progress Bar */}
+        <div className="relative h-6 w-full bg-secondary/50 rounded-full overflow-hidden border border-black/5 shadow-inner">
+          <div
+            className="absolute top-0 left-0 h-full bg-gradient-to-r from-primary via-purple-500 to-indigo-500 transition-all duration-700 ease-out rounded-full shadow-[0_0_10px_rgba(var(--primary),0.5)]"
+            style={{ width: `${percent}%` }}
+          >
+            <div className="absolute inset-0 bg-white/30 animate-[shimmer_2s_infinite] w-full" style={{ backgroundImage: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent)' }}></div>
+          </div>
+          <div className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-white shadow-sm uppercase tracking-widest mix-blend-overlay">
+            {percent}%
+          </div>
+        </div>
       </div>
 
-      <p className="text-xs md:text-sm text-center text-muted-foreground px-4">
-        {t('quizGenerator.generationProgress.backgroundNote')}
-      </p>
+      {/* Fun Fact Card */}
+      <div className="w-full max-w-md px-6 relative z-10">
+        <div className="bg-white/60 backdrop-blur-md border-2 border-primary/10 rounded-2xl p-4 shadow-sm min-h-[100px] flex flex-col items-center justify-center text-center space-y-2 transition-all hover:border-primary/30 hover:shadow-md">
+          <span className="text-xs font-extrabold text-primary uppercase tracking-widest bg-primary/10 px-2 py-0.5 rounded-md">
+            Fun Fact 💡
+          </span>
+          <p className="text-sm md:text-base font-medium text-foreground animate-in fade-in slide-in-from-bottom-1 duration-500 key={funFactIndex}">
+            {currentFact || "Did you know learning is fun? 🚀"}
+          </p>
+        </div>
+      </div>
 
-      <div className="flex justify-center px-4">
+      {/* Cancel Button */}
+      <div className="relative z-10 pt-2">
         <Button
           onClick={onCancel}
-          variant="outline"
-          size="lg"
-          className="w-full sm:w-auto hover:bg-primary hover:text-primary-foreground hover:border-foreground transition-colors">
-          <XCircle className="mr-2 h-4 w-4" />
+          variant="ghost"
+          size="sm"
+          className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors gap-2"
+        >
+          <XCircle className="w-4 h-4" />
           {t('quizGenerator.generationProgress.cancelButton')}
         </Button>
       </div>
+
+      {/* Custom Styles for wiggle/bounce if needed */}
+      <style>{`
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+      `}</style>
     </div>
   );
 };

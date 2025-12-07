@@ -57,8 +57,8 @@ export function useQuizGeneration<Quiz = unknown>() {
           setProgress(data.progress);
           setIsPolling(
             data.status !== "completed" &&
-              data.status !== "failed" &&
-              data.status !== "expired"
+            data.status !== "failed" &&
+            data.status !== "expired"
           );
         }
       } else if (message.type === "polling-start") {
@@ -132,8 +132,8 @@ export function useQuizGeneration<Quiz = unknown>() {
       );
 
       // Exponential backoff configuration
-      const MAX_BACKOFF_MS = 30000; // Max 30s between polls
-      const INITIAL_INTERVAL_MS = 2000;
+      const MAX_BACKOFF_MS = 60000; // Max 60s between polls
+      const INITIAL_INTERVAL_MS = 13000; // 13s to stay under 5 req/min
       let currentIntervalMs = INITIAL_INTERVAL_MS;
 
       const sleep = (ms: number) =>

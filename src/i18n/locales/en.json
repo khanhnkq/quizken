@@ -16,7 +16,16 @@
         "login": "Sign In",
         "logout": "Sign Out",
         "required": "Authentication Required",
-        "loginToCreate": "Please log in to create quizzes."
+        "loginToCreate": "Please log in to create quizzes.",
+        "redirecting": "Redirecting to Google...",
+        "completeLogin": "Please complete login on Google page",
+        "loginError": "Login Error",
+        "defaultError": "An error occurred while logging in with Google.",
+        "signInWithGoogle": "Sign in with Google",
+        "redirectingShort": "Redirecting...",
+        "googleOnly": "Only Google sign-in is supported",
+        "termsAgreement": "By continuing, you agree to our Terms of Service and Privacy Policy.",
+        "later": "Later"
     },
     "hero": {
         "title": "Create AI Quiz for Free",
@@ -165,19 +174,43 @@
             "pdfFailedDesc": "Could not create PDF. Please try again"
         },
         "generationProgress": {
-            "title": "Generating AI Questions...",
-            "titleFailed": "❌ Could not create quiz",
-            "titleExpired": "⏰ Quiz has expired",
-            "processing": "Processing...",
-            "backgroundNote": "You can continue with other tasks; the process runs in the background and will display when complete.",
-            "cancelButton": "Cancel quiz creation",
-            "progressLabel": "Quiz generation progress",
+            "title": "Setting up the exam room...",
+            "titleFailed": "Oops! Something went wrong 🥲",
+            "titleExpired": "Time's up!",
+            "processing": "Just a sec...",
             "steps": {
-                "init": "Initialize",
-                "auth": "Authenticate",
-                "limit": "Check Limits",
-                "generate": "AI Generate",
-                "done": "Complete"
+                "init": "Brewing coffee for AI... ☕",
+                "auth": "Getting visa for server... 🎫",
+                "limit": "Counting your remaining tries... 🔢",
+                "generate": "AI is brainstorming hard... 🤯",
+                "done": "All done! Let's go! 🎉"
+            },
+            "backgroundNote": "You can close this window, we'll notify you when done!",
+            "cancelButton": "Cancel creation",
+            "progressLabel": "Progress",
+            "mascot": {
+                "idle": "Poke me! 👇",
+                "active": "Hey! That tickles! 🤣"
+            },
+            "funFacts": [
+                "Did you know? The brain remembers 50% better when we... laugh! 😂",
+                "Every time you create a quiz, an AI gets... promoted (just kidding)! 🤖",
+                "Practice makes perfect... and Quizken makes practice fun! 🧅",
+                "Quizken is coded with 90% coffee and 10% tears... ☕",
+                "Consistency is key (and the key to unlocking courses)! 🗝️"
+            ]
+        },
+        "chat": {
+            "greeting": "Hi there! 👋 What kind of quiz shall we brew today?",
+            "askCount": "Awesome topic! 🧠 How many questions to cook up for \"{{topic}}\"?",
+            "confirming": "On it! Firing up the servers... 🍳",
+            "inputPlaceholder": "Type a topic (e.g. Vietnam History)...",
+            "inputPlaceholderCount": "Select a number above...",
+            "questionsCount": "{{count}} questions",
+            "botName": "Quizken AI",
+            "suggestions": {
+                "python": "Python Basics",
+                "marketing": "Marketing 101"
             }
         },
         "confirmDialog": {
@@ -198,6 +231,7 @@
             "20questions": "20 questions",
             "25questions": "25 questions",
             "30questions": "30 questions",
+            "questions": "questions",
             "estimatedTime": "Estimated time",
             "loginUnlimited": "Login for unlimited",
             "fillAllFields": "Please fill in all fields",
@@ -603,17 +637,6 @@
         "page": "Page",
         "minutes": "minutes",
         "morePages": "More pages"
-    },
-    "auth": {
-        "redirecting": "Redirecting to Google...",
-        "completeLogin": "Please complete login on Google page",
-        "loginError": "Login Error",
-        "defaultError": "An error occurred while logging in with Google.",
-        "signInWithGoogle": "Sign in with Google",
-        "redirectingShort": "Redirecting...",
-        "googleOnly": "Only Google sign-in is supported",
-        "termsAgreement": "By continuing, you agree to our Terms of Service and Privacy Policy.",
-        "later": "Later"
     },
     "apiKeySettings": {
         "title": "API Key Settings",
