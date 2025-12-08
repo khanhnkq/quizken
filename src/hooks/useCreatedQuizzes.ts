@@ -61,7 +61,7 @@ export function useCreatedQuizzes(userId?: string) {
             console.log("[useCreatedQuizzes] Cleaning up subscription");
             supabase.removeChannel(channel);
         };
-    }, [userId, queryClient, queryKey]);
+    }, [userId, queryClient]); // Removed queryKey to prevent re-sub loops
 
     return {
         createdQuizzes,
@@ -69,4 +69,4 @@ export function useCreatedQuizzes(userId?: string) {
         error: error ? (error as Error).message : null,
         refetch: () => queryClient.invalidateQueries({ queryKey }),
     };
-}
+};

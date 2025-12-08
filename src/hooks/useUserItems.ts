@@ -40,7 +40,7 @@ export function useUserItems() {
         return () => {
             supabase.removeChannel(channel);
         };
-    }, [user?.id, queryClient, queryKey]);
+    }, [user?.id, queryClient]); // Removed queryKey
 
     return useQuery({
         queryKey,

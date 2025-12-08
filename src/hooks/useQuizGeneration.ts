@@ -115,7 +115,7 @@ export function useQuizGeneration<Quiz = unknown>() {
         fallbackTimeoutRef.current = setTimeout(() => {
           console.log("[useQuizGeneration] Fallback timeout triggered (60s silence). Performing manual check...");
           performManualCheck();
-        }, 60000); // 60s safety net
+        }, 5000); // 5s fast retry (was 60s) to handling missed Realtime events
       };
 
       // Helper function to check status manually (for initial load and fallback)

@@ -50,7 +50,7 @@ export function useDashboardStats(userId?: string) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [userId, queryClient, queryKey]);
+  }, [userId, queryClient]); // Removed queryKey to prevent re-sub loops
 
   return {
     statistics: statistics as UserStatistics | null,

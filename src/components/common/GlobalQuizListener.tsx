@@ -163,7 +163,38 @@ export const GlobalQuizListener: React.FC = () => {
         // Listen for cross-tab updates
         window.addEventListener("storage", checkActiveGeneration);
 
+        // Backup Polling Interval (5s)
+        // If Realtime misses the 'completed' event, we check manually
+        const intervalId = setInterval(async () => {
+            const state = read();
+            const quizId = state?.quizId;
+            const active = !!(quizId && (state?.loading === true || state?.generationStatus === "processing" || state?.generationStatus === "pending"));
+
+            if (active && quizId) {
+                console.log(`[GlobalQuizListener] Backup polling for ${quizId}...`);
+                const { data, error } = await supabase
+                    .from('quizzes')
+                    .select('status')
+                    .eq('id', quizId)
+                    .maybeSingle(); // Use maybeSingle to avoid 406 errors on race conditions
+
+                if (data && !error) {
+                    // If completed/failed, handle it
+                    if (data.status === 'completed' || data.status === 'failed') {
+                        console.log(`✅ [GlobalQuizListener] Backup polling detected status: ${data.status}`);
+                        handleQuizCompletion(quizId, data.status);
+                    }
+                }
+                // If deleted/not found
+                if (!data && !error) {
+                    // Likely deleted
+                    handleQuizCompletion(quizId, 'failed'); // Stop UI
+                }
+            }
+        }, 5000); // Check every 5s
+
         return () => {
+            clearInterval(intervalId); // Cleanup interval
             window.removeEventListener("generation-storage-update", checkActiveGeneration);
             window.removeEventListener("storage", checkActiveGeneration);
 
