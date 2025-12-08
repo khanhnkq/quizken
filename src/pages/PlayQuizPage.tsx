@@ -17,6 +17,7 @@ import { useQuizProgress, clearQuizProgress, getQuizProgress } from "@/hooks/use
 import { QuickGeneratorDialog } from "@/components/quiz/QuickGeneratorDialog";
 import AuthModal from "@/components/AuthModal";
 import { useToast } from "@/hooks/use-toast";
+import { useQuizStore } from "@/hooks/useQuizStore"; // Import global store
 
 export default function PlayQuizPage() {
     const { t, i18n } = useTranslation();
@@ -26,6 +27,7 @@ export default function PlayQuizPage() {
     const { user } = useAuth();
     const { toast } = useToast();
     const { save: saveProgress, clear: clearProgress } = useQuizProgress();
+    const { setQuiz: setGlobalQuiz, setPrompt } = useQuizStore(); // Destructure global setter
     const [showGeneratorDialog, setShowGeneratorDialog] = useState(false);
     const [showAuthModal, setShowAuthModal] = useState(false);
 
@@ -80,6 +82,10 @@ export default function PlayQuizPage() {
                 };
 
                 setQuiz(quizData);
+                setGlobalQuiz(quizData); // Sync to global store so Generator knows about it
+
+
+
 
                 // Check for saved progress (synchronously from localStorage)
                 const saved = getQuizProgress();

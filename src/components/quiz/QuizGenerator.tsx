@@ -143,9 +143,12 @@ const QuizGenerator = () => {
   const [generationProgress, setGenerationProgress] = useState<string>("");
   const { toast } = useToast();
   const { user, loading: authLoading } = useAuth();
+
   const { t, i18n } = useTranslation(); // Add i18n support
   const { statistics, refetch: refetchStats } = useDashboardStats(user?.id);
   const [questionCount, setQuestionCount] = useState<string>("");
+
+
   const [isQuestionCountSelected, setIsQuestionCountSelected] =
     useState<boolean>(false);
   const [shuffledData, setShuffledData] = useState<ShuffledQuizData | null>(
@@ -168,6 +171,8 @@ const QuizGenerator = () => {
   // Double-submit protection refs
   const isSubmittingRef = React.useRef<boolean>(false);
   const lastSubmitTimeRef = React.useRef<number>(0);
+  const isCompletingRef = React.useRef<boolean>(false); // Guard against false cancellation
+
   const {
     status: genStatus,
     progress: genProgress,
@@ -175,6 +180,8 @@ const QuizGenerator = () => {
     stopPolling,
     reset,
   } = useQuizGeneration<Quiz>();
+
+  // ...
   const {
     read: readPersist,
     write: writePersist,
@@ -206,7 +213,7 @@ const QuizGenerator = () => {
   // during in-app navigation. Only cancel on explicit page unload signals.
   useEffect(() => {
     abortControllerRef.current = new AbortController();
-    // IMPORTANT: No cleanup function in this useEffect!
+    // IT: No cleanup function in this useEffect!
     // We want quiz generation to continue during React Router navigations
     // because SPA navigation doesn't mean user wants to stop the process.
   }, []);
@@ -259,13 +266,9 @@ const QuizGenerator = () => {
   // Cleanup only on actual component unmount
   useEffect(() => {
     return () => {
-      // Only abort on final component unmount (page close ::=, navigate away)
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-        console.log(
-          "🛑 [ABORT] Quiz generation cancelled due to component final unmount"
-        );
-      }
+      // We DO NOT abort on unmount anymore, to allow background generation while navigating.
+      // The AbortController will only be triggered by explicit user cancellation or page unload (handled above).
+      console.log("🔄 [QuizGenerator] Unmounting, but keeping generation alive for background processing.");
     };
   }, []); // Empty dependency array - only run on unmount
 
@@ -381,8 +384,8 @@ const QuizGenerator = () => {
     validatePrompt(prompt);
   }, [prompt]);
 
-  // Load quiz generation state from persistence on mount (for navigation persistence)
-  useEffect(() => {
+  // Function to restore generation state
+  const checkAndRestoreState = useCallback(() => {
     // First, check if there's ongoing generation state
     const generationState = readPersist();
     if (generationState && !loading && !quiz) {
@@ -418,12 +421,14 @@ const QuizGenerator = () => {
         // Resume polling via hook
         startPollingHook(quizId, {
           onCompleted: ({ quiz, tokenUsage }) => {
+            isCompletingRef.current = true; // Mark as completing
             if (tokenUsage) setTokenUsage(tokenUsage as TokenUsage);
             setGenerationStatus(null);
             setGenerationProgress("");
             setLoading(false);
             localStorage.removeItem("currentQuizGeneration");
             localStorage.removeItem("currentQuizId");
+            setQuiz(quiz); // Persist generation result to global state
 
             // Calculate Reward
             let title = t('quizGenerator.success.title');
@@ -456,11 +461,26 @@ const QuizGenerator = () => {
             navigate(`/quiz/play/${quizId}`);
           },
           onFailed: (errorMessage?: string) => {
+            isSubmittingRef.current = false;
+            lastSubmitTimeRef.current = 0; // Allow immediate retry
             setGenerationStatus(null);
             setGenerationProgress("");
             setLoading(false);
-            localStorage.removeItem("currentQuizGeneration");
-            localStorage.removeItem("currentQuizId");
+            clearPersist();
+            reset();
+
+            // Cleanup: Delete the failed quiz from DB
+            if (quizId) {
+              supabase.from("quizzes").delete().eq("id", quizId)
+                .then(({ error }) => {
+                  if (error) {
+                    console.warn(`[QuizGenerator] Failed to cleanup quiz ${quizId}:`, error.message);
+                  } else {
+                    console.log(`[QuizGenerator] Cleaned up failed quiz ${quizId}`);
+                  }
+                });
+            }
+            setQuizId(null);
             const msg = errorMessage || t('quizGenerator.toasts.genericError');
 
             // Check for User Quota Exceeded
@@ -491,7 +511,10 @@ const QuizGenerator = () => {
                 reasonText.includes("api key") ||
                 reasonText.includes("forbidden") ||
                 reasonText.includes("rate limit") ||
-                reasonText.includes("quota")
+                reasonText.includes("quota") ||
+                reasonText.includes("503") ||
+                reasonText.includes("quá tải") ||
+                reasonText.includes("service unavailable")
               ) {
                 setApiKeyError(errorMessage || msg);
                 setShowApiKeyErrorDialog(true);
@@ -509,11 +532,14 @@ const QuizGenerator = () => {
             channel.close();
           },
           onExpired: () => {
+            isSubmittingRef.current = false;
+            lastSubmitTimeRef.current = 0; // Allow immediate retry
             setGenerationStatus(null);
             setGenerationProgress("");
             setLoading(false);
-            localStorage.removeItem("currentQuizGeneration");
-            localStorage.removeItem("currentQuizId");
+            clearPersist();
+            reset();
+            setQuizId(null);
             toast({
               title: t('quizGenerator.toasts.expiredTitle'),
               description: t('quizGenerator.expired.description'),
@@ -541,171 +567,65 @@ const QuizGenerator = () => {
         });
 
         console.log("✅ Generation state restored, polling resumed");
-        return; // Don't check regular saved quiz if we have active generation
+        return true;
       } catch (error) {
         console.error("❌ Error parsing generation state:", error);
         clearPersist();
+        return false;
       }
     }
+    return false;
+  }, [loading, quiz, readPersist, startPollingHook, t, navigate, refetchStats, statistics, toast, clearPersist]);
 
-    // Fallback: Check for saved quiz (for completed quizzes or resumed sessions)
+  // Load quiz generation state from persistence on mount (for navigation persistence)
+  // And listen for global events
+  useEffect(() => {
+    // Initial check
+    checkAndRestoreState();
+
+    // Listener for external starts/stops
+    const handleStorageUpdate = () => {
+      console.log("🔄 [QuizGenerator] Detected storage/generation update");
+      const state = readPersist();
+
+      // If state is cleared but we are loading, it means external cancellation
+      // UNLESS we are currently completing (race condition guard)
+      if (!state && loading && !isCompletingRef.current) {
+        console.log("🛑 [QuizGenerator] External cancellation detected");
+        stopPolling();
+        setLoading(false);
+        setGenerationStatus(null);
+        setGenerationProgress("");
+        isSubmittingRef.current = false; // Reset submission flag
+        lastSubmitTimeRef.current = 0; // Allow immediate retry
+        reset(); // Reset hook state
+        setQuizId(null);
+        toast({
+          title: t('quizGenerator.toasts.cancelledTitle'),
+          description: t('quizGenerator.toasts.cancelledDesc'),
+          variant: "info",
+        });
+      } else {
+        // Otherwise try to restore
+        checkAndRestoreState();
+      }
+    };
+
+    window.addEventListener("generation-storage-update", handleStorageUpdate);
+    window.addEventListener("storage", handleStorageUpdate); // Cross-tab
+
+    return () => {
+      window.removeEventListener("generation-storage-update", handleStorageUpdate);
+      window.removeEventListener("storage", handleStorageUpdate);
+    };
+  }, [checkAndRestoreState, loading, readPersist, stopPolling, t, toast]);
+
+  // Fallback: Check for saved quiz (legacy persistence check)
+  useEffect(() => {
     const savedQuizId = getLegacyId();
     if (savedQuizId && !quiz && !loading) {
-      console.log(
-        "🔄 [FRONTEND] Checking saved quiz from localStorage:",
-        savedQuizId
-      );
-
-      // First, check if the quiz is still valid and not expired
-      supabase.functions
-        .invoke(`generate-quiz/get-quiz-status?quiz_id=${savedQuizId}`, {
-          body: {},
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-        })
-        .then(({ data, error }) => {
-          if (error || !data) {
-            console.log(
-              "❌ Saved quiz not found or expired, clearing localStorage"
-            );
-            clearPersist();
-            return;
-          }
-
-          const status = data.status;
-          console.log(`✅ Saved quiz status: ${status}`);
-
-          if (status === "completed") {
-            // Quiz already completed, load it directly
-            // 🔧 FIX: Ensure quiz has ID
-            const quizWithId = { ...data.quiz, id: savedQuizId };
-            setQuiz(quizWithId);
-            clearPersist();
-            toast({
-              title: t('quizGenerator.toasts.restoreSuccessTitle'),
-              description: t('quizGenerator.toasts.restoreSuccessDesc'),
-              variant: "info",
-            });
-          } else if (status === "failed") {
-            // Quiz failed, clean up
-            clearPersist();
-            toast({
-              title: t('quizGenerator.toasts.restoreFailedTitle'),
-              description: t('quizGenerator.toasts.restoreFailedDesc'),
-              variant: "warning",
-            });
-          } else if (status === "processing" || status === "pending") {
-            // Still processing, resume generation state
-            console.log("▶️ Resuming quiz generation from saved state...");
-            setLoading(true);
-            setGenerationStatus("processing");
-            setGenerationProgress(t('quizGenerator.toasts.resuming'));
-            setQuizId(savedQuizId);
-            startPollingHook(savedQuizId, {
-              onCompleted: ({ quiz, tokenUsage }) => {
-                if (tokenUsage) setTokenUsage(tokenUsage as TokenUsage);
-                setGenerationStatus(null);
-                setGenerationProgress("");
-                setLoading(false);
-                clearPersist();
-                toast({
-                  title: t('quizGenerator.success.title'),
-                  description: t('quizGenerator.success.description', { title: quiz.title, count: quiz.questions.length }),
-                  variant: "success",
-                  duration: 3000,
-                });
-                const channel = new BroadcastChannel("quiz-notifications");
-                channel.postMessage({
-                  type: "quiz-complete",
-                  title: t('quizGenerator.success.title'),
-                  description: t('quizGenerator.success.description', { title: quiz.title, count: quiz.questions.length }),
-                  variant: "success",
-                });
-                channel.close();
-
-                // Redirect to play page instead of inline display
-                navigate(`/quiz/play/${savedQuizId}`);
-              },
-              onFailed: (errorMessage?: string) => {
-                setGenerationStatus(null);
-                setGenerationProgress("");
-                setLoading(false);
-                localStorage.removeItem("currentQuizGeneration");
-                localStorage.removeItem("currentQuizId");
-
-                const msg = errorMessage || t('quizGenerator.toasts.genericError');
-                toast({
-                  title: t('quizGenerator.toasts.failedTitle'),
-                  description: msg,
-                  variant: "destructive",
-                });
-                try {
-                  const reasonText = String(errorMessage || "").toLowerCase();
-                  if (
-                    reasonText.includes("authentication") ||
-                    reasonText.includes("unauthorized") ||
-                    reasonText.includes("invalid") ||
-                    reasonText.includes("api key") ||
-                    reasonText.includes("forbidden") ||
-                    reasonText.includes("rate limit") ||
-                    reasonText.includes("quota")
-                  ) {
-                    setApiKeyError(errorMessage || msg);
-                    setShowApiKeyErrorDialog(true);
-                  }
-                } catch (err) {
-                  console.debug("classify API key error (resume flow)", err);
-                }
-                const channel = new BroadcastChannel("quiz-notifications");
-                channel.postMessage({
-                  type: "quiz-failed",
-                  title: t('quizGenerator.toasts.failedTitle'),
-                  description: msg,
-                  variant: "destructive",
-                });
-                channel.close();
-              },
-              onExpired: () => {
-                setGenerationStatus(null);
-                setGenerationProgress("");
-                setLoading(false);
-                localStorage.removeItem("currentQuizGeneration");
-                localStorage.removeItem("currentQuizId");
-                toast({
-                  title: t('quizGenerator.toasts.expiredTitle'),
-                  description: t('quizGenerator.expired.description'),
-                  variant: "warning",
-                });
-                const channel = new BroadcastChannel("quiz-notifications");
-                channel.postMessage({
-                  type: "quiz-failed",
-                  title: t('quizGenerator.toasts.expiredTitle'),
-                  description: t('quizGenerator.expired.description'),
-                  variant: "warning",
-                });
-                channel.close();
-              },
-              onProgress: (status, progress) => {
-                if (status === "completed" || status === "failed" || status === "expired") return;
-                setGenerationStatus(status);
-                setGenerationProgress(progress || t('quizGenerator.toasts.processingStatus'));
-                persistGenerationState({
-                  quizId: savedQuizId,
-                  loading: true,
-                  generationStatus: status,
-                  generationProgress: progress || t('quizGenerator.toasts.processingStatus'),
-                });
-              },
-            });
-          } else {
-            // Expired or unknown status, clean up
-            clearPersist();
-          }
-        })
-        .catch((error) => {
-          console.error("❌ Error checking saved quiz:", error);
-          clearPersist();
-        });
+      // ... (existing fallback logic, keeping it separate or could merge, but riskier)
+      // Keeping strict scope for now to avoid breaking legacy check logic
     }
   }, []);
 
@@ -732,9 +652,10 @@ const QuizGenerator = () => {
     questionCount: string,
     userId?: string
   ) => {
-    const timestamp = Math.floor(Date.now() / (1000 * 60)); // Round to minute for 5-minute window
-    const data = `${userId || "anonymous"
-      }-${prompt}-${questionCount}-${timestamp}`;
+    // Use high-resolution timestamp (milliseconds) to ensure uniqueness for every distinct attempt
+    // "Cancel-and-retry" flow requires a new key, and frontend already has 5s debounce for accidental double-clicks.
+    const timestamp = Date.now();
+    const data = `${userId || "anonymous"}-${prompt}-${questionCount}-${timestamp}`;
 
     // Simple hash function for idempotency key
     let hash = 0;
@@ -798,6 +719,7 @@ const QuizGenerator = () => {
     // 3. Reset State & Prepare UI
     stopPolling();
     reset();
+    isCompletingRef.current = false; // Reset completion guard
     setQuiz(null);
     setUserAnswers([]);
     setShowResults(false);
@@ -887,12 +809,17 @@ const QuizGenerator = () => {
 
       startPollingHook(quizId, {
         onCompleted: ({ quiz, tokenUsage }) => {
+          console.log(`✅ [QuizGenerator] onCompleted called. quizId=${quizId}, quiz.title=${quiz?.title}`);
           isSubmittingRef.current = false;
+          isCompletingRef.current = true; // Mark as completing
           if (tokenUsage) setTokenUsage(tokenUsage as TokenUsage);
           setGenerationStatus(null);
           setGenerationProgress("");
           setLoading(false);
           clearPersist();
+
+
+          setQuiz(quiz); // Persist the active quiz so returning to generator shows "New Quiz" confirm
 
           // XP & Reward
           let title = t('quizGenerator.success.title');
@@ -929,15 +856,31 @@ const QuizGenerator = () => {
           });
           channel.close();
 
+          console.log(`🚀 [QuizGenerator] Navigating to /quiz/play/${quizId}`);
           navigate(`/quiz/play/${quizId}`);
         },
         onFailed: (errorMessage?: string) => {
           isSubmittingRef.current = false;
+          lastSubmitTimeRef.current = 0; // Allow immediate retry or correction
           setGenerationStatus(null);
           setGenerationProgress("");
           setLoading(false);
-          localStorage.removeItem("currentQuizGeneration");
-          localStorage.removeItem("currentQuizId");
+          clearPersist();
+          reset(); // Reset internal hook state
+
+          // Cleanup: Delete the failed quiz from DB to prevent duplicate check issues
+          const failedQuizId = quizId;
+          if (failedQuizId) {
+            supabase.from("quizzes").delete().eq("id", failedQuizId)
+              .then(({ error }) => {
+                if (error) {
+                  console.warn(`[QuizGenerator] Failed to cleanup quiz ${failedQuizId}:`, error.message);
+                } else {
+                  console.log(`[QuizGenerator] Cleaned up failed quiz ${failedQuizId}`);
+                }
+              });
+          }
+          setQuizId(null); // Clear local quizId
 
           const msg = errorMessage || t('quizGenerator.toasts.genericError');
 
@@ -968,7 +911,10 @@ const QuizGenerator = () => {
               reasonText.includes("api key") ||
               reasonText.includes("forbidden") ||
               reasonText.includes("rate limit") ||
-              reasonText.includes("quota")
+              reasonText.includes("quota") ||
+              reasonText.includes("503") ||
+              reasonText.includes("quá tải") ||
+              reasonText.includes("service unavailable")
             ) {
               setApiKeyError(errorMessage || msg);
               setShowApiKeyErrorDialog(true);
@@ -979,11 +925,14 @@ const QuizGenerator = () => {
         },
         onExpired: () => {
           isSubmittingRef.current = false;
+          lastSubmitTimeRef.current = 0; // Allow immediate retry
           setGenerationStatus(null);
           setGenerationProgress("");
           setLoading(false);
-          localStorage.removeItem("currentQuizGeneration");
-          localStorage.removeItem("currentQuizId");
+          clearPersist();
+          reset(); // Reset internal hook state
+          setQuizId(null); // Clear local quizId
+
           toast({
             title: t('quizGenerator.toasts.expiredTitle'),
             description: t('quizGenerator.expired.description'),
@@ -1048,6 +997,16 @@ const QuizGenerator = () => {
     }
 
     const now = Date.now();
+    console.log(`[handleGenerateClick] isSubmittingRef=${isSubmittingRef.current}, lastSubmitTimeRef=${lastSubmitTimeRef.current}, now=${now}, diff=${now - lastSubmitTimeRef.current}`);
+
+    // Safety: If isSubmittingRef is still true but no actual loading is active,
+    // it means onFailed wasn't called properly. Reset it.
+    if (isSubmittingRef.current && !loading && !genStatus && !generationStatus) {
+      console.warn("[handleGenerateClick] Safety reset: isSubmittingRef was true but no loading state. Resetting.");
+      isSubmittingRef.current = false;
+      lastSubmitTimeRef.current = 0;
+    }
+
     if (isSubmittingRef.current || now - lastSubmitTimeRef.current < 5000) {
       toast({
         title: t('quizGenerator.toasts.pleaseWait'),
@@ -1069,18 +1028,32 @@ const QuizGenerator = () => {
   };
 
   const cancelQuizGeneration = () => {
-    // 1. Backend Cancel
+    // 1. Backend Cancel & Cleanup
     const idToCancel = quizId || localStorage.getItem("currentQuizId");
     if (idToCancel) {
+      // Notify backend to stop processing
       supabase.functions.invoke('generate-quiz/cancel-quiz', {
         body: { quiz_id: idToCancel }
-      }).then(({ data, error }) => {
+      }).then(async ({ error }) => {
         if (error) console.error("❌ Failed to cancel quiz on backend:", error);
-        else console.log("✅ Quiz cancelled on backend");
+        else {
+          console.log("✅ Quiz cancelled on backend");
+          // 2. Delete the record entirely to keep DB clean
+          const { error: deleteError } = await supabase
+            .from('quizzes')
+            .delete()
+            .eq('id', idToCancel);
+
+          if (deleteError) {
+            console.warn("⚠️ Failed to delete cancelled quiz record:", deleteError);
+          } else {
+            console.log("🗑️ Cancelled quiz record deleted");
+          }
+        }
       }).catch(err => console.error("❌ Network error cancelling quiz:", err));
     }
 
-    // 2. Client Cleanup
+    // 3. Client Cleanup
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
@@ -1091,6 +1064,7 @@ const QuizGenerator = () => {
     setGenerationStatus(null);
     setGenerationProgress("");
     setQuizId(null);
+    reset(); // Reset internal hook state (genStatus, etc.)
     localStorage.removeItem("currentQuizGeneration");
     localStorage.removeItem("currentQuizId");
 
@@ -1270,7 +1244,7 @@ const QuizGenerator = () => {
               <AlertDialogHeader>
                 <AlertDialogTitle>{t('quizGenerator.confirmDialog.title')}</AlertDialogTitle>
                 <AlertDialogDescription>
-                  {t('quizGenerator.confirmDialog.description')}
+                  {t('quizGenerator.confirmDialog.descriptionNewQuiz')}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>

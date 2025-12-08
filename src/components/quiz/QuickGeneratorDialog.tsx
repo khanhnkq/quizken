@@ -8,17 +8,6 @@ import {
     DialogTitle,
     DialogDescription,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
-import { Sparkles, Loader2, Target, XCircle, Clock, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { useTranslation } from "react-i18next";
@@ -33,7 +22,6 @@ import useQuizGeneration from "@/hooks/useQuizGeneration";
 import { useDashboardStats } from "@/hooks/useDashboardStats";
 import { calculateXP, calculateLevel, calculateCreateReward } from "@/utils/levelSystem";
 import type { Quiz } from "@/types/quiz";
-import { cn } from "@/lib/utils";
 import { useUserQuota } from "@/hooks/useUserQuota";
 import { useQuizProgress } from "@/hooks/useQuizProgress";
 import {
@@ -46,6 +34,8 @@ import {
     AlertDialogCancel,
     AlertDialogAction,
 } from "@/components/ui/alert-dialog";
+import { useGenerationPersistence } from "@/hooks/useGenerationPersistence";
+import { ApiKeyErrorDialog } from "./ApiKeyErrorDialog";
 
 interface QuickGeneratorDialogProps {
     open: boolean;
@@ -67,6 +57,7 @@ export function QuickGeneratorDialog({ open, onOpenChange }: QuickGeneratorDialo
         refetch: refetchQuota,
     } = useUserQuota(user?.id);
     const { hasProgress, clear: clearQuizProgress } = useQuizProgress();
+    const { read: readPersist, write: writePersist, clear: clearPersist } = useGenerationPersistence();
 
     // State
     const [prompt, setPrompt] = useState("");
@@ -81,14 +72,168 @@ export function QuickGeneratorDialog({ open, onOpenChange }: QuickGeneratorDialo
     const [showCancelConfirm, setShowCancelConfirm] = useState(false);
     const [showNewQuizConfirm, setShowNewQuizConfirm] = useState(false);
     const [currentQuizId, setCurrentQuizId] = useState<string | null>(null);
+    const [showApiKeyErrorDialog, setShowApiKeyErrorDialog] = useState(false);
+    const [apiKeyError, setApiKeyError] = useState("");
 
     // Refs
     const userRef = useRef(user);
     const currentQuizIdRef = useRef<string | null>(null);
+    const isCompletingRef = useRef<boolean>(false);
     useEffect(() => { userRef.current = user; }, [user]);
 
     // Quiz generation hook
     const { status: genStatus, progress: genProgress, startPolling, stopPolling, reset } = useQuizGeneration<Quiz>();
+
+    // Sync state with persistence (Restore on open + Listen for external changes)
+    useEffect(() => {
+        const syncState = () => {
+            const state = readPersist();
+
+            // Case 1: External Start (or Restore)
+            if (state && (state.generationStatus === 'processing' || state.generationStatus === 'pending')) {
+                // Always start polling to receive error callbacks, even if dialog is closed
+                if (!loading) {
+                    console.log("▶️ [QuickGen] Restoring active generation state (dialog open:", open, ")");
+                    setLoading(true);
+                    setGenerationStatus(state.generationStatus);
+                    setGenerationProgress(state.generationProgress);
+                    setCurrentQuizId(state.quizId);
+                    currentQuizIdRef.current = state.quizId;
+
+                    startPolling(state.quizId, {
+                        onCompleted: ({ quiz }) => {
+                            console.log(`✅ [QuickGen] onCompleted called. quizId=${state.quizId}, quiz.title=${quiz?.title}`);
+                            isCompletingRef.current = true;
+                            setLoading(false);
+                            setGenerationStatus(null);
+                            setGenerationProgress("");
+                            clearPersist();
+
+                            if (userRef.current) {
+                                const xp = calculateXP(statistics);
+                                const level = calculateLevel(xp);
+                                const reward = calculateCreateReward(level);
+                                refetchStats();
+                                refetchQuota();
+                            }
+
+                            toast({
+                                title: t("quizGenerator.success.title"),
+                                description: t("quizGenerator.success.description", { title: quiz.title, count: quiz.questions.length }),
+                                variant: "success",
+                                duration: 3000,
+                            });
+
+                            console.log(`🚀 [QuickGen] Navigating to /quiz/play/${state.quizId}`);
+                            onOpenChange(false);
+                            navigate(`/quiz/play/${state.quizId}`);
+                        },
+                        onFailed: (errorMessage) => {
+                            setLoading(false);
+                            setGenerationStatus(null);
+                            setGenerationProgress("");
+                            clearPersist();
+
+                            // Cleanup: Delete the failed quiz from DB
+                            if (state.quizId) {
+                                supabase.from("quizzes").delete().eq("id", state.quizId)
+                                    .then(({ error }) => {
+                                        if (error) {
+                                            console.warn(`[QuickGen] Failed to cleanup quiz ${state.quizId}:`, error.message);
+                                        } else {
+                                            console.log(`[QuickGen] Cleaned up failed quiz ${state.quizId}`);
+                                        }
+                                    });
+                            }
+
+                            const msg = errorMessage || t("quizGenerator.toasts.genericError");
+                            if (msg.toLowerCase().includes("daily quota limit reached")) {
+                                setQuotaErrorMessage(msg);
+                                setShowUserQuotaDialog(true);
+                                return;
+                            }
+
+                            toast({
+                                title: t("quizGenerator.toasts.failedTitle"),
+                                description: msg,
+                                variant: "destructive",
+                            });
+                            // API Key checks + Service errors
+                            const reasonText = String(errorMessage || "").toLowerCase();
+                            if (
+                                reasonText.includes("authentication") ||
+                                reasonText.includes("unauthorized") ||
+                                reasonText.includes("invalid") ||
+                                reasonText.includes("api key") ||
+                                reasonText.includes("forbidden") ||
+                                reasonText.includes("rate limit") ||
+                                reasonText.includes("503") ||
+                                reasonText.includes("quá tải") ||
+                                reasonText.includes("service unavailable")
+                            ) {
+                                setApiKeyError(errorMessage || msg);
+                                setShowApiKeyErrorDialog(true);
+                            }
+                        },
+                        onExpired: () => {
+                            setLoading(false);
+                            setGenerationStatus(null);
+                            setGenerationProgress("");
+                            clearPersist();
+                            toast({
+                                title: t("quizGenerator.toasts.expiredTitle"),
+                                description: t("quizGenerator.toasts.expiredDescription"),
+                                variant: "warning",
+                            });
+                        },
+                        onProgress: (status, progress) => {
+                            setGenerationStatus(status);
+                            setGenerationProgress(progress || t("quizGenerator.toasts.processingStatus"));
+
+                            // Only persist active states
+                            if (status === 'processing' || status === 'pending') {
+                                writePersist({
+                                    quizId: state.quizId,
+                                    loading: true,
+                                    generationStatus: status,
+                                    generationProgress: progress || t("quizGenerator.toasts.processingStatus"),
+                                });
+                            }
+                        },
+                    });
+                }
+            }
+            // Case 2: External Cancel
+            else if (!state && loading && !isCompletingRef.current) {
+                console.log("🛑 [QuickGen] External cancellation detected");
+                stopPolling();
+                setLoading(false);
+                setGenerationStatus(null);
+                setGenerationProgress("");
+
+                // Only show toast if dialog is OPEN. If closed, just silent reset.
+                if (open) {
+                    toast({
+                        title: t('quizGenerator.toasts.cancelledTitle'),
+                        description: t('quizGenerator.toasts.cancelledDesc'),
+                        variant: "info",
+                    });
+                }
+            }
+        };
+
+        // Initial Sync
+        syncState();
+
+        // Listen for updates
+        window.addEventListener("generation-storage-update", syncState);
+        window.addEventListener("storage", syncState);
+
+        return () => {
+            window.removeEventListener("generation-storage-update", syncState);
+            window.removeEventListener("storage", syncState);
+        };
+    }, [open, loading, readPersist, startPolling, stopPolling, clearPersist, navigate, t, toast, refetchStats, refetchQuota, statistics, writePersist, onOpenChange]);
 
     // Validate prompt
     const validatePrompt = useCallback((input: string) => {
@@ -159,6 +304,7 @@ export function QuickGeneratorDialog({ open, onOpenChange }: QuickGeneratorDialo
         }
 
         setLoading(true);
+        isCompletingRef.current = false; // Reset completion guard
         setGenerationStatus("pending");
         setGenerationProgress(t("quizGenerator.toasts.preparing"));
 
@@ -176,8 +322,8 @@ export function QuickGeneratorDialog({ open, onOpenChange }: QuickGeneratorDialo
                 },
             };
 
-            // Idempotency key
-            const timestamp = Math.floor(Date.now() / (1000 * 60));
+            // Idempotency key (use ms to allow quick retries)
+            const timestamp = Date.now();
             const idempotencyKey = `quick_${user?.id || "anon"}_${timestamp}`;
 
             // Start quiz generation
@@ -202,12 +348,24 @@ export function QuickGeneratorDialog({ open, onOpenChange }: QuickGeneratorDialo
             setCurrentQuizId(quizId);
             currentQuizIdRef.current = quizId;
 
+            // Persist initial state
+            writePersist({
+                quizId,
+                loading: true,
+                generationStatus: "pending",
+                generationProgress: t("quizGenerator.toasts.preparing"),
+            });
+
             // Start polling
             startPolling(quizId, {
                 onCompleted: ({ quiz }) => {
+                    isCompletingRef.current = true; // Mark as completing
                     setLoading(false);
                     setGenerationStatus(null);
                     setGenerationProgress("");
+
+                    // Clear persistence
+                    clearPersist();
 
                     // Calculate reward
                     let title = t("quizGenerator.success.title");
@@ -236,6 +394,9 @@ export function QuickGeneratorDialog({ open, onOpenChange }: QuickGeneratorDialo
                     setGenerationStatus(null);
                     setGenerationProgress("");
 
+                    // Clear persistence
+                    clearPersist();
+
                     const msg = errorMessage || t("quizGenerator.toasts.genericError");
 
                     // Check for User Quota Exceeded
@@ -255,11 +416,31 @@ export function QuickGeneratorDialog({ open, onOpenChange }: QuickGeneratorDialo
                         description: msg,
                         variant: "destructive",
                     });
+
+                    // Check for API Key + Service errors
+                    const reasonText = String(errorMessage || "").toLowerCase();
+                    if (
+                        reasonText.includes("authentication") ||
+                        reasonText.includes("unauthorized") ||
+                        reasonText.includes("invalid") ||
+                        reasonText.includes("api key") ||
+                        reasonText.includes("forbidden") ||
+                        reasonText.includes("rate limit") ||
+                        reasonText.includes("quota") ||
+                        reasonText.includes("503") ||
+                        reasonText.includes("quá tải") ||
+                        reasonText.includes("service unavailable")
+                    ) {
+                        setApiKeyError(errorMessage || msg);
+                        setShowApiKeyErrorDialog(true);
+                    }
                 },
                 onExpired: () => {
                     setLoading(false);
                     setGenerationStatus(null);
                     setGenerationProgress("");
+                    clearPersist();
+
                     toast({
                         title: t("quizGenerator.toasts.expiredTitle"),
                         description: t("quizGenerator.expired.description"),
@@ -269,6 +450,14 @@ export function QuickGeneratorDialog({ open, onOpenChange }: QuickGeneratorDialo
                 onProgress: (status, progress) => {
                     setGenerationStatus(status);
                     setGenerationProgress(progress || t("quizGenerator.toasts.processingStatus"));
+
+                    // Update persistence
+                    writePersist({
+                        quizId,
+                        loading: true,
+                        generationStatus: status,
+                        generationProgress: progress || t("quizGenerator.toasts.processingStatus"),
+                    });
                 },
             });
 
@@ -276,6 +465,9 @@ export function QuickGeneratorDialog({ open, onOpenChange }: QuickGeneratorDialo
             setLoading(false);
             setGenerationStatus(null);
             setGenerationProgress("");
+            // Clear persistence on immediate error
+            clearPersist();
+
             toast({
                 title: t("quizGenerator.toasts.failedTitle"),
                 description: (error as Error).message,
@@ -344,6 +536,12 @@ export function QuickGeneratorDialog({ open, onOpenChange }: QuickGeneratorDialo
                 message={quotaErrorMessage}
             />
 
+            <ApiKeyErrorDialog
+                open={showApiKeyErrorDialog}
+                onOpenChange={setShowApiKeyErrorDialog}
+                errorMessage={apiKeyError}
+            />
+
             {/* Cancel Confirmation Dialog */}
             <AlertDialog open={showCancelConfirm} onOpenChange={setShowCancelConfirm}>
                 <AlertDialogContent>
@@ -363,9 +561,22 @@ export function QuickGeneratorDialog({ open, onOpenChange }: QuickGeneratorDialo
                             if (idToCancel) {
                                 supabase.functions.invoke('generate-quiz/cancel-quiz', {
                                     body: { quiz_id: idToCancel }
-                                }).then(({ error }) => {
+                                }).then(async ({ error }) => {
                                     if (error) console.error("❌ Failed to cancel quiz on backend:", error);
-                                    else console.log("✅ Quiz cancelled on backend");
+                                    else {
+                                        console.log("✅ Quiz cancelled on backend");
+                                        // Delete the record entirely to keep DB clean
+                                        const { error: deleteError } = await supabase
+                                            .from('quizzes')
+                                            .delete()
+                                            .eq('id', idToCancel);
+
+                                        if (deleteError) {
+                                            console.warn("⚠️ Failed to delete cancelled quiz record:", deleteError);
+                                        } else {
+                                            console.log("🗑️ Cancelled quiz record deleted");
+                                        }
+                                    }
                                 }).catch(err => console.error("❌ Network error cancelling quiz:", err));
                             } else {
                                 console.warn("⚠️ No quiz ID to cancel");
@@ -382,6 +593,9 @@ export function QuickGeneratorDialog({ open, onOpenChange }: QuickGeneratorDialo
                             setGenerationProgress("");
                             setCurrentQuizId(null);
                             currentQuizIdRef.current = null;
+
+                            // Important: Clear global persistence too
+                            clearPersist();
 
                             // 4. Show toast
                             toast({
@@ -424,4 +638,5 @@ export function QuickGeneratorDialog({ open, onOpenChange }: QuickGeneratorDialo
     );
 }
 
+// Adding default export to satisfy Fast Refresh and lazy loading
 export default QuickGeneratorDialog;

@@ -752,14 +752,24 @@ async function processQuizGeneration(quizId, payload, req) {
 
     // Check for cancellation before starting AI generation loop
     {
-      const { data: checkQuiz } = await adminClient.from("quizzes").select("status").eq("id", quizId).single();
-      if (checkQuiz?.status === 'cancelled' || checkQuiz?.status === 'failed') {
-        console.log(`🛑 [BACKEND] Quiz ${quizId} was cancelled or failed. Stopping generation.`);
+      const { data: checkQuiz, error: checkError } = await adminClient.from("quizzes").select("status").eq("id", quizId).single();
+      // If deleted (error/null) or cancelled/failed
+      if (checkError || !checkQuiz || checkQuiz.status === 'cancelled' || checkQuiz.status === 'failed') {
+        console.log(`🛑 [BACKEND] Quiz ${quizId} was cancelled, failed, or deleted. Stopping generation.`);
         return;
       }
     }
 
     for (retryCount = 0; retryCount <= maxRetries; retryCount++) {
+      // Re-check status inside loop to catch mid-process cancellations/deletions
+      {
+        const { data: loopCheck, error: loopError } = await adminClient.from("quizzes").select("status").eq("id", quizId).single();
+        if (loopError || !loopCheck || loopCheck.status === 'cancelled' || loopCheck.status === 'failed') {
+          console.log(`🛑 [BACKEND] Quiz ${quizId} cancelled/deleted during retry. Aborting.`);
+          return;
+        }
+      }
+
       const attempt = retryCount + 1;
       try {
         console.log(
@@ -799,11 +809,17 @@ async function processQuizGeneration(quizId, payload, req) {
           );
           // Handle non-retriable status codes immediately
           if (response.status === 429) {
+            // NO RETRY for rate limits as per user request
+            console.warn("[BACKEND] Gemini rate limit exceeded (HTTP 429). Failing immediately.");
+
             const msg429 =
               "Gemini rate limit exceeded (HTTP 429). This usually means the API key's quota was reached. " +
               "If you are using a personal key, check your usage in Google AI Studio. " +
               "If using the server key, consider requesting higher quota or using user keys for authenticated users. " +
               "See: https://makersuite.google.com/app/apikey";
+
+            // Update status to FAILED (Realtime will notify frontend)
+            // Do NOT delete immediately - let frontend receive and handle the error first
             await updateQuizStatus(quizId, QUIZ_STATUS.FAILED, msg429);
             return;
           }
@@ -812,6 +828,8 @@ async function processQuizGeneration(quizId, payload, req) {
               "Authentication error (HTTP 401). The provided Gemini API key is invalid or revoked. " +
               "For user keys, re-generate in Google AI Studio. For server key, ensure GEMINI_API_KEY is set in Supabase secrets. " +
               "Guide: https://makersuite.google.com/app/apikey";
+
+            // Update status to FAILED - do NOT delete, let frontend receive error
             await updateQuizStatus(quizId, QUIZ_STATUS.FAILED, msg401);
             return;
           }
@@ -819,10 +837,25 @@ async function processQuizGeneration(quizId, payload, req) {
             const msg403 =
               "Access forbidden (HTTP 403). The API key does not have permission to use the Gemini model or account access is restricted. " +
               "Check IAM/permissions and that the key is enabled for generative AI. See: https://developers.generativeai.google/docs/";
+
+            // Update status to FAILED - do NOT delete, let frontend receive error
             await updateQuizStatus(quizId, QUIZ_STATUS.FAILED, msg403);
             return;
           }
-          // For 5xx and other transient errors, retry with backoff
+          // Handle 503 Service Unavailable - AI service overloaded
+          if (response.status === 503) {
+            console.warn("[BACKEND] Gemini service unavailable (HTTP 503). Failing immediately.");
+
+            const msg503 =
+              "Dịch vụ AI đang quá tải (HTTP 503). " +
+              "Google Gemini tạm thời không thể xử lý yêu cầu. Vui lòng thử lại sau vài phút. " +
+              "Nếu lỗi tiếp tục, hãy liên hệ hỗ trợ.";
+
+            // Update status to FAILED - do NOT delete, let frontend receive error
+            await updateQuizStatus(quizId, QUIZ_STATUS.FAILED, msg503);
+            return;
+          }
+          // For other 5xx transient errors, retry with backoff
           if (response.status >= 500 && retryCount < maxRetries) {
             const jitter = 0.5 + Math.random() * 0.5;
             const delay = Math.round(
@@ -1046,6 +1079,7 @@ async function processQuizGeneration(quizId, payload, req) {
       `❌ [BACKEND] Quiz generation failed for ID: ${quizId}`,
       error
     );
+    // Update status to FAILED - do NOT delete, let frontend receive error
     await updateQuizStatus(
       quizId,
       QUIZ_STATUS.FAILED,

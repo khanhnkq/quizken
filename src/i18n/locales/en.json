@@ -107,12 +107,15 @@
             "unlimited": "Unlimited",
             "byok": "BYOK",
             "none": "NONE",
-            "tip": "Get Unlimited Access",
+            "tip": "Unlimited Access",
             "tipDesc": "Add your own Google Gemini API Key in settings to create unlimited quizzes for free!"
         },
+        "status": {
+            "generating": "Creating Quiz..."
+        },
         "success": {
-            "title": "Questions created successfully!",
-            "description": "Created \"{{title}}\" with {{count}} questions"
+            "title": "Quiz Generated Successfully!",
+            "description": "Generated \"{{title}}\" with {{count}} questions"
         },
         "failed": {
             "title": "Failed to create questions"
@@ -219,7 +222,7 @@
             "titleNewQuiz": "Create New Quiz?",
             "description": "The current quiz will be removed from screen and any ongoing process will be cancelled. Do you want to continue creating a new quiz?",
             "descriptionCancel": "Are you sure you want to cancel the quiz generation? This process cannot be undone.",
-            "descriptionNewQuiz": "You have an unfinished quiz. Creating a new quiz will lose your current progress.",
+            "descriptionNewQuiz": "You have an unfinished quiz. Creating a new quiz will permanently delete the current quiz content and progress.",
             "cancel": "Cancel",
             "confirm": "Confirm"
         },

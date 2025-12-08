@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { UserStatistics } from "@/types/dashboard";
@@ -24,6 +25,32 @@ export function useDashboardStats(userId?: string) {
     // Stale time 5 minutes to avoid spamming refetches on focus refetch
     staleTime: 1000 * 60 * 5,
   });
+
+  // Subscribe to realtime updates for the user's profile
+  useEffect(() => {
+    if (!userId) return;
+
+    const channel = supabase
+      .channel(`dashboard-stats-${userId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "profiles",
+          filter: `id=eq.${userId}`,
+        },
+        (payload) => {
+          console.log("⚡ [useDashboardStats] Profile updated:", payload.new);
+          queryClient.invalidateQueries({ queryKey });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [userId, queryClient, queryKey]);
 
   return {
     statistics: statistics as UserStatistics | null,

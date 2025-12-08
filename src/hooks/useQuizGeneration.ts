@@ -1,7 +1,6 @@
 import { useCallback, useRef, useState, useEffect } from "react";
+import { RealtimeChannel } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { useBroadcastChannel, BroadcastMessage } from "./useBroadcastChannel";
-import { useLeaderElection } from "./useLeaderElection";
 
 type Status =
   | "pending"
@@ -25,201 +24,250 @@ export function useQuizGeneration<Quiz = unknown>() {
   const [status, setStatus] = useState<Status>(null);
   const [progress, setProgress] = useState<string>("");
   const [isPolling, setIsPolling] = useState(false);
-  const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
   const currentQuizIdRef = useRef<string | null>(null);
+  const channelRef = useRef<RealtimeChannel | null>(null);
+  const fallbackTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Leader election for polling coordination
-  const { isLeader } = useLeaderElection({
-    channelName: "quiz-polling-leader",
-    onLeaderChange: (isLeader) => {
-      if (isLeader) {
-        console.log("✅ This tab is now the leader for quiz polling");
-      } else {
-        console.log("⏸️ This tab is no longer the leader for quiz polling");
-        // Stop polling if we're no longer the leader
-        stopPolling();
-      }
-    },
-  });
+  const cleanupSubscription = useCallback(() => {
+    if (channelRef.current) {
+      console.log("[useQuizGeneration] Cleaning up Realtime subscription");
+      supabase.removeChannel(channelRef.current);
+      channelRef.current = null;
+    }
+  }, []);
 
-  // BroadcastChannel for cross-tab coordination
-  const { postMessage, isSupported } = useBroadcastChannel({
-    channelName: "quiz-polling-coordination",
-    onMessage: (message: BroadcastMessage) => {
-      if (message.type === "polling-status") {
-        const data = message.data as {
-          quizId: string;
-          status: Status;
-          progress: string;
-        };
-        if (data && data.quizId === currentQuizIdRef.current) {
-          setStatus(data.status);
-          setProgress(data.progress);
-          setIsPolling(
-            data.status !== "completed" &&
-            data.status !== "failed" &&
-            data.status !== "expired"
-          );
-        }
-      } else if (message.type === "polling-start") {
-        const data = message.data as { quizId: string };
-        if (data && data.quizId !== currentQuizIdRef.current) {
-          // Another tab started polling for a different quiz
-          console.log("📡 Another tab started polling for quiz:", data.quizId);
-        }
-      } else if (message.type === "polling-stop") {
-        const data = message.data as { quizId: string };
-        if (data && data.quizId === currentQuizIdRef.current) {
-          // Polling was stopped by another tab
-          console.log(
-            "📡 Polling stopped by another tab for quiz:",
-            data.quizId
-          );
-          stopPolling();
-        }
-      }
-    },
-  });
+  const clearFallbackTimeout = useCallback(() => {
+    if (fallbackTimeoutRef.current) {
+      clearTimeout(fallbackTimeoutRef.current);
+      fallbackTimeoutRef.current = null;
+    }
+  }, []);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      cleanupSubscription();
+      clearFallbackTimeout();
+    };
+  }, [cleanupSubscription, clearFallbackTimeout]);
 
   const stopPolling = useCallback(() => {
-    if (pollIntervalRef.current) {
-      clearInterval(pollIntervalRef.current);
-      pollIntervalRef.current = null;
-    }
+    cleanupSubscription();
+    clearFallbackTimeout();
     setIsPolling(false);
-
-    // Broadcast that polling has stopped
-    if (currentQuizIdRef.current && isSupported) {
-      postMessage("polling-stop", { quizId: currentQuizIdRef.current });
-    }
-
     currentQuizIdRef.current = null;
-  }, [isSupported, postMessage]);
+  }, [cleanupSubscription, clearFallbackTimeout]);
 
   const reset = useCallback(() => {
-    if (pollIntervalRef.current) {
-      clearInterval(pollIntervalRef.current);
-      pollIntervalRef.current = null;
-    }
-    setIsPolling(false);
+    stopPolling();
     setStatus(null);
     setProgress("");
-  }, []);
+  }, [stopPolling]);
 
   const startPolling = useCallback(
     async (quizId: string, callbacks: StartPollingCallbacks<Quiz>) => {
       if (!quizId) return;
 
-      // Ensure any previous polling is stopped before starting a new one
+      // Stop any previous monitoring
       stopPolling();
 
-      // Set current quiz ID
       currentQuizIdRef.current = quizId;
-
-      // Reset base state unconditionally for a fresh progress UI
       setIsPolling(true);
       setStatus("pending");
       setProgress("Đang chuẩn bị...");
 
-      // Broadcast that polling has started (only if leader)
-      if (isSupported && isLeader) {
-        postMessage("polling-start", { quizId });
-      }
+      console.log(`[useQuizGeneration] startMonitoring for quizId=${quizId}`);
 
-      // Debug: log when polling starts
-      console.log(
-        `[useQuizGeneration] startPolling called for quizId=${quizId}, isLeader=${isLeader}`
-      );
+      // Helper to handle status updates
+      const handleStatusUpdate = (newStatus: Status, newProgress: string, quizData?: any) => {
+        // Critical: Check if polling was stopped while we were waiting/processing
+        if (!currentQuizIdRef.current) {
+          console.log("[useQuizGeneration] Polling stopped, ignoring status update");
+          return;
+        }
 
-      // Exponential backoff configuration
-      const MAX_BACKOFF_MS = 60000; // Max 60s between polls
-      const INITIAL_INTERVAL_MS = 13000; // 13s to stay under 5 req/min
-      let currentIntervalMs = INITIAL_INTERVAL_MS;
+        setStatus(newStatus);
+        setProgress(newProgress);
+        callbacks.onProgress?.(newStatus, newProgress);
 
-      const sleep = (ms: number) =>
-        new Promise((resolve) => setTimeout(resolve, ms));
-
-      // Perform first poll immediately, don't wait for interval
-      let hasPolledOnce = false;
-
-      const performPoll = async () => {
-        try {
-          console.log(
-            `[useQuizGeneration] polling quizId=${quizId}, interval=${currentIntervalMs}ms`
-          );
-
-          // Use GET without a body to avoid fetch errors in browsers (some runtimes disallow GET with body)
-          const invokeOptions: Record<string, unknown> = {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          };
-          const { data, error } = await supabase.functions.invoke(
-            `generate-quiz/get-quiz-status?quiz_id=${quizId}`,
-            invokeOptions
-          );
-          if (error) {
-            // Error → increase backoff
-            currentIntervalMs = Math.min(
-              currentIntervalMs * 1.5,
-              MAX_BACKOFF_MS
-            );
-            console.warn(
-              `[useQuizGeneration] poll error, backing off to ${currentIntervalMs}ms:`,
-              error
-            );
-            throw error;
-          }
-
-          // Success → reset to initial interval
-          currentIntervalMs = INITIAL_INTERVAL_MS;
-
-          const nextStatus = (data?.status as Status) || null;
-          const nextProgress = data?.progress || "Đang xử lý...";
-          setStatus(nextStatus);
-          setProgress(nextProgress);
-          callbacks.onProgress?.(nextStatus, nextProgress);
-
-          // Broadcast status update to other tabs (only leader broadcasts)
-          if (isSupported && isLeader) {
-            postMessage("polling-status", {
-              quizId,
-              status: nextStatus,
-              progress: nextProgress,
-            });
-          }
-
-          if (nextStatus === "completed") {
-            stopPolling();
-            callbacks.onCompleted({
-              quiz: data.quiz,
-              tokenUsage: data.quiz?.tokenUsage,
-            });
-          } else if (nextStatus === "failed") {
-            stopPolling();
-            callbacks.onFailed(data?.error);
-          } else if (nextStatus === "expired") {
-            stopPolling();
-            callbacks.onExpired();
-          }
-        } catch (err) {
-          // keep polling; transient errors are ignored
-          console.debug(
-            "[useQuizGeneration] poll caught error (ignored):",
-            err
-          );
+        if (newStatus === "completed") {
+          console.log(`✅ [useQuizGeneration] Status is COMPLETED. Calling onCompleted with quizData.title=${quizData?.title}`);
+          stopPolling();
+          callbacks.onCompleted({
+            quiz: quizData,
+            tokenUsage: quizData?.tokenUsage,
+          });
+        } else if (newStatus === "failed") {
+          stopPolling();
+          callbacks.onFailed(quizData?.error || "Unknown error");
+        } else if (newStatus === "expired") {
+          stopPolling();
+          callbacks.onExpired();
         }
       };
 
-      // Poll immediately on start
-      performPoll();
-      hasPolledOnce = true;
+      // Helper to schedule fallback
+      const scheduleFallback = () => {
+        clearFallbackTimeout();
+        if (!currentQuizIdRef.current) return;
 
-      const interval = setInterval(performPoll, currentIntervalMs);
-      pollIntervalRef.current = interval;
+        fallbackTimeoutRef.current = setTimeout(() => {
+          console.log("[useQuizGeneration] Fallback timeout triggered (60s silence). Performing manual check...");
+          performManualCheck();
+        }, 60000); // 60s safety net
+      };
+
+      // Helper function to check status manually (for initial load and fallback)
+      const performManualCheck = async () => {
+        console.log(`[useQuizGeneration] performManualCheck called. currentQuizIdRef=${currentQuizIdRef.current}`);
+        if (!currentQuizIdRef.current) return;
+
+        try {
+          // Build the Edge Function URL based on Supabase project URL
+          const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+          const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+          const functionUrl = `${supabaseUrl}/functions/v1/generate-quiz/get-quiz-status?quiz_id=${currentQuizIdRef.current}`;
+
+          // Get current session for auth
+          const { data: { session } } = await supabase.auth.getSession();
+          const authToken = session?.access_token;
+
+          const response = await fetch(functionUrl, {
+            method: "GET",
+            headers: {
+              'Content-Type': 'application/json',
+              'apikey': supabaseAnonKey,
+              ...(authToken ? { 'Authorization': `Bearer ${authToken}` } : {}),
+            }
+          });
+
+          // Check again after await
+          if (!currentQuizIdRef.current) return;
+
+          // Handle specific error codes as failures
+          if (response.status === 404) {
+            console.log("❌ [useQuizGeneration] Quiz not found (404). Treating as deletion/cancellation.");
+            stopPolling();
+            callbacks.onFailed("Quiz was cancelled or deleted");
+            return;
+          }
+
+          if (response.status === 429) {
+            console.log("❌ [useQuizGeneration] Rate limit exceeded (429).");
+            stopPolling();
+            callbacks.onFailed("API rate limit exceeded. Please try again later.");
+            return;
+          }
+
+          if (response.status === 401) {
+            console.log("❌ [useQuizGeneration] Authentication error (401).");
+            stopPolling();
+            callbacks.onFailed("Authentication failed. Please log in again.");
+            return;
+          }
+
+          if (response.status === 403) {
+            console.log("❌ [useQuizGeneration] Access forbidden (403).");
+            stopPolling();
+            callbacks.onFailed("Access denied. Check API permissions.");
+            return;
+          }
+
+          if (response.status >= 500) {
+            console.log(`❌ [useQuizGeneration] Server error (${response.status}).`);
+            stopPolling();
+            callbacks.onFailed("Server error. Please try again later.");
+            return;
+          }
+
+          if (!response.ok) {
+            console.log(`❌ [useQuizGeneration] Unexpected error (${response.status}).`);
+            stopPolling();
+            callbacks.onFailed(`Request failed: ${response.status}`);
+            return;
+          }
+
+          const data = await response.json();
+
+          // Check again after parsing
+          if (!currentQuizIdRef.current) return;
+
+          // Using strict check for completion to decide whether to keep listening
+          const isDone = data.status === "completed" || data.status === "failed" || data.status === "expired";
+
+          if (data.status === "failed") {
+            console.log("❌ [useQuizGeneration] Manual check returned FAILED. Raw Data:", data);
+          }
+
+          // Pass data.error too if it exists at root level
+          handleStatusUpdate(data.status, data.progress, { ...data.quiz, error: data.error || data.quiz?.error });
+
+          if (!isDone) {
+            // If not done, reschedule fallback to keep checking if Realtime stays silent
+            scheduleFallback();
+          }
+
+        } catch (err) {
+          if (!currentQuizIdRef.current) return; // Stop if cancelled
+          console.error("[useQuizGeneration] Manual check error:", err);
+          // Even on error, reschedule fallback to try again later
+          scheduleFallback();
+        }
+      };
+
+      // 1. Initial Fetch
+      await performManualCheck();
+
+      // If performManualCheck stopped the polling (completed/failed), we shouldn't subscribe
+      if (!currentQuizIdRef.current) return;
+
+      // 2. Setup Realtime Subscription
+      const channel = supabase
+        .channel(`quiz-status-${quizId}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "*", // Listen for DELETE too
+            schema: "public",
+            table: "quizzes",
+            filter: `id=eq.${quizId}`,
+          },
+          (payload) => {
+            if (payload.eventType === 'DELETE') {
+              console.log("[useQuizGeneration] Quiz deleted remotely");
+              stopPolling();
+              // Treat deletion as cancellation/failure
+              callbacks.onFailed("Quiz cancelled remotely");
+              return;
+            }
+
+            const newRecord = payload.new as any;
+            console.log("[useQuizGeneration] Realtime update:", newRecord);
+
+            // Reset fallback timer on every live event
+            scheduleFallback();
+
+            // We only have the raw record here.
+            handleStatusUpdate(newRecord.status, newRecord.progress, newRecord);
+          }
+        )
+        .subscribe((status, err) => {
+          if (status === 'SUBSCRIBED') {
+            console.log(`[useQuizGeneration] Subscribed to quiz ${quizId}`);
+            // Start the first fallback timer once subscribed
+            scheduleFallback();
+          }
+          if (status === 'CHANNEL_ERROR') {
+            console.error(`[useQuizGeneration] Subscription error:`, err);
+            // If subscription fails, the initial manual check loop (via scheduleFallback)
+            // will effectively turn into a slow poll (every 60s), which is a safe fallback.
+          }
+        });
+
+      channelRef.current = channel;
     },
-    [stopPolling, isLeader, isSupported, postMessage]
+    [stopPolling, cleanupSubscription, clearFallbackTimeout]
   );
 
   return {

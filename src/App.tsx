@@ -31,6 +31,7 @@ import "@/i18n"; // Initialize i18n
 import { GlobalLevelNotification } from "@/components/common/GlobalLevelNotification";
 import { GlobalResumeButton } from "@/components/common/GlobalResumeButton";
 import { GlobalCreateButton } from "@/components/common/GlobalCreateButton";
+import { GlobalQuizListener } from "@/components/common/GlobalQuizListener";
 
 // GSAP plugins are loaded dynamically in useLayoutEffect to reduce initial bundle size
 
@@ -208,6 +209,7 @@ const App = () => {
               <AppRoutes />
               <GlobalResumeButton />
               <GlobalCreateButton />
+              <GlobalQuizListener />
             </BrowserRouter>
             <Analytics />
           </ChillMusicProvider>

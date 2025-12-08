@@ -111,6 +111,9 @@
             "tip": "Truy cập không giới hạn",
             "tipDesc": "Thêm Google Gemini API Key của riêng bạn trong cài đặt để tạo trắc nghiệm không giới hạn miễn phí!"
         },
+        "status": {
+            "generating": "Đang tạo quiz..."
+        },
         "success": {
             "title": "Tạo câu hỏi thành công!",
             "description": "Đã tạo \"{{title}}\" với {{count}} câu hỏi"
@@ -220,7 +223,7 @@
             "titleNewQuiz": "Tạo Quiz mới?",
             "description": "Bài quiz hiện tại sẽ bị xóa khỏi màn hình và tiến trình đang chạy (nếu có) sẽ được hủy. Bạn có muốn tiếp tục tạo quiz mới?",
             "descriptionCancel": "Bạn có chắc chắn muốn hủy quá trình tạo quiz? Thao tác này không thể hoàn tác.",
-            "descriptionNewQuiz": "Bạn đang có quiz chưa hoàn thành. Tạo quiz mới sẽ mất tiến trình quiz cũ.",
+            "descriptionNewQuiz": "Bạn đang có quiz chưa hoàn thành. Tạo quiz mới sẽ xóa toàn bộ nội dung và tiến trình của bài quiz hiện tại.",
             "cancel": "Hủy",
             "confirm": "Xác nhận"
         },

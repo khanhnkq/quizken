@@ -83,6 +83,71 @@ export function useQuizProgress() {
 
         loadProgress();
 
+        // Listen for Realtime updates from other devices
+        let realtimeChannel: ReturnType<typeof supabase.channel> | null = null;
+        if (user) {
+            console.log("🔌 [useQuizProgress] Subscribing to quiz_progress for user:", user.id);
+            realtimeChannel = supabase
+                .channel(`progress-sync-${user.id}`)
+                .on(
+                    "postgres_changes",
+                    {
+                        event: "*", // Listen for INSERT and UPDATE
+                        schema: "public",
+                        table: "quiz_progress",
+                        filter: `user_id=eq.${user.id}`,
+                    },
+                    (payload) => {
+                        // Type guard for payload.new
+                        const newData = payload.new as any;
+                        if (!newData || !newData.quiz_id) return;
+
+                        // DELETE event check (payload.new is null for DELETE)
+                        if (payload.eventType === 'DELETE') {
+                            console.log("🗑️ [useQuizProgress] Progress deleted remotely");
+                            localStorage.removeItem(STORAGE_KEY);
+                            setProgress(null);
+                            notifyUpdate();
+                            return;
+                        }
+
+                        console.log("☁️ [useQuizProgress] Remote progress detected:", newData);
+
+                        const remoteProgress: QuizProgress = {
+                            quizId: newData.quiz_id,
+                            quizTitle: newData.quiz_title || "Unknown Quiz",
+                            userAnswers: Array.isArray(newData.user_answers) ? newData.user_answers : [],
+                            currentQuestion: newData.current_question || 0,
+                            startTime: newData.start_time,
+                            totalQuestions: newData.total_questions
+                        };
+
+                        // Compare with local to avoid loop/unnecessary updates
+                        const local = localStorage.getItem(STORAGE_KEY);
+                        if (local) {
+                            const current = JSON.parse(local) as QuizProgress;
+                            // Basic equality check to ignore Echo from our own save
+                            if (
+                                current.quizId === remoteProgress.quizId &&
+                                JSON.stringify(current.userAnswers) === JSON.stringify(remoteProgress.userAnswers) &&
+                                current.currentQuestion === remoteProgress.currentQuestion
+                            ) {
+                                return;
+                            }
+                        }
+
+                        // Apply update
+                        setProgress(remoteProgress);
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(remoteProgress));
+                        notifyUpdate();
+
+                        // Optional: Show toast or indicator (commented out to avoid intrusive toasting on every answer)
+                        // toast({ title: "Progress Synced", description: "Updated from another device" });
+                    }
+                )
+                .subscribe();
+        }
+
         // Listen for custom event to sync across components
         const handleStorageChange = () => {
             const saved = localStorage.getItem(STORAGE_KEY);
@@ -94,6 +159,7 @@ export function useQuizProgress() {
         window.addEventListener("storage", handleStorageChange);
 
         return () => {
+            if (realtimeChannel) supabase.removeChannel(realtimeChannel);
             window.removeEventListener("quiz-progress-updated", handleStorageChange);
             window.removeEventListener("storage", handleStorageChange);
             // Clear pending save on unmount

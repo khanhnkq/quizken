@@ -110,6 +110,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ onComplete, onCanc
     };
 
     const handleOptionSelect = (value: string) => {
+        console.log(`[ChatInterface] handleOptionSelect called. step=${step}, value=${value}, topic=${topic}`);
         // Determine context based on step
         if (step === "COUNT") {
             addUserMessage(t("quizGenerator.chat.questionsCount", { count: parseInt(value) }));

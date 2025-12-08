@@ -1,4 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 
@@ -12,8 +13,37 @@ export interface UserItem {
 export function useUserItems() {
     const { user } = useAuth();
 
+    const queryClient = useQueryClient();
+    const queryKey = ['userItems', user?.id];
+
+    // Subscribe to realtime updates for the user's inventory
+    useEffect(() => {
+        if (!user?.id) return;
+
+        const channel = supabase
+            .channel(`user-items-${user.id}`)
+            .on(
+                "postgres_changes",
+                {
+                    event: "INSERT", // Listen for new item purchases
+                    schema: "public",
+                    table: "user_items",
+                    filter: `user_id=eq.${user.id}`,
+                },
+                (payload) => {
+                    console.log("⚡ [useUserItems] Inventory updated:", payload.new);
+                    queryClient.invalidateQueries({ queryKey });
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [user?.id, queryClient, queryKey]);
+
     return useQuery({
-        queryKey: ['userItems', user?.id],
+        queryKey,
         queryFn: async () => {
             if (!user) return [];
 

@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
-import { useBroadcastChannel, BroadcastMessage } from "./useBroadcastChannel";
-import { useLeaderElection } from "./useLeaderElection";
+
 
 type GenState = {
   quizId?: string;
@@ -12,60 +11,14 @@ type GenState = {
 
 const KEY = "currentQuizGeneration";
 const LEGACY_ID = "currentQuizId";
-const CHANNEL_NAME = "quiz-generation-persistence";
 
 export const useGenerationPersistence = () => {
   const lastKnownStateRef = useRef<GenState | null>(null);
 
-  // TEMPORARY: Disable leader election for localStorage to fix immediate issue
-  // TODO: Re-enable after testing multi-tab coordination
-  // const { isLeader } = useLeaderElection({
-  //   channelName: `${CHANNEL_NAME}-leader`,
-  //   onLeaderChange: (isLeader) => {
-  //     if (isLeader) {
-  //       console.log("This tab is now the leader for localStorage coordination");
-  //     } else {
-  //       console.log("This tab is no longer the leader for localStorage coordination");
-  //     }
-  //   },
-  // });
-  
-  // Temporary fallback - always allow localStorage writes
-  const isLeader = true;
 
-  // TEMPORARY: Disable BroadcastChannel for localStorage to fix immediate issue
-  // TODO: Re-enable after testing multi-tab coordination
-  // const { postMessage, isSupported } = useBroadcastChannel({
-  //   channelName: CHANNEL_NAME,
-  //   onMessage: (message: BroadcastMessage) => {
-  //     if (message.type === "state-update") {
-  //       const newState = message.data as GenState;
-  //       if (newState) {
-  //         lastKnownStateRef.current = newState;
-  //         console.log("Received state update from another tab:", newState);
-  //       }
-  //     } else if (message.type === "state-request") {
-  //       // Another tab is requesting current state, send it if we're the leader
-  //       if (isLeader) {
-  //         const currentState = read();
-  //         if (currentState) {
-  //           postMessage("state-response", currentState);
-  //         }
-  //       }
-  //     } else if (message.type === "state-response") {
-  //       // Received state from leader tab
-  //       const state = message.data as GenState;
-  //       if (state) {
-  //         lastKnownStateRef.current = state;
-  //         console.log("Received state from leader tab:", state);
-  //       }
-  //     }
-  //   },
-  // });
-  
-  // Temporary fallback - disable cross-tab communication
-  const postMessage = () => {};
-  const isSupported = false;
+  // Simplified persistence without cross-tab complexity for now
+  // relying on Supabase Realtime for synchronization across tabs
+  const isLeader = true;
 
   const read = useCallback((): GenState | null => {
     try {
@@ -92,6 +45,9 @@ export const useGenerationPersistence = () => {
         // TEMPORARY: Always write to localStorage (no coordination)
         localStorage.setItem(KEY, JSON.stringify(next));
         lastKnownStateRef.current = next;
+
+        // Dispatch custom event for same-tab listeners (GlobalQuizListener)
+        window.dispatchEvent(new Event("generation-storage-update"));
       } catch (e) {
         // Log to help debug storage issues (e.g. quota, privacy settings)
         console.warn("useGenerationPersistence write error:", e);
@@ -105,6 +61,9 @@ export const useGenerationPersistence = () => {
     localStorage.removeItem(KEY);
     localStorage.removeItem(LEGACY_ID);
     lastKnownStateRef.current = null;
+
+    // Dispatch custom event for same-tab listeners
+    window.dispatchEvent(new Event("generation-storage-update"));
   }, []);
 
   const setLegacyId = useCallback((id: string) => {
@@ -117,18 +76,12 @@ export const useGenerationPersistence = () => {
     return localStorage.getItem(LEGACY_ID);
   }, []);
 
-  // TEMPORARY: Disable state request (no coordination)
-  // useEffect(() => {
-  //   if (!isLeader && isSupported) {
-  //     postMessage("state-request", { tabId: "requesting" });
-  //   }
-  // }, [isLeader, isSupported, postMessage]);
 
-  return { 
-    read, 
-    write, 
-    clear, 
-    setLegacyId, 
+  return {
+    read,
+    write,
+    clear,
+    setLegacyId,
     getLegacyId,
     isLeader,
     lastKnownState: lastKnownStateRef.current,

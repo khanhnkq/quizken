@@ -1,6 +1,8 @@
 import * as React from "react";
 import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { useQuizStore } from "@/hooks/useQuizStore";
+import { clearQuizProgress } from "@/hooks/useQuizProgress";
 
 interface AuthContextType {
   user: User | null;
@@ -40,9 +42,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
       setUser(session?.user ?? null);
       setLoading(false);
+
+      if (event === 'SIGNED_OUT') {
+        // Clear global quiz state to prevent data leaking to next session
+        useQuizStore.getState().reset();
+        clearQuizProgress();
+        // Also clear local storage related to generation
+        localStorage.removeItem("currentQuizGeneration");
+        localStorage.removeItem("currentQuizId");
+      }
     });
 
     return () => subscription.unsubscribe();

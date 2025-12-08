@@ -36,6 +36,7 @@ export interface CreatedQuiz {
   category: string;
   tags: string[] | null;
   difficulty: string;
+  status?: string; // Added status field
 }
 
 export interface DashboardData {

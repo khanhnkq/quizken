@@ -222,12 +222,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
   ) => {
     onAnswerSelect(questionIndex, answerIndex);
 
-    if (questionIndex < quiz.questions.length - 1) {
-      // Auto-advance after a short delay
-      setTimeout(() => {
-        handleNavigateQuestion(questionIndex + 1);
-      }, 350); // Slightly longer delay for user to see selection
-    }
+    EMPTY_STRING
   };
 
   const scrollToTop = () => {

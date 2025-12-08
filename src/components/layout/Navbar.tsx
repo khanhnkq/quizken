@@ -13,6 +13,17 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { cn } from "@/lib/utils";
 import { QuickGeneratorDialog } from "@/components/quiz/QuickGeneratorDialog";
 import { useToast } from "@/hooks/use-toast";
+import { useActiveGeneration } from "@/hooks/useActiveGeneration";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 
 const Navbar = () => {
@@ -20,8 +31,10 @@ const Navbar = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
+  const { isProcessing, cancelGeneration } = useActiveGeneration();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showGeneratorDialog, setShowGeneratorDialog] = useState(false);
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { user, loading } = useAuth();
   const { play } = useAudio();
@@ -105,8 +118,34 @@ const Navbar = () => {
 
           </div>
 
+
+
           {/* Right: Auth / User Dropdown */}
           <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
+            {/* Global Loading Indicator (Navbar Integration) */}
+            {isProcessing && (
+              <div className="flex items-center gap-2 md:bg-primary/10 md:border md:border-primary/20 rounded-full md:px-3 md:py-1 animate-in fade-in slide-in-from-right-4 duration-300 pointer-events-none md:pointer-events-auto">
+                <div className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                </div>
+                <span className="hidden md:inline text-[10px] font-medium text-primary whitespace-nowrap">
+                  {t('quizGenerator.status.generating') || "Creating..."}
+                </span>
+
+                {/* Cancel Button */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowCancelConfirm(true);
+                  }}
+                  className="ml-1 hidden md:flex items-center justify-center h-4 w-4 rounded-full hover:bg-red-100 text-primary/50 hover:text-red-500 transition-colors pointer-events-auto"
+                  title={t('quizGenerator.actions.cancel') || "Cancel"}
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </div>
+            )}
             <LanguageSwitcher />
             {!loading && (
               <>
@@ -145,7 +184,33 @@ const Navbar = () => {
 
       {/* Quick Generator Dialog */}
       <QuickGeneratorDialog open={showGeneratorDialog} onOpenChange={setShowGeneratorDialog} />
-    </nav>
+
+      {/* Global Cancel Confirmation Dialog */}
+      <AlertDialog open={showCancelConfirm} onOpenChange={setShowCancelConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('quizGenerator.confirmDialog.titleCancel') || "Cancel Generation?"}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('quizGenerator.confirmDialog.descriptionCancel') || "Are you sure you want to stop generating this quiz? This action cannot be undone."}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('quizGenerator.confirmDialog.cancel') || "Cancel"}</AlertDialogCancel>
+            <AlertDialogAction onClick={() => {
+              cancelGeneration?.();
+              setShowCancelConfirm(false);
+              toast({
+                title: t('quizGenerator.toasts.cancelledTitle') || "Cancelled",
+                description: t('quizGenerator.toasts.cancelledDesc') || "Quiz generation has been stopped.",
+                variant: "info",
+              });
+            }}>
+              {t('quizGenerator.confirmDialog.confirm') || "Stop Generation"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </nav >
   );
 };
 

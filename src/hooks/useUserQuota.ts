@@ -46,7 +46,8 @@ export function useUserQuota(userId?: string) {
             };
         },
         enabled: !!userId,
-        staleTime: 1000 * 30, // 30 seconds (reduced for more responsive updates)
+        staleTime: 0, // Always fresh
+        refetchOnWindowFocus: true,
     });
 
     // Real-time subscription for profiles and API keys changes
@@ -64,8 +65,8 @@ export function useUserQuota(userId?: string) {
                     table: 'profiles',
                     filter: `id=eq.${userId}`
                 },
-                () => {
-                    // Refetch when profile quota changes
+                (payload) => {
+                    console.log("⚡ [useUserQuota] Profile updated, refetching quota", payload);
                     queryClient.invalidateQueries({ queryKey });
                 }
             )
