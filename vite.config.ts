@@ -26,12 +26,12 @@ export default defineConfig({
     react(),
     // Bundle analyzer - only in analyze mode
     process.env.NODE_ENV === "analyze" &&
-      visualizer({
-        filename: "dist/bundle-analysis.html",
-        open: true,
-        gzipSize: true,
-        brotliSize: true,
-      }),
+    visualizer({
+      filename: "dist/bundle-analysis.html",
+      open: true,
+      gzipSize: true,
+      brotliSize: true,
+    }),
   ].filter(Boolean),
 
   build: {
@@ -107,7 +107,7 @@ export default defineConfig({
     exclude: [
       "gsap/ScrollTrigger",
       "gsap/dist/ScrollSmoother",
-      "jspdf/dist/jspdf.umd.min.js", // Exclude jspdf to prevent optimizer conflicts
+      "jspdf", // Exclude jspdf to prevent optimizer conflicts
     ],
 
     // Only include critical dependencies for initial load
@@ -118,9 +118,6 @@ export default defineConfig({
       "@/lib/icons",
       "@tanstack/react-query",
     ],
-
-    // Force deps to be bundled correctly
-    force: true,
   },
 
   worker: {
