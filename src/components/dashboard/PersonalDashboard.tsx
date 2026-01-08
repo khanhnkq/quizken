@@ -7,6 +7,7 @@ import { ProgressTrendline } from "./ProgressTrendline";
 import { CreatedQuizzes } from "./CreatedQuizzes";
 import { RecentQuizzes } from "./RecentQuizzes";
 import { UserProfile } from "../user-profile/UserProfile";
+import { EnglishStatsCard } from "./EnglishStatsCard";
 import { useDashboardStats } from "@/hooks/useDashboardStats";
 import { useProgressTrend } from "@/hooks/useProgressTrend";
 import { useRecentQuizzes } from "@/hooks/useRecentQuizzes";
@@ -23,7 +24,9 @@ import {
   Store,
   Package,
   Settings,
-  LogOut
+  LogOut,
+  BookOpen,
+  ArrowRight
 } from "lucide-react";
 import { BackgroundDecorations } from "@/components/ui/BackgroundDecorations";
 import { gsap } from "gsap";
@@ -290,6 +293,12 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
             )}
 
             {/* Bento Grid Layout - Soft & Rounded */}
+            <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="md:col-span-3">
+                <EnglishStatsCard />
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
               {/* Profile Card */}
               <div className="w-full h-full transform hover:scale-[1.01] transition-transform duration-300">

@@ -865,5 +865,83 @@
             "signature": "Nguyễn Khánh",
             "signatureRole": "Creator of Quizken"
         }
+    },
+    "englishHub": {
+        "titlePrefix": "Thế Giới",
+        "titleSuffix": "Tiếng Anh",
+        "badge": "Hành Trình Zero to Hero",
+        "subtitle": "Chinh phục tiếng Anh qua hành trình tương tác. <br> Thu thập đá quý, giữ chuỗi ngày học và chiếm lĩnh các hòn đảo!",
+        "streak": "Chuỗi",
+        "gems": "Đá Quý",
+        "back": "Quay Lại",
+        "comingSoon": "Sắp Ra Mắt Thêm",
+        "phase1": {
+            "back": "Quay Lại Lộ Trình",
+            "title": "Chủ Đề Từ Vựng Cốt Lõi",
+            "subtitle": "Chọn một chủ đề để bắt đầu xây dựng nền tảng.",
+            "words": "từ",
+            "vocabTitle": "Từ Vựng {{topic}}"
+        },
+        "study": {
+            "tapToFlip": "Chạm để Lật",
+            "definition": "Định Nghĩa",
+            "gotIt": "Đã hiểu",
+            "showMeaning": "Xem Nghĩa",
+            "saved": "Đã lưu vào Sổ Tay",
+            "removed": "Đã xóa khỏi Sổ Tay",
+            "reviewLater": "Ôn tập lại từ này sau trong sổ tay của bạn.",
+            "sessionComplete": "Hoàn Thành Phiên Học!",
+            "sessionDesc": "Làm tốt lắm! Bạn đã hoàn thành bài tập hôm nay."
+        },
+        "notebook": {
+            "title": "Sổ Tay Từ Vựng",
+            "subtitle": "Bộ sưu tập từ vựng cá nhân để ôn tập.",
+            "searchPlaceholder": "Tìm kiếm trong sổ tay...",
+            "emptyTitle": "Sổ tay trống",
+            "emptyDesc": "Ghim từ vựng từ flashcard để xem tại đây.",
+            "emptyAction": "Đi tới Học Ngay",
+            "exampleLabel": "Ví dụ:",
+            "removedToastTitle": "Đã xóa",
+            "removedToastDesc": "Đã xóa {{word}} khỏi sổ tay."
+        }
+    },
+    "roadmap": {
+        "phase1": {
+            "title": "Giai Đoạn 1: Người Xây Dựng",
+            "subtitle": "Nền Tảng (1-3 Tháng)",
+            "description": "Xây dựng ngân hàng từ vựng cốt lõi và cấu trúc ngữ pháp cơ bản.",
+            "task1": {
+                "title": "600 Từ Vựng Cốt Lõi",
+                "desc": "Học 50 chủ đề từ vựng học thuật thiết yếu."
+            },
+            "task2": {
+                "title": "Sổ Tay Từ Vựng Của Tôi",
+                "desc": "Ôn tập các từ bạn đã ghim vào sổ tay."
+            }
+        },
+        "phase2": {
+            "title": "Giai Đoạn 2: Kiếm Trúc Sư",
+            "subtitle": "Ngữ Pháp (1-2 Tháng)",
+            "description": "Làm chủ câu phức, mệnh đề quan hệ và câu bị động.",
+            "task1": {
+                "title": "Mệnh Đề Quan Hệ",
+                "desc": "Luyện tập kết hợp câu sử dụng who, which, that."
+            }
+        },
+        "phase3": {
+            "title": "Giai Đoạn 3: Thợ Lặn",
+            "subtitle": "Kỹ Năng Chuyên Sâu (1 Tháng)",
+            "description": "Nghe chép chính tả chuyên sâu và đọc hiểu."
+        },
+        "phase4": {
+            "title": "Giai Đoạn 4: Nhà Văn",
+            "subtitle": "Làm Chủ Đầu Ra",
+            "description": "Nghiên cứu bài luận mẫu và luyện nói shadowing."
+        },
+        "phase5": {
+            "title": "Giai Đoạn 5: Vận Động Viên",
+            "subtitle": "Mô Phỏng Kỳ Thi",
+            "description": "Làm bài test Cambridge full dưới áp lực thời gian."
+        }
     }
 }

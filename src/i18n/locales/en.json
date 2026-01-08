@@ -862,5 +862,83 @@
             "signature": "Nguyen Khanh",
             "signatureRole": "Creator of Quizken"
         }
+    },
+    "englishHub": {
+        "titlePrefix": "English",
+        "titleSuffix": "World",
+        "badge": "Zero to Hero Path",
+        "subtitle": "Master English through an interactive journey. <br> Collect gems, keep your streak, and conquer the islands!",
+        "streak": "Streak",
+        "gems": "Gems",
+        "back": "Back",
+        "comingSoon": "More Coming Soon",
+        "phase1": {
+            "back": "Back to Roadmap",
+            "title": "Essential Vocabulary Topics",
+            "subtitle": "Select a topic to start building your foundation.",
+            "words": "words",
+            "vocabTitle": "{{topic}} Vocabulary"
+        },
+        "study": {
+            "tapToFlip": "Tap to Flip",
+            "definition": "Definition",
+            "gotIt": "Got it",
+            "showMeaning": "Show Meaning",
+            "saved": "Saved to Notebook",
+            "removed": "Removed from Notebook",
+            "reviewLater": "Review this word later in your notebook.",
+            "sessionComplete": "Session Complete!",
+            "sessionDesc": "Great job practicing today."
+        },
+        "notebook": {
+            "title": "My Notebook",
+            "subtitle": "Your personal collection of words to review.",
+            "searchPlaceholder": "Search your notebook...",
+            "emptyTitle": "Notebook is empty",
+            "emptyDesc": "Pin words from your flashcards to see them here.",
+            "emptyAction": "Go to Study",
+            "exampleLabel": "Example:",
+            "removedToastTitle": "Removed",
+            "removedToastDesc": "Removed {{word}} from notebook."
+        }
+    },
+    "roadmap": {
+        "phase1": {
+            "title": "Phase 1: The Builder",
+            "subtitle": "Foundation (1-3 Months)",
+            "description": "Build your core vocabulary bank and basic grammar structure.",
+            "task1": {
+                "title": "600 Essential Words",
+                "desc": "Learn 50 topics of essential academic vocabulary."
+            },
+            "task2": {
+                "title": "My Vocabulary Notebook",
+                "desc": "Review words you have pinned to your notebook."
+            }
+        },
+        "phase2": {
+            "title": "Phase 2: The Architect",
+            "subtitle": "Grammar (1-2 Months)",
+            "description": "Master complex sentences, relative clauses, and passive voice.",
+            "task1": {
+                "title": "Relative Clauses",
+                "desc": "Practice combining sentences using who, which, that."
+            }
+        },
+        "phase3": {
+            "title": "Phase 3: The Diver",
+            "subtitle": "Deep Skills (1 Month)",
+            "description": "Intensive listening dictation and reading comprehension."
+        },
+        "phase4": {
+            "title": "Phase 4: The Writer",
+            "subtitle": "Output Mastery",
+            "description": "Study model essays and practice speaking shadowing."
+        },
+        "phase5": {
+            "title": "Phase 5: The Sprinter",
+            "subtitle": "Exam Simulation",
+            "description": "Full Cambridge tests under strict time pressure."
+        }
     }
 }

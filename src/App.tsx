@@ -3,6 +3,10 @@ import { Toaster as HotToaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+import EnglishHub from "./pages/EnglishHub";
+import Phase1View from "./components/english/phases/Phase1View";
+import MyNotebook from "./components/english/MyNotebook";
 import { gsap } from "gsap";
 import { toast } from "@/hooks/use-toast";
 import { shouldDisableScrollSmoother } from "@/utils/deviceDetection";
@@ -66,6 +70,11 @@ const AppRoutes = () => {
       <Routes>
         {/* Static Pages */}
         <Route path="/" element={<Index />} />
+        <Route path="/english" element={<EnglishHub />} />
+        <Route path="/english/phase/1/vocab" element={<Phase1View />} />
+        <Route path="/english/notebook" element={<MyNotebook />} />
+
+
         <Route path="/about" element={<About />} />
 
         {/* Quiz Domain */}
