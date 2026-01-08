@@ -26,6 +26,7 @@ import {
   Settings,
   LogOut,
   BookOpen,
+  BookOpenIcon,
   ArrowRight
 } from "lucide-react";
 import { BackgroundDecorations } from "@/components/ui/BackgroundDecorations";
@@ -231,18 +232,33 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
                 </p>
               </div>
 
-              <Button
-                onClick={handleCreateQuiz}
-                size="xl"
-                variant="hero"
-                className="group rounded-3xl shadow-xl border-4 border-primary hover:border-primary-foreground/20 bg-primary text-white font-heading text-lg px-8 py-6 h-auto transition-all duration-200 active:scale-95"
-                onMouseEnter={handleHoverEnter}
-                onMouseLeave={handleHoverLeave}>
-                <span className="mr-2">{t('dashboard.createQuiz')}</span>
-                <div className="bg-white/20 p-1.5 rounded-xl group-hover:rotate-12 transition-transform">
-                  <PlusCircleIcon className="w-6 h-6 text-white" />
-                </div>
-              </Button>
+              <div className="flex flex-wrap gap-3">
+                <Button
+                  onClick={handleCreateQuiz}
+                  size="xl"
+                  variant="hero"
+                  className="group rounded-3xl shadow-xl border-4 border-primary hover:border-primary-foreground/20 bg-primary text-white font-heading text-lg px-8 py-6 h-auto transition-all duration-200 active:scale-95"
+                  onMouseEnter={handleHoverEnter}
+                  onMouseLeave={handleHoverLeave}>
+                  <span className="mr-2">{t('dashboard.createQuiz')}</span>
+                  <div className="bg-white/20 p-1.5 rounded-xl group-hover:rotate-12 transition-transform">
+                    <PlusCircleIcon className="w-6 h-6 text-white" />
+                  </div>
+                </Button>
+
+                <Button
+                  onClick={() => navigate('/english')}
+                  size="xl"
+                  variant="hero"
+                  className="group rounded-3xl shadow-xl border-4 border-blue-400 hover:border-blue-300 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-heading text-lg px-8 py-6 h-auto transition-all duration-200 active:scale-95"
+                  onMouseEnter={handleHoverEnter}
+                  onMouseLeave={handleHoverLeave}>
+                  <span className="mr-2">English Hub</span>
+                  <div className="bg-white/20 p-1.5 rounded-xl group-hover:rotate-12 transition-transform">
+                    <BookOpenIcon className="w-6 h-6 text-white" />
+                  </div>
+                </Button>
+              </div>
             </div>
 
 

@@ -21,61 +21,40 @@ import { useUserProgress } from '../../../hooks/useUserProgress';
 import MiniQuiz from '../MiniQuiz';
 import LessonProgressMap, { LessonStep } from '../LessonProgressMap';
 import { CEFRBadge } from '../../cefr/CEFRBadge';
-import { GRAMMAR_SENTENCES_A1, GRAMMAR_SENTENCES_A2, GRAMMAR_SENTENCES_B1, GRAMMAR_SENTENCES_B2, GRAMMAR_SENTENCES_C1, GRAMMAR_SENTENCES_C2, GrammarSentence } from '@/lib/constants/grammarSentences';
 
-const LEVEL_GRAMMAR_MAP: Record<string, GrammarSentence[]> = {
-    'A1': GRAMMAR_SENTENCES_A1,
-    'A2': GRAMMAR_SENTENCES_A2,
-    'B1': GRAMMAR_SENTENCES_B1,
-    'B2': GRAMMAR_SENTENCES_B2,
-    'C1': GRAMMAR_SENTENCES_C1,
-    'C2': GRAMMAR_SENTENCES_C2
+const LEVEL_VOCAB_MAP: Record<string, VocabWord[]> = {
+    'A1': VOCAB_A1, 'A2': VOCAB_A2, 'B1': VOCAB_B1, 'B2': VOCAB_B2, 'C1': VOCAB_C1, 'C2': VOCAB_C2
 };
 
 const generateChallenges = (level: string): SentenceChallenge[] => {
-    let sourceSentences: GrammarSentence[] = LEVEL_GRAMMAR_MAP[level] || [];
+    // START OF NEW LOGIC
 
-    // For TOEIC or unknown levels: Mix 2 sentences from each CEFR level
-    if (sourceSentences.length === 0) {
-        const allLevels = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
-        sourceSentences = allLevels.flatMap(lvl => {
-            const levelSentences = LEVEL_GRAMMAR_MAP[lvl] || [];
-            const shuffled = [...levelSentences].sort(() => 0.5 - Math.random());
-            return shuffled.slice(0, 2); // Pick 2 from each level
+    return learningWords
+        .filter(w => w.example_en && (w.example_vi || w.definition_vi))
+        .map((w, index) => {
+            // Split sentence into chunks (simplified logic)
+            // Remove punctuation for parts, but keep in fullSentence
+            const cleanSentence = w.example_en.replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, "");
+            const words = cleanSentence.split(/\s+/);
+
+            const parts: SentencePart[] = words.map((word, i) => ({
+                id: `p-${index}-${i}`,
+                text: word,
+                type: 'M' // Default type as we don't have NLP
+            }));
+
+            const correctOrder = parts.map(p => p.id);
+
+            return {
+                id: `challenge-${index}`,
+                topic: 'Practice',
+                fullSentence: w.example_en,
+                translation: w.example_vi || w.definition_vi,
+                parts: parts,
+                correctOrder: correctOrder
+            };
         });
-    }
-
-    // Shuffle and pick 10
-    const shuffled = [...sourceSentences].sort(() => 0.5 - Math.random());
-    const selected = shuffled.slice(0, 10);
-
-    return selected.map((s, index) => {
-        const cleanSentence = s.sentence.replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, "");
-        const words = cleanSentence.split(/\s+/);
-
-        // Chunk long sentences if needed (simple logic)
-        const chunkedWords = words.length > 8 ?
-            [...words.slice(0, 7), words.slice(7).join(" ")] : words;
-
-        const parts: SentencePart[] = chunkedWords.map((word, i) => ({
-            id: `p-${index}-${i}`,
-            text: word,
-            type: 'M'
-        }));
-
-        const correctOrder = parts.map(p => p.id);
-
-        return {
-            id: `challenge-${index}`,
-            topic: 'Grammar Practice',
-            fullSentence: s.sentence,
-            translation: s.translation,
-            parts: parts,
-            correctOrder: correctOrder
-        };
-    });
 };
-
 
 
 
@@ -102,9 +81,6 @@ const Phase1View = () => {
     const [showSentenceBuilder, setShowSentenceBuilder] = useState(false);
     const [expandedLevel, setExpandedLevel] = useState<CEFRLevelData | null>(null);
     const [completedSteps, setCompletedSteps] = useState<LessonStep[]>([]);
-
-    // transform generateChallenges to be stable
-
 
     // Effect to sync persistent progress when selectedLesson changes
     React.useEffect(() => {
@@ -144,14 +120,6 @@ const Phase1View = () => {
 
     // Determine current step based on state
     const currentStep: LessonStep = showSentenceBuilder ? 'practice' : showQuiz ? 'quiz' : 'learn';
-
-    // transform generateChallenges to be stable
-    const practiceChallenges = React.useMemo(() => {
-        if (selectedLesson && currentStep === 'practice') {
-            return generateChallenges(selectedLesson.level);
-        }
-        return [];
-    }, [selectedLesson?.id, currentStep]);
 
     const handleNavigate = (step: LessonStep) => {
         if (step === 'learn') {
@@ -280,13 +248,13 @@ const Phase1View = () => {
 
                     {currentStep === 'practice' && (
                         <SentenceBuilder
-                            challenges={practiceChallenges}
+                            challenges={generateChallenges(selectedLesson.words)}
                             onComplete={() => {
                                 setCompletedSteps(prev => [...new Set([...prev, 'practice'])] as LessonStep[]);
                                 const stepKey = `${baseKey}-practice`;
-
-                                // Mark practice step and main lesson as completed (Batch update to avoid race condition)
-                                completeLesson([stepKey, baseKey]);
+                                completeLesson(stepKey);
+                                // Also mark the main lesson as completed for the list view
+                                completeLesson(baseKey);
 
                                 toast({
                                     title: "Practice Completed!",
@@ -547,15 +515,7 @@ const Phase1View = () => {
                                                 {/* Lesson Card */}
                                                 <button
                                                     disabled={locked}
-                                                    onClick={() => {
-                                                        setSelectedLesson(lesson);
-                                                        // If lesson is already done or level is skipped, mark all steps as "highlighted"
-                                                        if (completed || isLevelSkipped(expandedLevel.level)) {
-                                                            setCompletedSteps(['learn', 'quiz', 'practice']);
-                                                        } else {
-                                                            setCompletedSteps([]);
-                                                        }
-                                                    }}
+                                                    onClick={() => setSelectedLesson(lesson)}
                                                     className={`
                                                         w-full group text-left relative overflow-hidden transition-all duration-300
                                                         bg-white rounded-[2.5rem] p-6 shadow-md hover:shadow-xl border-b-4

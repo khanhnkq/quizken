@@ -191,6 +191,7 @@ const SentenceBuilder: React.FC<SentenceBuilderProps> = ({
     const [combo, setCombo] = useState(0);
     const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
     const [activeId, setActiveId] = useState<string | null>(null); // For DragOverlay
+    const [isFinished, setIsFinished] = useState(false);
 
     // Refs for Animations
     const mascotRef = useRef<HTMLDivElement>(null);
@@ -198,34 +199,6 @@ const SentenceBuilder: React.FC<SentenceBuilderProps> = ({
 
     const currentChallenge = challenges[currentChallengeIndex];
 
-    if (challenges.length === 0) {
-        return (
-            <div className="fixed inset-0 z-50 flex flex-col items-center justify-center p-4 bg-white/90 backdrop-blur-md">
-                <div className="bg-white p-8 rounded-[2.5rem] shadow-2xl border-4 border-slate-100 text-center max-w-md">
-                    <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <Flag className="w-10 h-10 text-slate-400" />
-                    </div>
-                    <h3 className="text-2xl font-black text-slate-800 mb-2">Practice Coming Soon</h3>
-                    <p className="text-slate-500 font-medium mb-8">We are crafting challenges for this topic!</p>
-                    <div className="flex flex-col gap-3 w-full">
-                        <button
-                            onClick={() => {
-                                if (onComplete) onComplete();
-                            }}
-                            className="w-full px-8 py-4 bg-green-500 text-white rounded-xl font-black shadow-lg hover:scale-105 hover:bg-green-600 transition-all flex items-center justify-center gap-2"
-                        >
-                            <Trophy className="w-5 h-5" />
-                            Finish Lesson
-                        </button>
-
-                        <button onClick={onClose} className="w-full px-8 py-3 text-slate-400 font-bold hover:text-slate-600 transition-colors">
-                            Close
-                        </button>
-                    </div>
-                </div>
-            </div>
-        );
-    }
 
     // --- Init Challenge ---
     useEffect(() => {
@@ -317,7 +290,7 @@ const SentenceBuilder: React.FC<SentenceBuilderProps> = ({
                     setCurrentChallengeIndex(prev => prev + 1);
                 } else {
                     // ALL DONE
-                    if (onComplete) onComplete();
+                    setIsFinished(true);
                 }
             }, 1500);
 
@@ -342,6 +315,74 @@ const SentenceBuilder: React.FC<SentenceBuilderProps> = ({
         }
     };
 
+
+
+    if (isFinished) {
+        return (
+            <div className="fixed inset-0 z-50 flex flex-col items-center justify-center p-4 bg-white/90 backdrop-blur-md animate-in fade-in zoom-in duration-300">
+                <div className="bg-white p-8 rounded-[2.5rem] shadow-2xl border-4 border-slate-100 text-center max-w-md w-full relative overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-yellow-50 to-orange-50 opacity-50" />
+                    <div className="relative z-10">
+                        <div className="w-24 h-24 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner animate-bounce">
+                            <Trophy className="w-12 h-12 text-yellow-500" />
+                        </div>
+                        <h3 className="text-3xl font-black text-slate-800 mb-2">Practice Complete!</h3>
+                        <p className="text-slate-500 font-medium mb-8">You've mastered this session!</p>
+
+                        <div className="flex flex-col gap-3">
+                            <div className="grid grid-cols-2 gap-3 mb-6">
+                                <div className="bg-orange-50 p-4 rounded-2xl border border-orange-100">
+                                    <div className="text-2xl font-black text-orange-500">{combo}</div>
+                                    <div className="text-xs font-bold text-orange-300 uppercase">Max Combo</div>
+                                </div>
+                                <div className="bg-red-50 p-4 rounded-2xl border border-red-100">
+                                    <div className="text-2xl font-black text-red-500">{hearts}</div>
+                                    <div className="text-xs font-bold text-red-300 uppercase">Hearts Left</div>
+                                </div>
+                            </div>
+
+                            <button
+                                onClick={() => onComplete && onComplete()}
+                                className="w-full px-8 py-4 bg-green-500 text-white rounded-2xl font-black shadow-[0_4px_0_0_#16a34a] hover:scale-105 active:scale-95 active:shadow-none active:translate-y-1 transition-all flex items-center justify-center gap-2"
+                            >
+                                <CheckCircle className="w-6 h-6" />
+                                Finish Practice
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    if (challenges.length === 0) {
+        return (
+            <div className="fixed inset-0 z-50 flex flex-col items-center justify-center p-4 bg-white/90 backdrop-blur-md">
+                <div className="bg-white p-8 rounded-[2.5rem] shadow-2xl border-4 border-slate-100 text-center max-w-md">
+                    <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <Flag className="w-10 h-10 text-slate-400" />
+                    </div>
+                    <h3 className="text-2xl font-black text-slate-800 mb-2">Practice Coming Soon</h3>
+                    <p className="text-slate-500 font-medium mb-8">We are crafting challenges for this topic!</p>
+                    <div className="flex flex-col gap-3 w-full">
+                        <button
+                            onClick={() => {
+                                if (onComplete) onComplete();
+                            }}
+                            className="w-full px-8 py-4 bg-green-500 text-white rounded-xl font-black shadow-lg hover:scale-105 hover:bg-green-600 transition-all flex items-center justify-center gap-2"
+                        >
+                            <Trophy className="w-5 h-5" />
+                            Finish Lesson
+                        </button>
+
+                        <button onClick={onClose} className="w-full px-8 py-3 text-slate-400 font-bold hover:text-slate-600 transition-colors">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     if (!currentChallenge) return null;
 
@@ -382,12 +423,7 @@ const SentenceBuilder: React.FC<SentenceBuilderProps> = ({
                     >
                         <ArrowLeft className="w-6 h-6" />
                     </button>
-                    <button
-                        onClick={() => onComplete && onComplete()}
-                        className="px-4 py-2 bg-green-500/90 backdrop-blur-md hover:bg-green-500 text-white rounded-full shadow-lg border border-white/50 transition-all hover:scale-105 active:scale-95 font-bold flex items-center gap-2"
-                    >
-                        <CheckCircle className="w-4 h-4" /> Finish
-                    </button>
+
                 </div>
 
                 {/* Mascot Helper */}

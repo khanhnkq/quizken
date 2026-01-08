@@ -18,6 +18,8 @@ export function useUserProgress() {
     const [completedLessons, setCompletedLessons] = useState<string[]>([]);
     const [lessonScores, setLessonScores] = useState<Record<string, number>>({});
     const [isLoading, setIsLoading] = useState(true);
+    const [streak, setStreak] = useState(0);
+    const [activeDays, setActiveDays] = useState<boolean[]>([false, false, false, false, false, false, false]);
 
     // Helper to get keys based on user (for local storage fallback/cache)
     const getKeys = useCallback(() => {
@@ -64,7 +66,7 @@ export function useUserProgress() {
                 try {
                     const { data, error } = await supabase
                         .from('lesson_completions')
-                        .select('lesson_id, score')
+                        .select('lesson_id, score, completed_at')
                         .eq('user_id', user.id);
 
                     if (error) throw error;
@@ -83,6 +85,35 @@ export function useUserProgress() {
                         // Update local cache
                         localStorage.setItem(keyLessons, JSON.stringify(uniqueLessons));
                         localStorage.setItem(keyScores, JSON.stringify(dbScores));
+
+                        // Calculate Streak and Active Days (for GitHub-style grid)
+                        const dates = data.map(r => new Date(r.completed_at).toDateString());
+                        const uniqueDates = [...new Set(dates)];
+
+                        let calculatedStreak = 0;
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+
+                        // Check last 7 days for activity (for grid display)
+                        const last7Days: boolean[] = [];
+                        for (let i = 6; i >= 0; i--) {
+                            const checkDate = new Date(today);
+                            checkDate.setDate(today.getDate() - i);
+                            last7Days.push(uniqueDates.includes(checkDate.toDateString()));
+                        }
+                        setActiveDays(last7Days);
+
+                        // Calculate consecutive streak from today backwards
+                        for (let i = 0; i < 365; i++) {
+                            const checkDate = new Date(today);
+                            checkDate.setDate(today.getDate() - i);
+                            if (uniqueDates.includes(checkDate.toDateString())) {
+                                calculatedStreak++;
+                            } else {
+                                break;
+                            }
+                        }
+                        setStreak(calculatedStreak);
                     }
                 } catch (err) {
                     console.error("Failed to sync progress from backend:", err);
@@ -119,12 +150,22 @@ export function useUserProgress() {
         }
     }, [completedTopics, unlockedTopics, getKeys]);
 
-    const completeLesson = useCallback(async (lessonId: string, score?: number) => {
+    const completeLesson = useCallback(async (lessonId: string | string[], score?: number) => {
         if (!lessonId) return;
 
-        // Optimistic UI Update - Always update score if provided, even if lesson explicitly marked 'completed' before
-        const newLessons = completedLessons.includes(lessonId) ? completedLessons : [...completedLessons, lessonId];
-        const newScores = score !== undefined ? { ...lessonScores, [lessonId]: score } : lessonScores;
+        const ids = Array.isArray(lessonId) ? lessonId : [lessonId];
+        if (ids.length === 0) return;
+
+        // Optimistic UI Update
+        let currentLessons = [...completedLessons];
+        const newIdsToAdd = ids.filter(id => !currentLessons.includes(id));
+
+        const newLessons = [...currentLessons, ...newIdsToAdd];
+
+        let newScores = { ...lessonScores };
+        if (score !== undefined && !Array.isArray(lessonId)) {
+            newScores[lessonId as string] = score;
+        }
 
         setCompletedLessons(newLessons);
         setLessonScores(newScores);
@@ -136,14 +177,17 @@ export function useUserProgress() {
         // Backend Update
         if (user?.id) {
             try {
+                // Prepare upsert data
+                const updates = ids.map(id => ({
+                    user_id: user.id,
+                    lesson_id: id,
+                    score: (score !== undefined && ids.length === 1) ? score : 100,
+                    completed_at: new Date().toISOString()
+                }));
+
                 const { error } = await supabase
                     .from('lesson_completions')
-                    .upsert({
-                        user_id: user.id,
-                        lesson_id: lessonId,
-                        score: score || 100, // Default to 100 for completion if not provided
-                        completed_at: new Date().toISOString()
-                    }, { onConflict: 'user_id, lesson_id' }) // Use upsert to update score if exists
+                    .upsert(updates, { onConflict: 'user_id, lesson_id' })
                     .select();
 
                 if (error) {
@@ -242,6 +286,10 @@ export function useUserProgress() {
         skippedLevels,
         skipLevel,
         isLevelSkipped,
+
+        // Streak
+        streak,
+        activeDays,
 
         resetProgress
     };

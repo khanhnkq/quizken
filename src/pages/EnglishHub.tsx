@@ -1,14 +1,16 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Store, Sparkles } from 'lucide-react';
+import { ArrowLeft, Sparkles, Flame } from 'lucide-react';
 import { ROADMAP_DATA } from '../lib/constants/roadmapData';
 import MapNode from '../components/english/MapNode';
 import { BackgroundDecorations } from '../components/ui/BackgroundDecorations';
 import { useTranslation } from 'react-i18next';
+import { useUserProgress } from '../hooks/useUserProgress';
 
 const EnglishHub = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
+    const { streak, activeDays } = useUserProgress();
     const containerRef = useRef<HTMLDivElement>(null);
     const [pathHeight, setPathHeight] = useState(1000);
 
@@ -86,18 +88,31 @@ const EnglishHub = () => {
                         </button>
 
                         <div className="flex items-center gap-3">
-                            <div className="bg-white/90 backdrop-blur-sm px-4 py-2 rounded-2xl shadow-lg border-2 border-yellow-200 flex items-center gap-2">
-                                <span className="text-2xl">🔥</span>
-                                <div>
-                                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t('englishHub.streak')}</p>
-                                    <p className="text-sm font-black text-orange-500">3 Days</p>
+                            <div className="bg-white/95 backdrop-blur-sm px-4 py-3 rounded-2xl shadow-lg border border-slate-200/50 flex items-center gap-4">
+                                {/* GitHub-style contribution grid */}
+                                <div className="flex flex-col gap-1">
+                                    <div className="flex gap-1">
+                                        {activeDays.map((isActive, index) => (
+                                            <div
+                                                key={index}
+                                                className={`w-4 h-4 rounded-sm transition-all ${isActive
+                                                    ? 'bg-gradient-to-br from-emerald-400 to-green-500 shadow-sm'
+                                                    : 'bg-slate-100 border border-slate-200'
+                                                    }`}
+                                                title={`${6 - index} days ago`}
+                                            />
+                                        ))}
+                                    </div>
+                                    <p className="text-[9px] text-slate-400 text-center">Last 7 days</p>
                                 </div>
-                            </div>
-                            <div className="bg-white/90 backdrop-blur-sm px-4 py-2 rounded-2xl shadow-lg border-2 border-blue-200 flex items-center gap-2">
-                                <Store className="w-6 h-6 text-blue-500" />
-                                <div>
-                                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t('englishHub.gems')}</p>
-                                    <p className="text-sm font-black text-blue-500">1,250</p>
+
+                                {/* Streak counter */}
+                                <div className="border-l border-slate-200 pl-4">
+                                    <div className="flex items-center gap-1.5">
+                                        <Flame className="w-4 h-4 text-orange-500" />
+                                        <span className="text-xl font-black text-slate-700">{streak}</span>
+                                    </div>
+                                    <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wide">{streak === 1 ? 'Day Streak' : 'Days Streak'}</p>
                                 </div>
                             </div>
                         </div>
@@ -128,9 +143,6 @@ const EnglishHub = () => {
                         </span>
                     </h1>
 
-                    <p className="text-lg text-slate-600 font-medium max-w-lg mx-auto leading-relaxed"
-                        dangerouslySetInnerHTML={{ __html: t('englishHub.subtitle') }}
-                    />
                 </div>
             </div>
 
