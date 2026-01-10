@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link, useNavigate } from "react-router-dom";
+import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 import {
   Sparkles,
@@ -35,6 +37,7 @@ type Cta = {
 export const AboutHero = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const handlePrimary = () => {
     window.dispatchEvent(
       new CustomEvent("analytics", {
@@ -45,6 +48,7 @@ export const AboutHero = () => {
   };
 
   const handleHoverEnter = (e: MouseEvent<HTMLButtonElement>) => {
+    if (isMobile) return;
     const target = e.currentTarget as HTMLButtonElement;
     gsap.to(target, {
       y: -2,
@@ -56,6 +60,7 @@ export const AboutHero = () => {
   };
 
   const handleHoverLeave = (e: MouseEvent<HTMLButtonElement>) => {
+    if (isMobile) return;
     const target = e.currentTarget as HTMLButtonElement;
     gsap.to(target, {
       y: 0,
@@ -128,12 +133,18 @@ export const AboutHero = () => {
           <Button
             variant="hero"
             size="xl"
-            className="group text-lg px-8 py-6 rounded-3xl shadow-xl border-4 border-primary hover:border-primary-foreground/50 active:scale-95 transition-all duration-200 font-heading bg-primary text-white w-full sm:w-auto h-auto"
+            className={cn(
+              "group text-lg px-8 py-6 rounded-3xl shadow-xl border-4 border-primary active:scale-95 transition-all duration-200 font-heading bg-primary text-white w-full sm:w-auto h-auto",
+              !isMobile && "hover:border-primary-foreground/50"
+            )}
             onClick={handlePrimary}
             onMouseEnter={handleHoverEnter}
             onMouseLeave={handleHoverLeave}>
             {t('about.hero.primaryCta')}
-            <div className="bg-white/20 p-1.5 rounded-xl ml-3 group-hover:rotate-12 transition-transform">
+            <div className={cn(
+              "bg-white/20 p-1.5 rounded-xl ml-3 transition-transform",
+              !isMobile && "group-hover:rotate-12"
+            )}>
               <Sparkles className="w-6 h-6 text-white" />
             </div>
           </Button>
@@ -142,7 +153,10 @@ export const AboutHero = () => {
             <Button
               variant="outline"
               size="xl"
-              className="text-lg px-8 py-6 rounded-3xl border-4 border-border hover:border-primary/50 hover:bg-secondary hover:text-secondary-foreground active:scale-95 transition-all duration-200 font-heading w-full h-auto"
+              className={cn(
+                "text-lg px-8 py-6 rounded-3xl border-4 border-border active:scale-95 transition-all duration-200 font-heading w-full h-auto",
+                !isMobile && "hover:border-primary/50 hover:bg-secondary hover:text-secondary-foreground"
+              )}
             >
               {t('about.hero.secondaryCta')}
             </Button>
@@ -160,6 +174,7 @@ export const AboutHero = () => {
 
 export const AboutMissionVision = () => {
   const { t } = useTranslation();
+  const isMobile = useIsMobile();
   return (
     <section className="py-24 px-4 bg-transparent relative overflow-hidden">
       <div className="container mx-auto max-w-5xl">
@@ -179,8 +194,14 @@ export const AboutMissionVision = () => {
 
           {/* PANEL 1: MISSION (Action Style) */}
           <div className="group relative">
-            <div className="absolute inset-0 bg-black rounded-xl translate-x-4 translate-y-4 transition-transform group-hover:translate-x-3 group-hover:translate-y-3" />
-            <div className="relative h-full bg-white border-4 border-black rounded-xl p-8 overflow-hidden hover:-translate-y-1 hover:-translate-x-1 transition-transform duration-200">
+            <div className={cn(
+              "absolute inset-0 bg-black rounded-xl translate-x-4 translate-y-4 transition-transform",
+              !isMobile && "group-hover:translate-x-3 group-hover:translate-y-3"
+            )} />
+            <div className={cn(
+              "relative h-full bg-white border-4 border-black rounded-xl p-8 overflow-hidden transition-transform duration-200",
+              !isMobile && "hover:-translate-y-1 hover:-translate-x-1"
+            )}>
 
               {/* Manga Background: Speed Lines */}
               <div className="absolute inset-0 opacity-10 pointer-events-none"
@@ -228,8 +249,14 @@ export const AboutMissionVision = () => {
 
           {/* PANEL 2: VISION (Dreamy/Future Style) */}
           <div className="group relative mt-12 lg:mt-0">
-            <div className="absolute inset-0 bg-black rounded-xl translate-x-4 translate-y-4 transition-transform group-hover:translate-x-3 group-hover:translate-y-3" />
-            <div className="relative h-full bg-white border-4 border-black rounded-xl p-8 overflow-hidden hover:-translate-y-1 hover:-translate-x-1 transition-transform duration-200">
+            <div className={cn(
+              "absolute inset-0 bg-black rounded-xl translate-x-4 translate-y-4 transition-transform",
+              !isMobile && "group-hover:translate-x-3 group-hover:translate-y-3"
+            )} />
+            <div className={cn(
+              "relative h-full bg-white border-4 border-black rounded-xl p-8 overflow-hidden transition-transform duration-200",
+              !isMobile && "hover:-translate-y-1 hover:-translate-x-1"
+            )}>
 
               {/* Manga Background: Halftone Dots */}
               <div className="absolute inset-0 opacity-15 pointer-events-none"
@@ -499,6 +526,7 @@ export const AboutStory = () => {
 
 export const AboutFeatures = () => {
   const { t } = useTranslation();
+  const isMobile = useIsMobile();
   const featuresData = t('about.features.items', { returnObjects: true }) as { title: string; desc: string }[];
 
   const features = featuresData.map((item, index) => ({
@@ -536,12 +564,18 @@ export const AboutFeatures = () => {
 
         <div className="grid md:grid-cols-3 gap-8">
           {features.map((feature, idx) => (
-            <div key={idx} className={`relative group ${feature.rotate} hover:rotate-0 transition-all duration-300 hover:z-10`}>
+            <div key={idx} className={cn(
+              `relative group ${feature.rotate} transition-all duration-300`,
+              !isMobile && "hover:rotate-0 hover:z-10"
+            )}>
               {/* Manga Frame - Black Background for Shadow */}
               <div className="absolute inset-0 bg-black translate-x-3 translate-y-3 rounded-xl" />
 
               {/* Main Card - Manga Style */}
-              <div className="relative bg-white border-4 border-black rounded-xl p-6 h-full flex flex-col items-center text-center overflow-hidden hover:-translate-y-2 hover:-translate-x-2 transition-transform duration-200">
+              <div className={cn(
+                "relative bg-white border-4 border-black rounded-xl p-6 h-full flex flex-col items-center text-center overflow-hidden transition-transform duration-200",
+                !isMobile && "hover:-translate-y-2 hover:-translate-x-2"
+              )}>
 
                 {/* Halftone Pattern Background */}
                 <div className="absolute inset-0 opacity-10 pointer-events-none"
@@ -580,6 +614,7 @@ export const AboutFeatures = () => {
 
 export const AboutValues = () => {
   const { t } = useTranslation();
+  const isMobile = useIsMobile();
   const valuesData = t('about.values.items', { returnObjects: true }) as { title: string; desc: string; sfx: string }[];
 
   const values = valuesData.map((item, index) => ({
@@ -609,7 +644,10 @@ export const AboutValues = () => {
             return (
               <div
                 key={i}
-                className={`group relative ${v.rotate} hover:rotate-0 transition-all duration-300 hover:z-20`}
+                className={cn(
+                  `group relative ${v.rotate} transition-all duration-300`,
+                  !isMobile && "hover:rotate-0 hover:z-20"
+                )}
               >
                 {/* SFX Floating Text */}
                 <div className="absolute -top-6 -right-4 font-black text-xl text-black bg-white border-2 border-black px-2 py-0.5 transform rotate-12 z-20 shadow-[2px_2px_0px_#000] animate-bounce">
@@ -617,7 +655,10 @@ export const AboutValues = () => {
                 </div>
 
                 {/* Card Container */}
-                <div className="relative bg-white border-4 border-black p-6 rounded-xl shadow-[8px_8px_0px_#000] group-hover:translate-x-1 group-hover:translate-y-1 group-hover:shadow-[4px_4px_0px_#000] transition-all overflow-hidden h-full flex flex-col">
+                <div className={cn(
+                  "relative bg-white border-4 border-black p-6 rounded-xl shadow-[8px_8px_0px_#000] transition-all overflow-hidden h-full flex flex-col",
+                  !isMobile && "group-hover:translate-x-1 group-hover:translate-y-1 group-hover:shadow-[4px_4px_0px_#000]"
+                )}>
 
                   {/* Background Stripes */}
                   <div className={`absolute top-0 left-0 w-full h-2 ${v.color} border-b-2 border-black`}></div>
@@ -662,6 +703,7 @@ export const AboutShopFavorites = ({
   shopeeUrl?: string;
 }) => {
   const { t } = useTranslation();
+  const isMobile = useIsMobile();
   const items =
     products && products.length > 0
       ? products
@@ -722,7 +764,10 @@ export const AboutShopFavorites = ({
                     }
                   >
                     {/* Card Frame (RPG Inventory Slot) */}
-                    <div className="h-full bg-white border-4 border-black p-4 rounded-xl shadow-[6px_6px_0px_#000] group-hover:translate-x-1 group-hover:translate-y-1 group-hover:shadow-[2px_2px_0px_#000] transition-all duration-200 flex flex-col">
+                    <div className={cn(
+                      "h-full bg-white border-4 border-black p-4 rounded-xl shadow-[6px_6px_0px_#000] transition-all duration-200 flex flex-col",
+                      !isMobile && "group-hover:translate-x-1 group-hover:translate-y-1 group-hover:shadow-[2px_2px_0px_#000]"
+                    )}>
 
                       {/* Item Image Container */}
                       <div className="relative aspect-square bg-gray-100 border-2 border-black rounded-lg mb-4 overflow-hidden">

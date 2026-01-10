@@ -69,6 +69,13 @@ import {
   TooltipContent,
   TooltipProvider,
 } from "@/components/ui/tooltip";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Plus, ArrowUp, Mic, Play, Layers } from "lucide-react";
+import logo from "@/assets/logo/logo.png";
 import useQuizGeneration from "@/hooks/useQuizGeneration";
 import { useGenerationPersistence } from "@/hooks/useGenerationPersistence";
 import {
@@ -205,6 +212,8 @@ const QuizGenerator = () => {
     hasApiKey,
     refetch: refetchQuota,
   } = useUserQuota(user?.id);
+
+  console.log("DEBUG QUOTA:", { user: !!user, hasApiKey, userCount, userRemaining, userLimit });
 
 
 
@@ -1113,105 +1122,9 @@ const QuizGenerator = () => {
     <>
       <section
         id="generator"
-        className="relative overflow-hidden bg-gradient-to-b from-secondary/30 to-background min-h-screen py-20 px-4">
+        className="relative overflow-hidden bg-white h-screen">
 
-        {/* Background scroll velocity effect - desktop only to optimize mobile */}
-        {!isMobile && (
-          <div className="absolute inset-0 z-0 opacity-5">
-            <ScrollVelocityContainer className="text-6xl md:text-8xl font-bold">
-              <ScrollVelocityRow baseVelocity={75} rowIndex={0}>
-                AI Education Smart Learning Intelligent Teaching Digital
-                Classroom
-              </ScrollVelocityRow>
-              <ScrollVelocityRow baseVelocity={75} rowIndex={1}>
-                Adaptive Assessment Personalized Learning Virtual Teacher
-                Cognitive Training
-              </ScrollVelocityRow>
-              <ScrollVelocityRow baseVelocity={75} rowIndex={2}>
-                Educational Analytics Student Engagement Knowledge Discovery
-                Learning Analytics
-              </ScrollVelocityRow>
-              <ScrollVelocityRow baseVelocity={75} rowIndex={3}>
-                Artificial Intelligence Machine Learning Neural Networks
-                Cognitive Computing
-              </ScrollVelocityRow>
-              <ScrollVelocityRow baseVelocity={75} rowIndex={4}>
-                Interactive Assessment Educational Technology Intelligent
-                Tutoring Automated Grading
-              </ScrollVelocityRow>
-              <ScrollVelocityRow baseVelocity={75} rowIndex={5}>
-                AI Education Smart Learning Intelligent Teaching Digital
-                Classroom
-              </ScrollVelocityRow>
-              <ScrollVelocityRow baseVelocity={75} rowIndex={6}>
-                Adaptive Assessment Personalized Learning Virtual Teacher
-                Cognitive Training
-              </ScrollVelocityRow>
-              <ScrollVelocityRow baseVelocity={75} rowIndex={7}>
-                Educational Analytics Student Engagement Knowledge Discovery
-                Learning Analytics
-              </ScrollVelocityRow>
-              <ScrollVelocityRow baseVelocity={75} rowIndex={8}>
-                Artificial Intelligence Machine Learning Neural Networks
-                Cognitive Computing
-              </ScrollVelocityRow>
-              <ScrollVelocityRow baseVelocity={75} rowIndex={9}>
-                Interactive Assessment Educational Technology Intelligent
-                Tutoring Automated Grading
-              </ScrollVelocityRow>
-            </ScrollVelocityContainer>
-          </div>
-        )}
-
-        <BackgroundDecorations />
-
-        {/* Floating Icons - Replaced with BackgroundDecorations component */}
-
-        <div className="container mx-auto max-w-4xl px-0 sm:px-4 relative z-10">
-
-
-
-          <div className="text-center mb-12">
-            <div className="flex justify-center mb-6">
-              <Sparkles className="w-16 h-16 text-primary" />
-            </div>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              {t('quizGenerator.header')}
-            </h2>
-            <div className="mt-4 flex items-center justify-center gap-3 flex-wrap">
-              <p className="text-lg text-muted-foreground m-0">
-                {t('quizGenerator.headerDescription')}
-              </p>
-            </div>
-            <div className="flex items-center justify-center gap-3 mt-5">
-              <Button
-                type="button"
-                variant="outline"
-                size="lg"
-                sound="toggle"
-                className="text-base w-full sm:w-auto hover:bg-primary hover:text-primary-foreground hover:border-foreground transition-colors"
-                onClick={handleToggleChill}
-                aria-pressed={isChillPlaying}
-                aria-label={
-                  isChillPlaying ? t('quizGenerator.ui.pauseMusic') : t('quizGenerator.ui.playMusic')
-                }>
-                {isChillPlaying ? (
-                  <PauseCircle className="w-5 h-5" />
-                ) : (
-                  <Music4 className="w-5 h-5" />
-                )}
-                <span className="text-sm font-medium">
-                  {isChillPlaying ? t('quizGenerator.ui.pauseMusic') : t('quizGenerator.ui.playMusic')}
-                </span>
-                {isChillPlaying && (
-                  <span className="flex items-end gap-0.5" aria-hidden="true">
-                    <span className="w-1 h-3 bg-primary rounded-sm animate-pulse group-hover:bg-primary-foreground" />
-                    <span className="w-1 h-2 bg-primary rounded-sm animate-pulse delay-150 group-hover:bg-primary-foreground/80" />
-                  </span>
-                )}
-              </Button>
-            </div>
-          </div>
+        <div className="w-full h-full relative z-10">
 
           {/* Quota Limit Dialog */}
           <QuotaLimitDialog
@@ -1284,210 +1197,194 @@ const QuizGenerator = () => {
 
 
 
-          <Card className="mb-8 border-4 border-primary/30 bg-white/80 backdrop-blur-sm shadow-[0_8px_30px_rgba(0,0,0,0.08),inset_0_2px_0_rgba(255,255,255,0.9)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.12)] transition-all duration-300 rounded-3xl overflow-hidden">
-            <CardContent className="p-3 sm:p-6 md:p-10 space-y-8">
+          <Card className="border-none bg-white shadow-none rounded-none overflow-hidden ring-0 relative w-full h-full">
+            <CardContent className="p-0 flex flex-col justify-center relative z-10 h-full">
               {/* Show Form OR Loading Progress */}
               {loading ? (
-                <GenerationProgress
-                  generationStatus={genStatus ?? generationStatus}
-                  generationProgress={genProgress || generationProgress}
-                  onCancel={handleCancelGeneration}
-                />
+                <div className="flex-1 flex flex-col justify-center items-center">
+                  <GenerationProgress
+                    generationStatus={genStatus ?? generationStatus}
+                    generationProgress={genProgress || generationProgress}
+                    onCancel={handleCancelGeneration}
+                  />
+                </div>
               ) : (
                 /* Form Input State */
                 <>
-                  {/* Compact Quota UI */}
-                  {user && (
-                    <div className="flex items-center justify-between gap-3 p-3 rounded-xl bg-gradient-to-r from-purple-50/80 to-indigo-50/80 dark:from-purple-950/30 dark:to-indigo-950/30 border border-purple-100 dark:border-purple-800 mb-6">
-                      <div className="flex items-center gap-2">
-                        <Sparkles className="w-4 h-4 text-purple-500" />
-                        <span className="text-xs font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wide">
-                          {t("quizGenerator.quota.usage")}
-                        </span>
-                      </div>
-                      {hasApiKey ? (
-                        <div className="flex items-center gap-1.5 text-sm font-bold text-emerald-600 dark:text-emerald-400">
-                          <Zap className="w-4 h-4" />
-                          {t("quizGenerator.quota.unlimited")}
-                        </div>
-                      ) : (
-                        <div className="flex items-center gap-2">
-                          <div className="w-16 h-2 bg-white/60 dark:bg-black/30 rounded-full overflow-hidden border border-purple-100 dark:border-purple-800">
-                            <div
-                              className={cn(
-                                "h-full rounded-full transition-all",
-                                userRemaining === 0
-                                  ? "bg-red-400"
-                                  : userRemaining === 1
-                                    ? "bg-orange-400"
-                                    : "bg-gradient-to-r from-purple-400 to-indigo-500"
-                              )}
-                              style={{ width: `${Math.min(100, (userRemaining / userLimit) * 100)}%` }}
-                            />
-                          </div>
-                          <span className="text-sm font-bold text-purple-700 dark:text-purple-300">
-                            {userRemaining}/{userLimit}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  )}
+                  <div className="flex flex-col items-center justify-center h-full py-12 md:py-20 space-y-12 relative w-full">
 
-                  {/* Topic Input Section */}
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                      <label
-                        htmlFor="quiz-topic"
-                        className="text-base md:text-lg font-heading font-bold text-foreground">
-                        {t('quizGenerator.ui.topicLabel')}
-                      </label>
-                      <Badge variant="secondary" className="rounded-lg px-2 py-0.5 text-xs font-bold border-2 border-border">
-                        {t('quizGenerator.ui.required')}
-                      </Badge>
-                    </div>
-                    <div className="relative group">
-                      <Textarea
-                        id="quiz-topic"
-                        placeholder={t('quizGenerator.ui.examplePlaceholder')}
-                        value={prompt}
-                        onChange={(e) => setPrompt(e.target.value)}
-                        className={`min-h-[140px] md:min-h-[160px] resize-none p-4 md:p-6 rounded-2xl border-4 shadow-sm transition-all text-base md:text-lg leading-relaxed ${promptError
-                          ? "border-destructive/50 focus-visible:ring-destructive/20 focus-visible:border-destructive"
-                          : isPromptValid
-                            ? "border-primary/50 focus-visible:ring-primary/20 focus-visible:border-primary bg-primary/5"
-                            : "border-border hover:border-primary/50 focus-visible:ring-primary/20 focus-visible:border-primary"
-                          }`}
+                    {/* Mascot / Visual */}
+                    <div className="relative group cursor-pointer scale-125" onClick={handleToggleChill}>
+                      <div className="absolute inset-0 bg-green-400/20 blur-[60px] rounded-full animate-pulse" />
+                      <img
+                        src={logo}
+                        alt="Mascot"
+                        className={cn(
+                          "w-32 h-32 md:w-40 md:h-40 object-contain relative z-10 drop-shadow-2xl transition-transform duration-500",
+                          isChillPlaying ? "animate-bounce-slow" : "hover:scale-110"
+                        )}
                       />
-                      {/* Character count floating inside */}
-                      <div className="absolute bottom-4 right-4 text-xs font-medium text-muted-foreground bg-white/80 px-2 py-1 rounded-md backdrop-blur-sm border border-border/50">
-                        {prompt.trim().length}/500
+                      {/* Music Indicator Mini Badge */}
+                      <div className="absolute bottom-0 right-0 bg-white rounded-full p-2 shadow-lg border border-slate-100">
+                        {isChillPlaying ? <Music4 className="w-4 h-4 text-green-500 animate-spin-slow" /> : <Play className="w-4 h-4 text-slate-400" />}
                       </div>
                     </div>
-
-                    <div className="min-h-[20px]">
-                      <div className="flex items-center gap-2">
-                        {promptError && (
-                          <span className="text-destructive font-medium flex items-center gap-1.5 text-sm animate-in slide-in-from-left-2 fade-in duration-300">
-                            <XCircle className="w-4 h-4" />
-                            <span>{promptError}</span>
-                          </span>
-                        )}
-                        {isPromptValid && !promptError && (
-                          <span className="text-primary font-medium flex items-center gap-1.5 text-sm animate-in slide-in-from-left-2 fade-in duration-300">
-                            <Sparkles className="w-4 h-4" />
-                            {t('quizGenerator.ui.validPrompt')}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Divider */}
-                  <div className="relative py-2">
-                    <div className="absolute inset-0 flex items-center">
-                      <div className="w-full border-t-2 border-dashed border-border/60"></div>
-                    </div>
-                    <div className="relative flex justify-center text-xs font-medium uppercase tracking-wider text-muted-foreground/70">
-                      <span className="bg-white/80 backdrop-blur-sm px-4 py-1.5 rounded-full border-2 border-border/50 flex items-center gap-2">
-                        <Sparkles className="w-3 h-3 text-primary" />
-                        {t('quizGenerator.ui.optional')}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Question Count Selection */}
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                      <label
-                        htmlFor="question-count"
-                        className="text-lg font-heading font-bold text-foreground">
-                        {t('quizGenerator.ui.questionCount')}
-                      </label>
-                      <Badge variant="secondary" className="rounded-lg px-2 py-0.5 text-xs font-bold border-2 border-border">
-                        {t('quizGenerator.ui.required')}
-                      </Badge>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-                      <Select
-                        value={questionCount}
-                        onValueChange={(value) => {
-                          setQuestionCount(value);
-                          setIsQuestionCountSelected(true);
-                        }}>
-                        <SelectTrigger
-                          id="question-count"
-                          className="w-full h-14 rounded-2xl border-4 text-base px-4 font-medium transition-all hover:border-primary/50 focus:ring-primary/20 bg-background text-foreground shadow-sm">
-                          <SelectValue placeholder={t('quizGenerator.ui.selectPlaceholder')} />
-                        </SelectTrigger>
-                        <SelectContent className="rounded-xl border-2">
-                          <SelectItem value="10" className="rounded-lg my-1 py-3 cursor-pointer">{t('quizGenerator.ui.10questions')}</SelectItem>
-                          <SelectItem value="15" className="rounded-lg my-1 py-3 cursor-pointer">{t('quizGenerator.ui.15questions')}</SelectItem>
-                          <SelectItem value="20" className="rounded-lg my-1 py-3 cursor-pointer">{t('quizGenerator.ui.20questions')}</SelectItem>
-                          <SelectItem value="25" className="rounded-lg my-1 py-3 cursor-pointer">{t('quizGenerator.ui.25questions')}</SelectItem>
-                          <SelectItem value="30" className="rounded-lg my-1 py-3 cursor-pointer">{t('quizGenerator.ui.30questions')}</SelectItem>
-                        </SelectContent>
-                      </Select>
-
-                      <div className="flex items-center gap-3 p-3 rounded-2xl bg-secondary/30 border border-secondary text-muted-foreground">
-                        <Clock className="w-5 h-5 text-primary" />
-                        <p className="text-sm font-medium">
-                          {t('quizGenerator.ui.estimatedTime')}{" "}
-                          <span className="text-foreground font-bold">
-                            {questionCount
-                              ? Math.ceil(parseInt(questionCount) / 10)
-                              : 2}
-                            -
-                            {questionCount
-                              ? Math.ceil(parseInt(questionCount) / 5)
-                              : 4}{" "}
-                          </span>
-                          {t('quizGenerator.ui.minutes')}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Main Action Button */}
-                  <div className="pt-4">
-                    <Button
-                      data-fast-hover
-                      onClick={handleGenerateClick}
-                      disabled={loading || !isPromptValid || !isQuestionCountSelected}
-                      className="w-full h-14 sm:h-16 text-lg sm:text-xl rounded-3xl shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 bg-primary text-white font-heading relative overflow-hidden group border-4 border-primary hover:border-primary-foreground/20 active:scale-95"
-                      variant="hero"
-                      size="xl"
-                    >
-                      {loading ? (
-                        <>
-                          <Loader2 className="mr-3 h-6 w-6 animate-spin" />
-                          {loadingMessage}
-                        </>
+                    {/* Music hint text */}
+                    <p className="text-sm text-slate-400 font-medium -mt-6 opacity-70 hover:opacity-100 transition-opacity cursor-pointer flex items-center gap-2" onClick={handleToggleChill}>
+                      {isChillPlaying ? (
+                        <><Music4 className="w-4 h-4 text-green-500" /> {t('quizGenerator.ui.musicPlaying', 'Đang phát nhạc...')}</>
                       ) : (
-                        <>
-                          <Sparkles className="w-6 h-6 mr-2" />
-                          {isPromptValid && isQuestionCountSelected
-                            ? t('quizGenerator.createButton')
-                            : t('quizGenerator.ui.fillAllFields')}
-                          {isPromptValid && isQuestionCountSelected && (
-                            <div className="bg-white/20 p-1.5 rounded-lg ml-3 group-hover:rotate-12 transition-transform">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="w-5 h-5 text-white"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth="3"
-                                  d="M14 5l7 7m0 0l-7 7m7-7H3"
+                        <><Play className="w-4 h-4" /> {t('quizGenerator.ui.musicHint', 'Nhấn vào mèo để phát nhạc')}</>
+                      )}
+                    </p>
+
+                    {/* Greeting Text */}
+                    <div className="text-center space-y-4 max-w-2xl mx-auto z-10 px-4">
+                      <h3 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight">
+                        {t('quizGenerator.ui.greeting', 'Làm chủ kiến thức ngay hôm nay.')}
+                      </h3>
+                      <p className="text-slate-500 font-medium text-lg md:text-xl">
+                        {t('quizGenerator.ui.greetingSub', 'Nhập chủ đề bất kỳ để tạo bài kiểm tra trong tích tắc.')}
+                      </p>
+                    </div>
+
+                    {/* Main Input Pill */}
+                    <div className="w-full max-w-5xl mx-auto z-20 px-4">
+                      <div className={cn(
+                        "flex items-center gap-2 p-2 pl-2 rounded-[2rem] md:rounded-[3rem] bg-white shadow-[0_10px_40px_-15px_rgba(0,0,0,0.1)] border-2 transition-all duration-300 transform w-full",
+                        isPromptValid
+                          ? "border-green-200 ring-4 ring-green-50/50 shadow-green-100 hover:shadow-green-200"
+                          : "border-slate-100 hover:border-slate-200 hover:shadow-lg focus-within:border-orange-200 focus-within:ring-4 focus-within:ring-orange-50/50"
+                      )}>
+                        {/* Settings (Question Count) */}
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              className={cn(
+                                "h-11 md:h-12 px-2 md:pl-2 md:pr-5 rounded-full shrink-0 font-extrabold transition-all duration-300 gap-1.5 md:gap-2 border-2",
+                                isQuestionCountSelected
+                                  ? "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100 hover:border-amber-300 shadow-sm"
+                                  : "bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100 hover:border-slate-300"
+                              )}
+                            >
+                              {isQuestionCountSelected ? (
+                                <>
+                                  <div className={cn(
+                                    "flex items-center justify-center w-8 h-8 md:w-9 md:h-9 rounded-full shadow-sm border",
+                                    "bg-white border-amber-100 text-amber-600"
+                                  )}>
+                                    <span className="text-sm md:text-base font-black">{questionCount}</span>
+                                  </div>
+                                  <span className="hidden md:inline text-xs uppercase tracking-wide font-bold">{t('quizGenerator.ui.questions', 'Câu')}</span>
+                                </>
+                              ) : (
+                                <>
+                                  <div className="flex items-center justify-center w-8 h-8 md:w-9 md:h-9 rounded-full bg-white shadow-sm border border-slate-200">
+                                    <Layers className="w-4 h-4 md:w-5 md:h-5 text-slate-400" />
+                                  </div>
+                                  <span className="hidden md:inline text-xs font-bold">{t('quizGenerator.ui.selectQuestionCountShort', 'Số câu')}</span>
+                                </>
+                              )}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-80 p-5 rounded-2xl shadow-xl border-slate-100" align="start" side="top" sideOffset={10}>
+                            <div className="space-y-4">
+                              <div className="flex items-center gap-2">
+                                <div className="p-2 bg-green-100 rounded-lg">
+                                  <Target className="w-4 h-4 text-green-600" />
+                                </div>
+                                <h4 className="font-bold text-slate-900">{t('quizGenerator.ui.questionCount')}</h4>
+                              </div>
+                              <p className="text-xs text-slate-500">{t('quizGenerator.ui.selectQuestionCountDesc', 'Chọn số lượng câu hỏi cho bài kiểm tra của bạn.')}</p>
+                              <div className="grid grid-cols-5 gap-2">
+                                {['10', '15', '20', '25', '30'].map(count => (
+                                  <button
+                                    key={count}
+                                    onClick={() => { setQuestionCount(count); setIsQuestionCountSelected(true); }}
+                                    className={cn(
+                                      "h-10 rounded-xl text-sm font-bold transition-all border-2",
+                                      questionCount === count
+                                        ? "bg-green-500 text-white border-green-500 shadow-lg shadow-green-500/30 scale-105"
+                                        : "bg-white text-slate-600 border-slate-100 hover:border-green-200 hover:bg-green-50 hover:text-green-700"
+                                    )}
+                                  >
+                                    {count}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          </PopoverContent>
+                        </Popover>
+
+                        {/* Input Field */}
+                        <div className="flex-1 px-4 flex items-center">
+                          <Textarea
+                            value={prompt}
+                            onChange={(e) => setPrompt(e.target.value)}
+                            placeholder={t('quizGenerator.ui.inputPlaceholder', 'Nhập chủ đề...')}
+                            className="min-h-[32px] max-h-[200px] w-full bg-transparent !border-0 !border-transparent !shadow-none !ring-0 !ring-offset-0 focus-visible:!ring-0 focus-visible:!ring-offset-0 focus:!ring-0 focus:!border-0 focus:!outline-none !outline-none resize-none text-2xl placeholder:text-slate-300 font-medium leading-relaxed p-0"
+                            rows={1}
+                            onInput={(e) => {
+                              // Auto-grow hack
+                              const target = e.target as HTMLTextAreaElement;
+                              target.style.height = 'auto';
+                              target.style.height = `${target.scrollHeight}px`;
+                            }}
+                          />
+                        </div>
+
+                        {/* Generate Button */}
+                        <Button
+                          onClick={handleGenerateClick}
+                          disabled={loading || !isPromptValid || !isQuestionCountSelected}
+                          size="icon"
+                          className={cn(
+                            "h-11 w-11 md:h-12 md:w-12 rounded-full shrink-0 transition-all duration-300 shadow-md flex items-center justify-center",
+                            isPromptValid && isQuestionCountSelected
+                              ? "bg-gradient-to-tr from-green-400 to-green-600 text-white shadow-green-500/30 hover:shadow-green-500/50 hover:scale-105 active:scale-95"
+                              : "bg-slate-200 text-slate-400 cursor-not-allowed"
+                          )}
+                        >
+                          {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <ArrowUp className="w-5 h-5 md:w-6 md:h-6 rotate-90" />}
+                        </Button>
+                      </div>
+
+                      {/* Validation Hint Message if valid but no count selected */}
+                      <div className="absolute top-full left-0 w-full flex justify-center mt-6">
+                        {(!isQuestionCountSelected && prompt.length > 3 && !promptError) && (
+                          <div className="flex items-center gap-2 bg-orange-100 text-orange-700 px-6 py-3 rounded-full text-base font-bold animate-bounce-slow shadow-xl border-2 border-orange-200 relative z-30">
+                            <ArrowUp className="w-5 h-5 -rotate-90" />
+                            <span>{t('quizGenerator.ui.selectQuestionCountHint', 'Chọn số lượng câu hỏi ở nút "Số câu"')}</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Quota Bar (Subtle) */}
+                      {user && (
+                        <div className="mt-12 flex justify-center opacity-80 hover:opacity-100 transition-opacity">
+                          {hasApiKey ? (
+                            <div className="bg-white/90 backdrop-blur-md rounded-full px-5 py-2.5 flex items-center gap-3 border-2 border-orange-100 shadow-[0_4px_20px_rgba(251,146,60,0.2)] hover:scale-105 transition-transform cursor-default scale-110">
+                              <div className="bg-gradient-to-br from-orange-400 to-red-500 rounded-full p-1.5 shadow-inner">
+                                <Zap className="w-4 h-4 text-white fill-white" />
+                              </div>
+                              <span className="text-sm font-black bg-gradient-to-r from-orange-500 to-amber-600 bg-clip-text text-transparent uppercase tracking-wider pr-2">UNLIMITED PLAN</span>
+                            </div>
+                          ) : (
+                            <div className="bg-slate-50 rounded-full px-4 py-1.5 flex items-center gap-3 border border-slate-100">
+                              <span className="text-xs font-bold text-slate-400 uppercase">Daily Limit</span>
+                              <div className="w-20 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                                <div
+                                  className="h-full bg-green-500 rounded-full"
+                                  style={{ width: `${Math.min(100, (userRemaining / userLimit) * 100)}%` }}
                                 />
-                              </svg>
+                              </div>
+                              <span className="text-xs font-bold text-slate-600">{userRemaining}/{userLimit}</span>
                             </div>
                           )}
-                        </>
+                        </div>
                       )}
-                    </Button>
+                    </div>
                   </div>
                 </>
               )}

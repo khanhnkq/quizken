@@ -95,7 +95,7 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
       y: -2,
       scale: 1.04,
       boxShadow: "0 12px 30px rgba(0,0,0,0.45)",
-      duration: 0.18,
+      duration: 0.1,
       ease: "power3.out",
     });
   };
@@ -106,7 +106,7 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
       y: 0,
       scale: 1,
       boxShadow: "0 0 0 rgba(0,0,0,0)",
-      duration: 0.22,
+      duration: 0.15,
       ease: "power3.inOut",
     });
   };
@@ -256,6 +256,19 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
                   <span className="mr-2">English Hub</span>
                   <div className="bg-white/20 p-1.5 rounded-xl group-hover:rotate-12 transition-transform">
                     <BookOpenIcon className="w-6 h-6 text-white" />
+                  </div>
+                </Button>
+
+                <Button
+                  onClick={() => navigate('/english/notebook')}
+                  size="xl"
+                  variant="hero"
+                  className="group rounded-3xl shadow-xl border-4 border-amber-400 hover:border-amber-300 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-heading text-lg px-8 py-6 h-auto transition-all duration-200 active:scale-95"
+                  onMouseEnter={handleHoverEnter}
+                  onMouseLeave={handleHoverLeave}>
+                  <span className="mr-2">{t('dashboard.notebook.title', 'Sổ tay')}</span>
+                  <div className="bg-white/20 p-1.5 rounded-xl group-hover:rotate-12 transition-transform">
+                    <BookOpen className="w-6 h-6 text-white" />
                   </div>
                 </Button>
               </div>

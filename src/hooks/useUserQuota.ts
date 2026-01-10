@@ -27,8 +27,6 @@ export function useUserQuota(userId?: string) {
                 supabase
                     .from("user_api_keys")
                     .select("id", { count: "exact", head: true })
-                    .eq("user_id", userId)
-                    .eq("provider", "gemini")
                     .eq("is_active", true)
             ]);
 
@@ -37,6 +35,10 @@ export function useUserQuota(userId?: string) {
                 if (quotaResult.error.code !== "PGRST116") {
                     console.error("Error fetching quota:", quotaResult.error);
                 }
+            }
+
+            if (apiKeyResult.error) {
+                console.error("Error fetching API keys:", apiKeyResult.error);
             }
 
             return {

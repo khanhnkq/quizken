@@ -39,7 +39,7 @@ export function EnglishStatsCard() {
     }, [isLessonCompleted, lessonScores]);
 
     return (
-        <Card className="rounded-[2.5rem] border-4 border-blue-200 bg-blue-100 transform transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] hover:shadow-xl rotate-[1deg] hover:rotate-0 cursor-default group overflow-hidden relative">
+        <Card className="rounded-[2.5rem] border-4 border-blue-200 bg-blue-100 transform transition-all duration-200 hover:-translate-y-2 hover:scale-[1.02] hover:shadow-xl cursor-default group overflow-hidden relative">
             {/* Background Decor */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-white/30 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
             <div className="absolute bottom-0 left-0 w-24 h-24 bg-blue-200/50 rounded-full blur-xl -ml-6 -mb-6 pointer-events-none"></div>
@@ -93,8 +93,8 @@ export function EnglishStatsCard() {
                                 <div
                                     key={index}
                                     className={`w-3 h-3 rounded-sm transition-all ${isActive
-                                            ? 'bg-gradient-to-br from-emerald-400 to-green-500 shadow-sm'
-                                            : 'bg-slate-200'
+                                        ? 'bg-gradient-to-br from-emerald-400 to-green-500 shadow-sm'
+                                        : 'bg-slate-200'
                                         }`}
                                 />
                             ))}

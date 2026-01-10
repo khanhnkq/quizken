@@ -1,13 +1,14 @@
-import { useEffect, useRef, lazy, Suspense } from "react";
+import { useEffect, useRef, lazy, Suspense, useLayoutEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
-import Hero from "@/components/sections/Hero";
+import HomeHero from "@/components/sections/HomeHero";
 import QuizGenerator from "@/components/quiz/QuizGenerator";
 import Footer from "@/components/layout/Footer";
 import SeoMeta from "@/components/SeoMeta";
 import { shouldDisableScrollSmoother } from "@/utils/deviceDetection";
 import { generateHomepageSchema } from "@/lib/seoSchemas";
 import { ComponentSkeleton } from "@/components/ui/loading-skeleton";
+import { gsap } from "gsap";
 
 // Lazy load heavy components
 const Features = lazy(() => import("@/components/sections/Features"));
@@ -16,6 +17,81 @@ const Index = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const hasScrolled = useRef(false);
+  const mainRef = useRef<HTMLDivElement>(null);
+
+  // Entry Animations
+  useLayoutEffect(() => {
+    const ctx = gsap.context(() => {
+      // Navbar (if not already animated globally, but good to reinforce)
+      gsap.from("nav", {
+        y: -100,
+        opacity: 0,
+        duration: 1,
+        ease: "power3.out",
+        delay: 0.2
+      });
+
+      // Hero Section Elements
+      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+
+      tl.from(".hero-badge", {
+        y: 20,
+        opacity: 0,
+        duration: 0.6,
+      })
+        .from(".hero-title", {
+          y: 50,
+          opacity: 0,
+          duration: 0.8,
+          stagger: 0.1,
+        }, "-=0.4")
+        .from(".hero-description", {
+          y: 30,
+          opacity: 0,
+          duration: 0.8,
+        }, "-=0.6")
+        .from(".hero-input", {
+          scale: 0.9,
+          opacity: 0,
+          duration: 0.6,
+          ease: "back.out(1.7)",
+        }, "-=0.4")
+        .from(".hero-floating-icon", {
+          scale: 0,
+          opacity: 0,
+          duration: 0.8,
+          stagger: 0.1,
+          ease: "elastic.out(1, 0.5)",
+        }, "-=0.4");
+
+      // Quiz Generator Section
+      gsap.from(".quiz-generator-section", {
+        scrollTrigger: {
+          trigger: ".quiz-generator-section",
+          start: "top 80%",
+        },
+        y: 50,
+        opacity: 0,
+        duration: 0.8,
+        ease: "power3.out",
+      });
+
+      // Features Section
+      gsap.from(".features-section", {
+        scrollTrigger: {
+          trigger: ".features-section",
+          start: "top 80%",
+        },
+        y: 50,
+        opacity: 0,
+        duration: 0.8,
+        ease: "power3.out",
+      });
+
+    }, mainRef);
+
+    return () => ctx.revert();
+  }, []);
 
   useEffect(() => {
     // Check if we need to scroll to quiz section
@@ -83,14 +159,13 @@ const Index = () => {
         fallbackScroll();
 
         function fallbackScroll() {
+          if (!quizElement) return;
           // Get element position relative to document
           const rect = quizElement.getBoundingClientRect();
-          const scrollTop =
-            window.pageYOffset || document.documentElement.scrollTop;
+          const scrollTop = window.scrollY ?? document.documentElement.scrollTop;
           const elementTop = rect.top + scrollTop;
-          const headerHeight =
-            (document.querySelector("nav") as HTMLElement | null)
-              ?.clientHeight ?? 64;
+          const nav = document.querySelector("nav");
+          const headerHeight = nav ? nav.clientHeight : 64;
           const marginCompensation = 8;
           const offset = headerHeight + marginCompensation;
           const targetY = elementTop - offset;
@@ -154,14 +229,18 @@ const Index = () => {
       />
       {/* Navbar outside ScrollSmoother for proper sticky behavior */}
       <Navbar />
-      <div className="min-h-screen pt-16" id="smooth-wrapper">
+      <div ref={mainRef} className="min-h-screen pt-0" id="smooth-wrapper">
         <div id="smooth-content">
-          <Hero />
-          <QuizGenerator />
+          <HomeHero />
+          <div className="quiz-generator-section">
+            <QuizGenerator />
+          </div>
 
           {/* Lazy load heavy components with Intersection Observer */}
           <Suspense fallback={<ComponentSkeleton className="py-16" />}>
-            <Features />
+            <div className="features-section">
+              <Features />
+            </div>
           </Suspense>
 
           <Footer />

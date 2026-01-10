@@ -92,6 +92,7 @@ export const FileDownAlt = L.FileDown;
 export const RefreshCw = L.RefreshCw;
 export const Store = L.Store;
 export const Package = L.Package;
+export const Headphones = L.Headphones;
 
 export const TrendingUp = L.TrendingUp;
 

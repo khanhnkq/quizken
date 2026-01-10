@@ -247,7 +247,16 @@
             "validPrompt": "Ready to generate",
             "minutes": "minutes",
             "playMusic": "Play chill music",
-            "pauseMusic": "Pause music"
+            "pauseMusic": "Pause music",
+            "musicHint": "Click the cat to play music",
+            "musicPlaying": "Playing music...",
+            "greeting": "Master knowledge today.",
+            "greetingSub": "Enter any topic to create a quiz instantly.",
+            "inputPlaceholder": "Enter a topic...",
+            "questions": "Questions",
+            "selectQuestionCountShort": "Count",
+            "selectQuestionCountDesc": "Choose the number of questions for your quiz.",
+            "selectQuestionCountHint": "Select question count using the \"Count\" button"
         },
         "flashcard": {
             "loading": "Loading flashcards...",
@@ -499,6 +508,10 @@
             "exchange": "Shop",
             "inventory": "Inventory",
             "settings": "Settings"
+        },
+        "notebook": {
+            "title": "My Notebook",
+            "description": "Review your saved vocabulary"
         },
         "settings": {
             "title": "API Settings",
@@ -872,12 +885,38 @@
         "gems": "Gems",
         "back": "Back",
         "comingSoon": "More Coming Soon",
+        "last7Days": "Last 7 days",
+        "daysAgo": "{{count}} days ago",
+        "dayStreak": "Day Streak",
+        "daysStreak": "Days Streak",
+        "notebook": "Notebook",
         "phase1": {
             "back": "Back to Roadmap",
             "title": "Essential Vocabulary Topics",
             "subtitle": "Select a topic to start building your foundation.",
             "words": "words",
-            "vocabTitle": "{{topic}} Vocabulary"
+            "vocabTitle": "{{topic}} Vocabulary",
+            "tabs": {
+                "cefr": "CEFR",
+                "toeic": "TOEIC",
+                "topic": "TOPIC"
+            },
+            "headers": {
+                "cefr": "CEFR Levels",
+                "toeic": "TOEIC Topics",
+                "topic": "Topic Vocabulary"
+            },
+            "actions": {
+                "locked": "Locked",
+                "start": "Start",
+                "done": "Done",
+                "skip": "Test Out / Skip Level",
+                "skipConfirm": "Skip {{level}}?"
+            },
+            "common": {
+                "lessons": "Lessons",
+                "selectLevel": "Select Level..."
+            }
         },
         "study": {
             "tapToFlip": "Tap to Flip",
@@ -893,6 +932,8 @@
         "notebook": {
             "title": "My Notebook",
             "subtitle": "Your personal collection of words to review.",
+            "badge": "Vocabulary Collection",
+            "wordsCount": "words",
             "searchPlaceholder": "Search your notebook...",
             "emptyTitle": "Notebook is empty",
             "emptyDesc": "Pin words from your flashcards to see them here.",

@@ -250,7 +250,16 @@
             "validPrompt": "Đủ điều kiện",
             "minutes": "phút",
             "playMusic": "Phát nhạc chill",
-            "pauseMusic": "Tạm dừng nhạc"
+            "pauseMusic": "Tạm dừng nhạc",
+            "musicHint": "Nhấn vào mèo để phát nhạc",
+            "musicPlaying": "Đang phát nhạc...",
+            "greeting": "Làm chủ kiến thức ngay hôm nay.",
+            "greetingSub": "Nhập chủ đề bất kỳ để tạo bài kiểm tra trong tích tắc.",
+            "inputPlaceholder": "Nhập chủ đề...",
+            "questions": "Câu",
+            "selectQuestionCountShort": "Số câu",
+            "selectQuestionCountDesc": "Chọn số lượng câu hỏi cho bài kiểm tra của bạn.",
+            "selectQuestionCountHint": "Chọn số lượng câu hỏi ở nút \"Số câu\""
         },
         "flashcard": {
             "loading": "Đang tải flashcards...",
@@ -502,6 +511,10 @@
             "exchange": "Cửa hàng",
             "inventory": "Kho đồ",
             "settings": "Cài đặt"
+        },
+        "notebook": {
+            "title": "Sổ tay",
+            "description": "Xem lại từ vựng đã lưu"
         },
         "settings": {
             "title": "Cài đặt API",
@@ -875,12 +888,38 @@
         "gems": "Đá Quý",
         "back": "Quay Lại",
         "comingSoon": "Sắp Ra Mắt Thêm",
+        "last7Days": "7 ngày qua",
+        "daysAgo": "{{count}} ngày trước",
+        "dayStreak": "Ngày Chuỗi",
+        "daysStreak": "Ngày Chuỗi",
+        "notebook": "Sổ tay",
         "phase1": {
             "back": "Quay Lại Lộ Trình",
             "title": "Chủ Đề Từ Vựng Cốt Lõi",
             "subtitle": "Chọn một chủ đề để bắt đầu xây dựng nền tảng.",
             "words": "từ",
-            "vocabTitle": "Từ Vựng {{topic}}"
+            "vocabTitle": "Từ Vựng {{topic}}",
+            "tabs": {
+                "cefr": "CEFR",
+                "toeic": "TOEIC",
+                "topic": "CHỦ ĐỀ"
+            },
+            "headers": {
+                "cefr": "Cấp Độ CEFR",
+                "toeic": "Chủ Đề TOEIC",
+                "topic": "Từ Vựng Theo Chủ Đề"
+            },
+            "actions": {
+                "locked": "Đã Khóa",
+                "start": "Bắt Đầu",
+                "done": "Hoàn Thành",
+                "skip": "Thi Vượt Cấp / Bỏ Qua",
+                "skipConfirm": "Bỏ qua {{level}}?"
+            },
+            "common": {
+                "lessons": "Bài Học",
+                "selectLevel": "Chọn Level..."
+            }
         },
         "study": {
             "tapToFlip": "Chạm để Lật",
@@ -896,6 +935,8 @@
         "notebook": {
             "title": "Sổ Tay Từ Vựng",
             "subtitle": "Bộ sưu tập từ vựng cá nhân để ôn tập.",
+            "badge": "Bộ Sưu Tập",
+            "wordsCount": "từ",
             "searchPlaceholder": "Tìm kiếm trong sổ tay...",
             "emptyTitle": "Sổ tay trống",
             "emptyDesc": "Ghim từ vựng từ flashcard để xem tại đây.",

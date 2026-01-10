@@ -98,7 +98,7 @@ export function StatisticsCards({
             key={index}
             className={`
               rounded-[2.5rem] border-4 ${card.borderColor} ${card.bgColor}
-              transform transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] hover:shadow-xl hover:rotate-0
+              transform transition-all duration-200 hover:-translate-y-2 hover:scale-[1.02] hover:shadow-xl hover:rotate-0
               ${card.rotate} cursor-default group overflow-hidden relative
             `}
           >

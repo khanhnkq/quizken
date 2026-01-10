@@ -6,10 +6,13 @@ import { killActiveScroll, scrollToTarget } from "@/lib/scroll";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { shouldReduceAnimations } from "@/utils/deviceDetection";
+import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Hero = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const scrollToGenerator = async () => {
     // Chuẩn hóa cuộn bằng tiện ích thống nhất, ưu tiên ScrollSmoother nếu khả dụng
     killActiveScroll();
@@ -160,10 +163,16 @@ const Hero = () => {
             <Button
               variant="hero"
               size="xl"
-              className="group text-lg px-8 py-6 rounded-3xl shadow-xl border-4 border-primary hover:border-primary-foreground/50 active:scale-95 transition-all duration-200 font-heading bg-primary text-white w-full sm:w-auto"
+              className={cn(
+                "group text-lg px-8 py-6 rounded-3xl shadow-xl border-4 border-primary active:scale-95 transition-all duration-200 font-heading bg-primary text-white w-full sm:w-auto",
+                !isMobile && "hover:border-primary-foreground/50 hover:bg-primary/90"
+              )}
               onClick={scrollToGenerator}>
               {t("hero.createQuizButton")}
-              <div className="bg-white/20 p-1.5 rounded-xl ml-2 group-hover:rotate-12 transition-transform">
+              <div className={cn(
+                "bg-white/20 p-1.5 rounded-xl ml-2 transition-transform",
+                !isMobile && "group-hover:rotate-12"
+              )}>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="w-5 h-5 text-white"
@@ -182,7 +191,10 @@ const Hero = () => {
             <Button
               variant="outline"
               size="xl"
-              className="text-lg px-8 py-6 rounded-3xl border-4 border-border hover:border-primary/50 hover:bg-secondary hover:text-secondary-foreground active:scale-95 transition-all duration-200 font-heading w-full sm:w-auto"
+              className={cn(
+                "text-lg px-8 py-6 rounded-3xl border-4 border-border active:scale-95 transition-all duration-200 font-heading w-full sm:w-auto",
+                !isMobile && "hover:border-primary/50 hover:bg-secondary hover:text-secondary-foreground"
+              )}
               onClick={() => navigate("/quiz/library")}>
               {t("hero.viewExamplesButton")}
             </Button>

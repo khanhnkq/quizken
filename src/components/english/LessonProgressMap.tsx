@@ -1,7 +1,7 @@
 import React from 'react';
-import { BookOpen, HelpCircle, PenTool, CheckCircle, Lock } from 'lucide-react';
+import { BookOpen, HelpCircle, Headphones, CheckCircle, Lock } from 'lucide-react';
 
-export type LessonStep = 'learn' | 'quiz' | 'practice';
+export type LessonStep = 'learn' | 'quiz' | 'listening';
 
 interface LessonProgressMapProps {
     currentStep: LessonStep;
@@ -13,7 +13,7 @@ interface LessonProgressMapProps {
 const STEPS: { id: LessonStep; label: string; icon: React.FC<any> }[] = [
     { id: 'learn', label: 'Vocabulary', icon: BookOpen },
     { id: 'quiz', label: 'Mini Quiz', icon: HelpCircle },
-    { id: 'practice', label: 'Practice', icon: PenTool },
+    { id: 'listening', label: 'Listening', icon: Headphones },
 ];
 
 const LessonProgressMap: React.FC<LessonProgressMapProps> = ({ currentStep, completedSteps, onNavigate, topic }) => {

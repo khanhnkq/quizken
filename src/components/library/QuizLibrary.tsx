@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef, useLayoutEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { BackgroundDecorations } from "@/components/ui/BackgroundDecorations";
 import { useAuth } from "@/lib/auth";
@@ -79,6 +79,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { PreviewModal } from "@/components/quiz/PreviewModal";
+import { gsap } from "gsap";
 
 interface PublicQuiz {
   id: string;
@@ -114,6 +115,7 @@ const QuizLibrary: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [previewQuiz, setPreviewQuiz] = useState<Quiz | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const [sortBy, setSortBy] = useState<"usage" | "downloads" | "date">("usage");
   const [searchIn, setSearchIn] = useState<"all" | "title" | "content">("all");
@@ -123,6 +125,57 @@ const QuizLibrary: React.FC = () => {
   // Scroll to top on mount
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
+  }, []);
+
+  // Entry Animations with GSAP
+  useLayoutEffect(() => {
+    const ctx = gsap.context(() => {
+      // Hero content
+      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+
+      tl.from(".hero-badge", {
+        y: 20,
+        opacity: 0,
+        duration: 0.6,
+        delay: 0.1,
+      })
+        .from(".hero-title", {
+          y: 40,
+          opacity: 0,
+          duration: 0.8,
+        }, "-=0.4")
+        .from(".hero-desc", {
+          y: 20,
+          opacity: 0,
+          duration: 0.8,
+        }, "-=0.6");
+
+      // Stats Cards Stagger
+      gsap.fromTo(".stats-card",
+        { y: 50, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.6,
+          stagger: 0.15,
+          ease: "back.out(1.2)",
+          delay: 0.4,
+          clearProps: "transform" // Optional: clear transform after animation to avoid conflicts with hover effects
+        }
+      );
+
+      // Search & Filters Slide In
+      gsap.from(".search-filter-section", {
+        y: 30,
+        opacity: 0,
+        duration: 0.8,
+        ease: "power2.out",
+        delay: 0.6,
+      });
+
+    }, containerRef);
+
+    return () => ctx.revert();
   }, []);
 
   // All available categories from database (fetched once, not affected by filters)
@@ -184,15 +237,15 @@ const QuizLibrary: React.FC = () => {
   // GSAP count up animation refs
   const totalQuizzesRef = useCountUp(totalStats.totalQuizzes, {
     duration: 1.5,
-    delay: 0.1,
+    delay: 0.8, // Increased delay to match entry animation
   });
   const totalCategoriesRef = useCountUp(totalStats.totalCategories, {
     duration: 1.5,
-    delay: 0.3,
+    delay: 1.0,
   });
   const totalCreatorsRef = useCountUp(totalStats.totalCreators, {
     duration: 1.5,
-    delay: 0.5,
+    delay: 1.2,
   });
 
   // Use all categories from database (not affected by current filters)
@@ -302,6 +355,7 @@ const QuizLibrary: React.FC = () => {
         title: t('library.toasts.loadError'),
         description: t('library.toasts.loadDesc'),
         variant: "destructive",
+        duration: 3000,
       });
     } finally {
       setLoading(false);
@@ -396,7 +450,7 @@ const QuizLibrary: React.FC = () => {
       />
       <Navbar />
 
-      <div className="min-h-screen pt-16 relative" id="smooth-wrapper">
+      <div className="min-h-screen pt-16 relative" id="smooth-wrapper" ref={containerRef}>
         <div className="fixed inset-0 z-0 pointer-events-none">
           <BackgroundDecorations density="medium" />
         </div>
@@ -432,12 +486,12 @@ const QuizLibrary: React.FC = () => {
 
             <div className="container mx-auto max-w-4xl text-center relative z-10">
               {/* Badge */}
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary font-medium text-sm animate-fade-in mx-auto mb-8">
+              <div className="hero-badge inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary font-medium text-sm mx-auto mb-8">
                 <span className="text-lg">✨</span>
                 <span>{t('library.hero.badge')}</span>
               </div>
 
-              <h1 className="font-heading text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[1.1] md:leading-tight text-foreground drop-shadow-sm mb-6">
+              <h1 className="hero-title font-heading text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[1.1] md:leading-tight text-foreground drop-shadow-sm mb-6">
                 <span className="relative inline-block">
                   {t('library.hero.titlePart1')}
                   <svg className="absolute -bottom-2 left-0 w-full h-3 text-yellow-300 -z-10" viewBox="0 0 100 10" preserveAspectRatio="none">
@@ -452,7 +506,7 @@ const QuizLibrary: React.FC = () => {
                 </span>
               </h1>
 
-              <p className="text-lg md:text-2xl text-muted-foreground font-medium max-w-2xl mx-auto mb-10 leading-relaxed">
+              <p className="hero-desc text-lg md:text-2xl text-muted-foreground font-medium max-w-2xl mx-auto mb-10 leading-relaxed">
                 {t('library.hero.description')}
               </p>
             </div>
@@ -461,7 +515,10 @@ const QuizLibrary: React.FC = () => {
               {/* Stats - Playful Cards */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6 mb-16">
                 {/* Quizzes Card */}
-                <Card className="rounded-3xl border-4 border-primary/20 bg-gradient-to-br from-green-50 to-white backdrop-blur-md shadow-xl hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 group cursor-pointer overflow-hidden">
+                <Card className={cn(
+                  "stats-card rounded-3xl border-4 border-primary/20 bg-gradient-to-br from-green-50 to-white backdrop-blur-md shadow-xl transition-all duration-300 group cursor-pointer overflow-hidden",
+                  !isMobile && "hover:-translate-y-2 hover:shadow-2xl"
+                )}>
                   <CardContent className="p-6 text-center relative">
                     {/* Floating Icon */}
                     <div className="absolute -top-2 -right-2 p-3 bg-primary/10 rounded-full transform rotate-12 group-hover:rotate-0 group-hover:scale-110 transition-all duration-300">
@@ -479,7 +536,10 @@ const QuizLibrary: React.FC = () => {
                 </Card>
 
                 {/* Topics Card */}
-                <Card className="rounded-3xl border-4 border-purple-200 bg-gradient-to-br from-purple-50 to-white backdrop-blur-md shadow-xl hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 group cursor-pointer overflow-hidden">
+                <Card className={cn(
+                  "stats-card rounded-3xl border-4 border-purple-200 bg-gradient-to-br from-purple-50 to-white backdrop-blur-md shadow-xl transition-all duration-300 group cursor-pointer overflow-hidden",
+                  !isMobile && "hover:-translate-y-2 hover:shadow-2xl"
+                )}>
                   <CardContent className="p-6 text-center relative">
                     {/* Floating Icon */}
                     <div className="absolute -top-2 -right-2 p-3 bg-purple-100 rounded-full transform rotate-12 group-hover:rotate-0 group-hover:scale-110 transition-all duration-300">
@@ -497,7 +557,10 @@ const QuizLibrary: React.FC = () => {
                 </Card>
 
                 {/* Creators Card */}
-                <Card className="rounded-3xl border-4 border-orange-200 bg-gradient-to-br from-orange-50 to-white backdrop-blur-md shadow-xl hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 group cursor-pointer overflow-hidden">
+                <Card className={cn(
+                  "stats-card rounded-3xl border-4 border-orange-200 bg-gradient-to-br from-orange-50 to-white backdrop-blur-md shadow-xl transition-all duration-300 group cursor-pointer overflow-hidden",
+                  !isMobile && "hover:-translate-y-2 hover:shadow-2xl"
+                )}>
                   <CardContent className="p-6 text-center relative">
                     {/* Floating Icon */}
                     <div className="absolute -top-2 -right-2 p-3 bg-orange-100 rounded-full transform rotate-12 group-hover:rotate-0 group-hover:scale-110 transition-all duration-300">
@@ -516,7 +579,7 @@ const QuizLibrary: React.FC = () => {
               </div>
 
               {/* Search & Filters */}
-              <div className="max-w-4xl mx-auto mb-12 space-y-4 relative z-10">
+              <div className="search-filter-section max-w-4xl mx-auto mb-12 space-y-4 relative z-10">
                 {/* Search Bar */}
                 <div className="relative">
                   <Search className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 h-5 w-5 md:h-8 md:w-8 text-primary/40" />
@@ -525,7 +588,10 @@ const QuizLibrary: React.FC = () => {
                     placeholder={t('library.search.placeholder')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-12 pr-12 md:pl-16 md:pr-16 text-base md:text-xl py-4 md:py-8 h-14 md:h-20 rounded-full border-4 border-primary/20 focus:border-primary shadow-xl hover:shadow-2xl transition-all placeholder:text-muted-foreground/50 font-medium"
+                    className={cn(
+                      "pl-12 pr-12 md:pl-16 md:pr-16 text-base md:text-xl py-4 md:py-8 h-14 md:h-20 rounded-full border-4 border-primary/20 focus:border-primary shadow-xl transition-all placeholder:text-muted-foreground/50 font-medium",
+                      !isMobile && "hover:shadow-2xl"
+                    )}
                   />
                   <div className="absolute right-3 top-1/2 -translate-y-1/2">
                     {searchQuery ? (

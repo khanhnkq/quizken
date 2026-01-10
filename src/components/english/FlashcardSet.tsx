@@ -68,14 +68,15 @@ const getTheme = (level: string) => {
     }
 };
 
+import { useVocabulary } from '@/hooks/useVocabulary';
+
 const FlashcardSet = ({ words, title, onClose, onComplete }: FlashcardSetProps) => {
     const { t } = useTranslation();
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isFlipped, setIsFlipped] = useState(false);
-    const [pinnedWords, setPinnedWords] = useState<string[]>(() => {
-        const saved = localStorage.getItem('my_notebook_words');
-        return saved ? JSON.parse(saved) : [];
-    });
+
+    // Use the hook for pinned words
+    const { vocabulary: pinnedWords, toggleWord } = useVocabulary();
 
     const cardRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -112,22 +113,23 @@ const FlashcardSet = ({ words, title, onClose, onComplete }: FlashcardSetProps) 
         gsap.to(e.currentTarget, { scale: 1.2, duration: 0.1, yoyo: true, repeat: 1 });
     };
 
-    const togglePin = (e: React.MouseEvent) => {
+    const togglePin = async (e: React.MouseEvent) => {
         e.stopPropagation();
-        const newPinned = pinnedWords.includes(currentWord.word)
-            ? pinnedWords.filter(w => w !== currentWord.word)
-            : [...pinnedWords, currentWord.word];
 
-        setPinnedWords(newPinned);
-        localStorage.setItem('my_notebook_words', JSON.stringify(newPinned));
+        // Optimistic check for animation purpose (hook handles actual check)
+        const isAdding = !pinnedWords.includes(currentWord.word);
 
-        // Shake animation for pin
-        gsap.fromTo(e.currentTarget, { rotate: -20 }, { rotate: 20, duration: 0.1, yoyo: true, repeat: 3, clearProps: "rotate" });
+        const success = await toggleWord(currentWord.word);
 
-        toast({
-            title: newPinned.includes(currentWord.word) ? "Word Saved!" : "Removed from Notebook",
-            variant: newPinned.includes(currentWord.word) ? "success" : "default"
-        });
+        if (success) {
+            // Shake animation for pin
+            gsap.fromTo(e.currentTarget, { rotate: -20 }, { rotate: 20, duration: 0.1, yoyo: true, repeat: 3, clearProps: "rotate" });
+
+            toast({
+                title: isAdding ? "Word Saved!" : "Removed from Notebook",
+                variant: isAdding ? "default" : "default" // success variant removed as default toast supports standard styles
+            });
+        }
     };
 
     const handleNext = () => {

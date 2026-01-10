@@ -99,7 +99,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         y: -2,
         scale: 1.04,
         boxShadow: "0 12px 30px rgba(0,0,0,0.45)",
-        duration: fast ? 0.12 : 0.18,
+        duration: fast ? 0.08 : 0.1,
         ease: "power3.out",
       });
     };
@@ -112,7 +112,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         y: 0,
         scale: 1,
         boxShadow: "0 0 0 rgba(0,0,0,0)",
-        duration: fast ? 0.16 : 0.22,
+        duration: fast ? 0.1 : 0.15,
         ease: "power3.inOut",
       });
     };
@@ -125,7 +125,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         y: -2,
         scale: 1.04,
         boxShadow: "0 12px 30px rgba(0,0,0,0.45)",
-        duration: fast ? 0.12 : 0.18,
+        duration: fast ? 0.08 : 0.1,
         ease: "power3.out",
       });
     };
@@ -138,7 +138,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         y: 0,
         scale: 1,
         boxShadow: "0 0 0 rgba(0,0,0,0)",
-        duration: fast ? 0.16 : 0.22,
+        duration: fast ? 0.1 : 0.15,
         ease: "power3.inOut",
       });
     };

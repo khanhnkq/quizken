@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { toast } from '@/hooks/use-toast';
-import { ArrowLeft, Lock, CheckCircle, Star, Sparkles, Layout, BookOpen } from 'lucide-react';
+import { ArrowLeft, Lock, CheckCircle, Star, Sparkles, Layout, BookOpen, ChevronLeft, ChevronRight } from 'lucide-react';
 import { SentenceChallenge, SentencePart } from '@/lib/constants/vocabData';
 import {
     VocabWord,
@@ -13,14 +13,31 @@ import {
 } from '@/lib/constants/cefrVocabData';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { CEFR_LEVEL_DATA, CEFRLevelData, CEFRLesson } from '../../../lib/constants/cefrLessons';
 import { TOEIC_DATA } from '../../../lib/constants/toeicData';
+import { TOPIC_DATA } from '../../../lib/constants/topicVocabData';
 import FlashcardSet from '../FlashcardSet';
-import SentenceBuilder from '../SentenceBuilder';
+import ListeningPractice from '../ListeningPractice';
 import { useUserProgress } from '../../../hooks/useUserProgress';
 import MiniQuiz from '../MiniQuiz';
 import LessonProgressMap, { LessonStep } from '../LessonProgressMap';
 import { CEFRBadge } from '../../cefr/CEFRBadge';
+import {
+    Pagination,
+    PaginationContent,
+    PaginationEllipsis,
+    PaginationItem,
+    PaginationLink,
+    PaginationNext,
+    PaginationPrevious,
+} from "@/components/ui/pagination";
 import { GRAMMAR_SENTENCES_A1, GRAMMAR_SENTENCES_A2, GRAMMAR_SENTENCES_B1, GRAMMAR_SENTENCES_B2, GRAMMAR_SENTENCES_C1, GRAMMAR_SENTENCES_C2, GrammarSentence } from '@/lib/constants/grammarSentences';
 
 const LEVEL_GRAMMAR_MAP: Record<string, GrammarSentence[]> = {
@@ -99,9 +116,11 @@ const Phase1View = () => {
     const { isLessonCompleted, completeLesson, getLessonScore, skipLevel, isLevelSkipped } = useUserProgress();
     const [selectedLesson, setSelectedLesson] = useState<CEFRLesson | null>(null);
     const [showQuiz, setShowQuiz] = useState(false);
-    const [showSentenceBuilder, setShowSentenceBuilder] = useState(false);
+    const [showListening, setShowListening] = useState(false);
     const [expandedLevel, setExpandedLevel] = useState<CEFRLevelData | null>(null);
     const [completedSteps, setCompletedSteps] = useState<LessonStep[]>([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const ITEMS_PER_PAGE = 6;
 
     // transform generateChallenges to be stable
 
@@ -117,11 +136,11 @@ const Phase1View = () => {
 
             if (isMainCompleted) {
                 // If main lesson is done, we assume all steps are done/unlocked
-                steps.push('learn', 'quiz', 'practice');
+                steps.push('learn', 'quiz', 'listening');
             } else {
                 if (isLessonCompleted(`${baseKey}-learn`)) steps.push('learn');
                 if (isLessonCompleted(`${baseKey}-quiz`)) steps.push('quiz');
-                if (isLessonCompleted(`${baseKey}-practice`)) steps.push('practice');
+                if (isLessonCompleted(`${baseKey}-listening`)) steps.push('listening');
             }
 
             setCompletedSteps(steps);
@@ -129,13 +148,13 @@ const Phase1View = () => {
             // Determine where to start based on progress
             // If main is completed, we default to showing nothing active (learn view) but fully unlocked map
             if (isMainCompleted) {
-                setShowQuiz(false); setShowSentenceBuilder(false);
+                setShowQuiz(false); setShowListening(false);
             } else if (!steps.includes('learn')) {
-                setShowQuiz(false); setShowSentenceBuilder(false);
+                setShowQuiz(false); setShowListening(false);
             } else if (!steps.includes('quiz')) {
-                setShowQuiz(true); setShowSentenceBuilder(false);
-            } else if (!steps.includes('practice')) {
-                setShowQuiz(false); setShowSentenceBuilder(true);
+                setShowQuiz(true); setShowListening(false);
+            } else if (!steps.includes('listening')) {
+                setShowQuiz(false); setShowListening(true);
             }
         } else {
             setCompletedSteps([]);
@@ -143,11 +162,11 @@ const Phase1View = () => {
     }, [selectedLesson, isLessonCompleted]);
 
     // Determine current step based on state
-    const currentStep: LessonStep = showSentenceBuilder ? 'practice' : showQuiz ? 'quiz' : 'learn';
+    const currentStep: LessonStep = showListening ? 'listening' : showQuiz ? 'quiz' : 'learn';
 
     // transform generateChallenges to be stable
     const practiceChallenges = React.useMemo(() => {
-        if (selectedLesson && currentStep === 'practice') {
+        if (selectedLesson && currentStep === 'listening') {
             return generateChallenges(selectedLesson.level);
         }
         return [];
@@ -156,17 +175,22 @@ const Phase1View = () => {
     const handleNavigate = (step: LessonStep) => {
         if (step === 'learn') {
             setShowQuiz(false);
-            setShowSentenceBuilder(false);
+            setShowListening(false);
         } else if (step === 'quiz') {
             setShowQuiz(true);
-            setShowSentenceBuilder(false);
-        } else if (step === 'practice') {
+            setShowListening(false);
+        } else if (step === 'listening') {
             setShowQuiz(false);
-            setShowSentenceBuilder(true);
+            setShowListening(true);
         }
     };
 
-    const [activeTab, setActiveTab] = useState<'cefr' | 'toeic'>('cefr');
+    const [activeTab, setActiveTab] = useState<'cefr' | 'toeic' | 'topic'>('cefr');
+
+    // Reset to page 1 when tab changes
+    React.useEffect(() => {
+        setCurrentPage(1);
+    }, [activeTab]);
 
     // Adapter for TOEIC Data to match CEFRLevelData structure
     const toeicLevels: CEFRLevelData[] = React.useMemo(() => {
@@ -202,7 +226,49 @@ const Phase1View = () => {
         }));
     }, []);
 
-    const activeLevels = activeTab === 'cefr' ? CEFR_LEVEL_DATA : toeicLevels;
+    // Adapter for Topic Data to match CEFRLevelData structure
+    const topicLevels: CEFRLevelData[] = React.useMemo(() => {
+        return TOPIC_DATA.map((topic: any) => {
+            // Debug data mapping
+            if (topic.id === 'chu-de-cong-nghe-2' || topic.words[0]?.meaning) {
+                console.log('Mapping Topic:', topic.title, 'Word 0 Meaning:', topic.words[0]?.meaning);
+            }
+            return {
+                level: topic.id,
+                levelName: topic.title,
+                color: topic.color || 'blue',
+                totalLessons: 1,
+                totalWords: topic.words.length,
+                lessons: [{
+                    id: topic.id,
+                    title: topic.title,
+                    level: topic.id,
+                    words: topic.words.map((w: any) => ({
+                        id: w.id || w.word,
+                        word: w.word,
+                        pos: w.word_type,
+                        phonetic: w.pronunciation,
+                        definition_vi: w.meaning,
+                        definition_en: w.meaning, // Use Vietnamese meaning as definition for Quiz
+                        example_en: w.example,
+                        example_vi: '',
+                        type: 'vocabulary',
+                        level: 'TOPIC',
+                    })),
+                    type: 'vocabulary',
+                    lessonNumber: 1,
+                    totalWords: topic.words.length
+                }]
+            };
+        });
+    }, []);
+
+    const activeLevels = activeTab === 'cefr' ? CEFR_LEVEL_DATA : activeTab === 'toeic' ? toeicLevels : topicLevels;
+
+    // Pagination Logic
+    const totalPages = Math.ceil(activeLevels.length / ITEMS_PER_PAGE);
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const paginatedLevels = activeLevels.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
     // Helper to get theme colors (Enhanced for TOEIC)
     const getTheme = (level: string, index: number) => {
@@ -240,7 +306,7 @@ const Phase1View = () => {
                         <FlashcardSet
                             words={selectedLesson.words}
                             title={selectedLesson.title}
-                            onClose={() => { setSelectedLesson(null); setShowQuiz(false); setShowSentenceBuilder(false); }}
+                            onClose={() => { setSelectedLesson(null); setShowQuiz(false); setShowListening(false); }}
                             onComplete={() => {
                                 const stepKey = `${baseKey}-learn`;
                                 completeLesson(stepKey);
@@ -256,7 +322,7 @@ const Phase1View = () => {
                             topic={selectedLesson.level}
                             isCompleted={isLessonCompleted(quizKey)}
                             initialScore={getLessonScore(quizKey)}
-                            onClose={() => { setSelectedLesson(null); setShowQuiz(false); setShowSentenceBuilder(false); }}
+                            onClose={() => { setSelectedLesson(null); setShowQuiz(false); setShowListening(false); }}
                             onComplete={(score, total) => {
                                 // Normalize score to 0-100 scale for storage
                                 const percentage = Math.round((score / total) * 100);
@@ -272,34 +338,34 @@ const Phase1View = () => {
                                 }
 
                                 setCompletedSteps(prev => [...new Set([...prev, 'quiz'])] as LessonStep[]);
-                                setShowSentenceBuilder(true);
+                                setShowListening(true);
                                 setShowQuiz(false);
                             }}
                         />
                     )}
 
-                    {currentStep === 'practice' && (
-                        <SentenceBuilder
-                            challenges={practiceChallenges}
+                    {currentStep === 'listening' && (
+                        <ListeningPractice
+                            words={selectedLesson.words}
+                            level={selectedLesson.level}
                             onComplete={() => {
-                                setCompletedSteps(prev => [...new Set([...prev, 'practice'])] as LessonStep[]);
-                                const stepKey = `${baseKey}-practice`;
+                                setCompletedSteps(prev => [...new Set([...prev, 'listening'])] as LessonStep[]);
+                                const stepKey = `${baseKey}-listening`;
 
-                                // Mark practice step and main lesson as completed (Batch update to avoid race condition)
+                                // Mark listening step and main lesson as completed
                                 completeLesson([stepKey, baseKey]);
 
                                 toast({
-                                    title: "Practice Completed!",
-                                    description: "Great job mastering these sentences!",
+                                    title: "Luyện Nghe Hoàn Thành!",
+                                    description: "Bạn đã hoàn thành phần luyện nghe!",
                                     variant: "success"
                                 });
 
                                 setSelectedLesson(null);
                                 setCompletedSteps([]);
-                                setShowSentenceBuilder(false);
+                                setShowListening(false);
                             }}
-                            onClose={() => { setSelectedLesson(null); setCompletedSteps([]); setShowSentenceBuilder(false); }}
-                            topic={selectedLesson.level}
+                            onClose={() => { setSelectedLesson(null); setCompletedSteps([]); setShowListening(false); }}
                         />
                     )}
                 </div>
@@ -324,7 +390,7 @@ const Phase1View = () => {
             <div className="absolute bottom-[-10%] left-[20%] w-96 h-96 bg-pink-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
 
             {/* FIXED HEADER AREA */}
-            <div className="flex-none z-20 relative w-full max-w-4xl mx-auto px-4 pt-6 pb-2">
+            <div className="flex-none z-20 relative w-full max-w-4xl mx-auto px-4 pt-2 pb-0">
                 <div className="text-center relative min-h-[60px]">
                     <button
                         onClick={() => expandedLevel ? setExpandedLevel(null) : navigate('/english')}
@@ -336,37 +402,80 @@ const Phase1View = () => {
                     {!expandedLevel ? (
                         <div className="animate-fade-in flex flex-col items-center">
                             {/* Tabs */}
-                            <div className="inline-flex items-center p-1 rounded-full bg-slate-200/50 backdrop-blur-sm border border-slate-200 mb-6">
+                            <div className="inline-flex items-center p-1 rounded-full bg-slate-200/50 backdrop-blur-sm border border-slate-200 mb-2">
                                 <button
                                     onClick={() => setActiveTab('cefr')}
                                     className={`
-                                        px-6 py-2 rounded-full text-sm font-bold transition-all
+                                        px-4 py-2 rounded-full text-sm font-bold transition-all
                                         ${activeTab === 'cefr' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}
                                     `}
                                 >
-                                    CEFR Levels
+                                    {t('englishHub.phase1.tabs.cefr')}
                                 </button>
                                 <button
                                     onClick={() => setActiveTab('toeic')}
                                     className={`
-                                        px-6 py-2 rounded-full text-sm font-bold transition-all
+                                        px-4 py-2 rounded-full text-sm font-bold transition-all
                                         ${activeTab === 'toeic' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}
                                     `}
                                 >
-                                    TOEIC Lists
+                                    {t('englishHub.phase1.tabs.toeic')}
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab('topic')}
+                                    className={`
+                                        px-4 py-2 rounded-full text-sm font-bold transition-all
+                                        ${activeTab === 'topic' ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}
+                                    `}
+                                >
+                                    {t('englishHub.phase1.tabs.topic')}
                                 </button>
                             </div>
 
-                            <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-white/60 backdrop-blur-md border border-white/60 shadow-sm text-blue-600 font-bold text-xs uppercase tracking-wider mb-2">
-                                <span className="text-base">{activeTab === 'cefr' ? '🚀' : '🎯'}</span>
-                                <span>{activeTab === 'cefr' ? 'Standard Curriculum' : 'Exam Preparation'}</span>
-                            </div>
+
 
                             <h1 className="font-heading text-3xl sm:text-4xl font-black tracking-tight text-slate-900 drop-shadow-sm mb-2">
                                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 relative inline-block">
-                                    {activeTab === 'cefr' ? 'CEFR Levels' : 'TOEIC Topics'}
+                                    {activeTab === 'cefr' ? t('englishHub.phase1.headers.cefr') : activeTab === 'toeic' ? t('englishHub.phase1.headers.toeic') : t('englishHub.phase1.headers.topic')}
                                 </span>
                             </h1>
+
+                            {/* Select Dropdown for Page Levels */}
+                            <div className="relative w-full max-w-sm mx-auto mb-2">
+                                <Select onValueChange={(value) => {
+                                    const selected = activeLevels.find(l => l.level === value);
+                                    if (selected) setExpandedLevel(selected);
+                                }}>
+                                    <SelectTrigger className="w-full h-14 pl-6 pr-4 rounded-[2rem] border-2 border-white bg-white/60 hover:bg-white hover:border-blue-200 hover:shadow-md transition-all duration-300 shadow-sm font-bold text-slate-700 backdrop-blur-md group">
+                                        <div className="flex items-center gap-2">
+                                            <div className="p-1.5 rounded-full bg-blue-100 text-blue-600 group-hover:scale-110 transition-transform">
+                                                <BookOpen className="w-4 h-4" />
+                                            </div>
+                                            <SelectValue placeholder={t('englishHub.phase1.common.selectLevel')} />
+                                        </div>
+                                    </SelectTrigger>
+                                    <SelectContent className="max-h-[300px] rounded-2xl border-white shadow-xl bg-white/90 backdrop-blur-xl p-1 w-[var(--radix-select-trigger-width)]">
+                                        {activeLevels.map((level, idx) => {
+                                            const theme = getTheme(level.level, idx);
+                                            return (
+                                                <SelectItem
+                                                    key={level.level}
+                                                    value={level.level}
+                                                    className="font-bold cursor-pointer py-3 px-4 rounded-xl focus:bg-slate-50 focus:text-blue-600 transition-colors mb-1"
+                                                >
+                                                    <div className="flex items-center gap-3 w-full">
+                                                        <div className={`w-2.5 h-2.5 rounded-full shadow-sm ${theme.accent}`} />
+                                                        <span className={`min-w-[40px] ${theme.text} opacity-80`}>
+                                                            {activeTab === 'cefr' ? level.level : `#${idx + 1}`}
+                                                        </span>
+                                                        <span className="text-slate-700 truncate flex-1 text-left">{level.levelName}</span>
+                                                    </div>
+                                                </SelectItem>
+                                            );
+                                        })}
+                                    </SelectContent>
+                                </Select>
+                            </div>
                         </div>
                     ) : (
                         <div className="animate-fade-in slide-in-from-top-4 duration-500">
@@ -383,7 +492,7 @@ const Phase1View = () => {
                                 {expandedLevel.levelName}
                             </h2>
                             <p className="text-gray-400 font-bold uppercase tracking-widest text-xs">
-                                {expandedLevel.totalLessons} Lessons · {expandedLevel.totalWords} Words
+                                {expandedLevel.totalLessons} {t('englishHub.phase1.common.lessons')} · {expandedLevel.totalWords} {t('englishHub.phase1.words')}
                             </p>
                         </div>
                     )}
@@ -398,123 +507,119 @@ const Phase1View = () => {
                     WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 40px, black calc(100% - 40px), transparent 100%)'
                 }}
             >
-                <div className="max-w-4xl mx-auto p-4 pb-32 min-h-full">
+                <div className="max-w-4xl mx-auto p-4 pb-24 min-h-full">
 
-                    {!expandedLevel && (
-                        <p className="text-center text-slate-600 font-medium max-w-lg mx-auto leading-relaxed mb-8 animate-fade-in">
-                            {activeTab === 'cefr'
-                                ? "Progress from Beginner (A1) to Proficient (C2) with 9,780 words"
-                                : "Master 600 essential words organized by 50 common business topics"
-                            }
-                        </p>
-                    )}
+
 
                     {!expandedLevel ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
-                            {activeLevels.map((levelData, index) => {
-                                const theme = getTheme(levelData.level, index);
+                        <>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-1">
+                                {paginatedLevels.map((levelData, index) => {
+                                    const globalIndex = startIndex + index;
+                                    const theme = getTheme(levelData.level, globalIndex);
 
-                                // Levels unlock if ALL lessons in prev level done OR prev level skipped
-                                // FOR TOEIC: We might want them all unlocked? Or sequential? 
-                                // Let's keep sequential for now for gamification, but maybe allow random access?
-                                // User request didn't specify, but "Test Out" implies sequential.
-                                // Let's assume sequential for TOEIC too for consistency.
+                                    // Levels unlock if ALL lessons in prev level done OR prev level skipped
+                                    // FOR TOEIC: We might want them all unlocked? Or sequential? 
+                                    // Let's keep sequential for now for gamification, but maybe allow random access?
+                                    // User request didn't specify, but "Test Out" implies sequential.
+                                    // Let's assume sequential for TOEIC too for consistency.
 
-                                const prevLevel = index > 0 ? activeLevels[index - 1] : null;
-                                const isPrevCompleted = prevLevel && prevLevel.lessons.every(l => isLessonCompleted(l.id));
-                                const isPrevSkipped = prevLevel && isLevelSkipped(prevLevel.level);
+                                    const prevLevel = globalIndex > 0 ? activeLevels[globalIndex - 1] : null;
+                                    const isPrevCompleted = prevLevel && prevLevel.lessons.every(l => isLessonCompleted(l.id));
+                                    const isPrevSkipped = prevLevel && isLevelSkipped(prevLevel.level);
 
-                                // For CEFR: Sequential locking.
-                                // For TOEIC: Always unlocked (User Requested).
-                                let locked = false;
-                                if (activeTab === 'cefr') {
-                                    locked = index > 0 && activeLevels[index - 1].lessons.length > 0 &&
-                                        !isPrevCompleted && !isPrevSkipped;
-                                }
+                                    // For CEFR: Sequential locking.
+                                    // For TOEIC: Always unlocked (User Requested).
+                                    let locked = false;
+                                    if (activeTab === 'cefr') {
+                                        locked = globalIndex > 0 && activeLevels[globalIndex - 1].lessons.length > 0 &&
+                                            !isPrevCompleted && !isPrevSkipped;
+                                    }
 
-                                const isSkipped = isLevelSkipped(levelData.level);
+                                    const isSkipped = isLevelSkipped(levelData.level);
 
-                                return (
-                                    <div key={levelData.level} className="relative group">
-                                        <button
-                                            onClick={() => !locked && setExpandedLevel(levelData)}
-                                            disabled={locked}
-                                            className={`
+                                    return (
+                                        <div key={levelData.level} className="relative group">
+                                            <button
+                                                onClick={() => !locked && setExpandedLevel(levelData)}
+                                                disabled={locked}
+                                                className={`
                                                 w-full h-full relative bg-white rounded-[2.5rem] p-6 transition-all duration-300
                                                 flex flex-col items-center text-center
                                                 ${locked
-                                                    ? 'grayscale opacity-70 cursor-not-allowed border-2 border-slate-100 shadow-none'
-                                                    : `border-b-[6px] hover:border-b-[8px] hover:-translate-y-1 shadow-lg hover:shadow-xl ${theme.border}`
-                                                }
+                                                        ? 'grayscale opacity-70 cursor-not-allowed border-2 border-slate-100 shadow-none'
+                                                        : `border-b-[6px] hover:border-b-[8px] hover:-translate-y-1 shadow-lg hover:shadow-xl ${theme.border}`
+                                                    }
                                             `}
-                                        >
-                                            {/* Badge - Floating Effect */}
-                                            <div className={`
-                                                w-24 h-24 rounded-[2rem] mb-4 overflow-hidden relative flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300
-                                                ${theme.bg} shadow-inner bg-opacity-50
-                                            `}>
-                                                {/* Large Typography Badge */}
+                                            >
+                                                {/* Badge - Floating Effect */}
                                                 <div className={`
+                                                w-20 h-20 rounded-3xl mb-3 overflow-hidden relative flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300
+                                                ${theme.bg} shadow-sm bg-opacity-50
+                                            `}>
+                                                    {/* Large Typography Badge */}
+                                                    <div className={`
                                                     font-black ${theme.text} drop-shadow-sm
-                                                    ${activeTab === 'cefr' ? 'text-4xl' : 'text-2xl p-2 leading-tight'}
+                                                    ${activeTab === 'cefr' ? 'text-3xl' : 'text-xl p-2 leading-tight'}
                                                 `}>
-                                                    {activeTab === 'cefr' ? levelData.level : (index + 1)}
+                                                        {activeTab === 'cefr' ? levelData.level : (globalIndex + 1)}
+                                                    </div>
+
+                                                    {/* Lock Overlay */}
+                                                    {locked && (
+                                                        <div className="absolute inset-0 bg-slate-100/50 flex items-center justify-center backdrop-blur-[2px]">
+                                                            <Lock className="w-8 h-8 text-slate-400 opacity-75" />
+                                                        </div>
+                                                    )}
+
+                                                    {/* Completed Checkmark */}
+                                                    {(isSkipped || isPrevCompleted && globalIndex === activeLevels.length - 1) && !locked && (
+                                                        <div className="absolute bottom-1 right-1 bg-green-500 text-white rounded-full p-1.5 shadow-md border-2 border-white">
+                                                            <CheckCircle className="w-5 h-5" />
+                                                        </div>
+                                                    )}
                                                 </div>
 
-                                                {/* Lock Overlay */}
-                                                {locked && (
-                                                    <div className="absolute inset-0 bg-slate-100/50 flex items-center justify-center backdrop-blur-[2px]">
-                                                        <Lock className="w-8 h-8 text-slate-400 opacity-75" />
-                                                    </div>
-                                                )}
+                                                <h3 className={`text-xl font-black mb-1 tracking-tight ${theme.text} line-clamp-2 min-h-[3.5rem] flex items-center justify-center`}>
+                                                    {levelData.levelName}
+                                                </h3>
+                                                <div className="px-3 py-1 rounded-full bg-slate-50 text-slate-400 text-xs font-bold mb-4 border border-slate-100">
+                                                    {levelData.totalWords} {t('englishHub.phase1.words')}
+                                                </div>
 
-                                                {/* Completed Checkmark */}
-                                                {(isSkipped || isPrevCompleted && index === activeLevels.length - 1) && !locked && (
-                                                    <div className="absolute bottom-1 right-1 bg-green-500 text-white rounded-full p-1.5 shadow-md border-2 border-white">
-                                                        <CheckCircle className="w-5 h-5" />
-                                                    </div>
-                                                )}
-                                            </div>
+                                                <div className="w-full mt-auto flex gap-3">
+                                                    {/* Test Out Option */}
+                                                    {!locked && !isSkipped && activeTab === 'cefr' && (
+                                                        <div
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                if (window.confirm(t('englishHub.phase1.actions.skipConfirm', { level: levelData.levelName }))) {
+                                                                    skipLevel(levelData.level);
+                                                                }
+                                                            }}
+                                                            className="w-12 h-12 flex items-center justify-center rounded-2xl bg-orange-100 text-orange-500 hover:bg-orange-200 hover:scale-105 active:scale-95 transition-all cursor-pointer shadow-sm border-b-4 border-orange-200"
+                                                            title={t('englishHub.phase1.actions.skip')}
+                                                        >
+                                                            <Sparkles className="w-6 h-6" />
+                                                        </div>
+                                                    )}
 
-                                            <h3 className={`text-xl font-black mb-1 tracking-tight ${theme.text} line-clamp-2 min-h-[3.5rem] flex items-center justify-center`}>
-                                                {levelData.levelName}
-                                            </h3>
-                                            <div className="px-3 py-1 rounded-full bg-slate-50 text-slate-400 text-xs font-bold mb-4 border border-slate-100">
-                                                {levelData.totalWords} Words
-                                            </div>
-
-                                            <div className="w-full mt-auto flex gap-3">
-                                                {/* Test Out Option */}
-                                                {!locked && !isSkipped && activeTab === 'cefr' && (
-                                                    <div
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            if (window.confirm(`Skip ${levelData.levelName}?`)) {
-                                                                skipLevel(levelData.level);
-                                                            }
-                                                        }}
-                                                        className="w-12 h-12 flex items-center justify-center rounded-2xl bg-orange-100 text-orange-500 hover:bg-orange-200 hover:scale-105 active:scale-95 transition-all cursor-pointer shadow-sm border-b-4 border-orange-200"
-                                                        title="Test Out / Skip Level"
-                                                    >
-                                                        <Sparkles className="w-6 h-6" />
-                                                    </div>
-                                                )}
-
-                                                <div className={`
+                                                    <div className={`
                                                     flex-1 h-12 rounded-2xl text-sm font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all
                                                     ${locked
-                                                        ? 'bg-slate-100 text-slate-400 border-2 border-slate-200'
-                                                        : `${theme.bg} ${theme.text} hover:opacity-90 shadow-sm border-b-4 ${theme.border}`
-                                                    }
+                                                            ? 'bg-slate-100 text-slate-400 border-2 border-slate-200'
+                                                            : `${theme.bg} ${theme.text} hover:opacity-90 shadow-sm border-b-4 ${theme.border}`
+                                                        }
                                                 `}>
-                                                    {locked ? 'Locked' : isSkipped ? 'Done' : 'Start'}
+                                                        {locked ? t('englishHub.phase1.actions.locked') : isSkipped ? t('englishHub.phase1.actions.done') : t('englishHub.phase1.actions.start')}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </button>
-                                    </div>
-                                );
-                            })}
-                        </div>
+                                            </button>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </>
                     ) : (
                         // Detailed List View (Lesson Selection)
                         <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 pt-8">
@@ -551,7 +656,7 @@ const Phase1View = () => {
                                                         setSelectedLesson(lesson);
                                                         // If lesson is already done or level is skipped, mark all steps as "highlighted"
                                                         if (completed || isLevelSkipped(expandedLevel.level)) {
-                                                            setCompletedSteps(['learn', 'quiz', 'practice']);
+                                                            setCompletedSteps(['learn', 'quiz', 'listening']);
                                                         } else {
                                                             setCompletedSteps([]);
                                                         }
@@ -596,7 +701,74 @@ const Phase1View = () => {
                     )}
                 </div>
             </div>
-        </div>
+
+            {/* Fixed Pagination Controls (Outside Scroll View) */}
+            {!expandedLevel && totalPages > 1 && (
+                <div className="flex-none w-full py-3 bg-white/70 backdrop-blur-md border-t border-slate-100 z-30 flex justify-center">
+                    <div className="flex items-center gap-2 p-1 bg-white rounded-full border border-slate-100 shadow-sm">
+                        <button
+                            onClick={() => { if (currentPage > 1) setCurrentPage(p => p - 1); }}
+                            disabled={currentPage === 1}
+                            className={`
+                                w-8 h-8 rounded-full flex items-center justify-center transition-all
+                                ${currentPage === 1
+                                    ? 'text-slate-300 cursor-not-allowed'
+                                    : 'text-slate-600 hover:bg-slate-100 hover:text-blue-600'
+                                }
+                            `}
+                        >
+                            <ChevronLeft className="w-5 h-5" />
+                        </button>
+
+                        <div className="flex items-center gap-1">
+                            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                                if (
+                                    totalPages > 6 &&
+                                    page !== 1 &&
+                                    page !== totalPages &&
+                                    Math.abs(currentPage - page) > 1
+                                ) {
+                                    if (Math.abs(currentPage - page) === 2) {
+                                        return <span key={page} className="text-slate-300 font-bold px-1 text-xs">...</span>;
+                                    }
+                                    return null;
+                                }
+
+                                return (
+                                    <button
+                                        key={page}
+                                        onClick={() => setCurrentPage(page)}
+                                        className={`
+                                            w-8 h-8 rounded-full font-bold text-xs transition-all
+                                            ${currentPage === page
+                                                ? 'bg-slate-800 text-white shadow-md scale-105'
+                                                : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'
+                                            }
+                                        `}
+                                    >
+                                        {page}
+                                    </button>
+                                );
+                            })}
+                        </div>
+
+                        <button
+                            onClick={() => { if (currentPage < totalPages) setCurrentPage(p => p + 1); }}
+                            disabled={currentPage === totalPages}
+                            className={`
+                                w-8 h-8 rounded-full flex items-center justify-center transition-all
+                                ${currentPage === totalPages
+                                    ? 'text-slate-300 cursor-not-allowed'
+                                    : 'text-slate-600 hover:bg-slate-100 hover:text-blue-600'
+                                }
+                            `}
+                        >
+                            <ChevronRight className="w-5 h-5" />
+                        </button>
+                    </div>
+                </div>
+            )}
+        </div >
     );
 };
 
