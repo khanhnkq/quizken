@@ -30,7 +30,10 @@ const EnglishHub = () => {
                 description: t('auth.loginDescription', "Please login to access English Hub."),
                 variant: 'destructive',
             });
-            navigate('/auth'); // Or wherever your login route is
+            navigate('/');
+            setTimeout(() => {
+                window.dispatchEvent(new Event("open-auth-modal"));
+            }, 100);
         }
     }, [user, authLoading, navigate, t]);
 

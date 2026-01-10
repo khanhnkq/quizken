@@ -1,0 +1,18 @@
+Tên đề tài:
+Xây dựng nền tảng học tập tiếng Anh & Tạo Quiz tự động bằng AI (Quizken)
+
+Mô tả đề tài:
+Xây dựng một ứng dụng web hiện đại (Modern Web App) tích hợp Trí tuệ nhân tạo (Generative AI - Google Gemini) để tự động hóa quy trình tạo bài kiểm tra (Quiz) và cung cấp lộ trình học tiếng Anh được cá nhân hóa. Dự án tập trung vào việc áp dụng kiến trúc Serverless, tối ưu hóa trải nghiệm người dùng (UX/UI) với phong cách thiết kế Playful/Gamification để tăng hứng thú học tập. Hệ thống giải quyết vấn đề thiếu hụt nguồn tài liệu học tập phong phú và sự nhàm chán trong các phương pháp học truyền thống.
+
+Tên App Quiz:
+Quizken - English Hub
+
+Mô tả App Quiz:
+Quizken là ứng dụng học tiếng Anh toàn diện kết hợp giữa "Học tập" và "Trò chơi" (Edutainment).
+Tính năng nổi bật:
+1.  **AI Quiz Generator:** Người dùng chỉ cần nhập chủ đề bất kỳ (VD: "Lịch sử", "IELTS Reading"), AI sẽ tạo ra bộ câu hỏi trắc nghiệm độc nhất chỉ trong vài giây.
+2.  **English Hub (Lộ trình học):** Hệ thống bài học từ vựng (Topics, TOEIC, CEFR) và ngữ pháp được thiết kế theo lộ trình dạng bản đồ khám phá.
+3.  **Gamification:** Tích hợp hệ thống Streak (chuỗi ngày học), XP (điểm kinh nghiệm), và giao diện hoạt hình sống động giúp việc học trở nên thú vị như chơi game.
+4.  **My Notebook:** Sổ tay từ vựng thông minh cho phép lưu trữ và ôn tập các từ khó.
+
+Công nghệ sử dụng: React 18, TailwindCSS, Supabase (Database & Auth), Google Gemini AI.

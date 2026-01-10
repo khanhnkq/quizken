@@ -200,10 +200,23 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
+  html,
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
     overflow-x: hidden;
+    cursor: url('/assets/cursors/custom-cursor.png'), auto;
+  }
+
+  /* Custom ID for Pointer/Hover state */
+  a,
+  button,
+  [role="button"],
+  input[type="submit"],
+  input[type="reset"],
+  input[type="button"],
+  .cursor-pointer {
+    cursor: url('/assets/cursors/custom-cursor-hover.png'), pointer !important;
   }
 
   h1,

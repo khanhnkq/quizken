@@ -36,6 +36,7 @@ import { GlobalLevelNotification } from "@/components/common/GlobalLevelNotifica
 import { GlobalResumeButton } from "@/components/common/GlobalResumeButton";
 import { GlobalCreateButton } from "@/components/common/GlobalCreateButton";
 import { GlobalQuizListener } from "@/components/common/GlobalQuizListener";
+import { CustomCursor } from "@/components/ui/CustomCursor";
 
 // GSAP plugins are loaded dynamically in useLayoutEffect to reduce initial bundle size
 
