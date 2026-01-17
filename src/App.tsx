@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import EnglishHub from "./pages/EnglishHub";
 import Phase1View from "./components/english/phases/Phase1View";
+import Phase2View from "./components/english/phases/Phase2View";
 import MyNotebook from "./components/english/MyNotebook";
 import { gsap } from "gsap";
 import { toast } from "@/hooks/use-toast";
@@ -73,6 +74,7 @@ const AppRoutes = () => {
         <Route path="/" element={<Index />} />
         <Route path="/english" element={<EnglishHub />} />
         <Route path="/english/phase/1/vocab" element={<Phase1View />} />
+        <Route path="/english/phase/2/grammar" element={<Phase2View />} />
         <Route path="/english/notebook" element={<MyNotebook />} />
 
 

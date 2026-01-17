@@ -64,16 +64,25 @@ export function useUserProgress() {
             // 2. Sync with Backend if User is Logged In
             if (user?.id) {
                 try {
-                    const { data, error } = await supabase
+                    // Fetch completed lessons
+                    const { data: lessonData, error: lessonError } = await supabase
                         .from('lesson_completions')
                         .select('lesson_id, score, completed_at')
                         .eq('user_id', user.id);
 
-                    if (error) throw error;
+                    if (lessonError) throw lessonError;
 
-                    if (data) {
-                        const dbLessons = data.map(r => r.lesson_id);
-                        const dbScores = data.reduce((acc, r) => ({ ...acc, [r.lesson_id]: r.score }), {});
+                    // Fetch skipped levels
+                    const { data: skippedData, error: skippedError } = await supabase
+                        .from('skipped_levels')
+                        .select('level_id')
+                        .eq('user_id', user.id);
+
+                    if (skippedError) console.error("Error fetching skipped levels:", skippedError);
+
+                    if (lessonData) {
+                        const dbLessons = lessonData.map(r => r.lesson_id);
+                        const dbScores = lessonData.reduce((acc, r) => ({ ...acc, [r.lesson_id]: r.score }), {});
 
                         // Deduplicate
                         const uniqueLessons = Array.from(new Set([...dbLessons]));
@@ -82,12 +91,12 @@ export function useUserProgress() {
                         // Merge Scores
                         setLessonScores(dbScores);
 
-                        // Update local cache
+                        // Update local cache for lessons
                         localStorage.setItem(keyLessons, JSON.stringify(uniqueLessons));
                         localStorage.setItem(keyScores, JSON.stringify(dbScores));
 
                         // Calculate Streak and Active Days (for GitHub-style grid)
-                        const dates = data.map(r => new Date(r.completed_at).toDateString());
+                        const dates = lessonData.map(r => new Date(r.completed_at).toDateString());
                         const uniqueDates = [...new Set(dates)];
 
                         let calculatedStreak = 0;
@@ -115,6 +124,14 @@ export function useUserProgress() {
                         }
                         setStreak(calculatedStreak);
                     }
+
+                    if (skippedData) {
+                        const dbSkipped = skippedData.map(r => r.level_id);
+                        const uniqueSkipped = Array.from(new Set([...dbSkipped]));
+                        setSkippedLevels(uniqueSkipped);
+                        localStorage.setItem(keySkipped, JSON.stringify(uniqueSkipped));
+                    }
+
                 } catch (err) {
                     console.error("Failed to sync progress from backend:", err);
                     // Keep using local storage data if backend fails
@@ -254,7 +271,7 @@ export function useUserProgress() {
     //   const storedSkipped = localStorage.getItem(keySkipped);
     //   if (storedSkipped) { try { setSkippedLevels(JSON.parse(storedSkipped)); } catch (e) { console.error(e); setSkippedLevels([]); } }
 
-    const skipLevel = useCallback((level: string) => {
+    const skipLevel = useCallback(async (level: string) => {
         const { lessons: keyLessons, skipped: keySkipped } = getKeys();
 
         // Mark level as skipped
@@ -262,13 +279,31 @@ export function useUserProgress() {
         if (!skippedLevels.includes(level)) {
             setSkippedLevels(newSkipped);
             localStorage.setItem(keySkipped, JSON.stringify(newSkipped));
+
+            // Sync with Supabase
+            if (user?.id) {
+                try {
+                    const { error } = await supabase
+                        .from('skipped_levels')
+                        .insert({
+                            user_id: user.id,
+                            level_id: level
+                        });
+
+                    if (error) {
+                        console.error('Error syncing skipped level:', error);
+                    }
+                } catch (err) {
+                    console.error('Exception syncing skipped level:', err);
+                }
+            }
         }
 
         // OPTIONAL: Mark all lessons in this level as completed too?
         // User request says "unlock level", but for stats consistency it might be good to auto-complete.
         // For now, we will just UNLOCK the next level. If we want to fill the progress bar, we would need to mark lessons.
         // Let's just track the skip for unlocking purposes first.
-    }, [skippedLevels, getKeys]);
+    }, [skippedLevels, getKeys, user?.id]);
 
     const isLevelSkipped = useCallback((level: string) => skippedLevels.includes(level), [skippedLevels]);
 

@@ -167,16 +167,26 @@ function ItemOverlay({ part }: { part: SentencePart }) {
 
 // --- Main Component ---
 
+interface CategoryTheme {
+    id: string;
+    color: string;
+    bg: string; // "bg-blue-50"
+    text: string;
+    border: string;
+}
+
 interface SentenceBuilderProps {
-    challenges: SentenceChallenge[]; // NEW: Array of challenges
+    challenges: SentenceChallenge[];
     topic?: string;
-    onComplete?: () => void;
+    theme?: CategoryTheme;
+    onComplete?: (score: number) => void;
     onClose?: () => void;
 }
 
 const SentenceBuilder: React.FC<SentenceBuilderProps> = ({
     challenges,
     topic = 'Academic',
+    theme: categoryTheme,
     onComplete,
     onClose
 }) => {
@@ -342,7 +352,7 @@ const SentenceBuilder: React.FC<SentenceBuilderProps> = ({
                             </div>
 
                             <button
-                                onClick={() => onComplete && onComplete()}
+                                onClick={() => onComplete && onComplete(100)}
                                 className="w-full px-8 py-4 bg-green-500 text-white rounded-2xl font-black shadow-[0_4px_0_0_#16a34a] hover:scale-105 active:scale-95 active:shadow-none active:translate-y-1 transition-all flex items-center justify-center gap-2"
                             >
                                 <CheckCircle className="w-6 h-6" />
@@ -367,7 +377,7 @@ const SentenceBuilder: React.FC<SentenceBuilderProps> = ({
                     <div className="flex flex-col gap-3 w-full">
                         <button
                             onClick={() => {
-                                if (onComplete) onComplete();
+                                if (onComplete) onComplete(100);
                             }}
                             className="w-full px-8 py-4 bg-green-500 text-white rounded-xl font-black shadow-lg hover:scale-105 hover:bg-green-600 transition-all flex items-center justify-center gap-2"
                         >
@@ -393,10 +403,11 @@ const SentenceBuilder: React.FC<SentenceBuilderProps> = ({
             onDragStart={handleDragStart}
             onDragEnd={handleDragEnd}
         >
-            <div className={`fixed inset-0 z-50 flex flex-col items-center justify-center p-4 bg-gradient-to-br ${theme.gradient} overflow-hidden`}>
+            <div className="fixed inset-0 z-50 flex flex-col items-center justify-center p-4 overflow-hidden bg-slate-50">
+                <div className={`absolute inset-0 bg-gradient-to-br ${categoryTheme ? categoryTheme.color : theme.gradient} ${categoryTheme ? 'opacity-10' : ''} pointer-events-none`} />
 
                 {/* Background FX */}
-                <div className="absolute inset-0 opacity-40" style={{ backgroundImage: 'radial-gradient(#cbd5e1 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
+                <div className="absolute inset-0 opacity-40 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#cbd5e1 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
                 <div className={`absolute top-1/2 left-1/4 w-96 h-96 ${theme.blobMain} rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-blob pointer-events-none`}></div>
                 <div className={`absolute top-0 right-1/4 w-96 h-96 ${theme.blobSec} rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-blob animation-delay-2000 pointer-events-none`}></div>
 
@@ -405,7 +416,7 @@ const SentenceBuilder: React.FC<SentenceBuilderProps> = ({
                 <div className="absolute top-4 right-4 md:top-8 md:right-8 flex gap-4 z-50">
                     <div className="flex bg-white/80 backdrop-blur-sm p-2 rounded-2xl shadow-sm border border-white/50">
                         {[1, 2, 3].map(i => (
-                            <Heart key={i} className={`w-8 h-8 transition-all ${i <= hearts ? 'fill-red-500 text-red-500 scale-100' : 'fill-slate-200 text-slate-200 scale-75'}`} />
+                            <Heart key={i} className={`w-6 h-6 transition-all ${i <= hearts ? 'fill-red-500 text-red-500 scale-100' : 'fill-slate-200 text-slate-200 scale-75'}`} />
                         ))}
                     </div>
                     {combo > 1 && (

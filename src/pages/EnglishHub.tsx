@@ -23,6 +23,50 @@ const EnglishHub = () => {
     const mapRef = useRef<HTMLDivElement>(null);
     const [pathHeight, setPathHeight] = useState(1000);
 
+    // Initial Entry Animation - MUST be before any early returns
+    useLayoutEffect(() => {
+        if (!containerRef.current || !headerRef.current || authLoading || !user) return;
+
+        const ctx = gsap.context(() => {
+            // Header animation
+            gsap.from(headerRef.current, {
+                y: -30,
+                opacity: 0,
+                duration: 0.8,
+                ease: "power3.out"
+            });
+
+            // Map Nodes Staggered Animation
+            gsap.from(".map-node-item", {
+                y: 50,
+                opacity: 0,
+                duration: 0.6,
+                stagger: 0.1,
+                ease: "back.out(1.7)",
+                delay: 0.2
+            });
+
+            // Path animation
+            gsap.from(".map-path-svg", {
+                opacity: 0,
+                duration: 1,
+                delay: 0.3,
+                ease: "power2.inOut"
+            });
+
+        }, containerRef);
+
+        return () => ctx.revert();
+    }, [authLoading, user]);
+
+    // Adjust path height based on content - MUST be before any early returns
+    useEffect(() => {
+        if (containerRef.current) {
+            setPathHeight(ROADMAP_DATA.length * 200 + 400);
+        }
+    }, []);
+
+    // Redirect if not authenticated
     useEffect(() => {
         if (!authLoading && !user) {
             toast({
@@ -37,80 +81,26 @@ const EnglishHub = () => {
         }
     }, [user, authLoading, navigate, t]);
 
+    // Early return AFTER all hooks
     if (authLoading || !user) {
-        return null; // Or a loading spinner
+        return null;
     }
 
-    // Initial Entry Animation
-    useLayoutEffect(() => {
-        if (!containerRef.current || !headerRef.current) return;
-
-        const ctx = gsap.context(() => {
-            // Header animation
-            gsap.from(headerRef.current, {
-                y: -30,
-                opacity: 0,
-                duration: 0.8,
-                ease: "power3.out"
-            });
-
-            // Map Nodes Staggered Animation
-            // Select all direct children nodes of the map container that are positioned
-            gsap.from(".map-node-item", {
-                y: 50,
-                opacity: 0,
-                duration: 0.6,
-                stagger: 0.1,
-                ease: "back.out(1.7)",
-                delay: 0.2 // Wait slightly for header
-            });
-
-            // Path animation (fade in)
-            gsap.from(".map-path-svg", {
-                opacity: 0,
-                duration: 1,
-                delay: 0.3,
-                ease: "power2.inOut"
-            });
-
-        }, containerRef); // Scope to container
-
-        return () => ctx.revert();
-    }, []);
-
-    // Adjust path height based on content
-    useEffect(() => {
-        if (containerRef.current) {
-            setPathHeight(ROADMAP_DATA.length * 200 + 400);
-        }
-    }, []);
-
     // Curved Path Logic
-    // We start from top center, curve left, then right, then left...
-    // M 50 0 -> Move to Top Center (50% x, 0 y)
-    // C control_points end_point
     const generatePath = () => {
-        let path = "M 50 20 "; // Start top center (relative coordinates 0-100)
+        let path = "M 50 20 ";
         let y = 20;
 
         ROADMAP_DATA.forEach((_, index) => {
-            // Zig-zag pattern: Center -> Left -> Center -> Right -> Center
-            // Actually, simpler is: curve to left node, then curve to right node
-            // Let's use a simpler sine-wave like curve
-            // Node positions: Left (20%), Right (80%)
             const isLeft = index % 2 === 0;
             const targetX = isLeft ? 30 : 70;
-            const nextY = y + 150; // Vertical spacing
+            const nextY = y + 150;
 
-            // Control points for smooth S-curve
             const cp1y = y + 75;
             const cp2y = y + 75;
 
             path += `C 50 ${cp1y}, ${targetX} ${cp2y}, ${targetX} ${nextY} `;
 
-            // If there is a next node, curve back towards center then to next target
-            // But here we just draw line to next node pos? 
-            // Better: Curve from current node to next node
             if (index < ROADMAP_DATA.length - 1) {
                 const nextIsLeft = (index + 1) % 2 === 0;
                 const nextX = nextIsLeft ? 30 : 70;
@@ -122,13 +112,6 @@ const EnglishHub = () => {
 
         return path;
     };
-
-    // Responsive Path using absolute SVG
-    // We render nodes using absolute positioning percentages to match the SVG path
-
-    if (authLoading || !user) {
-        return null; // Or a loading spinner
-    }
 
     return (
         <div ref={containerRef} className="h-screen bg-sky-50 relative overflow-hidden flex flex-col">
@@ -292,6 +275,8 @@ const EnglishHub = () => {
                                         onClick={() => {
                                             if (phase.id === 'phase-1') {
                                                 navigate('/english/phase/1/vocab');
+                                            } else if (phase.id === 'phase-2') {
+                                                navigate('/english/phase/2/grammar');
                                             }
                                         }}
                                     />

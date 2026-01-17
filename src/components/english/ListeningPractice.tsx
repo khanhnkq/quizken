@@ -32,6 +32,7 @@ const ListeningPractice: React.FC<ListeningPracticeProps> = ({
     onClose,
     level = 'A1'
 }) => {
+    const { t } = useTranslation();
     // Game state
     const [currentIndex, setCurrentIndex] = useState(0);
     const [hearts, setHearts] = useState(3);
@@ -116,7 +117,7 @@ const ListeningPractice: React.FC<ListeningPracticeProps> = ({
             }
 
             // Sound effect (optional) maybe just UI feedback
-            toast({ title: "Chính xác!", description: "Bạn đã làm rất tốt!", variant: "success", duration: 1000 });
+            toast({ title: t('englishHub.listening.toast.correct'), description: t('englishHub.listening.toast.correctDesc'), variant: "success", duration: 1000 });
 
         } else {
             // INCORRECT
@@ -184,6 +185,61 @@ const ListeningPractice: React.FC<ListeningPracticeProps> = ({
     };
     const theme = getTheme();
 
+    // Reset/Restart function
+    const handleRestart = () => {
+        const shuffled = [...words].sort(() => 0.5 - Math.random()).slice(0, 10);
+        setShuffledWords(shuffled);
+        setCurrentIndex(0);
+        setHearts(3);
+        setStreak(0);
+        setIsFinished(false);
+        setUserInput('');
+        setShowHint(false);
+        setCheckStatus('idle');
+    };
+
+    // Game Over Screen - When all hearts are lost
+    if (hearts <= 0) {
+        return (
+            <div className="fixed inset-0 z-50 flex flex-col items-center justify-center p-4 bg-gradient-to-br from-red-50 to-orange-50 backdrop-blur-md animate-in fade-in zoom-in duration-300">
+                <div className="bg-white p-8 rounded-[2.5rem] shadow-2xl border-4 border-red-100 text-center max-w-md w-full relative">
+                    <div className="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse shadow-inner">
+                        <XCircle className="w-12 h-12 text-red-500" />
+                    </div>
+                    <h3 className="text-3xl font-black text-slate-800 mb-2">{t('englishHub.listening.gameOver.title')}</h3>
+                    <p className="text-slate-500 font-medium mb-6">{t('englishHub.listening.gameOver.description')}</p>
+
+                    <div className="grid grid-cols-2 gap-3 mb-6">
+                        <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                            <div className="text-2xl font-black text-slate-500">{currentIndex}/{shuffledWords.length}</div>
+                            <div className="text-xs font-bold text-slate-300 uppercase">{t('englishHub.listening.gameOver.progress')}</div>
+                        </div>
+                        <div className="bg-orange-50 p-4 rounded-2xl border border-orange-100">
+                            <div className="text-2xl font-black text-orange-500">{streak}</div>
+                            <div className="text-xs font-bold text-orange-300 uppercase">{t('englishHub.listening.gameOver.bestStreak')}</div>
+                        </div>
+                    </div>
+
+                    <div className="flex gap-3">
+                        <button
+                            onClick={onClose}
+                            className="flex-1 px-6 py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold hover:bg-slate-200 transition-all"
+                        >
+                            {t('englishHub.listening.gameOver.exit')}
+                        </button>
+                        <button
+                            onClick={handleRestart}
+                            className="flex-[2] px-8 py-4 bg-orange-500 text-white rounded-2xl font-black shadow-[0_4px_0_0_#c2410c] hover:brightness-110 active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2"
+                        >
+                            <RotateCcw className="w-6 h-6" />
+                            {t('englishHub.listening.gameOver.retry')}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     if (isFinished) {
         return (
             <div className="fixed inset-0 z-50 flex flex-col items-center justify-center p-4 bg-white/95 backdrop-blur-md animate-in fade-in zoom-in duration-300">
@@ -191,17 +247,17 @@ const ListeningPractice: React.FC<ListeningPracticeProps> = ({
                     <div className="w-24 h-24 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce shadow-inner">
                         <Trophy className="w-12 h-12 text-yellow-500" />
                     </div>
-                    <h3 className="text-3xl font-black text-slate-800 mb-2">Hoàn thành xuất sắc!</h3>
-                    <p className="text-slate-500 font-medium mb-8">Bạn đã hoàn thành bài tập nghe chép chính tả.</p>
+                    <h3 className="text-3xl font-black text-slate-800 mb-2">{t('englishHub.listening.complete.title')}</h3>
+                    <p className="text-slate-500 font-medium mb-8">{t('englishHub.listening.complete.description')}</p>
 
                     <div className="grid grid-cols-2 gap-3 mb-6">
                         <div className="bg-orange-50 p-4 rounded-2xl border border-orange-100">
                             <div className="text-2xl font-black text-orange-500">{streak}</div>
-                            <div className="text-xs font-bold text-orange-300 uppercase">Streak Cao Nhất</div>
+                            <div className="text-xs font-bold text-orange-300 uppercase">{t('englishHub.listening.complete.bestStreak')}</div>
                         </div>
                         <div className="bg-red-50 p-4 rounded-2xl border border-red-100">
                             <div className="text-2xl font-black text-red-500">{hearts}</div>
-                            <div className="text-xs font-bold text-red-300 uppercase">Tim Còn Lại</div>
+                            <div className="text-xs font-bold text-red-300 uppercase">{t('englishHub.listening.complete.heartsLeft')}</div>
                         </div>
                     </div>
 
@@ -210,7 +266,7 @@ const ListeningPractice: React.FC<ListeningPracticeProps> = ({
                         className="w-full px-8 py-4 bg-green-500 text-white rounded-2xl font-black shadow-[0_4px_0_0_#16a34a] hover:brightness-110 active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2"
                     >
                         <CheckCircle className="w-6 h-6" />
-                        Trở về bài học
+                        {t('englishHub.listening.complete.backToLesson')}
                     </button>
                 </div>
             </div>
@@ -274,7 +330,7 @@ const ListeningPractice: React.FC<ListeningPracticeProps> = ({
                     {/* Topic Badge */}
                     <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-white px-6 py-2 rounded-full shadow-lg border-2 border-slate-100 flex items-center gap-2">
                         <Headphones className={`w-5 h-5 ${theme.text}`} />
-                        <span className="font-bold text-slate-600 uppercase tracking-wider text-sm">Nghe & Viết</span>
+                        <span className="font-bold text-slate-600 uppercase tracking-wider text-sm">{t('englishHub.listening.title')}</span>
                     </div>
 
                     {/* Word Sound Control */}
@@ -291,16 +347,16 @@ const ListeningPractice: React.FC<ListeningPracticeProps> = ({
                         >
                             <Volume2 className={`w-12 h-12 ${isSpeaking ? 'animate-pulse' : 'group-hover:scale-110'} transition-transform`} />
                         </button>
-                        <p className="text-slate-400 font-bold text-sm uppercase tracking-wide">Nhấn để nghe lại</p>
+                        <p className="text-slate-400 font-bold text-sm uppercase tracking-wide">{t('englishHub.listening.tapToReplay')}</p>
                     </div>
 
                     {/* Hint / Meaning Display */}
                     {(showHint || checkStatus !== 'idle') && (
                         <div className="mb-6 p-4 bg-slate-50 rounded-2xl text-center animate-in fade-in slide-in-from-top-2 border border-slate-100">
-                            <p className="text-slate-500 font-medium mb-1">Nghĩa tiếng Việt:</p>
+                            <p className="text-slate-500 font-medium mb-1">{t('englishHub.listening.meaningLabel')}</p>
                             <p className="text-xl font-bold text-slate-800">{currentWord.definition_vi}</p>
                             {checkStatus === 'incorrect' && (
-                                <p className="mt-2 text-rose-500 font-bold text-sm">Đáp án đúng: {currentWord.word}</p>
+                                <p className="mt-2 text-rose-500 font-bold text-sm">{t('englishHub.listening.correctAnswer')} {currentWord.word}</p>
                             )}
                         </div>
                     )}
@@ -316,7 +372,7 @@ const ListeningPractice: React.FC<ListeningPracticeProps> = ({
                                 if (checkStatus !== 'idle') setCheckStatus('idle'); // Reset status on edit
                             }}
                             onKeyDown={handleKeyDown}
-                            placeholder="Nhập từ bạn nghe được..."
+                            placeholder={t('englishHub.listening.inputPlaceholder')}
                             className={`
                                 w-full bg-slate-100 text-center text-2xl md:text-3xl font-bold py-4 px-6 rounded-2xl
                                 border-4 outline-none transition-all placeholder:text-slate-300 placeholder:font-bold
@@ -345,7 +401,7 @@ const ListeningPractice: React.FC<ListeningPracticeProps> = ({
                                     onClick={handleGiveUp}
                                     className="flex-1 py-4 text-slate-400 font-bold hover:text-slate-600 bg-slate-100/50 hover:bg-slate-100 rounded-2xl transition-colors"
                                 >
-                                    Không nghe được?
+                                    {t('englishHub.listening.giveUp')}
                                 </button>
                                 <button
                                     onClick={handleCheck}
@@ -356,7 +412,7 @@ const ListeningPractice: React.FC<ListeningPracticeProps> = ({
                                         ${!userInput.trim() ? 'bg-slate-300 cursor-not-allowed shadow-none' : `${theme.accent} hover:brightness-110`}
                                     `}
                                 >
-                                    Kiểm tra
+                                    {t('englishHub.listening.check')}
                                 </button>
                             </>
                         ) : (
@@ -368,24 +424,19 @@ const ListeningPractice: React.FC<ListeningPracticeProps> = ({
                                     ${checkStatus === 'correct' ? 'bg-green-500 hover:bg-green-600' : 'bg-slate-500 hover:bg-slate-600'}
                                 `}
                             >
-                                {currentIndex < shuffledWords.length - 1 ? 'Câu tiếp theo' : 'Hoàn thành'}
+                                {currentIndex < shuffledWords.length - 1 ? t('englishHub.listening.next') : t('englishHub.listening.finish')}
                                 <ArrowRight className="w-6 h-6" />
                             </button>
                         )}
                     </div>
                 </div>
 
-                {hearts <= 0 && (
-                    <div className="mt-4 p-3 bg-red-100 text-red-600 rounded-xl text-sm font-bold animate-pulse">
-                        Cẩn thận! Bạn đã hết trái tim!
-                    </div>
-                )}
             </div>
 
             {/* Keyboard Hint */}
             <div className="hidden md:flex justify-center pb-6 text-slate-500 font-bold text-sm opacity-60">
                 <span className="flex items-center gap-2">
-                    Nhấn <Keyboard className="w-4 h-4" /> Enter để kiểm tra / tiếp tục
+                    <Keyboard className="w-4 h-4" /> {t('englishHub.listening.keyboardHint')}
                 </span>
             </div>
         </div>

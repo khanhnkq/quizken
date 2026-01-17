@@ -54,7 +54,7 @@ export const ROADMAP_DATA: RoadmapPhase[] = [
         subtitle: 'roadmap.phase2.subtitle',
         description: 'roadmap.phase2.description',
         icon: PenTool,
-        isLocked: true,
+        isLocked: false,
         color: 'indigo',
         tasks: [
             {
@@ -62,7 +62,8 @@ export const ROADMAP_DATA: RoadmapPhase[] = [
                 title: 'roadmap.phase2.task1.title',
                 description: 'roadmap.phase2.task1.desc',
                 type: 'grammar',
-                isCompleted: false
+                isCompleted: false,
+                link: '/english/phase/2/grammar'
             }
         ]
     },

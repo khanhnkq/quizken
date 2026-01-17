@@ -1,22 +1,30 @@
 import React from 'react';
 import { BookOpen, HelpCircle, Headphones, CheckCircle, Lock } from 'lucide-react';
 
-export type LessonStep = 'learn' | 'quiz' | 'listening';
+export type LessonStep = string;
+
+interface StepDef {
+    id: string;
+    label: string;
+    icon: React.FC<any>;
+}
 
 interface LessonProgressMapProps {
     currentStep: LessonStep;
     completedSteps: LessonStep[];
     onNavigate: (step: LessonStep) => void;
     topic: string;
+    steps?: StepDef[];
 }
 
-const STEPS: { id: LessonStep; label: string; icon: React.FC<any> }[] = [
+const DEFAULT_STEPS: StepDef[] = [
     { id: 'learn', label: 'Vocabulary', icon: BookOpen },
     { id: 'quiz', label: 'Mini Quiz', icon: HelpCircle },
     { id: 'listening', label: 'Listening', icon: Headphones },
 ];
 
-const LessonProgressMap: React.FC<LessonProgressMapProps> = ({ currentStep, completedSteps, onNavigate, topic }) => {
+const LessonProgressMap: React.FC<LessonProgressMapProps> = ({ currentStep, completedSteps, onNavigate, topic, steps }) => {
+    const activeSteps = steps || DEFAULT_STEPS;
 
     // Helper colors based on topic (simplified version)
     // Could pass full theme or just use generic distinct colors
@@ -27,7 +35,7 @@ const LessonProgressMap: React.FC<LessonProgressMapProps> = ({ currentStep, comp
     return (
         <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] bg-white/90 backdrop-blur-md px-2 py-2 rounded-full shadow-lg border border-white/50 flex items-center gap-0 transition-all duration-300 animate-in slide-in-from-top-4">
 
-            {STEPS.map((step, idx) => {
+            {activeSteps.map((step, idx) => {
                 const isCurrent = currentStep === step.id;
                 const isCompleted = completedSteps.includes(step.id);
                 // ... (logic remains same)
@@ -37,7 +45,7 @@ const LessonProgressMap: React.FC<LessonProgressMapProps> = ({ currentStep, comp
                 // 2. Completed steps are unlocked
                 // 3. Current step is unlocked
                 // 4. Step is unlocked if the PREVIOUS step is completed
-                const prevStep = STEPS[idx - 1];
+                const prevStep = activeSteps[idx - 1];
                 const isPrevCompleted = !prevStep || completedSteps.includes(prevStep.id);
 
                 const isUnlocked = isCurrent || isCompleted || isPrevCompleted;
@@ -75,7 +83,7 @@ const LessonProgressMap: React.FC<LessonProgressMapProps> = ({ currentStep, comp
                         </button>
 
                         {/* Connector Line */}
-                        {idx < STEPS.length - 1 && (
+                        {idx < activeSteps.length - 1 && (
                             <div className={`w-4 sm:w-8 h-1 mx-2 sm:mx-4 rounded-full transition-colors duration-500 ${isCompleted ? 'bg-green-300' : 'bg-gray-200'}`} />
                         )}
                     </div>

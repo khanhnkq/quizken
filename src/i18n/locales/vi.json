@@ -919,6 +919,12 @@
             "common": {
                 "lessons": "Bài Học",
                 "selectLevel": "Chọn Level..."
+            },
+            "steps": {
+                "learn": "Từ vựng",
+                "listening": "Luyện nghe",
+                "pronunciation": "Luyện nói",
+                "quiz": "Trắc nghiệm"
             }
         },
         "study": {
@@ -944,6 +950,62 @@
             "exampleLabel": "Ví dụ:",
             "removedToastTitle": "Đã xóa",
             "removedToastDesc": "Đã xóa {{word}} khỏi sổ tay."
+        },
+        "listening": {
+            "title": "Nghe & Viết",
+            "tapToReplay": "Nhấn để nghe lại",
+            "inputPlaceholder": "Nhập từ bạn nghe được...",
+            "meaningLabel": "Nghĩa tiếng Việt:",
+            "correctAnswer": "Đáp án đúng:",
+            "giveUp": "Không nghe được?",
+            "check": "Kiểm tra",
+            "next": "Câu tiếp theo",
+            "finish": "Hoàn thành",
+            "keyboardHint": "Nhấn Enter để kiểm tra / tiếp tục",
+            "gameOver": {
+                "title": "Hết trái tim!",
+                "description": "Bạn đã mất hết 3 trái tim. Hãy luyện tập lại nhé!",
+                "progress": "Tiến độ",
+                "bestStreak": "Streak Cao Nhất",
+                "exit": "Thoát",
+                "retry": "Làm lại"
+            },
+            "complete": {
+                "title": "Hoàn thành xuất sắc!",
+                "description": "Bạn đã hoàn thành bài tập nghe chép chính tả.",
+                "bestStreak": "Streak Cao Nhất",
+                "heartsLeft": "Tim Còn Lại",
+                "backToLesson": "Trở về bài học"
+            },
+            "toast": {
+                "correct": "Chính xác!",
+                "correctDesc": "Bạn đã làm rất tốt!"
+            }
+        },
+        "phase2": {
+            "header": "Ngữ Pháp Tiếng Anh",
+            "categories": {
+                "tenses": "Các Thì",
+                "structures": "Cấu Trúc Câu",
+                "verbs": "Động Từ",
+                "others": "Khác"
+            },
+            "steps": {
+                "theory": "Lý thuyết",
+                "quiz": "Trắc nghiệm",
+                "builder": "Ghép câu"
+            },
+            "buttons": {
+                "continueLearn": "Tiếp tục học",
+                "practiceAgain": "Luyện tập lại",
+                "backToList": "Về danh sách"
+            },
+            "messages": {
+                "lessonComplete": "Hoàn thành bài học!",
+                "quizComplete": "Đã hoàn thành!",
+                "alreadyMastered": "Bạn đã làm bài quiz này rồi.",
+                "yourScore": "Điểm số"
+            }
         }
     },
     "roadmap": {
@@ -964,6 +1026,29 @@
             "title": "Giai Đoạn 2: Kiếm Trúc Sư",
             "subtitle": "Ngữ Pháp (1-2 Tháng)",
             "description": "Làm chủ câu phức, mệnh đề quan hệ và câu bị động.",
+            "header": "Ngữ Pháp Tiếng Anh",
+            "categories": {
+                "tenses": "Các Thì",
+                "structures": "Cấu Trúc Câu",
+                "verbs": "Động Từ",
+                "others": "Khác"
+            },
+            "steps": {
+                "theory": "Lý thuyết",
+                "quiz": "Trắc nghiệm",
+                "builder": "Ghép câu"
+            },
+            "buttons": {
+                "continueLearn": "Tiếp tục học",
+                "practiceAgain": "Luyện tập lại",
+                "backToList": "Về danh sách"
+            },
+            "messages": {
+                "lessonComplete": "Hoàn thành bài học!",
+                "quizComplete": "Đã hoàn thành!",
+                "alreadyMastered": "Bạn đã làm bài quiz này rồi.",
+                "yourScore": "Điểm số"
+            },
             "task1": {
                 "title": "Mệnh Đề Quan Hệ",
                 "desc": "Luyện tập kết hợp câu sử dụng who, which, that."

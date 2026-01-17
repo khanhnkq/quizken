@@ -916,6 +916,12 @@
             "common": {
                 "lessons": "Lessons",
                 "selectLevel": "Select Level..."
+            },
+            "steps": {
+                "learn": "Vocabulary",
+                "listening": "Listening",
+                "pronunciation": "Speaking",
+                "quiz": "Quiz"
             }
         },
         "study": {
@@ -941,6 +947,62 @@
             "exampleLabel": "Example:",
             "removedToastTitle": "Removed",
             "removedToastDesc": "Removed {{word}} from notebook."
+        },
+        "listening": {
+            "title": "Listen & Write",
+            "tapToReplay": "Tap to replay",
+            "inputPlaceholder": "Type the word you hear...",
+            "meaningLabel": "Vietnamese meaning:",
+            "correctAnswer": "Correct answer:",
+            "giveUp": "Can't hear it?",
+            "check": "Check",
+            "next": "Next question",
+            "finish": "Finish",
+            "keyboardHint": "Press Enter to check / continue",
+            "gameOver": {
+                "title": "Out of hearts!",
+                "description": "You've lost all 3 hearts. Try practicing again!",
+                "progress": "Progress",
+                "bestStreak": "Best Streak",
+                "exit": "Exit",
+                "retry": "Try Again"
+            },
+            "complete": {
+                "title": "Excellent!",
+                "description": "You've completed the listening dictation exercise.",
+                "bestStreak": "Best Streak",
+                "heartsLeft": "Hearts Left",
+                "backToLesson": "Back to Lesson"
+            },
+            "toast": {
+                "correct": "Correct!",
+                "correctDesc": "Great job!"
+            }
+        },
+        "phase2": {
+            "header": "English Grammar",
+            "categories": {
+                "tenses": "Tenses",
+                "structures": "Sentence Structures",
+                "verbs": "Verbs",
+                "others": "Others"
+            },
+            "steps": {
+                "theory": "Theory",
+                "quiz": "Quiz",
+                "builder": "Builder"
+            },
+            "buttons": {
+                "continueLearn": "Continue Learning",
+                "practiceAgain": "Practice Again",
+                "backToList": "Back to List"
+            },
+            "messages": {
+                "lessonComplete": "Lesson Completed!",
+                "quizComplete": "Quiz Completed!",
+                "alreadyMastered": "You have already mastered this quiz.",
+                "yourScore": "Your Score"
+            }
         }
     },
     "roadmap": {
@@ -961,6 +1023,29 @@
             "title": "Phase 2: The Architect",
             "subtitle": "Grammar (1-2 Months)",
             "description": "Master complex sentences, relative clauses, and passive voice.",
+            "header": "English Grammar",
+            "categories": {
+                "tenses": "Tenses",
+                "structures": "Sentence Structures",
+                "verbs": "Verbs",
+                "others": "Others"
+            },
+            "steps": {
+                "theory": "Theory",
+                "quiz": "Quiz",
+                "builder": "Builder"
+            },
+            "buttons": {
+                "continueLearn": "Continue Learning",
+                "practiceAgain": "Practice Again",
+                "backToList": "Back to List"
+            },
+            "messages": {
+                "lessonComplete": "Lesson Completed!",
+                "quizComplete": "Quiz Completed!",
+                "alreadyMastered": "You have already mastered this quiz.",
+                "yourScore": "Your Score"
+            },
             "task1": {
                 "title": "Relative Clauses",
                 "desc": "Practice combining sentences using who, which, that."

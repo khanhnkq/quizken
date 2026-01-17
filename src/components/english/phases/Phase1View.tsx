@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { toast } from '@/hooks/use-toast';
-import { ArrowLeft, Lock, CheckCircle, Star, Sparkles, Layout, BookOpen, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Lock, CheckCircle, Star, Sparkles, Layout, BookOpen, ChevronLeft, ChevronRight, Headphones, Mic, HelpCircle } from 'lucide-react';
 import { SentenceChallenge, SentencePart } from '@/lib/constants/vocabData';
 import {
     VocabWord,
@@ -25,6 +25,7 @@ import { TOEIC_DATA } from '../../../lib/constants/toeicData';
 import { TOPIC_DATA } from '../../../lib/constants/topicVocabData';
 import FlashcardSet from '../FlashcardSet';
 import ListeningPractice from '../ListeningPractice';
+import PronunciationPractice from '../PronunciationPractice';
 import { useUserProgress } from '../../../hooks/useUserProgress';
 import MiniQuiz from '../MiniQuiz';
 import LessonProgressMap, { LessonStep } from '../LessonProgressMap';
@@ -114,13 +115,22 @@ const Phase1View = () => {
     const navigate = useNavigate();
     const { t } = useTranslation();
     const { isLessonCompleted, completeLesson, getLessonScore, skipLevel, isLevelSkipped } = useUserProgress();
-    const [selectedLesson, setSelectedLesson] = useState<CEFRLesson | null>(null);
+    // Lesson Flow State
     const [showQuiz, setShowQuiz] = useState(false);
     const [showListening, setShowListening] = useState(false);
+    const [showPronunciation, setShowPronunciation] = useState(false);
+    const [selectedLesson, setSelectedLesson] = useState<any>(null);
+
+    // Track completed steps for current lesson
+    const [completedSteps, setCompletedSteps] = useState<string[]>([]);
+
+    // UI State
     const [expandedLevel, setExpandedLevel] = useState<CEFRLevelData | null>(null);
-    const [completedSteps, setCompletedSteps] = useState<LessonStep[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const ITEMS_PER_PAGE = 6;
+
+    // Define steps
+    type LessonStep = 'learn' | 'listening' | 'pronunciation' | 'quiz';
 
     // transform generateChallenges to be stable
 
@@ -150,11 +160,21 @@ const Phase1View = () => {
             if (isMainCompleted) {
                 setShowQuiz(false); setShowListening(false);
             } else if (!steps.includes('learn')) {
-                setShowQuiz(false); setShowListening(false);
+                setShowQuiz(false); setShowListening(false); setShowPronunciation(false);
             } else if (!steps.includes('quiz')) {
-                setShowQuiz(true); setShowListening(false);
-            } else if (!steps.includes('listening')) {
-                setShowQuiz(false); setShowListening(true);
+                // If quiz not done, check previous steps
+                if (!steps.includes('pronunciation')) {
+                    if (!steps.includes('listening')) {
+                        setShowListening(true); setShowPronunciation(false); setShowQuiz(false);
+                    } else {
+                        setShowListening(false); setShowPronunciation(true); setShowQuiz(false);
+                    }
+                } else {
+                    setShowListening(false); setShowPronunciation(false); setShowQuiz(true);
+                }
+            } else {
+                // All done or just navigation
+                setShowListening(false); setShowPronunciation(false); setShowQuiz(false);
             }
         } else {
             setCompletedSteps([]);
@@ -162,7 +182,7 @@ const Phase1View = () => {
     }, [selectedLesson, isLessonCompleted]);
 
     // Determine current step based on state
-    const currentStep: LessonStep = showListening ? 'listening' : showQuiz ? 'quiz' : 'learn';
+    const currentStep: LessonStep = showListening ? 'listening' : showPronunciation ? 'pronunciation' : showQuiz ? 'quiz' : 'learn';
 
     // transform generateChallenges to be stable
     const practiceChallenges = React.useMemo(() => {
@@ -176,12 +196,19 @@ const Phase1View = () => {
         if (step === 'learn') {
             setShowQuiz(false);
             setShowListening(false);
+            setShowPronunciation(false);
         } else if (step === 'quiz') {
             setShowQuiz(true);
             setShowListening(false);
+            setShowPronunciation(false);
         } else if (step === 'listening') {
             setShowQuiz(false);
             setShowListening(true);
+            setShowPronunciation(false);
+        } else if (step === 'pronunciation') {
+            setShowQuiz(false);
+            setShowListening(false);
+            setShowPronunciation(true);
         }
     };
 
@@ -293,11 +320,18 @@ const Phase1View = () => {
         return (
             <div className="relative min-h-screen">
                 {/* Navigation Map - Floating on top */}
+                {/* Navigation Map - Floating on top */}
                 <LessonProgressMap
                     currentStep={currentStep}
                     completedSteps={completedSteps}
                     onNavigate={handleNavigate}
                     topic={selectedLesson.level}
+                    steps={[
+                        { id: 'learn', label: t('englishHub.phase1.steps.learn', 'Vocabulary'), icon: BookOpen },
+                        { id: 'listening', label: t('englishHub.phase1.steps.listening', 'Listening'), icon: Headphones },
+                        { id: 'pronunciation', label: t('englishHub.phase1.steps.pronunciation', 'Speaking'), icon: Mic },
+                        { id: 'quiz', label: t('englishHub.phase1.steps.quiz', 'Quiz'), icon: HelpCircle },
+                    ]}
                 />
 
                 {/* Content Area */}
@@ -311,7 +345,9 @@ const Phase1View = () => {
                                 const stepKey = `${baseKey}-learn`;
                                 completeLesson(stepKey);
                                 setCompletedSteps(prev => [...new Set([...prev, 'learn'])] as LessonStep[]);
-                                setShowQuiz(true);
+                                setShowListening(true);
+                                setShowPronunciation(false);
+                                setShowQuiz(false);
                             }}
                         />
                     )}
@@ -351,21 +387,40 @@ const Phase1View = () => {
                             onComplete={() => {
                                 setCompletedSteps(prev => [...new Set([...prev, 'listening'])] as LessonStep[]);
                                 const stepKey = `${baseKey}-listening`;
-
-                                // Mark listening step and main lesson as completed
-                                completeLesson([stepKey, baseKey]);
+                                completeLesson(stepKey);
 
                                 toast({
-                                    title: "Luyện Nghe Hoàn Thành!",
-                                    description: "Bạn đã hoàn thành phần luyện nghe!",
+                                    title: "Listening Phase Complete!",
+                                    description: "Great job! Now let's practice speaking.",
                                     variant: "success"
                                 });
 
-                                setSelectedLesson(null);
-                                setCompletedSteps([]);
                                 setShowListening(false);
+                                setShowPronunciation(true);
                             }}
                             onClose={() => { setSelectedLesson(null); setCompletedSteps([]); setShowListening(false); }}
+                        />
+                    )}
+
+                    {currentStep === 'pronunciation' && (
+                        <PronunciationPractice
+                            words={selectedLesson.words}
+                            level={selectedLesson.level}
+                            onComplete={() => {
+                                setCompletedSteps(prev => [...new Set([...prev, 'pronunciation'])] as LessonStep[]);
+                                const stepKey = `${baseKey}-pronunciation`; // Not tracked in global completedLessons for now, or maybe it should?
+                                // Let's just track UI state for now to keep it simple, or add to completeLesson if tracking is flexible
+
+                                toast({
+                                    title: "Pronunciation Phase Complete!",
+                                    description: "Excellent! Final step: Take the Quiz.",
+                                    variant: "success"
+                                });
+
+                                setShowPronunciation(false);
+                                setShowQuiz(true);
+                            }}
+                            onClose={() => { setSelectedLesson(null); setCompletedSteps([]); setShowPronunciation(false); }}
                         />
                     )}
                 </div>
@@ -389,6 +444,16 @@ const Phase1View = () => {
             <div className="absolute top-[-10%] right-[-10%] w-96 h-96 bg-yellow-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
             <div className="absolute bottom-[-10%] left-[20%] w-96 h-96 bg-pink-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
 
+            {/* Floating Icons */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+                <BookOpen className="absolute top-[15%] left-[8%] w-8 h-8 text-blue-200 opacity-40 animate-bounce" style={{ animationDuration: '3s' }} />
+                <Star className="absolute top-[25%] right-[12%] w-6 h-6 text-yellow-300 opacity-50 animate-pulse" style={{ animationDuration: '2.5s' }} />
+                <Sparkles className="absolute bottom-[30%] left-[15%] w-7 h-7 text-purple-200 opacity-40 animate-bounce" style={{ animationDuration: '4s' }} />
+                <BookOpen className="absolute bottom-[20%] right-[10%] w-6 h-6 text-pink-200 opacity-40 animate-pulse" style={{ animationDuration: '3.5s' }} />
+                <Star className="absolute top-[50%] left-[5%] w-5 h-5 text-indigo-200 opacity-30 animate-bounce" style={{ animationDuration: '5s' }} />
+                <Sparkles className="absolute top-[10%] right-[25%] w-5 h-5 text-cyan-200 opacity-35 animate-pulse" style={{ animationDuration: '2s' }} />
+            </div>
+
             {/* FIXED HEADER AREA */}
             <div className="flex-none z-20 relative w-full max-w-4xl mx-auto px-4 pt-2 pb-0">
                 <div className="text-center relative min-h-[60px]">
@@ -401,8 +466,17 @@ const Phase1View = () => {
 
                     {!expandedLevel ? (
                         <div className="animate-fade-in flex flex-col items-center">
+                            {/* Subtitle */}
+                            <span className="text-sm font-bold tracking-widest text-slate-400 uppercase mb-1">Phase 1</span>
+
+                            <h1 className="font-heading text-3xl sm:text-4xl font-black tracking-tight text-slate-900 drop-shadow-sm mb-4">
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 relative inline-block">
+                                    {activeTab === 'cefr' ? t('englishHub.phase1.headers.cefr') : activeTab === 'toeic' ? t('englishHub.phase1.headers.toeic') : t('englishHub.phase1.headers.topic')}
+                                </span>
+                            </h1>
+
                             {/* Tabs */}
-                            <div className="inline-flex items-center p-1 rounded-full bg-slate-200/50 backdrop-blur-sm border border-slate-200 mb-2">
+                            <div className="inline-flex items-center p-1 rounded-full bg-slate-200/50 backdrop-blur-sm border border-slate-200 mb-6">
                                 <button
                                     onClick={() => setActiveTab('cefr')}
                                     className={`
@@ -431,14 +505,6 @@ const Phase1View = () => {
                                     {t('englishHub.phase1.tabs.topic')}
                                 </button>
                             </div>
-
-
-
-                            <h1 className="font-heading text-3xl sm:text-4xl font-black tracking-tight text-slate-900 drop-shadow-sm mb-2">
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 relative inline-block">
-                                    {activeTab === 'cefr' ? t('englishHub.phase1.headers.cefr') : activeTab === 'toeic' ? t('englishHub.phase1.headers.toeic') : t('englishHub.phase1.headers.topic')}
-                                </span>
-                            </h1>
 
                             {/* Select Dropdown for Page Levels */}
                             <div className="relative w-full max-w-sm mx-auto mb-2">
