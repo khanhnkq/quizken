@@ -5,6 +5,7 @@ import { VocabWord } from '../../lib/constants/cefrVocabData';
 import { toast } from '@/hooks/use-toast';
 import { gsap } from 'gsap';
 import confetti from 'canvas-confetti';
+import { useVocabulary } from '@/hooks/useVocabulary';
 
 interface FlashcardSetProps {
     words: VocabWord[];
@@ -13,25 +14,6 @@ interface FlashcardSetProps {
     onComplete?: () => void;
     minimalView?: boolean;
 }
-
-// Helper to get playful theme colors based on CEFR level
-const getTheme = (level: string) => {
-    switch (level) {
-        case 'A1': return {
-    
-    // ... inside render ...
-    // Note: Can't easily target a large block with replacement if I don't see exact lines.
-    // I will use replace on the props interface and signature first, then the return statement.
-    // Since I can't do multiple disparate edits in one replace_file_content call easily if they are far apart, 
-    // I'll assume I do them in one go if I include enough context or use multi_replace.
-    // Actually, I'll use multi_replace for safety as they are apart.
-    // Wait, I am constrained to one tool usage per turn for replace/multi_replace ideally? 
-    // No, I can stream tools. But let's check the view again.
-    // Lines 1-50 showed interface. 
-    // I need to see the return statement to modify the background.
-    
-    // Let's use multi_replace_file_content for this file.
-
 
 // Helper to get playful theme colors based on CEFR level
 const getTheme = (level: string) => {
@@ -88,9 +70,8 @@ const getTheme = (level: string) => {
     }
 };
 
-import { useVocabulary } from '@/hooks/useVocabulary';
 
-const FlashcardSet = ({ words, title, onClose, onComplete }: FlashcardSetProps) => {
+const FlashcardSet = ({ words, title, onClose, onComplete, minimalView = false }: FlashcardSetProps) => {
     const { t } = useTranslation();
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isFlipped, setIsFlipped] = useState(false);
