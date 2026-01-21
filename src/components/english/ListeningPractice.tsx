@@ -276,53 +276,55 @@ const ListeningPractice: React.FC<ListeningPracticeProps> = ({
     if (!currentWord) return null;
 
     return (
-        <div className={`fixed inset-0 z-50 flex flex-col bg-gradient-to-br ${theme.gradient} overflow-hidden`}>
+        <div className={`fixed inset-0 z-50 flex flex-col items-center justify-start pt-24 md:pt-0 bg-gradient-to-br ${theme.gradient} overflow-hidden`}>
             {/* Background pattern */}
             <div className="absolute inset-0 opacity-30 pointer-events-none" style={{
                 backgroundImage: 'radial-gradient(#94a3b8 1px, transparent 1px)',
                 backgroundSize: '24px 24px'
             }} />
 
-            {/* Header */}
-            <div className="relative z-10 flex items-center justify-between p-4 md:p-6">
-                <button
-                    onClick={onClose}
-                    className="p-3 bg-white/60 backdrop-blur-sm rounded-full shadow-lg hover:bg-white/80 transition-all border border-white/50"
-                >
-                    <ArrowLeft className="w-6 h-6 text-slate-600" />
-                </button>
+            {/* Floating Back Button */}
+            <button
+                onClick={onClose}
+                className="absolute top-16 left-4 md:top-8 md:left-8 z-50 p-3 bg-white/60 backdrop-blur-sm rounded-full shadow-lg hover:bg-white/80 transition-all border border-white/50"
+            >
+                <ArrowLeft className="w-6 h-6 text-slate-600" />
+            </button>
+
+            {/* Top Bar */}
+            <div className="w-full max-w-md flex items-center justify-between mb-4 relative z-10 px-4 md:mt-28">
+                {/* Spacer for symmetry */}
+                <div className="w-12"></div>
 
                 {/* Progress Bar */}
-                <div className="flex-1 mx-4 max-w-md">
-                    <div className="h-4 bg-white/50 rounded-full overflow-hidden shadow-inner border border-white/30">
-                        <div
-                            className={`h-full ${theme.accent} transition-all duration-500 rounded-full shadow-[0_2px_0_0_rgba(0,0,0,0.1)]`}
-                            style={{ width: `${((currentIndex + 1) / shuffledWords.length) * 100}%` }}
-                        />
-                    </div>
+                <div className="flex-1 mx-4 h-5 bg-white rounded-full overflow-hidden shadow-inner p-1 border border-white/50">
+                    <div
+                        className={`h-full rounded-full transition-all duration-500 ${theme.accent} shadow-sm`}
+                        style={{ width: `${((currentIndex + 1) / shuffledWords.length) * 100}%` }}
+                    />
                 </div>
 
                 {/* Status: Hearts & Streak */}
-                <div className="flex items-center gap-3">
-                    <div className="flex bg-white/60 backdrop-blur-sm p-2 rounded-2xl border border-white/50 shadow-sm">
+                <div className="flex items-center gap-2">
+                    <div className="flex bg-white p-2 rounded-2xl border border-white/50 shadow-sm">
                         {[1, 2, 3].map(i => (
                             <Heart
                                 key={i}
-                                className={`w-6 h-6 transition-all ${i <= hearts ? 'fill-red-500 text-red-500' : 'fill-slate-200 text-slate-200'}`}
+                                className={`w-5 h-5 transition-all ${i <= hearts ? 'fill-red-500 text-red-500' : 'fill-slate-200 text-slate-200'}`}
                             />
                         ))}
                     </div>
                     {streak > 1 && (
                         <div className="flex items-center gap-1 px-3 py-2 bg-gradient-to-r from-orange-400 to-red-500 text-white rounded-2xl font-black shadow-lg animate-bounce">
-                            <Flame className="w-5 h-5 fill-white" />
-                            <span>x{streak}</span>
+                            <Flame className="w-4 h-4 fill-white" />
+                            <span className="text-sm">x{streak}</span>
                         </div>
                     )}
                 </div>
             </div>
 
             {/* Main Content */}
-            <div className="flex-1 flex flex-col items-center justify-center p-4 relative z-10">
+            <div className="flex-1 w-full flex flex-col items-center justify-center p-4 relative z-10">
                 <div
                     ref={cardRef}
                     className="w-full max-w-xl bg-white/90 backdrop-blur-md rounded-[2.5rem] shadow-2xl p-6 md:p-10 border-4 border-white relative"

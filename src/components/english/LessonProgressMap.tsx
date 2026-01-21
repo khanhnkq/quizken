@@ -33,7 +33,7 @@ const LessonProgressMap: React.FC<LessonProgressMapProps> = ({ currentStep, comp
     const lockedColor = "text-gray-400 bg-gray-100 border-gray-100";
 
     return (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] bg-white/90 backdrop-blur-md px-2 py-2 rounded-full shadow-lg border border-white/50 flex items-center gap-0 transition-all duration-300 animate-in slide-in-from-top-4">
+        <div className="fixed top-4 md:top-6 left-1/2 -translate-x-1/2 z-[100] bg-white/95 backdrop-blur-md px-2 py-2 rounded-full shadow-lg border border-slate-200/60 flex items-center gap-0 transition-all duration-300 animate-in slide-in-from-top-4">
 
             {activeSteps.map((step, idx) => {
                 const isCurrent = currentStep === step.id;

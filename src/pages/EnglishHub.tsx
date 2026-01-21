@@ -1,8 +1,9 @@
 import React, { useRef, useState, useEffect, useLayoutEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Sparkles, Flame, BookOpen } from 'lucide-react';
+import { ArrowLeft, Sparkles, Flame, BookOpen, Mic } from 'lucide-react';
 import { ROADMAP_DATA } from '../lib/constants/roadmapData';
 import MapNode from '../components/english/MapNode';
+import PronunciationPractice from '../components/english/PronunciationPractice';
 import { BackgroundDecorations } from '../components/ui/BackgroundDecorations';
 import { useTranslation } from 'react-i18next';
 import { useUserProgress } from '../hooks/useUserProgress';
@@ -22,6 +23,7 @@ const EnglishHub = () => {
     const headerRef = useRef<HTMLDivElement>(null);
     const mapRef = useRef<HTMLDivElement>(null);
     const [pathHeight, setPathHeight] = useState(1000);
+    const [showPronunciation, setShowPronunciation] = useState(false);
 
     // Initial Entry Animation - MUST be before any early returns
     useLayoutEffect(() => {
@@ -131,10 +133,22 @@ const EnglishHub = () => {
                         </button>
 
                         <div className="flex items-center gap-3">
+                            {/* Speaking Button - New */}
+                            <button
+                                onClick={() => setShowPronunciation(true)}
+                                className="group relative bg-gradient-to-r from-blue-400 to-indigo-500 hover:from-blue-500 hover:to-indigo-600 text-white h-12 pl-3 pr-4 rounded-2xl shadow-lg shadow-blue-200 hover:shadow-blue-300 transform hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2"
+                                title="Practice Speaking"
+                            >
+                                <div className="bg-white/20 p-1.5 rounded-xl group-hover:scale-110 transition-transform">
+                                    <Mic className="w-5 h-5 text-white" />
+                                </div>
+                                <span className="font-bold text-sm tracking-wide hidden sm:block">Speaking</span>
+                            </button>
+
                             {/* Notebook Button - Redesigned */}
                             <button
                                 onClick={() => navigate('/english/notebook')}
-                                className="group relative bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white p-2 pl-3 pr-4 rounded-2xl shadow-lg shadow-orange-200 hover:shadow-orange-300 transform hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2"
+                                className="group relative bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white h-12 pl-3 pr-4 rounded-2xl shadow-lg shadow-orange-200 hover:shadow-orange-300 transform hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2"
                                 title={t('englishHub.notebook')}
                             >
                                 <div className="bg-white/20 p-1.5 rounded-xl group-hover:rotate-12 transition-transform">
@@ -150,7 +164,7 @@ const EnglishHub = () => {
                                 )}
                             </button>
 
-                            <div className="bg-white/95 backdrop-blur-sm px-4 py-3 rounded-2xl shadow-lg border border-slate-200/50 flex items-center gap-4">
+                            <div className="bg-white/95 backdrop-blur-sm px-4 h-12 rounded-2xl shadow-lg border border-slate-200/50 flex items-center gap-4">
                                 {/* GitHub-style contribution grid */}
                                 <div className="flex flex-col gap-1">
                                     <div className="flex gap-1">
@@ -292,6 +306,25 @@ const EnglishHub = () => {
                     </div>
                 </div>
             </main>
+            {/* Global Speaking Practice Overlay */}
+            {showPronunciation && (
+                <div className="absolute inset-0 z-50 bg-white/95 backdrop-blur-sm">
+                    <PronunciationPractice
+                        words={vocabulary.map(word => ({
+                            id: word,
+                            word: word,
+                            pronunciation: '', // Placeholder
+                            meaning: '', // Placeholder
+                            example: '',
+                            type: 'vocabulary',
+                            level: 'Personal'
+                        }))}
+                        level="General"
+                        onComplete={() => setShowPronunciation(false)}
+                        onClose={() => setShowPronunciation(false)}
+                    />
+                </div>
+            )}
         </div>
     );
 };

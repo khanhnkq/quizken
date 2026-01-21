@@ -40,39 +40,35 @@ export async function getUserGeminiKey(userId: string): Promise<string | null> {
  */
 export async function getPronunciationFeedback(
     targetWord: string,
-    userTranscript: string,
+    audioBase64: string,
     apiKey: string,
     isVietnamese: boolean = true
 ): Promise<PronunciationFeedback> {
-    const prompt = isVietnamese
+    const systemInstruction = isVietnamese
         ? `Bạn là huấn luyện viên phát âm tiếng Anh cho người Việt.
-
-Từ cần nói: "${targetWord}"
-Speech Recognition nghe được: "${userTranscript}"
+Nhiệm vụ: Nghe file âm thanh và so sánh với từ mục tiêu: "${targetWord}".
 
 Phân tích:
-1. Nếu transcript khớp hoặc gần khớp với từ gốc (bỏ qua hoa thường), cho điểm cao
-2. Nếu khác, phân tích lỗi phát âm phổ biến người Việt mắc phải
-3. Đưa ra mẹo cải thiện cụ thể
+1. Độ chính xác (0-100%): Dựa trên độ rõ ràng, ngữ điệu và độ khớp với từ gốc.
+2. Lỗi sai: Chỉ ra các âm bị sai (ví dụ: thiếu ending sound, sai nguyên âm...).
+3. Mẹo: Đưa ra lời khuyên ngắn gọn để sửa lỗi.
 
-Trả lời CHÍNH XÁC dưới dạng JSON:
-{ "accuracy": <số từ 0-100>, "error": "<mô tả lỗi hoặc 'Phát âm tốt!''>", "tip": "<mẹo cải thiện>" }`
+Trả lời CHÍNH XÁC JSON:
+{ "accuracy": <số>, "error": "<nhận xét ngắn>", "tip": "<lời khuyên>" }`
         : `You are an English pronunciation coach.
-
-Target word: "${targetWord}"
-Speech Recognition heard: "${userTranscript}"
+Task: Listen to the audio and compare with target word: "${targetWord}".
 
 Analyze:
-1. If transcript matches or nearly matches the target (case insensitive), give high score
-2. If different, analyze common pronunciation errors
-3. Give specific improvement tips
+1. Accuracy (0-100%): Based on clarity, intonation, and match.
+2. Error: Point out specific mispronounced sounds.
+3. Tip: Brief advice to improve.
 
-Respond EXACTLY in JSON format:
-{ "accuracy": <number 0-100>, "error": "<error description or 'Great pronunciation!'">", "tip": "<improvement tip>" }`;
+Respond EXACTLY in JSON:
+{ "accuracy": <number>, "error": "<short comment>", "tip": "<advice>" }`;
 
     try {
         const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.0-flash-preview:generateContent?key=${apiKey}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`,
             {
                 method: 'POST',
                 headers: {
@@ -81,32 +77,34 @@ Respond EXACTLY in JSON format:
                 body: JSON.stringify({
                     contents: [
                         {
-                            parts: [{ text: prompt }],
+                            parts: [
+                                { text: systemInstruction },
+                                {
+                                    inline_data: {
+                                        mime_type: "audio/webm;codecs=opus",
+                                        data: audioBase64
+                                    }
+                                }
+                            ],
                         },
                     ],
                     generationConfig: {
-                        temperature: 0.3,
-                        maxOutputTokens: 256,
+                        temperature: 0.1,
+                        response_mime_type: "application/json"
                     },
                 }),
             }
         );
 
         if (!response.ok) {
-            throw new Error(`Gemini API error: ${response.status}`);
+            const errData = await response.json();
+            throw new Error(`Gemini API error: ${response.status} - ${JSON.stringify(errData)}`);
         }
 
         const data: GeminiResponse = await response.json();
         const textResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
-        // Extract JSON from response (handle markdown code blocks)
-        let jsonStr = textResponse;
-        const jsonMatch = textResponse.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-            jsonStr = jsonMatch[0];
-        }
-
-        const parsed = JSON.parse(jsonStr);
+        const parsed = JSON.parse(textResponse);
 
         return {
             accuracy: Number(parsed.accuracy) || 0,
@@ -116,19 +114,11 @@ Respond EXACTLY in JSON format:
         };
     } catch (error) {
         console.error('Gemini pronunciation analysis error:', error);
-
-        // Fallback: simple text comparison
-        const isMatch = targetWord.toLowerCase().trim() === userTranscript.toLowerCase().trim();
-
         return {
-            accuracy: isMatch ? 100 : calculateSimilarity(targetWord, userTranscript),
-            error: isMatch
-                ? (isVietnamese ? 'Phát âm tốt!' : 'Great pronunciation!')
-                : (isVietnamese ? 'Phát âm chưa khớp với từ gốc' : 'Pronunciation does not match target'),
-            tip: isMatch
-                ? (isVietnamese ? 'Tiếp tục phát huy!' : 'Keep it up!')
-                : (isVietnamese ? 'Hãy nghe lại và thử lần nữa' : 'Listen again and try once more'),
-            isCorrect: isMatch,
+            accuracy: 0,
+            error: isVietnamese ? 'Lỗi xử lý âm thanh' : 'Audio processing error',
+            tip: isVietnamese ? 'Vui lòng thử lại' : 'Please try again',
+            isCorrect: false,
         };
     }
 }

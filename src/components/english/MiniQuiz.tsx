@@ -293,7 +293,7 @@ const MiniQuiz: React.FC<MiniQuizProps> = ({ words, topic, onClose, onComplete, 
     }
 
     return (
-        <section className={`fixed inset-0 z-50 flex flex-col items-center justify-center p-4 bg-gradient-to-br ${theme.gradient} overflow-hidden`}>
+        <section className={`fixed inset-0 z-50 flex flex-col items-center justify-start pt-24 md:pt-0 p-4 bg-gradient-to-br ${theme.gradient} overflow-hidden`}>
 
             <div className="absolute inset-0 opacity-40"
                 style={{ backgroundImage: 'radial-gradient(#cbd5e1 1px, transparent 1px)', backgroundSize: '24px 24px' }}>
@@ -303,150 +303,152 @@ const MiniQuiz: React.FC<MiniQuizProps> = ({ words, topic, onClose, onComplete, 
             <div className={`absolute top-1/2 left-1/4 w-96 h-96 ${theme.blobMain} rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-blob pointer-events-none`}></div>
             <div className={`absolute top-0 right-1/4 w-96 h-96 ${theme.blobSec} rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-blob animation-delay-2000 pointer-events-none`}></div>
 
-            {/* Mascot / Structure Hint */}
-            <div className="absolute top-20 md:top-[12%] flex flex-col items-center gap-2 animate-float pointer-events-none z-10">
-                <div ref={mascotRef} className="bg-white p-4 rounded-3xl shadow-xl border-4 border-slate-100 rotate-[-5deg]">
-                    <Brain className={`w-12 h-12 ${theme.text}`} />
-                </div>
-            </div>
+            {/* Mascot removed to prevent overlap with progress bar */}
 
             <button
                 onClick={onClose}
-                className="absolute top-4 left-4 md:top-8 md:left-8 z-50 p-3 bg-white/40 backdrop-blur-md hover:bg-white/60 text-slate-700 rounded-full shadow-lg border border-white/50 transition-all hover:scale-105 active:scale-95"
+                className="absolute top-16 left-4 md:top-8 md:left-8 z-50 p-3 bg-white/40 backdrop-blur-md hover:bg-white/60 text-slate-700 rounded-full shadow-lg border border-white/50 transition-all hover:scale-105 active:scale-95"
             >
                 <ArrowLeft className="w-6 h-6" />
             </button>
 
-            <div ref={containerRef} className="max-w-3xl w-full bg-white/90 backdrop-blur-md rounded-[2.5rem] shadow-2xl border-4 border-white/50 overflow-hidden relative flex flex-col max-h-[90vh]">
+            {/* Top Bar - Matching FlashcardSet layout */}
+            <div className="w-full max-w-md mx-auto flex items-center justify-between mb-4 relative z-10 px-4 md:mt-28">
+                {/* Spacer for symmetry */}
+                <div className="w-12"></div>
 
-                <div className="p-6 pb-2 border-b border-slate-100/50">
-                    <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-2">
-                            {/* Only show prev button if playability warrants it, though typically unused in quiz flow */}
-                            {currentQuestionIndex > 0 && (
-                                <button
-                                    onClick={prevQuestion}
-                                    className="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 transition-colors"
-                                >
-                                    <ArrowLeft className="w-5 h-5" />
-                                </button>
-                            )}
-
-                            {/* Next Button (Manual Navigation for review) */}
-                            {currentQuestionIndex < quizData.length - 1 && selectedOption && (
-                                <button
-                                    onClick={nextQuestion}
-                                    className="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 transition-colors"
-                                >
-                                    <ArrowRight className="w-5 h-5" />
-                                </button>
-                            )}
-                        </div>
-
-                        <div className={`flex items-center gap-2 px-4 py-1.5 rounded-full ${theme.light} ${theme.text} font-black border border-white/50 shadow-sm`}>
-                            <Trophy className="w-4 h-4 fill-current" />
-                            <span className="text-base">{score}/{quizData.length}</span>
-                        </div>
-                    </div>
-
-                    <div className="flex items-center justify-between mb-2 text-sm text-slate-400 font-bold uppercase tracking-wider">
-                        <span>Progress</span>
-                        <span>{currentQuestionIndex + 1}/{quizData.length}</span>
-                    </div>
-                    <div className="w-full bg-slate-100 rounded-full h-3">
-                        <div
-                            className={`h-3 rounded-full transition-all duration-500 ease-out relative overflow-hidden ${theme.progress} shadow-[0_2px_4px_rgba(0,0,0,0.1)]`}
-                            style={{ width: `${((currentQuestionIndex + 1) / quizData.length) * 100}%` }}
-                        >
-                            <div className="absolute inset-0 bg-white/20 animate-progress-indeterminate w-full h-full" />
-                        </div>
-                    </div>
+                {/* Progress Bar */}
+                <div className="flex-1 mx-4 h-5 bg-white rounded-full overflow-hidden shadow-inner p-1 border border-white/50">
+                    <div
+                        className={`h-full rounded-full transition-all duration-500 ${theme.progress} shadow-sm`}
+                        style={{ width: `${((currentQuestionIndex + 1) / quizData.length) * 100}%` }}
+                    ></div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-6 md:p-8">
-                    <div className="max-w-2xl mx-auto">
-                        <div className="mb-8 text-center">
-                            <h3 className="text-2xl md:text-3xl font-black text-slate-800 leading-relaxed mb-2">
-                                <span ref={questionRef} className="inline-block">
-                                    What means <span className={`${theme.text} underline decoration-wavy decoration-4 underline-offset-4`}>{currentQuestion.questionWord}</span>?
-                                </span>
-                            </h3>
-                            <p className="text-slate-400 font-bold text-sm uppercase tracking-widest">Choose the correct definition</p>
-                        </div>
+                <div className={`px-4 py-2 bg-white rounded-2xl shadow-sm border border-white/50 font-black text-sm ${theme.text}`}>
+                    {currentQuestionIndex + 1}/{quizData.length}
+                </div>
+            </div>
 
-                        <div ref={optionsRef} className="grid grid-cols-1 gap-4">
-                            {currentQuestion.options.map((option: VocabWord, idx: number) => {
-                                let labelClass = `bg-white border-2 border-slate-200 text-slate-700 shadow-[0_4px_0_0_#e2e8f0] hover:-translate-y-1 hover:border-${theme.text.split('-')[1]}-300 hover:text-${theme.text.split('-')[1]}-600 hover:shadow-[0_6px_0_0_#e2e8f0]`;
-                                let indicatorClass = "bg-slate-100 text-slate-400";
-                                let indicator = String.fromCharCode(65 + idx);
+            <div className="flex-1 w-full flex flex-col items-center justify-center pb-8">
+                <div ref={containerRef} className="max-w-3xl w-full bg-white/90 backdrop-blur-md rounded-[2.5rem] shadow-2xl border-4 border-white/50 overflow-hidden relative flex flex-col max-h-[75vh]">
 
-                                if (selectedOption) {
-                                    if (option.definition_en === currentQuestion.correctMeaning) {
-                                        labelClass = "bg-green-100 border-green-500 text-green-800 shadow-[0_4px_0_0_#22c55e] translate-y-[-2px]";
-                                        indicatorClass = "bg-green-500 text-white";
-                                        indicator = "✓";
-                                    } else if (option.definition_en === selectedOption) {
-                                        labelClass = "bg-red-100 border-red-500 text-red-800 shadow-[0_4px_0_0_#ef4444] translate-y-[-2px]";
-                                        indicatorClass = "bg-red-500 text-white";
-                                        indicator = "✕";
-                                    } else {
-                                        labelClass = "bg-slate-50 border-slate-100 opacity-40 grayscale shadow-none translate-y-0";
-                                    }
-                                }
-
-                                return (
+                    <div className="p-6 pb-4 border-b border-slate-100/50">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                {/* Only show prev button if playability warrants it, though typically unused in quiz flow */}
+                                {currentQuestionIndex > 0 && (
                                     <button
-                                        key={idx}
-                                        onClick={() => handleOptionClick(option.definition_en)}
-                                        disabled={!!selectedOption}
-                                        className={`
+                                        onClick={prevQuestion}
+                                        className="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 transition-colors"
+                                    >
+                                        <ArrowLeft className="w-5 h-5" />
+                                    </button>
+                                )}
+
+                                {/* Next Button (Manual Navigation for review) */}
+                                {currentQuestionIndex < quizData.length - 1 && selectedOption && (
+                                    <button
+                                        onClick={nextQuestion}
+                                        className="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 transition-colors"
+                                    >
+                                        <ArrowRight className="w-5 h-5" />
+                                    </button>
+                                )}
+                            </div>
+
+                            <div className={`flex items-center gap-2 px-4 py-1.5 rounded-full ${theme.light} ${theme.text} font-black border border-white/50 shadow-sm`}>
+                                <Trophy className="w-4 h-4 fill-current" />
+                                <span className="text-base">{score}/{quizData.length}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto p-6 md:p-8">
+                        <div className="max-w-2xl mx-auto">
+                            <div className="mb-8 text-center">
+                                <h3 className="text-2xl md:text-3xl font-black text-slate-800 leading-relaxed mb-2">
+                                    <span ref={questionRef} className="inline-block">
+                                        What means <span className={`${theme.text} underline decoration-wavy decoration-4 underline-offset-4`}>{currentQuestion.questionWord}</span>?
+                                    </span>
+                                </h3>
+                                <p className="text-slate-400 font-bold text-sm uppercase tracking-widest">Choose the correct definition</p>
+                            </div>
+
+                            <div ref={optionsRef} className="grid grid-cols-1 gap-4">
+                                {currentQuestion.options.map((option: VocabWord, idx: number) => {
+                                    let labelClass = `bg-white border-2 border-slate-200 text-slate-700 shadow-[0_4px_0_0_#e2e8f0] hover:-translate-y-1 hover:border-${theme.text.split('-')[1]}-300 hover:text-${theme.text.split('-')[1]}-600 hover:shadow-[0_6px_0_0_#e2e8f0]`;
+                                    let indicatorClass = "bg-slate-100 text-slate-400";
+                                    let indicator = String.fromCharCode(65 + idx);
+
+                                    if (selectedOption) {
+                                        if (option.definition_en === currentQuestion.correctMeaning) {
+                                            labelClass = "bg-green-100 border-green-500 text-green-800 shadow-[0_4px_0_0_#22c55e] translate-y-[-2px]";
+                                            indicatorClass = "bg-green-500 text-white";
+                                            indicator = "✓";
+                                        } else if (option.definition_en === selectedOption) {
+                                            labelClass = "bg-red-100 border-red-500 text-red-800 shadow-[0_4px_0_0_#ef4444] translate-y-[-2px]";
+                                            indicatorClass = "bg-red-500 text-white";
+                                            indicator = "✕";
+                                        } else {
+                                            labelClass = "bg-slate-50 border-slate-100 opacity-40 grayscale shadow-none translate-y-0";
+                                        }
+                                    }
+
+                                    return (
+                                        <button
+                                            key={idx}
+                                            onClick={() => handleOptionClick(option.definition_en)}
+                                            disabled={!!selectedOption}
+                                            className={`
                                             w-full text-left p-4 rounded-2xl transition-all duration-200 active:scale-[0.98] 
                                             flex items-center gap-4 group relative font-bold text-lg
                                             ${labelClass}
                                         `}
-                                    >
-                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-lg transition-colors ${indicatorClass}`}>
-                                            {indicator === "✓" ? <CheckCircle className="w-6 h-6" /> : indicator === "✕" ? <XCircle className="w-6 h-6" /> : indicator}
-                                        </div>
-                                        <span className="flex-1 leading-snug">
-                                            {option.definition_en}
-                                        </span>
-                                    </button>
-                                );
-                            })}
+                                        >
+                                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-lg transition-colors ${indicatorClass}`}>
+                                                {indicator === "✓" ? <CheckCircle className="w-6 h-6" /> : indicator === "✕" ? <XCircle className="w-6 h-6" /> : indicator}
+                                            </div>
+                                            <span className="flex-1 leading-snug">
+                                                {option.definition_en}
+                                            </span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                {/* Footer Feedback Bar */}
-                <div className={`
+                    {/* Footer Feedback Bar */}
+                    <div className={`
                     border-t-4 border-slate-100 bg-white overflow-hidden transition-all duration-300 ease-in-out
                     ${selectedOption ? 'h-24 opacity-100' : 'h-0 opacity-0 border-transparent'}
                 `}>
-                    <div className={`
+                        <div className={`
                         w-full h-full flex items-center justify-center gap-4 text-white font-black text-2xl
                         ${currentAnswer?.isCorrect ? 'bg-green-500' : 'bg-red-500'}
                     `}>
-                        {currentAnswer?.isCorrect ? (
-                            <>
-                                <PartyPopper className="w-8 h-8 animate-bounce" />
-                                <div className="flex flex-col items-start">
-                                    <span>Correct!</span>
-                                    <span className="text-sm font-medium opacity-90">Next question coming up...</span>
-                                </div>
-                            </>
-                        ) : (
-                            <>
-                                <XCircle className="w-8 h-8 animate-pulse" />
-                                <div className="flex flex-col items-start">
-                                    <span>Oops!</span>
-                                    <span className="text-sm font-medium opacity-90">Don't worry, keep going!</span>
-                                </div>
-                            </>
-                        )}
+                            {currentAnswer?.isCorrect ? (
+                                <>
+                                    <PartyPopper className="w-8 h-8 animate-bounce" />
+                                    <div className="flex flex-col items-start">
+                                        <span>Correct!</span>
+                                        <span className="text-sm font-medium opacity-90">Next question coming up...</span>
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    <XCircle className="w-8 h-8 animate-pulse" />
+                                    <div className="flex flex-col items-start">
+                                        <span>Oops!</span>
+                                        <span className="text-sm font-medium opacity-90">Don't worry, keep going!</span>
+                                    </div>
+                                </>
+                            )}
+                        </div>
                     </div>
-                </div>
 
+                </div>
             </div>
         </section>
     );

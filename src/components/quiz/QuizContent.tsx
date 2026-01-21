@@ -222,7 +222,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
   ) => {
     onAnswerSelect(questionIndex, answerIndex);
 
-    EMPTY_STRING
+
   };
 
   const scrollToTop = () => {

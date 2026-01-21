@@ -186,7 +186,7 @@ const FlashcardSet = ({ words, title, onClose, onComplete }: FlashcardSetProps) 
 
     // --- Playing Screen ---
     return (
-        <div ref={containerRef} className={`fixed inset-0 z-50 flex flex-col items-center justify-center p-4 bg-gradient-to-br ${theme.gradient} overflow-hidden`}>
+        <div ref={containerRef} className={`fixed inset-0 z-50 flex flex-col items-center justify-start pt-24 md:pt-0 p-4 bg-gradient-to-br ${theme.gradient} overflow-hidden`}>
 
             {/* Background Pattern */}
             <div className="absolute inset-0 opacity-40"
@@ -198,7 +198,7 @@ const FlashcardSet = ({ words, title, onClose, onComplete }: FlashcardSetProps) 
             <div className={`absolute top-0 right-1/4 w-96 h-96 ${theme.blobSec} rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-blob animation-delay-2000 pointer-events-none`}></div>
 
             {/* Floating Icon */}
-            <div className="absolute top-[10%] left-[10%] hidden md:block animate-float pointer-events-none">
+            <div className="absolute top-[10%] left-[10%] md:top-[25%] hidden md:block animate-float pointer-events-none">
                 <div className="bg-white/80 backdrop-blur-sm p-3 rounded-2xl shadow-lg border border-white/50 rotate-[-12deg]">
                     <Brain className={`w-8 h-8 ${theme.text}`} />
                 </div>
@@ -207,13 +207,13 @@ const FlashcardSet = ({ words, title, onClose, onComplete }: FlashcardSetProps) 
             {/* Floating Back Button */}
             <button
                 onClick={onClose}
-                className="absolute top-4 left-4 md:top-8 md:left-8 z-50 p-3 bg-white/40 backdrop-blur-md hover:bg-white/60 text-slate-700 rounded-full shadow-lg border border-white/50 transition-all hover:scale-105 active:scale-95"
+                className="absolute top-16 left-4 md:top-8 md:left-8 z-50 p-3 bg-white/40 backdrop-blur-md hover:bg-white/60 text-slate-700 rounded-full shadow-lg border border-white/50 transition-all hover:scale-105 active:scale-95"
             >
                 <ArrowLeft className="w-6 h-6" />
             </button>
 
             {/* Top Bar */}
-            <div className="w-full max-w-md flex items-center justify-between mb-8 relative z-10 px-4">
+            <div className="w-full max-w-md flex items-center justify-between mb-4 relative z-10 px-4 md:mt-28">
                 <div className="flex items-center gap-2">
                     <button
                         onClick={handlePrev}
@@ -244,134 +244,137 @@ const FlashcardSet = ({ words, title, onClose, onComplete }: FlashcardSetProps) 
             </div>
 
             {/* The Flashcard */}
-            <div
-                ref={cardRef}
-                className="w-full max-w-sm aspect-[3/4] perspective-1000 cursor-pointer relative group"
-                onClick={() => setIsFlipped(!isFlipped)}
-            >
-                {/* 3D Depth Layer */}
-                <div className={`absolute top-4 left-4 w-full h-full rounded-[2.5rem] bg-black/10 transition-all duration-300 group-hover:top-6 group-hover:left-6 -z-10`} />
+            <div className="flex-1 w-full flex flex-col items-center justify-center pb-20">
+                <div
+                    ref={cardRef}
+                    className="w-full max-w-sm aspect-[3/4] perspective-1000 cursor-pointer relative group"
+                    onClick={() => setIsFlipped(!isFlipped)}
+                >
+                    {/* 3D Depth Layer */}
+                    <div className={`absolute top-4 left-4 w-full h-full rounded-[2.5rem] bg-black/10 transition-all duration-300 group-hover:top-6 group-hover:left-6 -z-10`} />
 
-                <div className={`relative w-full h-full duration-500 transform-style-3d transition-all ease-spring ${isFlipped ? 'rotate-y-180' : ''}`}>
+                    <div className={`relative w-full h-full duration-500 transform-style-3d transition-all ease-spring ${isFlipped ? 'rotate-y-180' : ''}`}>
 
-                    {/* FRONT */}
-                    <div className={`
+                        {/* FRONT */}
+                        <div className={`
                         absolute inset-0 backface-hidden bg-white rounded-[2.5rem] shadow-2xl 
                         flex flex-col items-center justify-center p-6 border-4 border-white
                         transition-transform duration-300 group-hover:-translate-y-1
                     `}>
-                        {/* Corner Actions */}
-                        <div className="absolute top-6 right-6 flex flex-col gap-3">
-                            <button
-                                onClick={togglePin}
-                                className={`p-3 rounded-full shadow-sm transition-all hover:scale-110 active:scale-95 ${pinnedWords.includes(currentWord.word) ? 'bg-yellow-100 text-yellow-500' : 'bg-gray-50 text-gray-300 hover:text-yellow-500'}`}
-                            >
-                                <Star className={`w-6 h-6 ${pinnedWords.includes(currentWord.word) ? 'fill-current' : ''}`} />
-                            </button>
-                        </div>
-
-                        {/* Word Content */}
-                        <div className="text-center z-10">
-                            <h3 className={`text-5xl md:text-6xl font-black mb-4 tracking-tight ${theme.text} drop-shadow-sm`}>{currentWord.word}</h3>
-                            <div className={`inline-block px-5 py-2 ${theme.light} rounded-2xl`}>
-                                <p className={`text-xl font-serif font-bold opacity-80 ${theme.text}`}>{currentWord.phonetic}</p>
+                            {/* Corner Actions */}
+                            <div className="absolute top-6 right-6 flex flex-col gap-3">
+                                <button
+                                    onClick={togglePin}
+                                    className={`p-3 rounded-full shadow-sm transition-all hover:scale-110 active:scale-95 ${pinnedWords.includes(currentWord.word) ? 'bg-yellow-100 text-yellow-500' : 'bg-gray-50 text-gray-300 hover:text-yellow-500'}`}
+                                >
+                                    <Star className={`w-6 h-6 ${pinnedWords.includes(currentWord.word) ? 'fill-current' : ''}`} />
+                                </button>
                             </div>
-                        </div>
 
-                        {/* Speaker Button (Floating) */}
-                        <button
-                            onClick={handleSpeak}
-                            className={`
+                            {/* Word Content */}
+                            <div className="text-center z-10">
+                                <h3 className={`text-5xl md:text-6xl font-black mb-4 tracking-tight ${theme.text} drop-shadow-sm`}>{currentWord.word}</h3>
+                                <div className={`inline-block px-5 py-2 ${theme.light} rounded-2xl`}>
+                                    <p className={`text-xl font-serif font-bold opacity-80 ${theme.text}`}>{currentWord.phonetic}</p>
+                                </div>
+                            </div>
+
+                            {/* Speaker Button (Floating) */}
+                            <button
+                                onClick={handleSpeak}
+                                className={`
                                 mt-12 p-5 rounded-full text-white shadow-[0_8px_16px_rgba(0,0,0,0.2)] transform transition-transform hover:scale-110 active:scale-95
                                 ${theme.accent}
                             `}
-                        >
-                            <Volume2 className="w-10 h-10" />
-                        </button>
+                            >
+                                <Volume2 className="w-10 h-10" />
+                            </button>
 
-                        <div className="absolute bottom-10 text-xs font-black text-slate-300 uppercase tracking-[0.25em] animate-pulse">
-                            Tap to flip
+                            <div className="absolute bottom-10 text-xs font-black text-slate-300 uppercase tracking-[0.25em] animate-pulse">
+                                Tap to flip
+                            </div>
                         </div>
-                    </div>
 
-                    {/* BACK */}
-                    <div className={`
+                        {/* BACK */}
+                        <div className={`
                         absolute inset-0 backface-hidden rotate-y-180 rounded-[2.5rem] shadow-2xl 
                         flex flex-col items-center justify-center p-6 text-white text-center border-8 border-white
                         overflow-y-auto
                         ${theme.cardBack}
                     `}>
-                        <div className="w-full space-y-4">
-                            {/* Part of Speech Badge */}
-                            <div className={`inline-block px-4 py-1.5 rounded-full text-xs font-black uppercase bg-black/20 text-white/90 shadow-inner`}>
-                                {currentWord.pos || 'word'}
-                            </div>
+                            <div className="w-full space-y-4">
+                                {/* Part of Speech Badge */}
+                                <div className={`inline-block px-4 py-1.5 rounded-full text-xs font-black uppercase bg-black/20 text-white/90 shadow-inner`}>
+                                    {currentWord.pos || 'word'}
+                                </div>
 
-                            {/* English Definition */}
-                            <div className="bg-white/15 p-4 rounded-2xl backdrop-blur-sm">
-                                <p className="text-xs uppercase tracking-wider text-white/60 mb-2 font-bold">Definition</p>
-                                <h4 className="text-lg font-bold leading-snug drop-shadow-md">
-                                    {currentWord.definition_en || 'No definition'}
-                                </h4>
-                            </div>
-
-                            {/* Vietnamese Translation */}
-                            {currentWord.definition_vi && (
-                                <div className="bg-white/25 p-4 rounded-2xl backdrop-blur-sm border border-white/30">
-                                    <p className="text-xs uppercase tracking-wider text-white/60 mb-2 font-bold">Vietnamese</p>
-                                    <h4 className="text-lg font-bold leading-snug text-yellow-100">
-                                        {currentWord.definition_vi}
+                                {/* English Definition */}
+                                <div className="bg-white/15 p-4 rounded-2xl backdrop-blur-sm">
+                                    <p className="text-xs uppercase tracking-wider text-white/60 mb-2 font-bold">Definition</p>
+                                    <h4 className="text-lg font-bold leading-snug drop-shadow-md">
+                                        {currentWord.definition_en || 'No definition'}
                                     </h4>
                                 </div>
-                            )}
 
-                            {/* Example Sentence */}
-                            <div className="bg-white/10 p-4 rounded-2xl backdrop-blur-md border border-white/20">
-                                <p className="text-xs uppercase tracking-wider text-white/60 mb-2 font-bold">Example</p>
-                                <p className="text-base italic text-white/90 font-medium leading-relaxed">
-                                    "{currentWord.example_en || 'No example available'}"
-                                </p>
-                                {currentWord.example_vi && (
-                                    <p className="text-sm italic text-yellow-100/80 font-medium mt-2 border-t border-white/20 pt-2">
-                                        "{currentWord.example_vi}"
-                                    </p>
+                                {/* Vietnamese Translation */}
+                                {currentWord.definition_vi && (
+                                    <div className="bg-white/25 p-4 rounded-2xl backdrop-blur-sm border border-white/30">
+                                        <p className="text-xs uppercase tracking-wider text-white/60 mb-2 font-bold">Vietnamese</p>
+                                        <h4 className="text-lg font-bold leading-snug text-yellow-100">
+                                            {currentWord.definition_vi}
+                                        </h4>
+                                    </div>
                                 )}
+
+                                {/* Example Sentence */}
+                                <div className="bg-white/10 p-4 rounded-2xl backdrop-blur-md border border-white/20">
+                                    <p className="text-xs uppercase tracking-wider text-white/60 mb-2 font-bold">Example</p>
+                                    <p className="text-base italic text-white/90 font-medium leading-relaxed">
+                                        "{currentWord.example_en || 'No example available'}"
+                                    </p>
+                                    {currentWord.example_vi && (
+                                        <p className="text-sm italic text-yellow-100/80 font-medium mt-2 border-t border-white/20 pt-2">
+                                            "{currentWord.example_vi}"
+                                        </p>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>
+
                 </div>
 
-            </div>
-
-            {/* Bottom Controls - Candy Buttons */}
-            <div className="w-full max-w-sm mt-10 px-4">
-                {isFlipped ? (
-                    <button
-                        onClick={(e) => { e.stopPropagation(); handleNext(); }}
-                        className={`
+                {/* Bottom Controls - Candy Buttons */}
+                <div className="w-full max-w-sm mt-10 px-4">
+                    {isFlipped ? (
+                        <button
+                            onClick={(e) => { e.stopPropagation(); handleNext(); }}
+                            className={`
                             w-full py-4 text-white rounded-2xl font-black text-xl shadow-[0_4px_0_0_#15803d]
                             transform transition-all active:translate-y-1 active:shadow-none
                             flex items-center justify-center gap-3
                             bg-gradient-to-r from-green-500 to-emerald-600
                         `}
-                    >
-                        Got It! <Check className="w-7 h-7" />
-                    </button>
-                ) : (
-                    <button
-                        onClick={(e) => { e.stopPropagation(); setIsFlipped(true); }}
-                        className={`
+                        >
+                            Got It! <Check className="w-7 h-7" />
+                        </button>
+                    ) : (
+                        <button
+                            onClick={(e) => { e.stopPropagation(); setIsFlipped(true); }}
+                            className={`
                             w-full py-4 bg-white text-slate-600 rounded-2xl font-black text-xl shadow-[0_4px_0_0_#cbd5e1] border-2 border-slate-200
                             transform transition-all active:translate-y-1 active:shadow-none
                             flex items-center justify-center gap-3 hover:text-indigo-500 hover:border-indigo-100
                         `}
-                    >
-                        Reveal <Sparkles className="w-6 h-6 text-yellow-400 fill-yellow-400" />
-                    </button>
-                )}
+                        >
+                            Reveal <Sparkles className="w-6 h-6 text-yellow-400 fill-yellow-400" />
+                        </button>
+                    )}
+                </div>
             </div>
-        </div >
+        </div>
     );
 };
 
 export default FlashcardSet;
+
