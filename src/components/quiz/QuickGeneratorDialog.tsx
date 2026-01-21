@@ -293,8 +293,21 @@ export function QuickGeneratorDialog({ open, onOpenChange }: QuickGeneratorDialo
         const activePrompt = overridePrompt ?? prompt;
         const activeCount = overrideCount ?? questionCount;
 
-        if (!validatePrompt(activePrompt)) return;
+        console.log(`[QuickGenerator] Proceeding with: prompt="${activePrompt}", count=${activeCount}`);
+
+        const isValid = validatePrompt(activePrompt);
+        if (!isValid) {
+            console.warn(`[QuickGenerator] Validation failed for prompt: "${activePrompt}"`);
+            toast({
+                title: t("quizGenerator.errors.invalidPrompt"), // Ensure this key exists or use a fallback
+                description: promptError || t("quizGenerator.errors.checkInput"),
+                variant: "destructive",
+            });
+            return;
+        }
+
         if (!activeCount) {
+            console.warn("[QuickGenerator] Missing question count");
             toast({
                 title: t("quizGenerator.toasts.selectCount"),
                 description: t("quizGenerator.toasts.selectCountDesc"),
@@ -303,6 +316,7 @@ export function QuickGeneratorDialog({ open, onOpenChange }: QuickGeneratorDialo
             return;
         }
 
+        console.log("[QuickGenerator] Setting loading state to TRUE");
         setLoading(true);
         isCompletingRef.current = false; // Reset completion guard
         setGenerationStatus("pending");

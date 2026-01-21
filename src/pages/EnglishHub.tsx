@@ -132,39 +132,36 @@ const EnglishHub = () => {
                             <span className="hidden sm:inline">{t('englishHub.back')}</span>
                         </button>
 
-                        <div className="flex items-center gap-3">
-                            {/* Speaking Button - New */}
+                        <div className="flex items-center gap-2">
+                            {/* Speaking Button - Compact Style */}
                             <button
                                 onClick={() => setShowPronunciation(true)}
-                                className="group relative bg-gradient-to-r from-blue-400 to-indigo-500 hover:from-blue-500 hover:to-indigo-600 text-white h-12 pl-3 pr-4 rounded-2xl shadow-lg shadow-blue-200 hover:shadow-blue-300 transform hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2"
+                                className="group rounded-2xl shadow-lg border-2 border-blue-400 hover:border-blue-300 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-bold text-sm px-3 py-2 sm:px-4 sm:py-2.5 h-auto transition-all duration-200 active:scale-95 hover:-translate-y-0.5 flex items-center gap-2"
                                 title="Practice Speaking"
                             >
-                                <div className="bg-white/20 p-1.5 rounded-xl group-hover:scale-110 transition-transform">
-                                    <Mic className="w-5 h-5 text-white" />
-                                </div>
-                                <span className="font-bold text-sm tracking-wide hidden sm:block">Speaking</span>
+                                <Mic className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                                <span className="hidden sm:inline">Speaking</span>
                             </button>
 
-                            {/* Notebook Button - Redesigned */}
+                            {/* Notebook Button - Compact Style */}
                             <button
                                 onClick={() => navigate('/english/notebook')}
-                                className="group relative bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white h-12 pl-3 pr-4 rounded-2xl shadow-lg shadow-orange-200 hover:shadow-orange-300 transform hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2"
+                                className="group relative rounded-2xl shadow-lg border-2 border-amber-400 hover:border-amber-300 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold text-sm px-3 py-2 sm:px-4 sm:py-2.5 h-auto transition-all duration-200 active:scale-95 hover:-translate-y-0.5 flex items-center gap-2"
                                 title={t('englishHub.notebook')}
                             >
-                                <div className="bg-white/20 p-1.5 rounded-xl group-hover:rotate-12 transition-transform">
-                                    <BookOpen className="w-5 h-5 text-white" />
-                                </div>
-                                <span className="font-bold text-sm tracking-wide hidden sm:block">Notebook</span>
+                                <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                                <span className="hidden sm:inline">{t('dashboard.notebook.title', 'Notebook')}</span>
 
                                 {/* Badge count */}
                                 {vocabulary.length > 0 && (
-                                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-sm border-2 border-white animate-in zoom-in">
+                                    <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full shadow-sm border-2 border-white animate-in zoom-in min-w-[18px] text-center">
                                         {vocabulary.length}
                                     </span>
                                 )}
                             </button>
 
-                            <div className="bg-white/95 backdrop-blur-sm px-4 h-12 rounded-2xl shadow-lg border border-slate-200/50 flex items-center gap-4">
+                            {/* Streak/Activity - Hidden on mobile */}
+                            <div className="hidden sm:flex bg-white/95 backdrop-blur-sm px-4 h-12 rounded-2xl shadow-lg border border-slate-200/50 items-center gap-4">
                                 {/* GitHub-style contribution grid */}
                                 <div className="flex flex-col gap-1">
                                     <div className="flex gap-1">

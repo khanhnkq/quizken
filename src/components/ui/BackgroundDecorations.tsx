@@ -54,7 +54,7 @@ export const BackgroundDecorations = ({ density = "high" }: { density?: "high" |
                 // --- Left Side (Vertical) ---
                 { Icon: Turtle, color: "text-emerald-500", top: "40%", left: "3%", rot: "12deg", delay: "500ms" },
                 { Icon: Square, color: "text-pink-200", top: "48%", left: "12%", rot: "15deg", delay: "2500ms", size: "w-5 h-5" }, // Object
-                { Icon: Snail, color: "text-rose-400", top: "55%", left: "8%", rot: "-8deg", delay: "2500ms" },
+                { Icon: Snail, color: "text-rose-400", top: "60%", left: "8%", rot: "-8deg", delay: "2500ms" },
                 { Icon: Fish, color: "text-indigo-400", top: "70%", left: "4%", rot: "8deg", delay: "3500ms" },
 
                 // --- Right Side (Vertical) ---

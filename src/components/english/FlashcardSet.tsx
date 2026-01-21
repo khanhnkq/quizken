@@ -203,21 +203,6 @@ const FlashcardSet = ({ words, title, onClose, onComplete, minimalView = false }
             )}
 
             {/* Floating Icon */}
-            <div className="absolute top-[10%] left-[10%] md:top-[25%] hidden md:block animate-float pointer-events-none">
-                <div className="bg-white/80 backdrop-blur-sm p-3 rounded-2xl shadow-lg border border-white/50 rotate-[-12deg]">
-                    <Brain className={`w-8 h-8 ${theme.text}`} />
-                </div>
-            </div>
-
-            {/* Floating Back Button */}
-            <button
-                onClick={onClose}
-                className="absolute top-16 left-4 md:top-8 md:left-8 z-50 p-3 bg-white/40 backdrop-blur-md hover:bg-white/60 text-slate-700 rounded-full shadow-lg border border-white/50 transition-all hover:scale-105 active:scale-95"
-            >
-                <ArrowLeft className="w-6 h-6" />
-            </button>
-
-            {/* Top Bar */}
             <div className="w-full max-w-md flex items-center justify-between mb-4 relative z-10 px-4 md:mt-28">
                 <div className="flex items-center gap-2">
                     <button

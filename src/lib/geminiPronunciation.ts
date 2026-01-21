@@ -7,6 +7,19 @@ interface PronunciationFeedback {
     isCorrect: boolean;
 }
 
+export interface WordFeedback {
+    word: string;
+    isCorrect: boolean;
+    feedback?: string;
+}
+
+export interface SentenceFeedback {
+    words: WordFeedback[];
+    overallAccuracy: number;
+    tip: string;
+    isCorrect: boolean;
+}
+
 interface GeminiResponse {
     candidates: Array<{
         content: {
@@ -102,7 +115,16 @@ Respond EXACTLY in JSON:
         }
 
         const data: GeminiResponse = await response.json();
-        const textResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        let textResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+        // Check for empty response
+        if (!textResponse.trim()) {
+            console.warn('Gemini returned empty response');
+            throw new Error('Empty response from Gemini API');
+        }
+
+        // Sanitize: Remove markdown code block markers if present
+        textResponse = textResponse.replace(/^```json\s*/i, '').replace(/\s*```$/i, '').trim();
 
         const parsed = JSON.parse(textResponse);
 
@@ -161,6 +183,117 @@ function calculateSimilarity(str1: string, str2: string): number {
     const similarity = ((maxLen - distance) / maxLen) * 100;
 
     return Math.round(similarity);
+}
+
+/**
+ * Analyze sentence pronunciation using Gemini API
+ * Returns word-by-word feedback with overall accuracy
+ */
+export async function getSentenceFeedback(
+    targetSentence: string,
+    audioBase64: string,
+    apiKey: string,
+    isVietnamese: boolean = true
+): Promise<SentenceFeedback> {
+    const words = targetSentence.split(/\s+/).filter(w => w.length > 0);
+    
+    const systemInstruction = isVietnamese
+        ? `Bạn là huấn luyện viên phát âm tiếng Anh cho người Việt.
+Nhiệm vụ: Nghe file âm thanh và so sánh với câu mục tiêu: "${targetSentence}".
+
+Phân tích từng từ trong câu và đánh giá độ chính xác.
+
+Trả lời CHÍNH XÁC JSON:
+{
+  "words": [
+    { "word": "<từ>", "isCorrect": true/false, "feedback": "<nhận xét ngắn nếu sai>" }
+  ],
+  "overallAccuracy": <số 0-100>,
+  "tip": "<lời khuyên tổng thể>"
+}`
+        : `You are an English pronunciation coach.
+Task: Listen to the audio and compare with target sentence: "${targetSentence}".
+
+Analyze each word in the sentence and evaluate accuracy.
+
+Respond EXACTLY in JSON:
+{
+  "words": [
+    { "word": "<word>", "isCorrect": true/false, "feedback": "<brief note if wrong>" }
+  ],
+  "overallAccuracy": <number 0-100>,
+  "tip": "<overall advice>"
+}`;
+
+    try {
+        const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    contents: [
+                        {
+                            parts: [
+                                { text: systemInstruction },
+                                {
+                                    inline_data: {
+                                        mime_type: "audio/webm;codecs=opus",
+                                        data: audioBase64
+                                    }
+                                }
+                            ],
+                        },
+                    ],
+                    generationConfig: {
+                        temperature: 0.1,
+                        response_mime_type: "application/json"
+                    },
+                }),
+            }
+        );
+
+        if (!response.ok) {
+            const errData = await response.json();
+            throw new Error(`Gemini API error: ${response.status} - ${JSON.stringify(errData)}`);
+        }
+
+        const data: GeminiResponse = await response.json();
+        let textResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+        if (!textResponse.trim()) {
+            throw new Error('Empty response from Gemini API');
+        }
+
+        textResponse = textResponse.replace(/^```json\s*/i, '').replace(/\s*```$/i, '').trim();
+
+        const parsed = JSON.parse(textResponse);
+
+        const wordFeedback: WordFeedback[] = parsed.words || words.map(w => ({
+            word: w,
+            isCorrect: false,
+            feedback: ''
+        }));
+
+        const overallAccuracy = Number(parsed.overallAccuracy) || 0;
+
+        return {
+            words: wordFeedback,
+            overallAccuracy,
+            tip: parsed.tip || '',
+            isCorrect: overallAccuracy >= 80,
+        };
+    } catch (error) {
+        console.error('Gemini sentence analysis error:', error);
+        return {
+            words: words.map(w => ({ word: w, isCorrect: false })),
+            overallAccuracy: 0,
+            tip: isVietnamese ? 'Lỗi xử lý âm thanh. Vui lòng thử lại.' : 'Audio processing error. Please try again.',
+            isCorrect: false,
+        };
+    }
 }
 
 export default getPronunciationFeedback;

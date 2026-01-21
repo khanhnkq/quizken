@@ -90,16 +90,8 @@ const GrammarLessonView: React.FC<GrammarLessonProps> = ({ lesson, theme, onComp
             <div className="absolute top-[-10%] right-[-10%] w-96 h-96 bg-white rounded-full mix-blend-overlay filter blur-3xl opacity-50 animate-blob pointer-events-none"></div>
             <div className="absolute bottom-[-10%] left-[-10%] w-96 h-96 bg-white rounded-full mix-blend-overlay filter blur-3xl opacity-50 animate-blob pointer-events-none"></div>
 
-            {/* Header */}
-            <div className="relative z-10 w-full max-w-4xl mx-auto px-4 pt-6 pb-2 flex items-center justify-between">
-                <button
-                    onClick={onClose}
-                    className="p-3 bg-white/60 backdrop-blur-md hover:bg-white text-slate-700 rounded-full shadow-sm border border-white/50 transition-all hover:scale-105 active:scale-95"
-                >
-                    <ArrowLeft className="w-5 h-5" />
-                </button>
-
-
+            {/* Header - Empty space for layout */}
+            <div className="relative z-10 w-full max-w-4xl mx-auto px-4 pt-6 pb-2">
             </div>
 
             {/* Main Content Card - Centered */}

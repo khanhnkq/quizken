@@ -232,44 +232,38 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
                 </p>
               </div>
 
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-wrap gap-2">
                 <Button
                   onClick={handleCreateQuiz}
-                  size="xl"
+                  size="default"
                   variant="hero"
-                  className="group rounded-3xl shadow-xl border-4 border-primary hover:border-primary-foreground/20 bg-primary text-white font-heading text-lg px-8 py-6 h-auto transition-all duration-200 active:scale-95"
+                  className="group rounded-2xl shadow-lg border-2 border-primary hover:border-primary-foreground/20 bg-primary text-white font-bold text-sm px-4 py-2.5 h-auto transition-all duration-200 active:scale-95 hover:-translate-y-0.5"
                   onMouseEnter={handleHoverEnter}
                   onMouseLeave={handleHoverLeave}>
-                  <span className="mr-2">{t('dashboard.createQuiz')}</span>
-                  <div className="bg-white/20 p-1.5 rounded-xl group-hover:rotate-12 transition-transform">
-                    <PlusCircleIcon className="w-6 h-6 text-white" />
-                  </div>
+                  <span className="mr-1.5">{t('dashboard.createQuiz')}</span>
+                  <PlusCircleIcon className="w-4 h-4 text-white" />
                 </Button>
 
                 <Button
                   onClick={() => navigate('/english')}
-                  size="xl"
+                  size="default"
                   variant="hero"
-                  className="group rounded-3xl shadow-xl border-4 border-blue-400 hover:border-blue-300 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-heading text-lg px-8 py-6 h-auto transition-all duration-200 active:scale-95"
+                  className="group rounded-2xl shadow-lg border-2 border-blue-400 hover:border-blue-300 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-bold text-sm px-4 py-2.5 h-auto transition-all duration-200 active:scale-95 hover:-translate-y-0.5"
                   onMouseEnter={handleHoverEnter}
                   onMouseLeave={handleHoverLeave}>
-                  <span className="mr-2">English Hub</span>
-                  <div className="bg-white/20 p-1.5 rounded-xl group-hover:rotate-12 transition-transform">
-                    <BookOpenIcon className="w-6 h-6 text-white" />
-                  </div>
+                  <span className="mr-1.5">English Hub</span>
+                  <BookOpenIcon className="w-4 h-4 text-white" />
                 </Button>
 
                 <Button
                   onClick={() => navigate('/english/notebook')}
-                  size="xl"
+                  size="default"
                   variant="hero"
-                  className="group rounded-3xl shadow-xl border-4 border-amber-400 hover:border-amber-300 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-heading text-lg px-8 py-6 h-auto transition-all duration-200 active:scale-95"
+                  className="group rounded-2xl shadow-lg border-2 border-amber-400 hover:border-amber-300 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold text-sm px-4 py-2.5 h-auto transition-all duration-200 active:scale-95 hover:-translate-y-0.5"
                   onMouseEnter={handleHoverEnter}
                   onMouseLeave={handleHoverLeave}>
-                  <span className="mr-2">{t('dashboard.notebook.title', 'Sổ tay')}</span>
-                  <div className="bg-white/20 p-1.5 rounded-xl group-hover:rotate-12 transition-transform">
-                    <BookOpen className="w-6 h-6 text-white" />
-                  </div>
+                  <span className="mr-1.5">{t('dashboard.notebook.title', 'Sổ tay')}</span>
+                  <BookOpen className="w-4 h-4 text-white" />
                 </Button>
               </div>
             </div>

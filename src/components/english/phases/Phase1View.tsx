@@ -25,7 +25,6 @@ import { TOEIC_DATA } from '../../../lib/constants/toeicData';
 import { TOPIC_DATA } from '../../../lib/constants/topicVocabData';
 import FlashcardSet from '../FlashcardSet';
 import ListeningPractice from '../ListeningPractice';
-import PronunciationPractice from '../PronunciationPractice';
 import { useUserProgress } from '../../../hooks/useUserProgress';
 import MiniQuiz from '../MiniQuiz';
 import LessonProgressMap, { LessonStep } from '../LessonProgressMap';
@@ -118,7 +117,6 @@ const Phase1View = () => {
     // Lesson Flow State
     const [showQuiz, setShowQuiz] = useState(false);
     const [showListening, setShowListening] = useState(false);
-    const [showPronunciation, setShowPronunciation] = useState(false);
     const [selectedLesson, setSelectedLesson] = useState<any>(null);
 
     // Track completed steps for current lesson
@@ -130,7 +128,7 @@ const Phase1View = () => {
     const ITEMS_PER_PAGE = 6;
 
     // Define steps
-    type LessonStep = 'learn' | 'listening' | 'pronunciation' | 'quiz';
+    type LessonStep = 'learn' | 'listening' | 'quiz';
 
     // transform generateChallenges to be stable
 
@@ -160,21 +158,14 @@ const Phase1View = () => {
             if (isMainCompleted) {
                 setShowQuiz(false); setShowListening(false);
             } else if (!steps.includes('learn')) {
-                setShowQuiz(false); setShowListening(false); setShowPronunciation(false);
+                setShowQuiz(false); setShowListening(false);
+            } else if (!steps.includes('listening')) {
+                setShowListening(true); setShowQuiz(false);
             } else if (!steps.includes('quiz')) {
-                // If quiz not done, check previous steps
-                if (!steps.includes('pronunciation')) {
-                    if (!steps.includes('listening')) {
-                        setShowListening(true); setShowPronunciation(false); setShowQuiz(false);
-                    } else {
-                        setShowListening(false); setShowPronunciation(true); setShowQuiz(false);
-                    }
-                } else {
-                    setShowListening(false); setShowPronunciation(false); setShowQuiz(true);
-                }
+                setShowListening(false); setShowQuiz(true);
             } else {
                 // All done or just navigation
-                setShowListening(false); setShowPronunciation(false); setShowQuiz(false);
+                setShowListening(false); setShowQuiz(false);
             }
         } else {
             setCompletedSteps([]);
@@ -182,7 +173,7 @@ const Phase1View = () => {
     }, [selectedLesson, isLessonCompleted]);
 
     // Determine current step based on state
-    const currentStep: LessonStep = showListening ? 'listening' : showPronunciation ? 'pronunciation' : showQuiz ? 'quiz' : 'learn';
+    const currentStep: LessonStep = showListening ? 'listening' : showQuiz ? 'quiz' : 'learn';
 
     // transform generateChallenges to be stable
     const practiceChallenges = React.useMemo(() => {
@@ -196,19 +187,12 @@ const Phase1View = () => {
         if (step === 'learn') {
             setShowQuiz(false);
             setShowListening(false);
-            setShowPronunciation(false);
         } else if (step === 'quiz') {
             setShowQuiz(true);
             setShowListening(false);
-            setShowPronunciation(false);
         } else if (step === 'listening') {
             setShowQuiz(false);
             setShowListening(true);
-            setShowPronunciation(false);
-        } else if (step === 'pronunciation') {
-            setShowQuiz(false);
-            setShowListening(false);
-            setShowPronunciation(true);
         }
     };
 
@@ -336,10 +320,10 @@ const Phase1View = () => {
                     completedSteps={completedSteps}
                     onNavigate={handleNavigate}
                     topic={selectedLesson.level}
+                    onBack={() => { setSelectedLesson(null); setShowQuiz(false); setShowListening(false); }}
                     steps={[
                         { id: 'learn', label: t('englishHub.phase1.steps.learn', 'Vocabulary'), icon: BookOpen },
                         { id: 'listening', label: t('englishHub.phase1.steps.listening', 'Listening'), icon: Headphones },
-                        { id: 'pronunciation', label: t('englishHub.phase1.steps.pronunciation', 'Speaking'), icon: Mic },
                         { id: 'quiz', label: t('englishHub.phase1.steps.quiz', 'Quiz'), icon: HelpCircle },
                     ]}
                 />
@@ -357,7 +341,6 @@ const Phase1View = () => {
                                 completeLesson(stepKey);
                                 setCompletedSteps(prev => [...new Set([...prev, 'learn'])] as LessonStep[]);
                                 setShowListening(true);
-                                setShowPronunciation(false);
                                 setShowQuiz(false);
                             }}
                         />
@@ -404,37 +387,14 @@ const Phase1View = () => {
 
                                 toast({
                                     title: "Listening Phase Complete!",
-                                    description: "Great job! Now let's practice speaking.",
+                                    description: "Great job! Now let's take the quiz.",
                                     variant: "success"
                                 });
 
                                 setShowListening(false);
-                                setShowPronunciation(true);
-                            }}
-                            onClose={() => { setSelectedLesson(null); setCompletedSteps([]); setShowListening(false); }}
-                        />
-                    )}
-
-                    {currentStep === 'pronunciation' && (
-                        <PronunciationPractice
-                            words={selectedLesson.words}
-                            level={selectedLesson.level}
-                            minimalView={true}
-                            onComplete={() => {
-                                setCompletedSteps(prev => [...new Set([...prev, 'pronunciation'])] as LessonStep[]);
-                                const stepKey = `${baseKey}-pronunciation`; // Not tracked in global completedLessons for now, or maybe it should?
-                                // Let's just track UI state for now to keep it simple, or add to completeLesson if tracking is flexible
-
-                                toast({
-                                    title: "Pronunciation Phase Complete!",
-                                    description: "Excellent! Final step: Take the Quiz.",
-                                    variant: "success"
-                                });
-
-                                setShowPronunciation(false);
                                 setShowQuiz(true);
                             }}
-                            onClose={() => { setSelectedLesson(null); setCompletedSteps([]); setShowPronunciation(false); }}
+                            onClose={() => { setSelectedLesson(null); setCompletedSteps([]); setShowListening(false); }}
                         />
                     )}
                 </div>

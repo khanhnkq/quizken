@@ -1236,17 +1236,15 @@ const QuizGenerator = () => {
                       ) : (
                         <><Play className="w-4 h-4" /> {t('quizGenerator.ui.musicHint', 'Nhấn vào mèo để phát nhạc')}</>
                       )}
-                    </p>
-
-                    {/* Greeting Text */}
+                    </p>{/* Greeting Text */}
                     <div className="text-center space-y-4 max-w-2xl mx-auto z-10 px-4">
-                      <h3 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight">
-                        {t('quizGenerator.ui.greeting', 'Làm chủ kiến thức ngay hôm nay.')}
-                      </h3>
+                      
                       <p className="text-slate-500 font-medium text-lg md:text-xl">
                         {t('quizGenerator.ui.greetingSub', 'Nhập chủ đề bất kỳ để tạo bài kiểm tra trong tích tắc.')}
                       </p>
                     </div>
+
+                    
 
                     {/* Main Input Pill */}
                     <div className="w-full max-w-5xl mx-auto z-20 px-4">

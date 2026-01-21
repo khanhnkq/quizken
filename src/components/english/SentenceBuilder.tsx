@@ -426,17 +426,6 @@ const SentenceBuilder: React.FC<SentenceBuilderProps> = ({
                     )}
                 </div>
 
-                {/* Back Button */}
-                <div className="absolute top-4 left-4 md:top-8 md:left-8 z-50 flex items-center gap-2">
-                    <button
-                        onClick={onClose}
-                        className="p-3 bg-white/40 backdrop-blur-md hover:bg-white/60 text-slate-700 rounded-full shadow-lg border border-white/50 transition-all hover:scale-105 active:scale-95"
-                    >
-                        <ArrowLeft className="w-6 h-6" />
-                    </button>
-
-                </div>
-
                 {/* Mascot Helper */}
 
 

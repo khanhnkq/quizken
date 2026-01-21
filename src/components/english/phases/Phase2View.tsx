@@ -178,6 +178,7 @@ const Phase2View: React.FC = () => {
                         }
                     }}
                     topic={isVietnamese ? selectedLesson.titleVi : selectedLesson.title}
+                    onBack={handleCloseLesson}
                     steps={stepsDef}
                 />
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { BookOpen, HelpCircle, Headphones, CheckCircle, Lock } from 'lucide-react';
+import { BookOpen, HelpCircle, Headphones, CheckCircle, Lock, ArrowLeft } from 'lucide-react';
 
 export type LessonStep = string;
 
@@ -15,6 +15,7 @@ interface LessonProgressMapProps {
     onNavigate: (step: LessonStep) => void;
     topic: string;
     steps?: StepDef[];
+    onBack?: () => void;
 }
 
 const DEFAULT_STEPS: StepDef[] = [
@@ -23,7 +24,7 @@ const DEFAULT_STEPS: StepDef[] = [
     { id: 'listening', label: 'Listening', icon: Headphones },
 ];
 
-const LessonProgressMap: React.FC<LessonProgressMapProps> = ({ currentStep, completedSteps, onNavigate, topic, steps }) => {
+const LessonProgressMap: React.FC<LessonProgressMapProps> = ({ currentStep, completedSteps, onNavigate, topic, steps, onBack }) => {
     const activeSteps = steps || DEFAULT_STEPS;
 
     // Helper colors based on topic (simplified version)
@@ -34,6 +35,16 @@ const LessonProgressMap: React.FC<LessonProgressMapProps> = ({ currentStep, comp
 
     return (
         <div className="fixed top-4 md:top-6 left-1/2 -translate-x-1/2 z-[100] bg-white/95 backdrop-blur-md px-2 py-2 rounded-full shadow-lg border border-slate-200/60 flex items-center gap-0 transition-all duration-300 animate-in slide-in-from-top-4">
+            
+            {/* Back Button */}
+            {onBack && (
+                <button
+                    onClick={onBack}
+                    className="p-2 mr-2 rounded-full hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition-all"
+                >
+                    <ArrowLeft className="w-5 h-5" />
+                </button>
+            )}
 
             {activeSteps.map((step, idx) => {
                 const isCurrent = currentStep === step.id;
