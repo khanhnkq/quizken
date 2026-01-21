@@ -124,6 +124,27 @@ export function containsVietnameseBadwords(text: string): boolean {
     // Additional educational terms
     "thang",             // [month] - common in dates
     "nam",               // year/male
+    "ban",               // "bản" (basic/version) or "bạn" (friend) - normalized from "bắn" (shoot)
+    "can",               // "căn" (basic) or "cần" (need)
+    "kinh",              // "kinh" (economy)
+    "te",                // "tế" (economy)
+    "vat",               // "vật" (physics)
+    "ly",                // "lý" (physics)
+    "hoa",               // "hóa" (chemistry)
+    "hoc",               // "học" (study)
+    "co",                // "cơ" (mechanics)
+    "dien",              // "điện" (electric)
+    "tu",                // "từ" (magnetic)
+    "sinh",              // "sinh" (biology)
+    "su",                // "sử" (history)
+    "dia",               // "địa" (geography)
+    "giao",              // "giáo" (education)
+    "duc",               // "dục" (education)
+    "nghe",              // "nghệ" (art)
+    "thuat",             // "thuật" (art)
+    "marketing",         // marketing
+    "ke",                // "kế" (accounting)
+    "toan",              // "toán" (accounting)
   ]);
 
   const normalizedForWhitelist = normalizeForCompare(text.trim());
