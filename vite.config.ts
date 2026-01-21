@@ -76,6 +76,26 @@ export default defineConfig({
             return "charts";
           }
 
+          // Large data files - separate chunk
+          if (
+            id.includes("src/lib/constants/cefrVocabData") ||
+            id.includes("src/lib/constants/topicVocabData") ||
+            id.includes("src/lib/constants/vocab/") ||
+            id.includes("src/lib/constants/toeicData")
+          ) {
+            return "vocab-data";
+          }
+
+          // 3D & Visualization
+          if (id.includes("three") || id.includes("@react-three")) {
+            return "three-js";
+          }
+
+          // PDF Generation
+          if (id.includes("jspdf") || id.includes("html2canvas")) {
+            return "pdf-gen";
+          }
+
           // Core vendor libraries
           if (id.includes("node_modules")) {
             return "vendor";
