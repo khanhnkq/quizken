@@ -11,6 +11,7 @@ interface MiniQuizProps {
     onComplete: (score: number, total: number) => void;
     isCompleted?: boolean;
     initialScore?: number;
+    minimalView?: boolean;
 }
 
 const getTheme = (level: string) => {
@@ -81,7 +82,7 @@ const getTheme = (level: string) => {
     }
 };
 
-const MiniQuiz: React.FC<MiniQuizProps> = ({ words, topic, onClose, onComplete, isCompleted = false, initialScore = 0 }) => {
+const MiniQuiz: React.FC<MiniQuizProps> = ({ words, topic, onClose, onComplete, isCompleted = false, initialScore = 0, minimalView = false }) => {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [answers, setAnswers] = useState<Record<number, { option: string, isCorrect: boolean }>>({});
     const [quizData, setQuizData] = useState<any[]>([]);
@@ -293,15 +294,19 @@ const MiniQuiz: React.FC<MiniQuizProps> = ({ words, topic, onClose, onComplete, 
     }
 
     return (
-        <section className={`fixed inset-0 z-50 flex flex-col items-center justify-start pt-24 md:pt-0 p-4 bg-gradient-to-br ${theme.gradient} overflow-hidden`}>
+        <section className={`fixed inset-0 z-50 flex flex-col items-center justify-start pt-24 md:pt-0 p-4 ${minimalView ? 'bg-transparent' : `bg-gradient-to-br ${theme.gradient}`} overflow-hidden`}>
 
-            <div className="absolute inset-0 opacity-40"
-                style={{ backgroundImage: 'radial-gradient(#cbd5e1 1px, transparent 1px)', backgroundSize: '24px 24px' }}>
-            </div>
+            {!minimalView && (
+                <>
+                    <div className="absolute inset-0 opacity-40"
+                        style={{ backgroundImage: 'radial-gradient(#cbd5e1 1px, transparent 1px)', backgroundSize: '24px 24px' }}>
+                    </div>
 
-            {/* Same Background Blobs */}
-            <div className={`absolute top-1/2 left-1/4 w-96 h-96 ${theme.blobMain} rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-blob pointer-events-none`}></div>
-            <div className={`absolute top-0 right-1/4 w-96 h-96 ${theme.blobSec} rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-blob animation-delay-2000 pointer-events-none`}></div>
+                    {/* Same Background Blobs */}
+                    <div className={`absolute top-1/2 left-1/4 w-96 h-96 ${theme.blobMain} rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-blob pointer-events-none`}></div>
+                    <div className={`absolute top-0 right-1/4 w-96 h-96 ${theme.blobSec} rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-blob animation-delay-2000 pointer-events-none`}></div>
+                </>
+            )}
 
             {/* Mascot removed to prevent overlap with progress bar */}
 

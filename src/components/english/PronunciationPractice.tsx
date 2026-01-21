@@ -11,7 +11,11 @@ import {
     AlertCircle,
     Loader2,
     XCircle,
-    Trophy
+    Trophy,
+    Sparkles,
+    Zap,
+    Brain,
+    Lightbulb
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
@@ -20,14 +24,15 @@ import { VocabWord } from '@/lib/constants/cefrVocabData';
 import { useAudioRecorder } from '@/hooks/useAudioRecorder';
 import { getPronunciationFeedback, getUserGeminiKey } from '@/lib/geminiPronunciation';
 import { toast } from '@/hooks/use-toast';
+import { BackgroundDecorations } from '@/components/ui/BackgroundDecorations';
 
 interface PronunciationPracticeProps {
     words: VocabWord[];
+    level: string;
     onComplete: (score: number) => void;
     onClose: () => void;
-    level?: string;
+    minimalView?: boolean;
 }
-
 
 const getTheme = (level: string) => {
     const themes: Record<string, { gradient: string; text: string; accent: string; light: string; border: string }> = {
@@ -57,7 +62,8 @@ const PronunciationPractice: React.FC<PronunciationPracticeProps> = ({
     words,
     onComplete,
     onClose,
-    level = 'A1'
+    level = 'A1',
+    minimalView = false
 }) => {
     const { t, i18n } = useTranslation();
     const isVietnamese = i18n.language === 'vi';
@@ -208,7 +214,45 @@ const PronunciationPractice: React.FC<PronunciationPracticeProps> = ({
     }
 
     return (
-        <div className={`fixed inset-0 z-50 flex flex-col items-center justify-start pt-24 md:pt-0 bg-gradient-to-br ${theme.gradient}`}>
+        <div className={`fixed inset-0 z-50 flex flex-col items-center justify-start pt-24 md:pt-0 ${minimalView ? 'bg-transparent' : `bg-gradient-to-br ${theme.gradient}`} overflow-hidden`}>
+            {!minimalView && <BackgroundDecorations />}
+
+            {/* Animated Background Blobs - Denser Version */}
+            {!minimalView && (
+                <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+                    <div className={`absolute top-[-10%] left-[-10%] w-[500px] h-[500px] ${theme.accent} rounded-full mix-blend-multiply filter blur-[80px] opacity-40 animate-blob`}></div>
+                    <div className={`absolute top-[-10%] right-[-10%] w-[500px] h-[500px] ${theme.accent} rounded-full mix-blend-multiply filter blur-[80px] opacity-40 animate-blob animation-delay-2000`}></div>
+                    <div className={`absolute bottom-[-10%] left-[20%] w-[500px] h-[500px] ${theme.accent} rounded-full mix-blend-multiply filter blur-[80px] opacity-40 animate-blob animation-delay-4000`}></div>
+                    <div className={`absolute bottom-[10%] right-[-5%] w-[300px] h-[300px] ${theme.accent} rounded-full mix-blend-multiply filter blur-[60px] opacity-30 animate-blob animation-delay-6000`}></div>
+                </div>
+            )}
+
+            {/* Floating Icons - Denser Version */}
+            {!minimalView && (
+                <div className="hidden lg:block absolute inset-0 pointer-events-none z-0">
+                    <div className="absolute top-[15%] left-[5%] animate-float hover:scale-110 transition-transform duration-1000">
+                        <div className="bg-white/80 backdrop-blur-sm p-4 rounded-3xl shadow-xl border border-white/50 rotate-[-12deg]">
+                            <Brain className={`w-10 h-10 ${theme.text}`} />
+                        </div>
+                    </div>
+                    <div className="absolute top-[20%] right-[5%] animate-float animation-delay-2000 hover:scale-110 transition-transform duration-1000">
+                        <div className="bg-white/80 backdrop-blur-sm p-4 rounded-3xl shadow-xl border border-white/50 rotate-[12deg]">
+                            <Sparkles className="w-10 h-10 text-yellow-500" />
+                        </div>
+                    </div>
+                    <div className="absolute bottom-[30%] left-[8%] animate-float animation-delay-4000 hover:scale-110 transition-transform duration-1000">
+                        <div className="bg-white/80 backdrop-blur-sm p-4 rounded-3xl shadow-xl border border-white/50 rotate-[6deg]">
+                            <Zap className="w-8 h-8 text-blue-500" />
+                        </div>
+                    </div>
+                    <div className="absolute bottom-[20%] right-[8%] animate-float animation-delay-5000 hover:scale-110 transition-transform duration-1000">
+                        <div className="bg-white/80 backdrop-blur-sm p-4 rounded-3xl shadow-xl border border-white/50 rotate-[-8deg]">
+                            <Lightbulb className="w-8 h-8 text-orange-400" />
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Floating Back Button */}
             <button
                 onClick={onClose}
@@ -236,7 +280,7 @@ const PronunciationPractice: React.FC<PronunciationPracticeProps> = ({
             </div>
 
             {/* Main Content - Scrollable */}
-            <div className="flex-1 w-full overflow-y-auto custom-scrollbar flex flex-col">
+            <div className="flex-1 w-full overflow-y-auto custom-scrollbar flex flex-col relative z-10">
                 <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 pb-24 max-w-md mx-auto relative w-full">
 
                     {/* Target Word Card */}

@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Sparkles, Brain, Zap, Layout, FileText, CheckCircle, Play } from "lucide-react";
+import { Sparkles, Brain, Zap, Layout, FileText, CheckCircle, Play, Lightbulb } from "lucide-react";
 import logo from "@/assets/logo/logo.png";
 import { useState, useEffect, useRef } from "react";
 import { gsap } from "gsap";
@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { BackgroundDecorations } from "@/components/ui/BackgroundDecorations";
 
 const HomeHero = () => {
     const { t } = useTranslation();
@@ -85,10 +86,36 @@ const HomeHero = () => {
 
     return (
         <section ref={heroRef} className="relative min-h-[90vh] md:min-h-screen pt-24 pb-12 overflow-hidden flex items-center bg-slate-50/50">
-            {/* Background Decoration (Preserved Colors: Blue/Purple/Indigo) */}
-            <div className="absolute top-[-20%] right-[-10%] w-[800px] h-[800px] bg-green-100/50 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob" />
-            <div className="absolute top-[20%] left-[-10%] w-[600px] h-[600px] bg-emerald-100/50 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000" />
-            <div className="absolute bottom-[-10%] right-[20%] w-[600px] h-[600px] bg-teal-100/50 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-4000" />
+            <BackgroundDecorations />
+            {/* Background Decoration (Preserved Colors: Blue/Purple/Indigo) - Denser Version */}
+            <div className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-green-100/40 rounded-full mix-blend-multiply filter blur-[80px] opacity-50 animate-blob" />
+            <div className="absolute top-[20%] left-[-10%] w-[600px] h-[600px] bg-emerald-100/40 rounded-full mix-blend-multiply filter blur-[80px] opacity-50 animate-blob animation-delay-2000" />
+            <div className="absolute bottom-[-10%] right-[20%] w-[600px] h-[600px] bg-teal-100/40 rounded-full mix-blend-multiply filter blur-[80px] opacity-50 animate-blob animation-delay-4000" />
+            <div className="absolute bottom-[10%] left-[-5%] w-[400px] h-[400px] bg-lime-100/40 rounded-full mix-blend-multiply filter blur-[60px] opacity-40 animate-blob animation-delay-6000" />
+
+            {/* Floating Icons - Denser Version */}
+            <div className="hidden lg:block absolute inset-0 pointer-events-none z-0">
+                <div className="absolute top-[15%] left-[5%] animate-float hover:scale-110 transition-transform duration-1000">
+                    <div className="bg-white/80 backdrop-blur-sm p-4 rounded-3xl shadow-xl border border-white/50 rotate-[-6deg]">
+                        <Brain className="w-10 h-10 text-emerald-500" />
+                    </div>
+                </div>
+                <div className="absolute top-[10%] left-[45%] animate-float animation-delay-2000 hover:scale-110 transition-transform duration-1000">
+                    <div className="bg-white/80 backdrop-blur-sm p-4 rounded-3xl shadow-xl border border-white/50 rotate-[12deg]">
+                        <Sparkles className="w-10 h-10 text-yellow-500" />
+                    </div>
+                </div>
+                <div className="absolute bottom-[20%] left-[8%] animate-float animation-delay-4000 hover:scale-110 transition-transform duration-1000">
+                    <div className="bg-white/80 backdrop-blur-sm p-4 rounded-3xl shadow-xl border border-white/50 rotate-[3deg]">
+                        <Zap className="w-8 h-8 text-blue-500" />
+                    </div>
+                </div>
+                <div className="absolute bottom-[25%] right-[25%] animate-float animation-delay-5000 hover:scale-110 transition-transform duration-1000">
+                    <div className="bg-white/80 backdrop-blur-sm p-4 rounded-3xl shadow-xl border border-white/50 rotate-[-8deg]">
+                        <Lightbulb className="w-8 h-8 text-orange-400" />
+                    </div>
+                </div>
+            </div>
 
             <div className="container mx-auto px-4 z-10">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">

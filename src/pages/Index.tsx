@@ -145,7 +145,7 @@ const Index = () => {
               smoother.scrollTo(
                 quizElement,
                 true,
-                -(headerHeight + marginCompensation)
+                `top ${headerHeight + marginCompensation}px`
               );
               return; // Success, exit early
             }

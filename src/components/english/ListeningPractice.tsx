@@ -24,14 +24,18 @@ interface ListeningPracticeProps {
     onComplete?: () => void;
     onClose?: () => void;
     level?: string;
+    minimalView?: boolean;
 }
 
 const ListeningPractice: React.FC<ListeningPracticeProps> = ({
     words,
     onComplete,
     onClose,
-    level = 'A1'
+    level = 'A1',
+    minimalView = false
 }) => {
+
+
     const { t } = useTranslation();
     // Game state
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -276,12 +280,14 @@ const ListeningPractice: React.FC<ListeningPracticeProps> = ({
     if (!currentWord) return null;
 
     return (
-        <div className={`fixed inset-0 z-50 flex flex-col items-center justify-start pt-24 md:pt-0 bg-gradient-to-br ${theme.gradient} overflow-hidden`}>
-            {/* Background pattern */}
-            <div className="absolute inset-0 opacity-30 pointer-events-none" style={{
-                backgroundImage: 'radial-gradient(#94a3b8 1px, transparent 1px)',
-                backgroundSize: '24px 24px'
-            }} />
+        <div className={`fixed inset-0 z-50 flex flex-col items-center justify-start pt-24 md:pt-0 ${minimalView ? 'bg-transparent' : `bg-gradient-to-br ${theme.gradient}`} overflow-hidden`}>
+            {!minimalView && (
+                /* Background pattern */
+                <div className="absolute inset-0 opacity-30 pointer-events-none" style={{
+                    backgroundImage: 'radial-gradient(#94a3b8 1px, transparent 1px)',
+                    backgroundSize: '24px 24px'
+                }} />
+            )}
 
             {/* Floating Back Button */}
             <button

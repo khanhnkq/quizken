@@ -11,7 +11,27 @@ interface FlashcardSetProps {
     title: string;
     onClose: () => void;
     onComplete?: () => void;
+    minimalView?: boolean;
 }
+
+// Helper to get playful theme colors based on CEFR level
+const getTheme = (level: string) => {
+    switch (level) {
+        case 'A1': return {
+    
+    // ... inside render ...
+    // Note: Can't easily target a large block with replacement if I don't see exact lines.
+    // I will use replace on the props interface and signature first, then the return statement.
+    // Since I can't do multiple disparate edits in one replace_file_content call easily if they are far apart, 
+    // I'll assume I do them in one go if I include enough context or use multi_replace.
+    // Actually, I'll use multi_replace for safety as they are apart.
+    // Wait, I am constrained to one tool usage per turn for replace/multi_replace ideally? 
+    // No, I can stream tools. But let's check the view again.
+    // Lines 1-50 showed interface. 
+    // I need to see the return statement to modify the background.
+    
+    // Let's use multi_replace_file_content for this file.
+
 
 // Helper to get playful theme colors based on CEFR level
 const getTheme = (level: string) => {
@@ -186,16 +206,20 @@ const FlashcardSet = ({ words, title, onClose, onComplete }: FlashcardSetProps) 
 
     // --- Playing Screen ---
     return (
-        <div ref={containerRef} className={`fixed inset-0 z-50 flex flex-col items-center justify-start pt-24 md:pt-0 p-4 bg-gradient-to-br ${theme.gradient} overflow-hidden`}>
+        <div className={`fixed inset-0 z-50 flex flex-col items-center justify-start pt-24 md:pt-0 p-4 ${minimalView ? 'bg-transparent' : `bg-gradient-to-br ${theme.gradient}`} overflow-hidden`}>
 
-            {/* Background Pattern */}
-            <div className="absolute inset-0 opacity-40"
-                style={{ backgroundImage: 'radial-gradient(#cbd5e1 1px, transparent 1px)', backgroundSize: '24px 24px' }}>
-            </div>
+            {!minimalView && (
+                <>
+                    {/* Background Pattern */}
+                    <div className="absolute inset-0 opacity-40 pointer-events-none"
+                        style={{ backgroundImage: 'radial-gradient(#cbd5e1 1px, transparent 1px)', backgroundSize: '24px 24px' }}>
+                    </div>
 
-            {/* Animated Background Blobs */}
-            <div className={`absolute top-1/2 left-1/4 w-96 h-96 ${theme.blobMain} rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-blob pointer-events-none`}></div>
-            <div className={`absolute top-0 right-1/4 w-96 h-96 ${theme.blobSec} rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-blob animation-delay-2000 pointer-events-none`}></div>
+                    {/* Animated Background Blobs */}
+                    <div className={`absolute top-1/2 left-1/4 w-96 h-96 ${theme.blobMain} rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-blob pointer-events-none`}></div>
+                    <div className={`absolute top-0 right-1/4 w-96 h-96 ${theme.blobSec} rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-blob animation-delay-2000 pointer-events-none`}></div>
+                </>
+            )}
 
             {/* Floating Icon */}
             <div className="absolute top-[10%] left-[10%] md:top-[25%] hidden md:block animate-float pointer-events-none">

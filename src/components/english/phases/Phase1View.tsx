@@ -316,10 +316,20 @@ const Phase1View = () => {
     if (selectedLesson) {
         const baseKey = selectedLesson.id;
         const quizKey = `${baseKey}-quiz`;
+        const theme = getLevelTheme(selectedLesson.level);
 
         return (
-            <div className="relative min-h-screen">
-                {/* Navigation Map - Floating on top */}
+            <div className={`relative min-h-screen z-50 overflow-hidden bg-gradient-to-br ${theme.bg.replace('bg-', 'from-').replace('50', '50')} via-white ${theme.bg.replace('bg-', 'to-').replace('50', '50')}`}>
+                 {/* Shared Background Pattern */}
+                <div className="absolute inset-0 opacity-40 pointer-events-none z-0"
+                    style={{ backgroundImage: 'radial-gradient(#94a3b8 1px, transparent 1px)', backgroundSize: '24px 24px' }}>
+                </div>
+                
+                 {/* Shared Animated Blobs */}
+                 <div className={`absolute top-[-10%] left-[-10%] w-[500px] h-[500px] ${theme.accent} rounded-full mix-blend-multiply filter blur-[80px] opacity-20 animate-blob pointer-events-none z-0`}></div>
+                 <div className={`absolute top-[-10%] right-[-10%] w-[500px] h-[500px] ${theme.accent} rounded-full mix-blend-multiply filter blur-[80px] opacity-20 animate-blob animation-delay-2000 pointer-events-none z-0`}></div>
+                 <div className={`absolute bottom-[-10%] left-[20%] w-[500px] h-[500px] ${theme.accent} rounded-full mix-blend-multiply filter blur-[80px] opacity-20 animate-blob animation-delay-4000 pointer-events-none z-0`}></div>
+
                 {/* Navigation Map - Floating on top */}
                 <LessonProgressMap
                     currentStep={currentStep}
@@ -335,11 +345,12 @@ const Phase1View = () => {
                 />
 
                 {/* Content Area */}
-                <div className="relative z-0">
+                <div className="relative z-10">
                     {currentStep === 'learn' && (
                         <FlashcardSet
                             words={selectedLesson.words}
                             title={selectedLesson.title}
+                            minimalView={true}
                             onClose={() => { setSelectedLesson(null); setShowQuiz(false); setShowListening(false); }}
                             onComplete={() => {
                                 const stepKey = `${baseKey}-learn`;
@@ -356,8 +367,9 @@ const Phase1View = () => {
                         <MiniQuiz
                             words={selectedLesson.words}
                             topic={selectedLesson.level}
-                            isCompleted={isLessonCompleted(quizKey)}
                             initialScore={getLessonScore(quizKey)}
+                            isCompleted={isLessonCompleted(quizKey)}
+                            minimalView={true}
                             onClose={() => { setSelectedLesson(null); setShowQuiz(false); setShowListening(false); }}
                             onComplete={(score, total) => {
                                 // Normalize score to 0-100 scale for storage
@@ -384,6 +396,7 @@ const Phase1View = () => {
                         <ListeningPractice
                             words={selectedLesson.words}
                             level={selectedLesson.level}
+                            minimalView={true}
                             onComplete={() => {
                                 setCompletedSteps(prev => [...new Set([...prev, 'listening'])] as LessonStep[]);
                                 const stepKey = `${baseKey}-listening`;
@@ -406,6 +419,7 @@ const Phase1View = () => {
                         <PronunciationPractice
                             words={selectedLesson.words}
                             level={selectedLesson.level}
+                            minimalView={true}
                             onComplete={() => {
                                 setCompletedSteps(prev => [...new Set([...prev, 'pronunciation'])] as LessonStep[]);
                                 const stepKey = `${baseKey}-pronunciation`; // Not tracked in global completedLessons for now, or maybe it should?
