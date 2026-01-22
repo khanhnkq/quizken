@@ -33,7 +33,7 @@ export function ChatSidebar({ onBack }: ChatSidebarProps) {
   return (
     <div className="w-80 h-full bg-background border-r flex flex-col">
       {/* Header */}
-      <div className="p-4 border-b">
+      <div className="p-4 border-b h-[60px] flex items-center">
         <div className="flex items-center gap-2">
           {onBack && (
             <Button
@@ -154,16 +154,7 @@ export function ChatSidebar({ onBack }: ChatSidebarProps) {
             )}
           </div>
 
-          {/* Daily Streak */}
-          <div className="p-3 rounded-lg bg-gradient-to-br from-orange-50 to-yellow-50 border border-orange-100">
-            <div className="flex items-center gap-2 mb-2">
-              <Flame className="h-5 w-5 text-orange-500" />
-              <span className="font-semibold text-orange-700">Streak: 5 ngày</span>
-            </div>
-            <p className="text-xs text-orange-600">
-              Đăng nhập hàng ngày để nhận thêm phần thưởng!
-            </p>
-          </div>
+
 
           {/* Daily Gift */}
           <button className="w-full p-3 rounded-lg bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-100 hover:from-purple-100 hover:to-pink-100 transition-colors">

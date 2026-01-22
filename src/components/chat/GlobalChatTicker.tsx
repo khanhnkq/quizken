@@ -139,7 +139,7 @@ export function GlobalChatTicker() {
   }
 
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
+    <div className="fixed bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
       {/* Container for the pill - positioned bottom center */}
       <AnimatePresence mode="wait">
         <motion.div
@@ -150,7 +150,7 @@ export function GlobalChatTicker() {
           transition={{ duration: 0.4, ease: "easeOut" }}
           className="pointer-events-auto cursor-pointer group"
           onClick={() => navigate("/chat")}>
-          <div className="flex items-center gap-3 bg-white/90 backdrop-blur-md border border-green-200 shadow-lg rounded-full pl-2 pr-5 py-2 hover:shadow-xl hover:border-green-300 transition-all">
+          <div className="flex items-center gap-3 bg-white/90 backdrop-blur-md border border-green-200 shadow-lg rounded-full pl-2 pr-5 py-3 hover:shadow-xl hover:border-green-300 transition-all">
             <Avatar className="h-8 w-8 ring-2 ring-white shadow-sm">
               {latestMessage.profiles?.avatar_url && (
                 <AvatarImage src={latestMessage.profiles.avatar_url} />

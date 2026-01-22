@@ -160,7 +160,7 @@ export function ChatRoom({ onLoginClick }: ChatRoomProps) {
       </div>
 
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b bg-muted/30 relative z-10">
+      <div className="flex items-center justify-between p-4 border-b relative z-10 bg-background h-[60px]">
         <div className="flex items-center gap-2">
           <MessageCircle className="h-5 w-5 text-primary" />
           <h2 className="font-bold text-lg">Phòng Chat Chung</h2>
