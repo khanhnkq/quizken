@@ -282,8 +282,8 @@
             "title": "Public Quiz Library",
             "description": "Explore and use thousands of quizzes shared by the community. Learn, practice, and expand your knowledge.",
             "badge": "Discover Knowledge",
-            "titlePart1": "Quiz Library",
-            "titlePart2": "AI Powered"
+            "titlePart1": "Quiz ",
+            "titlePart2": "Library"
         },
         "meta": {
             "title": "Free AI Quiz Library",
@@ -1098,6 +1098,9 @@
         "explanationPlaceholder": "Explain why this answer is correct (optional)",
         "questionsCount": "{{count}} Questions",
         "saveQuiz": "Save Quiz",
+        "editTitle": "Edit Quiz",
+        "editSubtitle": "Update your quiz content and questions",
+        "updateQuiz": "Update Quiz",
         "errors": {
             "titleRequired": "Please enter a quiz title",
             "questionRequired": "Please enter question content",
@@ -1111,6 +1114,7 @@
         },
         "success": {
             "title": "Quiz created successfully!",
+            "updated": "Quiz updated successfully!",
             "description": "Quiz with {{count}} questions has been saved"
         }
     },

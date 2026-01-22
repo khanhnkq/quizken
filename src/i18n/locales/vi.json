@@ -1104,6 +1104,9 @@
         "explanationPlaceholder": "Giải thích tại sao đáp án này đúng (tuỳ chọn)",
         "questionsCount": "{{count}} câu hỏi",
         "saveQuiz": "Lưu Quiz",
+        "editTitle": "Chỉnh Sửa Bài Kiểm Tra",
+        "editSubtitle": "Cập nhật nội dung và câu hỏi của bạn",
+        "updateQuiz": "Cập nhật Quiz",
         "errors": {
             "titleRequired": "Vui lòng nhập tiêu đề quiz",
             "questionRequired": "Vui lòng nhập nội dung câu hỏi",

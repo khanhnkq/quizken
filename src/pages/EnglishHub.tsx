@@ -129,7 +129,6 @@ const EnglishHub = () => {
                             className="bg-white/90 backdrop-blur-sm p-3 rounded-2xl shadow-lg border-2 border-white hover:scale-105 transition-transform text-slate-600 font-bold flex items-center gap-2"
                         >
                             <ArrowLeft className="w-5 h-5" />
-                            <span className="hidden sm:inline">{t('englishHub.back')}</span>
                         </button>
 
                         <div className="flex items-center gap-2">

@@ -20,9 +20,10 @@ interface ManualQuizEditorProps {
   onComplete?: (quizId: string) => void;
   onCancel?: () => void;
   variant?: "dialog" | "page";
+  quizId?: string; // Optional quizId for editing mode
 }
 
-export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog" }: ManualQuizEditorProps) {
+export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", quizId }: ManualQuizEditorProps) {
   const { t } = useTranslation();
   const { toast } = useToast();
   const { user } = useAuth();
@@ -32,6 +33,7 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog" }: M
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [isPublic, setIsPublic] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Questions array
   const [questions, setQuestions] = useState<Question[]>([
@@ -41,6 +43,52 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog" }: M
   const [saving, setSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState<number | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Fetch quiz data if handling edit mode
+  React.useEffect(() => {
+    if (!quizId) return;
+
+    const fetchQuiz = async () => {
+      setIsLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from("quizzes")
+          .select("*")
+          .eq("id", quizId)
+          .single();
+
+        if (error) throw error;
+        if (data) {
+          setTitle(data.title);
+          setDescription(data.description || "");
+          setIsPublic(data.is_public ?? true);
+          
+          if (data.questions && Array.isArray(data.questions)) {
+            // Cast to Question[] to ensure type safety
+             const loadedQuestions = (data.questions as unknown as Question[]).map(q => ({
+                question: q.question || "",
+                options: q.options || ["", "", "", ""],
+                correctAnswer: typeof q.correctAnswer === 'number' ? q.correctAnswer : 0,
+                explanation: q.explanation || "",
+                image: q.image || undefined
+             }));
+             setQuestions(loadedQuestions.length > 0 ? loadedQuestions : [{ question: "", options: ["", "", "", ""], correctAnswer: 0, explanation: "" }]);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching quiz:", error);
+        toast({
+          title: t("common.error"),
+          description: "Failed to load quiz data",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchQuiz();
+  }, [quizId, toast, t]);
 
   // Add a new question
   const addQuestion = useCallback(() => {
@@ -203,7 +251,27 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog" }: M
         image: q.image || undefined,
       }));
 
-      const { data, error } = await supabase
+      let result;
+      
+      if (quizId) {
+        // Update existing quiz
+        result = await supabase
+          .from("quizzes")
+          .update({
+             title: title.trim(),
+             description: description.trim() || null,
+            // Only update prompt if not AI generated, or let user override it. 
+            // Ideally keep original prompt if AI, but here we just update metadata.
+             questions: cleanedQuestions,
+             is_public: isPublic,
+             updated_at: new Date().toISOString()
+           })
+           .eq("id", quizId)
+           .select("id")
+           .single();
+      } else {
+        // Create new quiz
+        result = await supabase
         .from("quizzes")
         .insert({
           title: title.trim(),
@@ -217,11 +285,14 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog" }: M
         })
         .select("id")
         .single();
+      }
+
+      const { data, error } = result;
 
       if (error) throw error;
 
       toast({
-        title: t("manualQuiz.success.title"),
+        title: quizId ? t("manualQuiz.success.updated") : t("manualQuiz.success.title"),
         description: t("manualQuiz.success.description", { count: cleanedQuestions.length }),
         variant: "success",
       });
@@ -264,7 +335,7 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog" }: M
             <PenLine className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h2 className="text-sm font-bold text-gray-800">{t("manualQuiz.title")}</h2>
+            <h2 className="text-sm font-bold text-gray-800">{quizId ? t("manualQuiz.editTitle") : t("manualQuiz.title")}</h2>
             <p className="text-xs text-gray-500">{t("manualQuiz.subtitle")}</p>
           </div>
         </div>
@@ -512,7 +583,7 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog" }: M
                 ) : (
                   <>
                     <Sparkles className="w-4 h-4 mr-2" />
-                    {t("manualQuiz.saveQuiz")}
+                    {quizId ? t("manualQuiz.updateQuiz") : t("manualQuiz.saveQuiz")}
                   </>
                 )}
               </Button>
