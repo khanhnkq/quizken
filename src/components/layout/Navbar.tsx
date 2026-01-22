@@ -75,7 +75,7 @@ const Navbar = () => {
     { path: "/", label: t('nav.home'), icon: Home },
     { path: "/quiz/library", label: t('nav.library'), icon: BookOpen },
     { path: "/english", label: "English Hub", icon: Store },
-    { path: "/about", label: t('nav.about'), icon: Info },
+    // { path: "/about", label: t('nav.about'), icon: Info },
   ];
 
 

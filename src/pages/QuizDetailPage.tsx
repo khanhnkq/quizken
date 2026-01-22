@@ -16,9 +16,10 @@ import {
   Target,
   Zap,
   BookOpen,
-  Share2Icon,
+  Share as ShareIcon,
   DownloadIcon
 } from "lucide-react";
+import { ShareDialog } from "@/components/common/ShareDialog";
 import { gsap } from "gsap";
 import { shouldReduceAnimations } from "@/utils/deviceDetection";
 import type { MouseEvent } from "react";
@@ -26,12 +27,15 @@ import { BackgroundDecorations } from "@/components/ui/BackgroundDecorations";
 import confetti from "canvas-confetti";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useTranslation } from "react-i18next";
+import { useToast } from "@/hooks/use-toast";
 
 export default function QuizDetailPage() {
   const { t } = useTranslation();
+  const { toast } = useToast();
   const { attemptId } = useParams<{ attemptId: string }>();
   const navigate = useNavigate();
   const [authLoading, setAuthLoading] = useState(true);
+  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
 
   const { attemptDetail, attemptSummary, isLoading, error } =
     useQuizAttemptDetail(attemptId);
@@ -167,8 +171,13 @@ export default function QuizDetailPage() {
           </Button>
 
           <div className="flex gap-2">
-            <Button size="icon" variant="outline" className="rounded-full bg-white/80 hover:scale-110 transition-transform">
-              <Share2Icon className="w-4 h-4 text-gray-600" />
+            <Button
+              size="icon"
+              variant="outline"
+              className="rounded-full bg-white/80 hover:scale-110 transition-transform"
+              onClick={() => setIsShareDialogOpen(true)}
+            >
+              <ShareIcon className="w-4 h-4 text-gray-600" />
             </Button>
             <Button size="icon" variant="outline" className="rounded-full bg-white/80 hover:scale-110 transition-transform">
               <DownloadIcon className="w-4 h-4 text-gray-600" />
@@ -364,6 +373,14 @@ export default function QuizDetailPage() {
           </div>
         </div>
       </div>
+      <ShareDialog
+        isOpen={isShareDialogOpen}
+        onClose={() => setIsShareDialogOpen(false)}
+        url={attemptDetail ? `${window.location.origin}/quiz/play/${attemptDetail.quiz_id}` : ""}
+        title={t('share.title', 'Share Quiz')}
+        quizTitle={attemptDetail?.quiz_title}
+        questionCount={attemptDetail?.total_questions}
+      />
     </div>
   );
 }

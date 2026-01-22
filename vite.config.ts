@@ -76,15 +76,18 @@ export default defineConfig({
             return "charts";
           }
 
-          // Large data files - separate chunk
-          if (
-            id.includes("src/lib/constants/cefrVocabData") ||
-            id.includes("src/lib/constants/topicVocabData") ||
-            id.includes("src/lib/constants/vocab/") ||
-            id.includes("src/lib/constants/toeicData")
-          ) {
-            return "vocab-data";
-          }
+          // Large data files - split by CEFR level for lazy loading
+          if (id.includes("src/lib/constants/vocab/a1")) return "vocab-a1";
+          if (id.includes("src/lib/constants/vocab/a2")) return "vocab-a2";
+          if (id.includes("src/lib/constants/vocab/b1")) return "vocab-b1";
+          if (id.includes("src/lib/constants/vocab/b2")) return "vocab-b2";
+          if (id.includes("src/lib/constants/vocab/c1")) return "vocab-c1";
+          if (id.includes("src/lib/constants/vocab/c2")) return "vocab-c2";
+          
+          // Other large data files
+          if (id.includes("src/lib/constants/cefrVocabData")) return "cefr-vocab-data";
+          if (id.includes("src/lib/constants/topicVocabData")) return "topic-vocab-data";
+          if (id.includes("src/lib/constants/toeicData")) return "toeic-data";
 
           // 3D & Visualization
           if (id.includes("three") || id.includes("@react-three")) {

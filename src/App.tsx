@@ -4,14 +4,12 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import EnglishHub from "./pages/EnglishHub";
-import Phase1View from "./components/english/phases/Phase1View";
-import Phase2View from "./components/english/phases/Phase2View";
-import MyNotebook from "./components/english/MyNotebook";
 import { gsap } from "gsap";
 import { toast } from "@/hooks/use-toast";
 import { shouldDisableScrollSmoother } from "@/utils/deviceDetection";
 import { PageSkeleton } from "@/components/ui/loading-skeleton";
+
+// Lazy-loaded pages for code splitting
 const Index = lazy(() => import("./pages/Index"));
 const About = lazy(() => import("./pages/About"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -19,6 +17,10 @@ const QuizLibrary = lazy(() => import("./components/library/QuizLibrary"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const QuizDetailPage = lazy(() => import("./pages/QuizDetailPage"));
 const PlayQuizPage = lazy(() => import("./pages/PlayQuizPage"));
+const EnglishHub = lazy(() => import("./pages/EnglishHub"));
+const Phase1View = lazy(() => import("./components/english/phases/Phase1View"));
+const Phase2View = lazy(() => import("./components/english/phases/Phase2View"));
+const MyNotebook = lazy(() => import("./components/english/MyNotebook"));
 
 // Preload functions for faster navigation
 const preloadRoutes = () => {
@@ -27,6 +29,7 @@ const preloadRoutes = () => {
   import("./pages/About");
   import("./components/library/QuizLibrary");
   import("./pages/Dashboard");
+  import("./pages/EnglishHub");
 };
 
 import { SoundProvider } from "@/contexts/SoundContext";

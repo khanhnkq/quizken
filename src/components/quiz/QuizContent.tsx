@@ -1,8 +1,9 @@
-import * as React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Download, Sparkles, BookOpen, Brain, Clock, CircleHelp } from "@/lib/icons";
+import { Share } from "lucide-react";
 import { BackgroundDecorations } from "@/components/ui/BackgroundDecorations";
 import {
   Card,
@@ -12,6 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { ShareDialog } from "@/components/common/ShareDialog";
 import type { Quiz, Question } from "@/types/quiz";
 import { useAudio } from "@/contexts/SoundContext";
 import { killActiveScroll, scrollToTarget } from "@/lib/scroll";
@@ -111,6 +113,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
 }) => {
   const { t } = useTranslation();
   const { toast } = useToast();
+  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const { statistics, refetch: refetchStats } = useDashboardStats(userId);
   const {
     activateFlashcard,
@@ -328,6 +331,18 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                         {t('quizContent.retake')}
                       </Button>
                     )}
+                    
+                    {/* Share Button */}
+                    <Button
+                      onClick={() => setIsShareDialogOpen(true)}
+                      variant="outline"
+                      size="icon"
+                      className="rounded-full border-4 border-border hover:border-primary hover:text-primary hover:bg-primary/10 transition-all duration-200 active:scale-95 w-10 h-10"
+                      title={t('quizContent.share') || "Share"}
+                    >
+                        <Share className="w-4 h-4" />
+                    </Button>
+
                     <Button
                       onClick={() => {
                         handleToggleFlashcard();
@@ -653,6 +668,14 @@ export const QuizContent: React.FC<QuizContentProps> = ({
           </div>
         </div>
       </div>
+      <ShareDialog
+        isOpen={isShareDialogOpen}
+        onClose={() => setIsShareDialogOpen(false)}
+        url={`${window.location.origin}/quiz/play/${quiz.id}`}
+        title={t('share.title', 'Share Quiz')}
+        quizTitle={quiz.title}
+        questionCount={quiz.questions.length}
+      />
     </section >
   );
 };

@@ -45,6 +45,7 @@ import {
   ScrollVelocityContainer,
   ScrollVelocityRow,
 } from "@/components/ScrollVelocity";
+import { ShareDialog } from "@/components/common/ShareDialog";
 import AuthModal from "@/components/AuthModal";
 import Navbar from "@/components/layout/Navbar";
 import {
@@ -121,6 +122,7 @@ const QuizLibrary: React.FC = () => {
   const [searchIn, setSearchIn] = useState<"all" | "title" | "content">("all");
   const [selectedCategory, setSelectedCategory] = useState<QuizCategory | "all">("all");
   const [selectedDifficulty, setSelectedDifficulty] = useState<QuizDifficulty | "all">("all");
+  const [shareQuiz, setShareQuiz] = useState<PublicQuiz | null>(null);
 
   // Scroll to top on mount
   useEffect(() => {
@@ -440,6 +442,10 @@ const QuizLibrary: React.FC = () => {
     navigate(`/quiz/play/${quiz.id}`);
   };
 
+  const handleShareQuiz = (quiz: PublicQuiz) => {
+    setShareQuiz(quiz);
+  };
+
   return (
     <>
       <SeoMeta
@@ -712,6 +718,7 @@ const QuizLibrary: React.FC = () => {
                           } as Quiz);
                         }}
                         onUse={() => handleUseQuiz(quiz)}
+                        onShare={() => handleShareQuiz(quiz)}
                         onDownload={async () => {
                           if (!user) {
                             toast({
@@ -891,6 +898,14 @@ const QuizLibrary: React.FC = () => {
             onPlay={(quiz) => handleUseQuiz(quiz as unknown as PublicQuiz)}
           />
 
+          <ShareDialog
+            isOpen={!!shareQuiz}
+            onClose={() => setShareQuiz(null)}
+            url={shareQuiz ? `${window.location.origin}/quiz/play/${shareQuiz.id}` : ""}
+            title={t('share.title', 'Share Quiz')}
+            quizTitle={shareQuiz?.title}
+            questionCount={Array.isArray(shareQuiz?.questions) ? shareQuiz?.questions.length : undefined}
+          />
           <AuthModal open={showAuthModal} onOpenChange={setShowAuthModal} />
         </div>
       </div>

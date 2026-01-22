@@ -15,6 +15,7 @@ import {
   Play,
   Sparkles,
   TrendingUp,
+  Share,
 } from "lucide-react";
 import {
   QuizTags,
@@ -40,6 +41,7 @@ interface QuizCardProps {
   onPreview: () => void;
   onUse: () => void;
   onDownload: () => void;
+  onShare: () => void;
   formatDate: (dateString: string) => string;
   formatNumber: (n: number) => string;
 }
@@ -49,6 +51,7 @@ export const QuizCard: React.FC<QuizCardProps> = ({
   onPreview,
   onUse,
   onDownload,
+  onShare,
   formatDate,
   formatNumber,
 }) => {
@@ -159,6 +162,19 @@ export const QuizCard: React.FC<QuizCardProps> = ({
             title={t('library.card.preview')}
           >
             <BookOpen className="w-5 h-5" />
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-12 w-12 rounded-3xl border-4 border-border bg-white text-muted-foreground hover:border-purple-400 hover:bg-purple-50 hover:text-purple-500 active:scale-95 transition-all duration-200"
+            onClick={(e) => {
+              e.stopPropagation();
+              onShare();
+            }}
+            title={t('library.card.share') || "Share"}
+          >
+            <Share className="w-5 h-5" />
           </Button>
 
           <Button

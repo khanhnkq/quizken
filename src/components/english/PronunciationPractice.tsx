@@ -156,7 +156,7 @@ const PronunciationPractice: React.FC<PronunciationPracticeProps> = ({
     } = useAudioRecorder();
 
     // Data
-    const currentWord = words[currentIndex % words.length];
+    const currentWord = words?.length ? words[currentIndex % words.length] : null;
     const theme = getTheme(level);
     
     // Get all topic keys for selection
@@ -182,7 +182,7 @@ const PronunciationPractice: React.FC<PronunciationPracticeProps> = ({
         return getSentencesByTopic;
     }, [isShuffled, shuffledSentences, getSentencesByTopic]);
     
-    const currentSentence = sentences[sentenceIndex % Math.max(sentences.length, 1)];
+    const currentSentence = sentences?.length ? sentences[sentenceIndex % sentences.length] : null;
     
     // Shuffle function
     const handleShuffle = () => {
@@ -242,6 +242,7 @@ const PronunciationPractice: React.FC<PronunciationPracticeProps> = ({
             const base64Audio = await blobToBase64(blob);
 
             if (practiceMode === 'word') {
+                if (!currentWord) return;
                 const result = await getPronunciationFeedback(
                     currentWord.word,
                     base64Audio,
@@ -254,6 +255,7 @@ const PronunciationPractice: React.FC<PronunciationPracticeProps> = ({
                     confetti({ particleCount: 30, spread: 50, origin: { y: 0.7 } });
                 }
             } else {
+                if (!currentSentence) return;
                 const result = await getSentenceFeedback(
                     currentSentence.sentence,
                     base64Audio,
@@ -487,30 +489,46 @@ const PronunciationPractice: React.FC<PronunciationPracticeProps> = ({
                         <div className={`absolute top-0 left-0 w-full h-2 ${theme.accent}`} />
 
                         {practiceMode === 'word' ? (
-                            <>
-                                <span className="inline-block px-3 py-1 rounded-full bg-slate-100 text-slate-400 text-[10px] sm:text-xs font-bold mb-4 uppercase tracking-widest border border-slate-200">
-                                    {currentWord.pos}
-                                </span>
-                                <h1 className="text-3xl sm:text-4xl font-black text-slate-800 mb-2 break-words">{currentWord.word}</h1>
-                                <p className="text-slate-400 font-medium text-lg mb-6">{currentWord.phonetic}</p>
-                            </>
+                            currentWord ? (
+                                <>
+                                    <span className="inline-block px-3 py-1 rounded-full bg-slate-100 text-slate-400 text-[10px] sm:text-xs font-bold mb-4 uppercase tracking-widest border border-slate-200">
+                                        {currentWord.pos}
+                                    </span>
+                                    <h1 className="text-3xl sm:text-4xl font-black text-slate-800 mb-2 break-words">{currentWord.word}</h1>
+                                    <p className="text-slate-400 font-medium text-lg mb-6">{currentWord.phonetic}</p>
+                                </>
+                            ) : (
+                                <div className="py-8 text-slate-400 flex flex-col items-center">
+                                    <p>{isVietnamese ? 'Chưa có từ vựng' : 'No vocabulary available'}</p>
+                                </div>
+                            )
                         ) : (
-                            <>
-                                <span className="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-600 text-[10px] sm:text-xs font-bold mb-4 uppercase tracking-widest border border-blue-200">
-                                    {isVietnamese ? 'Luyện câu' : 'Sentence Practice'}
-                                </span>
-                                <h1 className="text-xl sm:text-2xl font-black text-slate-800 mb-2 break-words leading-relaxed">
-                                    "{currentSentence.sentence}"
-                                </h1>
-                                {currentSentence.translation && (
-                                    <p className="text-slate-400 font-medium text-sm mb-4">{currentSentence.translation}</p>
-                                )}
-                            </>
+                            currentSentence ? (
+                                <>
+                                    <span className="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-600 text-[10px] sm:text-xs font-bold mb-4 uppercase tracking-widest border border-blue-200">
+                                        {isVietnamese ? 'Luyện câu' : 'Sentence Practice'}
+                                    </span>
+                                    <h1 className="text-xl sm:text-2xl font-black text-slate-800 mb-2 break-words leading-relaxed">
+                                        "{currentSentence.sentence}"
+                                    </h1>
+                                    {currentSentence.translation && (
+                                        <p className="text-slate-400 font-medium text-sm mb-4">{currentSentence.translation}</p>
+                                    )}
+                                </>
+                            ) : (
+                                <div className="py-8 text-slate-400 flex flex-col items-center">
+                                    <p>{isVietnamese ? 'Chưa có mẫu câu' : 'No sentences available'}</p>
+                                </div>
+                            )
                         )}
 
                         <button
-                            onClick={() => playAudio(practiceMode === 'word' ? currentWord.word : currentSentence.sentence)}
-                            className={`mx-auto w-12 h-12 rounded-full flex items-center justify-center transition-all shadow-md active:scale-95 ${theme.accent} text-white hover:brightness-95`}
+                            onClick={() => {
+                                if (practiceMode === 'word' && currentWord) playAudio(currentWord.word);
+                                else if (practiceMode === 'sentence' && currentSentence) playAudio(currentSentence.sentence);
+                            }}
+                            disabled={practiceMode === 'word' ? !currentWord : !currentSentence}
+                            className={`mx-auto w-12 h-12 rounded-full flex items-center justify-center transition-all shadow-md active:scale-95 ${theme.accent} text-white hover:brightness-95 disabled:opacity-50 disabled:pointer-events-none`}
                         >
                             <Volume2 className="w-6 h-6" />
                         </button>
@@ -600,8 +618,8 @@ const PronunciationPractice: React.FC<PronunciationPracticeProps> = ({
                                     </p>
                                     <p className="text-sm mt-1 opacity-70">
                                         {practiceMode === 'word' 
-                                            ? `Say: "${currentWord.word}"`
-                                            : `Say: "${currentSentence.sentence}"`
+                                            ? (currentWord ? `Say: "${currentWord.word}"` : '')
+                                            : (currentSentence ? `Say: "${currentSentence.sentence}"` : '')
                                         }
                                     </p>
                                 </motion.div>
