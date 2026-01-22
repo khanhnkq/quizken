@@ -20,7 +20,7 @@ export default function ChatPage() {
       <div className="flex h-screen bg-background overflow-hidden">
         {/* Sidebar - Hidden on mobile */}
         <div className="hidden lg:block">
-          <ChatSidebar />
+          <ChatSidebar onBack={() => window.history.back()} />
         </div>
 
         {/* Chat Room - Full width */}

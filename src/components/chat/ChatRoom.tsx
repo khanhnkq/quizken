@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { MessageCircle, Users, Loader2 } from "lucide-react";
+import { MessageCircle, Users, Loader2, ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useChatMessages } from "@/hooks/useChatMessages";
 import { useOnlinePresence } from "@/hooks/useOnlinePresence";
@@ -16,6 +17,56 @@ const STREAK_SLOGANS = [
   "{streak} ngày on-top server! Cố gắng bám đuôi nhé! 👑",
   "Chăm chỉ {streak} ngày rồi. Kiến thức đang ngấm dần... 🧠",
   "Không thể cản phá! Chuỗi {streak} ngày bất bại! 🔥",
+  "Sống trong giang hồ, ai không biết đến cái tên tao? (Chuỗi {streak} ngày)",
+  "Bước vào cuộc chơi này, không có đường lui. Đã đi được {streak} ngày.",
+  "Giang hồ máu lửa, anh em sống chết có nhau. {streak} ngày tình nghĩa.",
+  "Tiền bạc, danh vọng chẳng là gì, tình nghĩa mới là trên hết.",
+  "Chơi với bạn hết lòng, chơi với thù hết sức.",
+  "Một lần bước chân vào giang hồ, không còn đường quay lại. Clip {streak} ngày.",
+  "Số phận an bài, tao không sợ. Giữ chuỗi {streak} ngày là do tao.",
+  "Thắng làm vua, thua làm giặc, giang hồ là vậy.",
+  "Giang hồ hiểm ác, không ai biết trước ngày mai. Nhưng tao biết tao có chuỗi {streak} ngày.",
+  "Không cần nhiều lời, chỉ cần hành động. {streak} ngày liên tiếp.",
+  "Cái chết không sợ, chỉ sợ sống không đáng. Sống phải có chuỗi {streak} ngày.",
+  "Lênh đênh giang hồ, ai hiểu được lòng tao?",
+  "Lợi danh là hư ảo, tình nghĩa mới là chân thật.",
+  "Người ta sợ tao, tao chỉ sợ mất anh em (và mất chuỗi {streak} ngày).",
+  "Đời là bể khổ, mà giang hồ là bể máu.",
+  "Không có bạn tốt, chỉ có kẻ thù mạnh.",
+  "Đánh đổi tất cả, chỉ để bảo vệ anh em.",
+  "Giang hồ muôn mặt, ai thật, ai giả?",
+  "Không ai thắng mãi, chỉ có người không biết dừng lại.",
+  "Giang hồ không dành cho kẻ yếu lòng. {streak} ngày kiên trì.",
+  "Sống với giang hồ, phải biết luật chơi.",
+  "Tao không chọn giang hồ, giang hồ chọn tao.",
+  "Một khi đã bước vào, không có đường lui.",
+  "Giang hồ là thế, không tin ai ngoài bản thân.",
+  "Lòng người thay đổi, chỉ có mình tao là không đổi. Vẫn duy trì {streak} ngày.",
+  "Thế gian lắm kẻ giả nhân, tao chỉ là tao.",
+  "Tình nghĩa giang hồ, không cần nhiều lời.",
+  "Đường đi không khó, chỉ sợ lòng không bền. {streak} ngày rồi chưa nản.",
+  "Đã dấn thân vào giang hồ, sống chết không quan trọng.",
+  "Tao không cần biết ai đúng ai sai, chỉ cần biết tao không sai.",
+  "Một ngày giang hồ, cả đời giang hồ.",
+  "Không sợ kẻ địch mạnh, chỉ sợ lòng không kiên.",
+  "Giang hồ không nói lý, chỉ có máu và nước mắt.",
+  "Tao là tao, không cần ai phải hiểu. (Chuỗi {streak} ngày)",
+  "Không ai sống mãi, chỉ có danh tiếng còn lại.",
+  "Thắng thua là chuyện bình thường, quan trọng là biết đứng dậy.",
+  "Giang hồ không màu hồng, chỉ có máu và nước mắt.",
+  "Không cần nhiều bạn, chỉ cần vài người anh em.",
+  "Giang hồ là thế, không ai biết trước ngày mai.",
+  "Đời giang hồ, ai dám khinh thường?",
+  "Tao sống cho tao, không cần ai hiểu.",
+  "Giang hồ không dành cho kẻ yếu.",
+  "Lời nói gió bay, chỉ có hành động mới chứng minh.",
+  "Không cần nhiều lời, chỉ cần hành động. (Đã đạt {streak} ngày)",
+  "Tao không cần biết ai đúng ai sai, chỉ cần biết tao không sai.",
+  "Giang hồ không có chỗ cho kẻ yếu lòng.",
+  "Không cần biết tao là ai, chỉ cần biết tao không sợ.",
+  "Tình nghĩa anh em, không gì sánh được.",
+  "Sống trong giang hồ, ai cũng có một quá khứ.",
+  "Giang hồ là vậy, không cần ai hiểu, chỉ cần bản thân hiểu.",
 ];
 
 interface ChatRoomProps {
@@ -30,6 +81,7 @@ export function ChatRoom({ onLoginClick }: ChatRoomProps) {
     sendQuizShare,
     sendStreakShare,
     deleteMessage,
+    toggleReaction,
     currentUserId,
     userProfiles,
   } = useChatMessages();
@@ -81,8 +133,20 @@ export function ChatRoom({ onLoginClick }: ChatRoomProps) {
 
   return (
     <div className="flex flex-col h-full bg-background overflow-hidden relative">
+      {/* Background Decor */}
+      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden text-foreground">
+        {/* Dot Pattern - Polka Dots */}
+        <div
+          className="absolute inset-0 opacity-[0.4]"
+          style={{
+            backgroundImage: "radial-gradient(#cbd5e1 2px, transparent 2px)",
+            backgroundSize: "24px 24px",
+          }}
+        />
+      </div>
+
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b bg-muted/30">
+      <div className="flex items-center justify-between p-4 border-b bg-muted/30 relative z-10">
         <div className="flex items-center gap-2">
           <MessageCircle className="h-5 w-5 text-primary" />
           <h2 className="font-bold text-lg">Phòng Chat Chung</h2>
@@ -100,7 +164,7 @@ export function ChatRoom({ onLoginClick }: ChatRoomProps) {
 
       {/* Messages Area */}
       <ScrollArea
-        className="flex-1"
+        className="flex-1 relative z-10"
         ref={scrollRef as any}
         onScrollCapture={handleScroll}>
         <div className="py-4">
@@ -128,6 +192,8 @@ export function ChatRoom({ onLoginClick }: ChatRoomProps) {
                     displayName={profile?.display_name || undefined}
                     userLevel={profile?.user_level}
                     streak={message.user_id === currentUserId ? streak : 0}
+                    currentUserId={currentUserId}
+                    onToggleReaction={toggleReaction}
                     onDelete={
                       message.user_id === currentUserId
                         ? deleteMessage
@@ -143,14 +209,16 @@ export function ChatRoom({ onLoginClick }: ChatRoomProps) {
       </ScrollArea>
 
       {/* Input Area */}
-      <ChatInput
-        onSendMessage={sendMessage}
-        isAuthenticated={!!currentUserId}
-        onLoginClick={onLoginClick}
-        disabled={isLoading}
-        onOpenShare={() => setIsShareOpen(true)}
-        onShareStreak={handleShareStreak}
-      />
+      <div className="relative z-10">
+        <ChatInput
+          onSendMessage={sendMessage}
+          isAuthenticated={!!currentUserId}
+          onLoginClick={onLoginClick}
+          disabled={isLoading}
+          onOpenShare={() => setIsShareOpen(true)}
+          onShareStreak={handleShareStreak}
+        />
+      </div>
 
       <ShareQuizModal
         open={isShareOpen}

@@ -9,14 +9,10 @@ export interface ChatMessage {
   created_at: string;
   avatar_url?: string;
   display_name?: string;
+  reactions?: Record<string, string[]>; // emoji -> userIds[]
 }
 
-interface UserProfile {
-  user_id: string;
-  avatar_url: string | null;
-  display_name: string | null;
-  user_level: number;
-}
+// ...
 
 export interface UseChatMessagesReturn {
   messages: ChatMessage[];
@@ -25,6 +21,7 @@ export interface UseChatMessagesReturn {
   sendQuizShare: (payload: QuizSharePayload) => Promise<boolean>;
   sendStreakShare: (payload: StreakSharePayload) => Promise<boolean>;
   deleteMessage: (messageId: string) => Promise<boolean>;
+  toggleReaction: (messageId: string, emoji: string) => Promise<boolean>; // NEW
   currentUserId: string | null;
   userProfiles: Map<string, UserProfile>;
 }
@@ -402,6 +399,85 @@ export function useChatMessages(): UseChatMessagesReturn {
     [toast],
   );
 
+  // Toggle reaction
+  const toggleReaction = useCallback(
+    async (messageId: string, emoji: string): Promise<boolean> => {
+      if (!currentUserId) {
+        toast({
+          title: "Chưa đăng nhập",
+          description: "Vui lòng đăng nhập để thả cảm xúc",
+          variant: "destructive",
+        });
+        return false;
+      }
+
+      // Optimistic update
+      setMessages((prev) =>
+        prev.map((msg) => {
+          if (msg.id === messageId) {
+            const currentReactions = { ...(msg.reactions || {}) };
+            const users = currentReactions[emoji] || [];
+
+            if (users.includes(currentUserId)) {
+              // Remove reaction
+              currentReactions[emoji] = users.filter(
+                (id) => id !== currentUserId,
+              );
+              if (currentReactions[emoji].length === 0) {
+                delete currentReactions[emoji];
+              }
+            } else {
+              // Add reaction
+              currentReactions[emoji] = [...users, currentUserId];
+            }
+            return { ...msg, reactions: currentReactions };
+          }
+          return msg;
+        }),
+      );
+
+      try {
+        // Fetch current reactions first to ensure atomicity/freshness (simplified for JSONB)
+        const { data: currentMsg, error: fetchError } = await (supabase as any)
+          .from("chat_messages")
+          .select("reactions")
+          .eq("id", messageId)
+          .single();
+
+        if (fetchError) throw fetchError;
+
+        const currentReactions =
+          (currentMsg.reactions as Record<string, string[]>) || {};
+        const users = currentReactions[emoji] || [];
+        let newReactions = { ...currentReactions };
+
+        if (users.includes(currentUserId)) {
+          newReactions[emoji] = users.filter((id) => id !== currentUserId);
+          if (newReactions[emoji].length === 0) delete newReactions[emoji];
+        } else {
+          newReactions[emoji] = [...users, currentUserId];
+        }
+
+        const { error } = await (supabase as any)
+          .from("chat_messages")
+          .update({ reactions: newReactions })
+          .eq("id", messageId);
+
+        if (error) throw error;
+        return true;
+      } catch (error) {
+        console.error("Error toggling reaction:", error);
+        toast({
+          title: "Lỗi",
+          description: "Không thể thả cảm xúc",
+          variant: "destructive",
+        });
+        return false;
+      }
+    },
+    [currentUserId, toast],
+  );
+
   return {
     messages,
     isLoading,
@@ -409,6 +485,7 @@ export function useChatMessages(): UseChatMessagesReturn {
     sendQuizShare,
     deleteMessage,
     sendStreakShare,
+    toggleReaction,
     currentUserId,
     userProfiles,
   };

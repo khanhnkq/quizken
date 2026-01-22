@@ -6,11 +6,13 @@ import {
   Gift, 
   Megaphone,
   Hash,
-  Loader2
+  Loader2,
+  ArrowLeft
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import { useTopUsers } from "@/hooks/useTopUsers";
 import { useAnnouncements } from "@/hooks/useAnnouncements";
 
@@ -20,7 +22,11 @@ const chatRooms = [
   { id: "help", name: "Hỏi đáp", icon: Star, isActive: false },
 ];
 
-export function ChatSidebar() {
+interface ChatSidebarProps {
+  onBack?: () => void;
+}
+
+export function ChatSidebar({ onBack }: ChatSidebarProps) {
   const { users: topUsers, isLoading: isLoadingTopUsers } = useTopUsers(20);
   const { announcements, isLoading: isLoadingAnnouncements } = useAnnouncements();
 
@@ -28,10 +34,21 @@ export function ChatSidebar() {
     <div className="w-80 h-full bg-background border-r flex flex-col">
       {/* Header */}
       <div className="p-4 border-b">
-        <h2 className="font-bold text-lg flex items-center gap-2">
-          <Users className="h-5 w-5 text-primary" />
-          Cộng đồng
-        </h2>
+        <div className="flex items-center gap-2">
+          {onBack && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 -ml-2 mr-1"
+              onClick={onBack}>
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+          )}
+          <h2 className="font-bold text-lg flex items-center gap-2">
+            <Users className="h-5 w-5 text-primary" />
+            Cộng đồng
+          </h2>
+        </div>
       </div>
 
       <ScrollArea className="flex-1">

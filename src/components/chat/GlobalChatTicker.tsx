@@ -37,12 +37,18 @@ export function GlobalChatTicker() {
 
       if (msgError || !msgData) return;
 
-      // 2. Fetch profile
-      const { data: profileData } = await supabase
-        .from("profiles")
-        .select("avatar_url, display_name")
-        .eq("id", msgData.user_id)
-        .single();
+      // 2. Fetch profile using RPC
+      const { data: profiles, error: profileError } = await (
+        supabase as any
+      ).rpc("get_chat_user_profiles", {
+        user_ids: [msgData.user_id],
+      });
+
+      if (profileError) {
+        console.error("Error fetching profile:", profileError);
+      }
+
+      const profileData = profiles?.[0];
 
       setLatestMessage({
         ...msgData,
@@ -78,11 +84,17 @@ export function GlobalChatTicker() {
 
           if (!msgData) return;
 
-          const { data: profileData } = await supabase
-            .from("profiles")
-            .select("avatar_url, display_name")
-            .eq("id", msgData.user_id)
-            .single();
+          const { data: profiles, error: profileError } = await (
+            supabase as any
+          ).rpc("get_chat_user_profiles", {
+            user_ids: [msgData.user_id],
+          });
+
+          if (profileError) {
+            console.error("Error fetching profile:", profileError);
+          }
+
+          const profileData = profiles?.[0];
 
           setLatestMessage({
             ...msgData,

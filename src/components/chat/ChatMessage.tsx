@@ -1,6 +1,6 @@
 import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
-import { Trash2, User, BookOpenCheck, ArrowRight, Flame } from "lucide-react";
+import { Trash2, User, BookOpenCheck, ArrowRight, Flame, Smile } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
@@ -8,6 +8,11 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { ChatMessage as ChatMessageType } from "@/hooks/useChatMessages";
 import { UserProfilePopover } from "./UserProfilePopover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 interface ChatMessageProps {
   message: ChatMessageType;
@@ -18,6 +23,8 @@ interface ChatMessageProps {
   streak?: number;
   onDelete?: (messageId: string) => void;
   onAvatarClick?: () => void;
+  onToggleReaction?: (messageId: string, emoji: string) => void;
+  currentUserId?: string | null;
 }
 
 // Generate a consistent color based on user_id
@@ -27,7 +34,7 @@ function getUserColor(userId: string): string {
     hash = userId.charCodeAt(i) + ((hash << 5) - hash);
   }
   const hue = hash % 360;
-  return `hsl(${hue}, 70%, 50%)`;
+  return `hsl(${hue}, 70%, 40%)`;
 }
 
 export function ChatMessage({
@@ -39,6 +46,8 @@ export function ChatMessage({
   streak,
   onDelete,
   onAvatarClick,
+  onToggleReaction,
+  currentUserId,
 }: ChatMessageProps) {
   const timeAgo = formatDistanceToNow(new Date(message.created_at), {
     addSuffix: true,
@@ -197,7 +206,9 @@ export function ChatMessage({
       {!isOwnMessage && (displayName || userLevel) && (
         <div className="flex items-center gap-1.5 mb-1 ml-11">
           {displayName && (
-            <span className="text-xs font-medium text-muted-foreground">
+            <span
+              className="text-sm font-bold shadow-sm"
+              style={{ color: isOwnMessage ? undefined : avatarColor }}>
               {displayName}
             </span>
           )}
@@ -261,6 +272,57 @@ export function ChatMessage({
               isOwnMessage && "flex-row-reverse",
             )}>
             <span className="text-xs text-muted-foreground">{timeAgo}</span>
+
+            {/* Reactions Display */}
+            <div className="flex gap-1">
+              {Object.entries(message.reactions || {}).map(
+                ([emoji, userIds]: [string, any[]]) => {
+                  if (!userIds || userIds.length === 0) return null;
+                  const count = userIds.length;
+                  const hasReacted = currentUserId
+                    ? userIds.includes(currentUserId)
+                    : false;
+                  return (
+                    <button
+                      key={emoji}
+                      onClick={() => onToggleReaction?.(message.id, emoji)}
+                      className={cn(
+                        "text-[10px] px-1.5 py-0.5 rounded-full border flex items-center gap-1 transition-colors",
+                        hasReacted
+                          ? "bg-blue-100 border-blue-200 text-blue-700"
+                          : "bg-white border-border text-muted-foreground hover:bg-muted",
+                      )}>
+                      <span>{emoji}</span>
+                      <span className="font-bold">{count}</span>
+                    </button>
+                  );
+                },
+              )}
+            </div>
+
+            {/* Add Reaction Button */}
+            {onToggleReaction && (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Smile className="h-3 w-3 text-muted-foreground hover:text-primary" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-1 flex gap-1" align="center">
+                  {["👍", "❤️", "😂", "😮", "😢", "🔥"].map((emoji) => (
+                    <button
+                      key={emoji}
+                      onClick={() => onToggleReaction(message.id, emoji)}
+                      className="p-2 hover:bg-muted rounded-md text-lg transition-transform hover:scale-110">
+                      {emoji}
+                    </button>
+                  ))}
+                </PopoverContent>
+              </Popover>
+            )}
 
             {isOwnMessage && onDelete && (
               <Button
