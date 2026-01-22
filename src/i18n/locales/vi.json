@@ -299,7 +299,7 @@
             "creators": "Người tạo"
         },
         "search": {
-            "placeholder": "Tìm kiếm trong tiêu đề, mô tả, câu hỏi... (⌘K)",
+            "placeholder": "Tìm kiếm trong tiêu đề, mô tả, câu hỏi...",
             "clear": "Xóa tìm kiếm",
             "sortBy": "Sắp xếp theo",
             "sort": {

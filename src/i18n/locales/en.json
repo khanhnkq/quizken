@@ -296,7 +296,7 @@
             "creators": "Creators"
         },
         "search": {
-            "placeholder": "Search in title, description, questions... (⌘K)",
+            "placeholder": "Search in title, description, questions...",
             "clear": "Clear search",
             "sortBy": "Sort by",
             "sort": {
