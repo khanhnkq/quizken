@@ -122,7 +122,7 @@ export function useChatMessages(): UseChatMessagesReturn {
         const { data, error } = await (supabase as any)
           .from("chat_messages")
           .select("*")
-          .order("created_at", { ascending: true })
+          .order("created_at", { ascending: false }) // Fetch newest first
           .limit(MESSAGE_LIMIT);
 
         if (!isMounted) return;
@@ -133,7 +133,8 @@ export function useChatMessages(): UseChatMessagesReturn {
           return;
         }
         console.log("Fetched messages:", data);
-        setMessages((data as ChatMessage[]) || []);
+        // Reverse to show oldest to newest
+        setMessages((data as ChatMessage[]).reverse() || []);
       } catch (error) {
         console.error("Error fetching messages:", error);
       } finally {
