@@ -138,7 +138,8 @@ const HomeHero = () => {
                                 </svg>
                             </span>
                             <br className="hidden md:block" />
-                            {t("hero.titlePart3", "in Seconds.")}
+                            {t("hero.titlePart3", "with")}{" "}
+                            <span className="text-[#23c45d]">{t("hero.titlePart4", "AI")}</span>
                         </h1>
 
                         {/* Description */}

@@ -21,6 +21,7 @@ const EnglishHub = lazy(() => import("./pages/EnglishHub"));
 const Phase1View = lazy(() => import("./components/english/phases/Phase1View"));
 const Phase2View = lazy(() => import("./components/english/phases/Phase2View"));
 const MyNotebook = lazy(() => import("./components/english/MyNotebook"));
+const QuizCreatePage = lazy(() => import("./pages/QuizCreatePage"));
 
 // Preload functions for faster navigation
 const preloadRoutes = () => {
@@ -84,6 +85,7 @@ const AppRoutes = () => {
         <Route path="/about" element={<About />} />
 
         {/* Quiz Domain */}
+        <Route path="/quiz/create" element={<QuizCreatePage />} />
         <Route path="/quiz/library" element={<QuizLibrary />} />
         <Route path="/quiz/play/:quizId" element={<PlayQuizPage />} />
         <Route path="/quiz/result/:attemptId" element={<QuizDetailPage />} />

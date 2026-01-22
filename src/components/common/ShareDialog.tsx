@@ -35,15 +35,15 @@ export function ShareDialog({ isOpen, onClose, url, title, quizTitle, questionCo
       await navigator.clipboard.writeText(url);
       setHasCopied(true);
       toast({
-        title: "Copied!",
-        description: "Link copied to clipboard successfully.",
+        title: t('share.copied'),
+        description: t('share.copiedDesc'),
         variant: "default",
       });
       setTimeout(() => setHasCopied(false), 2000);
     } catch (err) {
       toast({
-        title: "Failed to copy",
-        description: "Could not copy link to clipboard.",
+        title: t('share.copyFailed'),
+        description: t('share.copyFailedDesc'),
         variant: "destructive",
       });
     }
@@ -60,10 +60,10 @@ export function ShareDialog({ isOpen, onClose, url, title, quizTitle, questionCo
             <div className="relative text-center space-y-6">
                 <DialogHeader>
                   <DialogTitle className="text-2xl font-black text-gray-800 tracking-tight">
-                    {title || t('share.title', 'Share Quiz')}
+                    {title || t('share.title')}
                   </DialogTitle>
                   <DialogDescription className="text-gray-500 font-medium">
-                     {t('share.description', 'Scan to play!')}
+                     {t('share.description')}
                   </DialogDescription>
                 </DialogHeader>
 
@@ -91,7 +91,7 @@ export function ShareDialog({ isOpen, onClose, url, title, quizTitle, questionCo
                           <h3 className="font-bold text-gray-800 truncate leading-tight mb-1">{quizTitle}</h3>
                           {questionCount !== undefined && (
                               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                                  {questionCount} {t('common.questions', 'Questions')}
+                                  {questionCount} {t('share.questions')}
                               </p>
                           )}
                       </div>
@@ -114,7 +114,7 @@ export function ShareDialog({ isOpen, onClose, url, title, quizTitle, questionCo
                       {hasCopied ? (
                         <Check className="h-4 w-4" />
                       ) : (
-                        <span className="text-xs">Copy</span>
+                        <span className="text-xs">{t('share.copy')}</span>
                       )}
                     </Button>
                   </div>

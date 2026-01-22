@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useTranslation } from "react-i18next";
 import logo from "@/assets/logo/logo.png";
-import { Send, Sparkles, Zap } from "lucide-react";
+import { Send, Sparkles, Zap, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { containsVietnameseBadwords } from "@/lib/vnBadwordsFilter";
 
@@ -148,6 +148,13 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ onComplete, onCanc
             {/* Header */}
             <div className="bg-primary/5 p-4 flex items-center justify-between border-b">
                 <div className="flex items-center gap-3">
+                    {/* Back Button */}
+                    <button 
+                        onClick={onCancel}
+                        className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                    >
+                        <ArrowLeft className="w-5 h-5 text-gray-600" />
+                    </button>
                     <div className="relative">
                         <img src={logo} alt="Bot" className="w-10 h-10 object-contain hover:animate-bounce cursor-pointer" />
                         <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>

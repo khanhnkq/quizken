@@ -14,12 +14,14 @@ import {
     Download,
     Trash2,
     FileQuestion,
-    PlayCircle
+    PlayCircle,
+    Share
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { ShareDialog } from "@/components/common/ShareDialog";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -50,6 +52,7 @@ export function CreatedQuizzes({
     const [currentPage, setCurrentPage] = useState(1);
     const [isDeleting, setIsDeleting] = useState<string | null>(null);
     const [isExpanded, setIsExpanded] = useState(false);
+    const [shareQuiz, setShareQuiz] = useState<CreatedQuiz | null>(null);
 
     // Pagination Logic
     const totalPages = Math.ceil((quizzes?.length || 0) / ITEMS_PER_PAGE);
@@ -224,6 +227,16 @@ export function CreatedQuizzes({
                                         {t('common.view')}
                                     </Button>
 
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => setShareQuiz(quiz)}
+                                        className="h-9 w-9 rounded-xl text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                                        title={t('common.share')}
+                                    >
+                                        <Share className="w-4 h-4" />
+                                    </Button>
+
                                     {/* Delete Button with Confirmation */}
                                     <AlertDialog>
                                         <AlertDialogTrigger asChild>
@@ -295,6 +308,13 @@ export function CreatedQuizzes({
                     </div>
                 )}
             </div>
+
+            <ShareDialog 
+                isOpen={!!shareQuiz}
+                onClose={() => setShareQuiz(null)}
+                url={shareQuiz ? `${window.location.origin}/quiz/play/${shareQuiz.id}` : ""}
+                quizTitle={shareQuiz?.title}
+            />
         </div>
     );
 }

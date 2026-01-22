@@ -632,6 +632,11 @@
         "title": "Quick Quiz Generator",
         "description": "Enter a topic and number of questions to create a quiz instantly"
     },
+    "modeSelection": {
+        "aiTitle": "AI Quiz Generator",
+        "aiDescription": "Auto-generate smart quizzes with AI ✨",
+        "manualDescription": "Enter your own questions and answers 📝"
+    },
     "common": {
         "loading": "Loading...",
         "error": "An error occurred",
@@ -1066,5 +1071,57 @@
             "subtitle": "Exam Simulation",
             "description": "Full Cambridge tests under strict time pressure."
         }
+    },
+    "manualQuiz": {
+        "title": "Manual Quiz Creator",
+        "subtitle": "Enter questions and answers directly",
+        "quizTitle": "Quiz Title",
+        "titlePlaceholder": "E.g., Vietnam History Review",
+        "description": "Description (optional)",
+        "descriptionPlaceholder": "Brief introduction about the quiz content...",
+        "public": "Public Quiz",
+        "publicDesc": "Allow everyone to find and take your quiz",
+        "questions": "Questions",
+        "addQuestion": "Add Question",
+        "questionLabel": "Question {{num}}",
+        "questionPlaceholder": "Enter question text...",
+        "image": "Image",
+        "addImage": "Add Image",
+        "changeImage": "Change Image",
+        "removeImage": "Remove Image",
+        "uploading": "Uploading...",
+        "options": "Options",
+        "optionPlaceholder": "Option {{num}}",
+        "addOption": "Add Option",
+        "markCorrect": "Mark as correct answer",
+        "explanation": "Explanation",
+        "explanationPlaceholder": "Explain why this answer is correct (optional)",
+        "questionsCount": "{{count}} Questions",
+        "saveQuiz": "Save Quiz",
+        "errors": {
+            "titleRequired": "Please enter a quiz title",
+            "questionRequired": "Please enter question content",
+            "minOptions": "Each question needs at least 2 options",
+            "correctRequired": "Correct answer cannot be empty",
+            "minQuestions": "Need at least 1 question",
+            "minQuestionsDesc": "Quiz must have at least 1 question",
+            "validationFailed": "Validation Error",
+            "fixErrors": "Please check and fix the errors",
+            "saveFailed": "Failed to save quiz"
+        },
+        "success": {
+            "title": "Quiz created successfully!",
+            "description": "Quiz with {{count}} questions has been saved"
+        }
+    },
+    "share": {
+        "title": "Share Quiz",
+        "description": "Scan to play!",
+        "questions": "Questions",
+        "copy": "Copy",
+        "copied": "Copied!",
+        "copiedDesc": "Link copied to clipboard successfully.",
+        "copyFailed": "Failed to copy",
+        "copyFailedDesc": "Could not copy link to clipboard."
     }
 }

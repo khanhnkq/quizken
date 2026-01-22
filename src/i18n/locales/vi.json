@@ -635,6 +635,11 @@
         "title": "Tạo Quiz Nhanh",
         "description": "Nhập chủ đề và số câu hỏi để tạo quiz ngay lập tức"
     },
+    "modeSelection": {
+        "aiTitle": "AI Quiz Generator",
+        "aiDescription": "Tự động tạo quiz thông minh với AI ✨",
+        "manualDescription": "Tự nhập câu hỏi và đáp án 📝"
+    },
     "common": {
         "loading": "Đang tải...",
         "error": "Có lỗi xảy ra",
@@ -644,6 +649,7 @@
         "cancel": "Hủy",
         "confirm": "Xác nhận",
         "save": "Lưu",
+        "saving": "Đang lưu...",
         "delete": "Xóa",
         "edit": "Chỉnh sửa",
         "view": "Xem",
@@ -652,6 +658,8 @@
         "next": "Tiếp theo",
         "previous": "Trước",
         "or": "hoặc",
+        "optional": "tuỳ chọn",
+        "questions": "câu hỏi",
         "untitledQuiz": "Bài kiểm tra không tên",
         "page": "Trang",
         "minutes": "phút",
@@ -1069,5 +1077,57 @@
             "subtitle": "Mô Phỏng Kỳ Thi",
             "description": "Làm bài test Cambridge full dưới áp lực thời gian."
         }
+    },
+    "manualQuiz": {
+        "title": "Tạo Quiz Thủ Công",
+        "subtitle": "Nhập câu hỏi và đáp án trực tiếp",
+        "quizTitle": "Tiêu đề Quiz",
+        "titlePlaceholder": "VD: Ôn tập Lịch sử Việt Nam",
+        "description": "Mô tả (tuỳ chọn)",
+        "descriptionPlaceholder": "Giới thiệu ngắn về nội dung quiz...",
+        "public": "Công khai Quiz",
+        "publicDesc": "Cho phép mọi người tìm kiếm và làm bài quiz của bạn",
+        "questions": "câu hỏi",
+        "addQuestion": "Thêm câu hỏi",
+        "questionLabel": "Câu hỏi {{num}}",
+        "questionPlaceholder": "Nhập nội dung câu hỏi...",
+        "image": "Hình ảnh",
+        "addImage": "Thêm ảnh",
+        "changeImage": "Thay ảnh",
+        "removeImage": "Xóa ảnh",
+        "uploading": "Đang tải lên...",
+        "options": "Các lựa chọn",
+        "optionPlaceholder": "Đáp án {{num}}",
+        "addOption": "Thêm đáp án",
+        "markCorrect": "Đánh dấu đáp án đúng",
+        "explanation": "Giải thích",
+        "explanationPlaceholder": "Giải thích tại sao đáp án này đúng (tuỳ chọn)",
+        "questionsCount": "{{count}} câu hỏi",
+        "saveQuiz": "Lưu Quiz",
+        "errors": {
+            "titleRequired": "Vui lòng nhập tiêu đề quiz",
+            "questionRequired": "Vui lòng nhập nội dung câu hỏi",
+            "minOptions": "Mỗi câu hỏi cần ít nhất 2 đáp án",
+            "correctRequired": "Đáp án đúng không được để trống",
+            "minQuestions": "Cần ít nhất 1 câu hỏi",
+            "minQuestionsDesc": "Quiz phải có ít nhất 1 câu hỏi",
+            "validationFailed": "Lỗi nhập liệu",
+            "fixErrors": "Vui lòng kiểm tra và sửa các lỗi",
+            "saveFailed": "Lưu quiz thất bại"
+        },
+        "success": {
+            "title": "Đã tạo quiz thành công!",
+            "description": "Quiz với {{count}} câu hỏi đã được lưu"
+        }
+    },
+    "share": {
+        "title": "Chia sẻ Quiz",
+        "description": "Quét mã để chơi ngay!",
+        "questions": "câu hỏi",
+        "copy": "Sao chép",
+        "copied": "Đã sao chép!",
+        "copiedDesc": "Link đã được lưu vào bộ nhớ tạm.",
+        "copyFailed": "Sao chép thất bại",
+        "copyFailedDesc": "Không thể lưu link vào bộ nhớ tạm."
     }
 }

@@ -8,6 +8,7 @@ import {
     DialogTitle,
     DialogDescription,
 } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { useTranslation } from "react-i18next";
@@ -18,6 +19,7 @@ import { QuotaLimitDialog } from "./QuotaLimitDialog";
 import { QuotaExceededDialog } from "./QuotaExceededDialog";
 import { GenerationProgress } from "./GenerationProgress";
 import { ChatInterface } from "./ChatInterface";
+import { ManualQuizEditor } from "./ManualQuizEditor";
 import useQuizGeneration from "@/hooks/useQuizGeneration";
 import { useDashboardStats } from "@/hooks/useDashboardStats";
 import { calculateXP, calculateLevel, calculateCreateReward } from "@/utils/levelSystem";
@@ -36,13 +38,16 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useGenerationPersistence } from "@/hooks/useGenerationPersistence";
 import { ApiKeyErrorDialog } from "./ApiKeyErrorDialog";
+import { Sparkles, PenLine, ArrowLeft, X } from "lucide-react";
+import logo from "@/assets/logo/logo.png";
 
 interface QuickGeneratorDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
+    initialTab?: "ai" | "manual" | null;
 }
 
-export function QuickGeneratorDialog({ open, onOpenChange }: QuickGeneratorDialogProps) {
+export function QuickGeneratorDialog({ open, onOpenChange, initialTab = null }: QuickGeneratorDialogProps) {
     const { t, i18n } = useTranslation();
     const navigate = useNavigate();
     const { toast } = useToast();
@@ -74,6 +79,20 @@ export function QuickGeneratorDialog({ open, onOpenChange }: QuickGeneratorDialo
     const [currentQuizId, setCurrentQuizId] = useState<string | null>(null);
     const [showApiKeyErrorDialog, setShowApiKeyErrorDialog] = useState(false);
     const [apiKeyError, setApiKeyError] = useState("");
+    const [activeTab, setActiveTab] = useState<"ai" | "manual" | null>(initialTab);
+
+    // Update activeTab when dialog opens with specific tab
+    useEffect(() => {
+        if (open && initialTab) {
+            setActiveTab(initialTab);
+        } else if (open && !initialTab) {
+            // Reset to null (selection mode) if no initial tab provided when opening
+            // But only if we want to reset selection on every open?
+            // Let's keep existing state unless initialTab is constrained.
+            // Actually, if initialTab is null, we might want to respect current state or reset?
+            // Safer to just set it if initialTab is provided.
+        }
+    }, [open, initialTab]);
 
     // Refs
     const userRef = useRef(user);
@@ -521,19 +540,98 @@ export function QuickGeneratorDialog({ open, onOpenChange }: QuickGeneratorDialo
                                 onCancel={() => setShowCancelConfirm(true)}
                             />
                         </div>
+                    ) : activeTab === null ? (
+                        /* Mode Selection - Messenger/Telegram Style */
+                        <div className="bg-white/95 backdrop-blur-xl border-2 border-primary/10 shadow-2xl rounded-3xl overflow-hidden">
+                            {/* Header */}
+                            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gray-50/50">
+                                <h2 className="text-lg font-bold text-gray-800">{t("quickGenerator.title")}</h2>
+                                <button 
+                                    onClick={() => onOpenChange(false)}
+                                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                                >
+                                    <X className="w-5 h-5 text-gray-500" />
+                                </button>
+                            </div>
+                            
+                            {/* Chat Room List */}
+                            <div className="divide-y divide-gray-100">
+                                {/* AI Mode Row */}
+                                <button
+                                    onClick={() => setActiveTab("ai")}
+                                    className="w-full flex items-center gap-4 px-4 py-4 hover:bg-gray-50 transition-colors text-left"
+                                >
+                                    <div className="relative shrink-0">
+                                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-violet-100 to-indigo-100 flex items-center justify-center overflow-hidden">
+                                            <img src={logo} alt="AI Bot" className="w-10 h-10 object-contain" />
+                                        </div>
+                                        {/* Online indicator */}
+                                        <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white" />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center justify-between">
+                                            <h3 className="font-semibold text-gray-900">{t("modeSelection.aiTitle")}</h3>
+                                            <span className="text-xs text-violet-600 font-medium bg-violet-100 px-2 py-0.5 rounded-full">HOT</span>
+                                        </div>
+                                        <p className="text-sm text-gray-500 truncate mt-0.5">{t("modeSelection.aiDescription")}</p>
+                                    </div>
+                                    <div className="shrink-0 text-gray-400">
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </div>
+                                </button>
+                                
+                                {/* Manual Mode Row */}
+                                <button
+                                    onClick={() => setActiveTab("manual")}
+                                    className="w-full flex items-center gap-4 px-4 py-4 hover:bg-gray-50 transition-colors text-left"
+                                >
+                                    <div className="relative shrink-0">
+                                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
+                                            <PenLine className="w-6 h-6 text-white" />
+                                        </div>
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center justify-between">
+                                            <h3 className="font-semibold text-gray-900">{t("manualQuiz.title")}</h3>
+                                        </div>
+                                        <p className="text-sm text-gray-500 truncate mt-0.5">{t("modeSelection.manualDescription")}</p>
+                                    </div>
+                                    <div className="shrink-0 text-gray-400">
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    ) : activeTab === "ai" ? (
+                        /* AI Chat Interface */
+                        <div className="bg-white/95 backdrop-blur-xl border-2 border-primary/10 shadow-2xl rounded-3xl overflow-hidden">
+                            <ChatInterface
+                                onComplete={(topic, count) => {
+                                    setPrompt(topic);
+                                    setQuestionCount(count);
+                                    proceedWithGeneration(topic, count);
+                                }}
+                                onCancel={() => setActiveTab(null)}
+                                userRemaining={userRemaining}
+                                userLimit={userLimit}
+                                hasApiKey={hasApiKey}
+                            />
+                        </div>
                     ) : (
-                        /* Chat Interface - Full Experience */
-                        <ChatInterface
-                            onComplete={(topic, count) => {
-                                setPrompt(topic);
-                                setQuestionCount(count);
-                                proceedWithGeneration(topic, count);
-                            }}
-                            onCancel={() => onOpenChange(false)}
-                            userRemaining={userRemaining}
-                            userLimit={userLimit}
-                            hasApiKey={hasApiKey}
-                        />
+                        /* Manual Quiz Editor */
+                        <div className="bg-white/95 backdrop-blur-xl border-2 border-primary/10 shadow-2xl rounded-3xl overflow-hidden">
+                            <ManualQuizEditor
+                                onComplete={(quizId) => {
+                                    onOpenChange(false);
+                                    navigate(`/quiz/play/${quizId}`);
+                                }}
+                                onCancel={() => setActiveTab(null)}
+                            />
+                        </div>
                     )}
                 </DialogContent>
             </Dialog>

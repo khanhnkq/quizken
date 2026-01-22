@@ -475,6 +475,17 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                           {currentQuestion.question}
                         </h3>
 
+                        {/* Question Image */}
+                        {currentQuestion.image && (
+                          <div className="rounded-xl overflow-hidden mb-6 border border-border/50 max-h-[400px] flex justify-center bg-gray-50">
+                            <img 
+                              src={currentQuestion.image} 
+                              alt="Question Illustration" 
+                              className="object-contain max-h-full max-w-full"
+                            />
+                          </div>
+                        )}
+
                         <div className="flex flex-col gap-2 mt-6">
                           {currentQuestion.options && Array.isArray(currentQuestion.options) ? (
                             currentQuestion.options.map((option, optIdx) => {

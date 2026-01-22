@@ -60,6 +60,7 @@ import { GenerationProgress } from "@/components/quiz/GenerationProgress";
 import { QuotaLimitDialog } from "@/components/quiz/QuotaLimitDialog";
 import { QuotaExceededDialog } from "@/components/quiz/QuotaExceededDialog";
 import { ApiKeyErrorDialog } from "@/components/quiz/ApiKeyErrorDialog";
+import { QuickGeneratorDialog } from "@/components/quiz/QuickGeneratorDialog";
 
 import { useQuizStore } from "@/hooks/useQuizStore";
 import AuthModal from "@/components/AuthModal";
@@ -74,7 +75,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Plus, ArrowUp, Mic, Play, Layers } from "lucide-react";
+import { Plus, ArrowUp, Mic, Play, Layers, PenLine } from "lucide-react";
 import logo from "@/assets/logo/logo.png";
 import useQuizGeneration from "@/hooks/useQuizGeneration";
 import { useGenerationPersistence } from "@/hooks/useGenerationPersistence";
@@ -136,6 +137,10 @@ const QuizGenerator = () => {
   const [showNewQuizConfirm, setShowNewQuizConfirm] = useState<boolean>(false); // For new quiz overwrite confirmation
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [pendingGenerate, setPendingGenerate] = useState<any>(null); // To store valid generation request while waiting for confirm
+  
+  // Dialog state for manual/AI toggle
+  const [showQuickDialog, setShowQuickDialog] = useState(false);
+  const [quickDialogTab, setQuickDialogTab] = useState<"ai" | "manual" | null>(null);
 
   // Chill background music via hook
   const {
@@ -1194,6 +1199,12 @@ const QuizGenerator = () => {
             onOpenChange={setShowApiKeyErrorDialog}
             errorMessage={apiKeyError}
           />
+          
+          <QuickGeneratorDialog 
+            open={showQuickDialog} 
+            onOpenChange={setShowQuickDialog}
+            initialTab={quickDialogTab}
+          />
 
 
 
@@ -1246,8 +1257,27 @@ const QuizGenerator = () => {
 
                     
 
+                    {/* Mode Toggle */}
+                    <div className="flex justify-center -mb-4 z-20 relative">
+                      <div className="bg-white/80 backdrop-blur-sm p-1.5 rounded-full border border-slate-200 shadow-sm flex items-center gap-1 cursor-pointer hover:shadow-md transition-all">
+                        <div 
+                          className="px-4 py-1.5 rounded-full bg-slate-900 text-white text-sm font-bold shadow-sm flex items-center gap-2"
+                        >
+                          <Sparkles className="w-4 h-4 text-green-400" />
+                          <span>AI Generator</span>
+                        </div>
+                        <button 
+                          onClick={() => navigate("/quiz/create")}
+                          className="px-4 py-1.5 rounded-full text-slate-500 text-sm font-bold hover:bg-slate-100 hover:text-slate-900 transition-all flex items-center gap-2"
+                        >
+                          <PenLine className="w-4 h-4" />
+                          <span>{t('manualQuiz.title', 'Manual')}</span>
+                        </button>
+                      </div>
+                    </div>
+
                     {/* Main Input Pill */}
-                    <div className="w-full max-w-5xl mx-auto z-20 px-4">
+                    <div className="w-full max-w-5xl mx-auto z-20 px-4 mt-8">
                       <div className={cn(
                         "flex items-center gap-2 p-2 pl-2 rounded-[2rem] md:rounded-[3rem] bg-white shadow-[0_10px_40px_-15px_rgba(0,0,0,0.1)] border-2 transition-all duration-300 transform w-full",
                         isPromptValid
