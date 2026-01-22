@@ -80,6 +80,9 @@ export interface UserProfileProps {
   statistics: UserStatistics | null;
   isLoading: boolean;
   className?: string;
+  overrideDisplayName?: string | null;
+  overrideAvatarUrl?: string | null;
+  streak?: number;
 }
 
 /**

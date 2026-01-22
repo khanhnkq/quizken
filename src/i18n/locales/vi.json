@@ -212,6 +212,16 @@
             "inputPlaceholderCount": "Chọn số lượng ở trên...",
             "questionsCount": "{{count}} câu hỏi",
             "botName": "Quizken AI",
+            "share": {
+                "title": "Chia sẻ quiz của bạn",
+                "subtitle": "Chọn một quiz đã hoàn thành để gửi vào phòng chat.",
+                "loadError": "Không thể tải danh sách quiz. Thử lại sau.",
+                "empty": "Bạn chưa có quiz nào ở trạng thái hoàn thành.",
+                "completed": "Hoàn thành",
+                "send": "Gửi",
+                "openQuiz": "Làm quiz",
+                "questions": "câu hỏi"
+            },
             "suggestions": {
                 "python": "Python Cơ bản",
                 "marketing": "Marketing Căn bản"

@@ -1,10 +1,13 @@
 import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
-import { Trash2, User } from "lucide-react";
+import { Trash2, User, BookOpenCheck, ArrowRight, Flame } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { ChatMessage as ChatMessageType } from "@/hooks/useChatMessages";
+import { UserProfilePopover } from "./UserProfilePopover";
 
 interface ChatMessageProps {
   message: ChatMessageType;
@@ -12,7 +15,9 @@ interface ChatMessageProps {
   avatarUrl?: string;
   displayName?: string;
   userLevel?: number;
+  streak?: number;
   onDelete?: (messageId: string) => void;
+  onAvatarClick?: () => void;
 }
 
 // Generate a consistent color based on user_id
@@ -25,16 +30,169 @@ function getUserColor(userId: string): string {
   return `hsl(${hue}, 70%, 50%)`;
 }
 
-export function ChatMessage({ message, isOwnMessage, avatarUrl, displayName, userLevel, onDelete }: ChatMessageProps) {
+export function ChatMessage({
+  message,
+  isOwnMessage,
+  avatarUrl,
+  displayName,
+  userLevel,
+  streak,
+  onDelete,
+  onAvatarClick,
+}: ChatMessageProps) {
   const timeAgo = formatDistanceToNow(new Date(message.created_at), {
     addSuffix: true,
     locale: vi,
   });
+  const { t } = useTranslation();
 
   const avatarColor = getUserColor(message.user_id);
 
+  let parsed: any = null;
+  if (message.content?.startsWith("{")) {
+    try {
+      parsed = JSON.parse(message.content);
+    } catch (e) {
+      parsed = null;
+    }
+  }
+
+  const renderContent = () => {
+    if (parsed?.type === "streak_share" && parsed.data) {
+      let { streak, slogan, imageId } = parsed.data;
+
+      // Fallback for old messages: Generate consistent imageId from message.id
+      if (!imageId) {
+        const hash = message.id
+          .split("")
+          .reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0);
+        imageId = (hash % 4) + 1;
+      }
+
+      const bgImage = `/images/streak/fire-${imageId}.jpg`;
+
+      return (
+        <div
+          className={cn(
+            "block rounded-xl overflow-hidden mt-1 mb-1 max-w-[280px] relative transition-all hover:scale-[1.02]",
+            isOwnMessage
+              ? "border border-orange-500/30"
+              : "border border-orange-200",
+          )}
+          style={{
+            backgroundImage: `url('${bgImage}')`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+          }}>
+          {/* Overlay to ensure text readability */}
+          <div className="absolute inset-0 z-0 bg-black/60 backdrop-blur-[1px]" />
+
+          <div className="p-4 relative z-10">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="p-1.5 bg-orange-500 rounded-full text-white shadow-lg animate-pulse">
+                <Flame className="h-4 w-4 fill-white" />
+              </div>
+              <span className="font-bold text-xs uppercase tracking-wider text-orange-100 drop-shadow-md">
+                Streak Master
+              </span>
+            </div>
+
+            <div className="text-center py-2">
+              <span className="text-5xl font-black block leading-none mb-1 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
+                {streak}
+              </span>
+              <span className="text-[10px] uppercase font-bold text-orange-200 drop-shadow-sm tracking-widest">
+                Ngày liên tiếp
+              </span>
+            </div>
+
+            <div className="mt-3 pt-3 border-t border-white/20">
+              <p className="text-sm italic text-center text-white/95 font-medium drop-shadow-md">
+                "{slogan}"
+              </p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    if (parsed?.type === "quiz_share" && parsed.data) {
+      const q = parsed.data as {
+        quiz_id: string;
+        quiz_title: string;
+        question_count?: number;
+        status?: string;
+      };
+      return (
+        <Link
+          to={`/quiz/play/${q.quiz_id}`}
+          className={cn(
+            "block rounded-xl overflow-hidden transition-all group/card mt-1 mb-1",
+            isOwnMessage
+              ? "bg-black/10 hover:bg-black/20 border border-white/10"
+              : "bg-background hover:bg-background/80 border border-border shadow-sm",
+          )}>
+          <div className="p-3">
+            <div className="flex items-start gap-3">
+              <div
+                className={cn(
+                  "p-2 rounded-lg shrink-0 flex items-center justify-center shadow-sm",
+                  isOwnMessage
+                    ? "bg-white/20 text-white"
+                    : "bg-primary/10 text-primary",
+                )}>
+                <BookOpenCheck className="h-5 w-5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h4
+                  className={cn(
+                    "font-bold text-sm leading-tight line-clamp-2 mb-1",
+                    isOwnMessage
+                      ? "text-primary-foreground"
+                      : "text-foreground",
+                  )}>
+                  {q.quiz_title}
+                </h4>
+                <div
+                  className={cn(
+                    "flex items-center gap-2 text-xs",
+                    isOwnMessage
+                      ? "text-primary-foreground/80"
+                      : "text-muted-foreground",
+                  )}>
+                  <span className="font-medium">
+                    {q.question_count || 0}{" "}
+                    {t("chat.share.questions", "questions")}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div
+              className={cn(
+                "mt-3 flex items-center justify-between text-xs font-bold px-3 py-2 rounded-lg transition-colors border",
+                isOwnMessage
+                  ? "bg-white text-primary border-transparent hover:bg-white/90 shadow-sm"
+                  : "bg-primary text-primary-foreground border-transparent hover:bg-primary/90 shadow-sm",
+              )}>
+              {t("chat.share.openQuiz", "Open quiz")}
+              <ArrowRight className="h-3.5 w-3.5" />
+            </div>
+          </div>
+        </Link>
+      );
+    }
+
+    return (
+      <p className="text-sm whitespace-pre-wrap break-words">
+        {message.content}
+      </p>
+    );
+  };
+
   return (
-    <div className="group px-4 py-2 hover:bg-muted/50 transition-colors">
+    <div className="group px-4 py-2 transition-colors">
       {/* Display Name and Level - Only for other users */}
       {!isOwnMessage && (displayName || userLevel) && (
         <div className="flex items-center gap-1.5 mb-1 ml-11">
@@ -52,52 +210,56 @@ export function ChatMessage({ message, isOwnMessage, avatarUrl, displayName, use
       )}
 
       {/* Avatar + Message Row */}
-      <div
-        className={cn(
-          "flex gap-3",
-          isOwnMessage && "flex-row-reverse"
-        )}
-      >
-        <Avatar className="h-8 w-8 shrink-0">
-          {avatarUrl && <AvatarImage src={avatarUrl} alt={displayName || "User"} />}
-          <AvatarFallback
-            style={{ backgroundColor: isOwnMessage ? undefined : avatarColor }}
+      <div className={cn("flex gap-3", isOwnMessage && "flex-row-reverse")}>
+        <UserProfilePopover
+          userId={message.user_id}
+          displayName={displayName}
+          avatarUrl={avatarUrl}
+          level={userLevel}
+          streak={streak}>
+          <Avatar
             className={cn(
-              "text-xs font-medium",
-              isOwnMessage
-                ? "bg-primary text-primary-foreground"
-                : "text-white"
+              "h-8 w-8 shrink-0 cursor-pointer transition-transform hover:scale-110 active:scale-95",
             )}
-          >
-            <User className="h-4 w-4" />
-          </AvatarFallback>
-        </Avatar>
+            onClick={onAvatarClick}>
+            {avatarUrl && (
+              <AvatarImage src={avatarUrl} alt={displayName || "User"} />
+            )}
+            <AvatarFallback
+              style={{
+                backgroundColor: isOwnMessage ? undefined : avatarColor,
+              }}
+              className={cn(
+                "text-xs font-medium",
+                isOwnMessage
+                  ? "bg-primary text-primary-foreground"
+                  : "text-white",
+              )}>
+              <User className="h-4 w-4" />
+            </AvatarFallback>
+          </Avatar>
+        </UserProfilePopover>
 
         <div
           className={cn(
             "flex flex-col",
-            isOwnMessage ? "items-end" : "items-start"
-          )}
-        >
+            isOwnMessage ? "items-end" : "items-start",
+          )}>
           <div
             className={cn(
               "rounded-2xl px-4 py-2 max-w-[280px] md:max-w-[400px]",
               isOwnMessage
                 ? "bg-primary text-primary-foreground rounded-tr-sm"
-                : "bg-muted rounded-tl-sm"
-            )}
-          >
-            <p className="text-sm whitespace-pre-wrap break-words">
-              {message.content}
-            </p>
+                : "bg-muted rounded-tl-sm",
+            )}>
+            {renderContent()}
           </div>
 
           <div
             className={cn(
               "flex items-center gap-2 mt-1",
-              isOwnMessage && "flex-row-reverse"
-            )}
-          >
+              isOwnMessage && "flex-row-reverse",
+            )}>
             <span className="text-xs text-muted-foreground">{timeAgo}</span>
 
             {isOwnMessage && onDelete && (
@@ -105,8 +267,7 @@ export function ChatMessage({ message, isOwnMessage, avatarUrl, displayName, use
                 variant="ghost"
                 size="icon"
                 className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity"
-                onClick={() => onDelete(message.id)}
-              >
+                onClick={() => onDelete(message.id)}>
                 <Trash2 className="h-3 w-3 text-muted-foreground hover:text-destructive" />
               </Button>
             )}

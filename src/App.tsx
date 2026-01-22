@@ -42,6 +42,7 @@ import "@/i18n"; // Initialize i18n
 import { GlobalLevelNotification } from "@/components/common/GlobalLevelNotification";
 import { GlobalResumeButton } from "@/components/common/GlobalResumeButton";
 import { GlobalCreateButton } from "@/components/common/GlobalCreateButton";
+import { GlobalChatTicker } from "@/components/chat/GlobalChatTicker";
 import { GlobalQuizListener } from "@/components/common/GlobalQuizListener";
 import { CustomCursor } from "@/components/ui/CustomCursor";
 
@@ -82,7 +83,6 @@ const AppRoutes = () => {
         <Route path="/english/phase/1/vocab" element={<Phase1View />} />
         <Route path="/english/phase/2/grammar" element={<Phase2View />} />
         <Route path="/english/notebook" element={<MyNotebook />} />
-
 
         <Route path="/about" element={<About />} />
 
@@ -150,7 +150,7 @@ const App = () => {
             });
           } else {
             console.log(
-              "ScrollSmoother elements not found, skipping initialization"
+              "ScrollSmoother elements not found, skipping initialization",
             );
           }
         }, 1);
@@ -193,7 +193,7 @@ const App = () => {
       if (!smoother) return;
 
       const toastContainer = document.querySelector(
-        "[data-hot-toast]"
+        "[data-hot-toast]",
       ) as HTMLElement | null;
 
       if (!toastContainer) return;
@@ -232,6 +232,7 @@ const App = () => {
               <AppRoutes />
               <GlobalResumeButton />
               <GlobalCreateButton />
+              <GlobalChatTicker />
               <GlobalQuizListener />
             </BrowserRouter>
             <Analytics />

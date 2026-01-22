@@ -1,10 +1,12 @@
 import { useState, useRef, KeyboardEvent } from "react";
-import { Send, LogIn } from "lucide-react";
+import { Send, LogIn, Share2, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
 interface ChatInputProps {
   onSendMessage: (content: string) => Promise<boolean>;
+  onOpenShare?: () => void;
+  onShareStreak?: () => void;
   isAuthenticated: boolean;
   onLoginClick?: () => void;
   disabled?: boolean;
@@ -12,6 +14,8 @@ interface ChatInputProps {
 
 export function ChatInput({
   onSendMessage,
+  onOpenShare,
+  onShareStreak,
   isAuthenticated,
   onLoginClick,
   disabled,
@@ -45,8 +49,7 @@ export function ChatInput({
         <Button
           variant="outline"
           className="w-full gap-2"
-          onClick={onLoginClick}
-        >
+          onClick={onLoginClick}>
           <LogIn className="h-4 w-4" />
           Đăng nhập để gửi tin nhắn
         </Button>
@@ -68,12 +71,33 @@ export function ChatInput({
             disabled={disabled || isSending}
             rows={1}
           />
+          {onOpenShare && (
+            <Button
+              type="button"
+              variant="secondary"
+              size="icon"
+              className="shrink-0 h-[44px] w-[44px]"
+              onClick={onOpenShare}
+              disabled={disabled || isSending}>
+              <Share2 className="h-4 w-4" />
+            </Button>
+          )}
+          {onShareStreak && (
+            <Button
+              type="button"
+              variant="secondary"
+              size="icon"
+              className="shrink-0 h-[44px] w-[44px] text-orange-500 hover:text-orange-600"
+              onClick={onShareStreak}
+              disabled={disabled || isSending}>
+              <Flame className="h-5 w-5 fill-current" />
+            </Button>
+          )}
           <Button
             size="icon"
             className="shrink-0 h-[44px] w-[44px]"
             onClick={handleSend}
-            disabled={!message.trim() || isSending || disabled}
-          >
+            disabled={!message.trim() || isSending || disabled}>
             <Send className="h-4 w-4" />
           </Button>
         </div>

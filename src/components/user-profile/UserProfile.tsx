@@ -3,20 +3,42 @@ import { cn } from "@/lib/utils";
 import { gsap } from "gsap";
 import { shouldReduceAnimations } from "@/utils/deviceDetection";
 import type { UserProfileProps } from "@/types/user";
-import { Sparkles, Calendar, Zap, User as UserIcon, Pencil } from "lucide-react";
+import {
+  Sparkles,
+  Calendar,
+  Zap,
+  User as UserIcon,
+  Pencil,
+  CheckCircle2,
+  PenTool,
+  Flame,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { calculateXP, calculateLevel, calculateNextLevelXP, calculateCurrentLevelBaseXP } from "@/utils/levelSystem";
+import {
+  calculateXP,
+  calculateLevel,
+  calculateNextLevelXP,
+  calculateCurrentLevelBaseXP,
+} from "@/utils/levelSystem";
 import { EditProfileDialog } from "./EditProfileDialog";
 import { useProfile } from "@/hooks/useProfile";
 
 /**
  * Main UserProfile component - Redesigned for "Playful & Cute" aesthetic
  */
-export const UserProfile: React.FC<UserProfileProps> = ({
+export const UserProfile: React.FC<
+  UserProfileProps & { isEditable?: boolean; overrideLevel?: number }
+> = ({
   user,
   statistics,
   isLoading,
   className,
+  isEditable = true,
+  overrideDisplayName,
+  overrideAvatarUrl,
+  streak = 0,
+  disableHoverEffects = false,
+  overrideLevel,
 }) => {
   const { t, i18n } = useTranslation();
   const cardRef = useRef<HTMLDivElement>(null);
@@ -26,7 +48,8 @@ export const UserProfile: React.FC<UserProfileProps> = ({
 
   // GSAP animations for hover effects (Bounce & Rotate)
   useEffect(() => {
-    if (!cardRef.current || shouldReduceAnimations()) return;
+    if (!cardRef.current || shouldReduceAnimations() || disableHoverEffects)
+      return;
 
     const card = cardRef.current;
 
@@ -98,18 +121,26 @@ export const UserProfile: React.FC<UserProfileProps> = ({
 
   if (isLoading) {
     return (
-      <div className={cn("w-full h-full min-h-[220px] rounded-[2.5rem] bg-gray-100 animate-pulse", className)} />
+      <div
+        className={cn(
+          "w-full h-full min-h-[220px] rounded-[2.5rem] bg-gray-100 animate-pulse",
+          className,
+        )}
+      />
     );
   }
 
   if (!user) {
     return (
-      <div className={cn(
-        "w-full h-full min-h-[220px] rounded-[2.5rem] bg-white border-2 border-dashed border-gray-200 flex flex-col items-center justify-center p-8 text-center",
-        className
-      )}>
+      <div
+        className={cn(
+          "w-full h-full min-h-[220px] rounded-[2.5rem] bg-white border-2 border-dashed border-gray-200 flex flex-col items-center justify-center p-8 text-center",
+          className,
+        )}>
         <UserIcon className="w-12 h-12 text-gray-300 mb-2" />
-        <p className="text-gray-500 font-medium">{t('library.toasts.loginRequired')}</p>
+        <p className="text-gray-500 font-medium">
+          {t("library.toasts.loginRequired")}
+        </p>
       </div>
     );
   }
@@ -117,20 +148,47 @@ export const UserProfile: React.FC<UserProfileProps> = ({
   // Fetch custom profile data from profiles table
   const { profileData } = useProfile(user?.id);
 
-  // Use profiles data with fallback to Google metadata
-  const userName = profileData?.display_name || user.user_metadata?.name || user.user_metadata?.full_name || user.email?.split('@')[0] || "Quizzer";
-  const avatarUrl = profileData?.avatar_url || user.user_metadata?.avatar_url;
-  const joinDate = user.created_at
-    ? new Date(user.created_at).toLocaleDateString(i18n.language === 'en' ? "en-US" : "vi-VN", { month: "long", year: "numeric" })
+  // Use profiles data with fallback to Google metadata, prioritizing overrides
+  const userName =
+    overrideDisplayName ||
+    profileData?.display_name ||
+    user?.user_metadata?.name ||
+    user?.user_metadata?.full_name ||
+    user?.email?.split("@")[0] ||
+    "Quizzer";
+
+  const avatarUrl =
+    overrideAvatarUrl ||
+    profileData?.avatar_url ||
+    user?.user_metadata?.avatar_url;
+
+  // Use current date if created_at is missing (e.g. for mock users)
+  const joinDate = user?.created_at
+    ? new Date(user.created_at).toLocaleDateString(
+        i18n.language === "en" ? "en-US" : "vi-VN",
+        { month: "long", year: "numeric" },
+      )
     : "";
 
   // Calculate XP and Level using shared utility
-  const totalXP = calculateXP(statistics);
-  const level = calculateLevel(totalXP);
+  const calculatedXP = calculateXP(statistics);
+  const calculatedLevel = calculateLevel(calculatedXP);
+
+  const level = overrideLevel || calculatedLevel;
+  const totalXP = overrideLevel
+    ? Math.max(calculatedXP, calculateCurrentLevelBaseXP(overrideLevel))
+    : calculatedXP;
 
   const nextLevelXP = calculateNextLevelXP(level);
   const currentLevelBaseXP = calculateCurrentLevelBaseXP(level);
-  const levelProgressPercent = Math.min(100, Math.max(0, ((totalXP - currentLevelBaseXP) / (nextLevelXP - currentLevelBaseXP)) * 100));
+  const levelProgressPercent = Math.min(
+    100,
+    Math.max(
+      0,
+      ((totalXP - currentLevelBaseXP) / (nextLevelXP - currentLevelBaseXP)) *
+        100,
+    ),
+  );
 
   return (
     <div
@@ -139,15 +197,13 @@ export const UserProfile: React.FC<UserProfileProps> = ({
         "relative w-full h-full min-h-[220px] rounded-[2.5rem] overflow-hidden transition-all duration-300 cursor-default",
         "bg-gradient-to-br from-pink-50 via-white to-blue-50",
         "border-4 border-white shadow-xl",
-        className
-      )}
-    >
+        className,
+      )}>
       {/* Decorative Blobs */}
       <div className="absolute top-0 right-0 w-48 h-48 bg-purple-200/30 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-40 h-40 bg-yellow-200/30 rounded-full blur-3xl -ml-10 -mb-10 pointer-events-none" />
 
       <div className="relative z-10 flex flex-col md:flex-row items-center h-full p-6 md:p-8 gap-6">
-
         {/* Avatar Section */}
         <div className="relative shrink-0 group/avatar">
           {/* Blob Background for Avatar */}
@@ -155,36 +211,40 @@ export const UserProfile: React.FC<UserProfileProps> = ({
 
           <img
             ref={avatarRef}
-            src={avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=random&color=fff`}
+            src={
+              avatarUrl ||
+              `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=random&color=fff`
+            }
             alt={userName}
             className="relative w-24 h-24 md:w-32 md:h-32 rounded-full object-cover border-4 border-white shadow-md z-10"
           />
 
           {/* Edit Button Overlay */}
-          <button
-            onClick={() => setShowEditDialog(true)}
-            className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover/avatar:opacity-100 transition-opacity cursor-pointer z-20"
-            title="Chỉnh sửa hồ sơ"
-          >
-            <Pencil className="w-6 h-6 text-white" />
-          </button>
+          {isEditable && (
+            <button
+              onClick={() => setShowEditDialog(true)}
+              className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover/avatar:opacity-100 transition-opacity cursor-pointer z-20"
+              title="Chỉnh sửa hồ sơ">
+              <Pencil className="w-6 h-6 text-white" />
+            </button>
+          )}
 
           {/* Edit Icon Badge - Always visible */}
-          <button
-            onClick={() => setShowEditDialog(true)}
-            className="absolute -top-1 -right-1 z-30 bg-white hover:bg-primary hover:text-white text-gray-600 p-1.5 rounded-full shadow-md border-2 border-white transition-colors cursor-pointer"
-            title="Chỉnh sửa hồ sơ"
-          >
-            <Pencil className="w-3 h-3" />
-          </button>
+          {isEditable && (
+            <button
+              onClick={() => setShowEditDialog(true)}
+              className="absolute -top-1 -right-1 z-30 bg-white hover:bg-primary hover:text-white text-gray-600 p-1.5 rounded-full shadow-md border-2 border-white transition-colors cursor-pointer"
+              title="Chỉnh sửa hồ sơ">
+              <Pencil className="w-3 h-3" />
+            </button>
+          )}
 
           {/* Level Badge floating on Avatar */}
           <div
             ref={badgeRef}
-            className="absolute -bottom-2 -right-2 z-30 bg-yellow-300 text-yellow-900 px-3 py-1 rounded-full text-xs font-bold shadow-sm border-2 border-white flex items-center gap-1"
-          >
+            className="absolute -bottom-2 -right-2 z-30 bg-yellow-300 text-yellow-900 px-3 py-1 rounded-full text-xs font-bold shadow-sm border-2 border-white flex items-center gap-1">
             <Zap className="w-3 h-3 fill-yellow-900" />
-            {t('profile.level')} {level}
+            {t("profile.level")} {level}
           </div>
         </div>
 
@@ -201,7 +261,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({
         <div className="flex-1 text-center md:text-left space-y-2">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/60 backdrop-blur-sm rounded-full text-blue-600/80 text-xs font-bold uppercase tracking-wider mb-1 shadow-sm">
             <Sparkles className="w-3 h-3" />
-            {t('profile.member')}
+            {t("profile.member")}
           </div>
 
           <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-yellow-400/20 backdrop-blur-sm rounded-full text-yellow-700 text-xs font-bold uppercase tracking-wider mb-1 shadow-sm ml-2 border border-yellow-200">
@@ -216,7 +276,9 @@ export const UserProfile: React.FC<UserProfileProps> = ({
           <div className="flex flex-col md:flex-row items-center md:items-start gap-3 text-sm font-medium text-gray-500">
             <div className="flex items-center gap-1.5 bg-white/50 px-2 py-1 rounded-lg">
               <Calendar className="w-4 h-4 text-pink-400" />
-              <span>{t('profile.joined')} {joinDate}</span>
+              <span>
+                {t("profile.joined")} {joinDate}
+              </span>
             </div>
 
             {/* Email/ID (Truncated) */}
@@ -226,24 +288,37 @@ export const UserProfile: React.FC<UserProfileProps> = ({
             </div>
           </div>
 
-          {/* Experience Bar */}
-          <div className="mt-4 max-w-xs mx-auto md:mx-0 group relative">
-            {/* Tooltip for XP Logic */}
-            <div className="absolute bottom-full left-1/2 md:left-0 -translate-x-1/2 md:translate-x-0 mb-2 w-48 p-2 bg-gray-800 text-white text-[10px] rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-30">
-              100 XP / Quiz Created <br /> + Score XP
+          {/* Quick Stats Grid */}
+          <div className="flex items-center gap-3 mt-4">
+            {/* Quizzes Taken */}
+            <div className="flex-1 bg-white/50 rounded-xl p-2 flex flex-col items-center">
+              <CheckCircle2 className="w-4 h-4 text-green-500 mb-1" />
+              <span className="text-sm font-bold text-gray-800">
+                {statistics?.total_quizzes_taken || 0}
+              </span>
+              <span className="text-[10px] text-gray-500 uppercase font-bold">
+                {t("dashboard.taken", "Taken")}
+              </span>
             </div>
 
-            <div className="flex justify-between text-xs font-bold text-gray-500 mb-1">
-              <span>{t('profile.exp')}</span>
-              <span className="text-blue-600">{totalXP} <span className="text-gray-400">/ {nextLevelXP}</span></span>
+            {/* Quizzes Created */}
+            <div className="flex-1 bg-white/50 rounded-xl p-2 flex flex-col items-center">
+              <PenTool className="w-4 h-4 text-purple-500 mb-1" />
+              <span className="text-sm font-bold text-gray-800">
+                {statistics?.total_quizzes_created || 0}
+              </span>
+              <span className="text-[10px] text-gray-500 uppercase font-bold">
+                {t("dashboard.created", "Created")}
+              </span>
             </div>
-            <div className="h-3 w-full bg-white rounded-full overflow-hidden shadow-inner border border-white/50">
-              <div
-                className="h-full bg-gradient-to-r from-yellow-300 to-orange-400 rounded-full transition-all duration-1000 ease-out relative"
-                style={{ width: `${levelProgressPercent}%` }}
-              >
-                <div className="absolute inset-0 bg-white/20 animate-shimmer" />
-              </div>
+
+            {/* Streak */}
+            <div className="flex-1 bg-white/50 rounded-xl p-2 flex flex-col items-center">
+              <Flame className="w-4 h-4 text-orange-500 mb-1" />
+              <span className="text-sm font-bold text-gray-800">{streak}</span>
+              <span className="text-[10px] text-gray-500 uppercase font-bold">
+                {t("dashboard.streak", "Streak")}
+              </span>
             </div>
           </div>
         </div>

@@ -22,52 +22,79 @@ export interface UseChatMessagesReturn {
   messages: ChatMessage[];
   isLoading: boolean;
   sendMessage: (content: string) => Promise<boolean>;
+  sendQuizShare: (payload: QuizSharePayload) => Promise<boolean>;
+  sendStreakShare: (payload: StreakSharePayload) => Promise<boolean>;
   deleteMessage: (messageId: string) => Promise<boolean>;
   currentUserId: string | null;
   userProfiles: Map<string, UserProfile>;
 }
 
 const MESSAGE_LIMIT = 50;
+const SHARE_WINDOW_MS = 30_000;
+const SHARE_MAX = 3;
+export interface QuizSharePayload {
+  quiz_id: string;
+  quiz_title: string;
+  question_count: number;
+  status?: string;
+  is_public?: boolean;
+  expires_at?: string | null;
+}
+
+export interface StreakSharePayload {
+  streak: number;
+  slogan: string;
+  imageId: number;
+}
 
 export function useChatMessages(): UseChatMessagesReturn {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  const [userProfiles, setUserProfiles] = useState<Map<string, UserProfile>>(new Map());
+  const [userProfiles, setUserProfiles] = useState<Map<string, UserProfile>>(
+    new Map(),
+  );
   const { toast } = useToast();
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+  const shareTimestampsRef = useRef<number[]>([]);
 
   // Fetch user profiles for given user IDs
-  const fetchUserProfiles = useCallback(async (userIds: string[]) => {
-    if (userIds.length === 0) return;
-    
-    // Filter out already fetched profiles
-    const newIds = userIds.filter(id => !userProfiles.has(id));
-    if (newIds.length === 0) return;
-    
-    try {
-      const { data, error } = await (supabase as any).rpc('get_chat_user_profiles', {
-        user_ids: newIds
-      });
-      
-      if (error) {
-        console.error('Error fetching user profiles:', error);
-        return;
-      }
-      
-      if (data && Array.isArray(data)) {
-        setUserProfiles(prev => {
-          const newMap = new Map(prev);
-          data.forEach((profile: UserProfile) => {
-            newMap.set(profile.user_id, profile);
+  const fetchUserProfiles = useCallback(
+    async (userIds: string[]) => {
+      if (userIds.length === 0) return;
+
+      // Filter out already fetched profiles
+      const newIds = userIds.filter((id) => !userProfiles.has(id));
+      if (newIds.length === 0) return;
+
+      try {
+        const { data, error } = await (supabase as any).rpc(
+          "get_chat_user_profiles",
+          {
+            user_ids: newIds,
+          },
+        );
+
+        if (error) {
+          console.error("Error fetching user profiles:", error);
+          return;
+        }
+
+        if (data && Array.isArray(data)) {
+          setUserProfiles((prev) => {
+            const newMap = new Map(prev);
+            data.forEach((profile: UserProfile) => {
+              newMap.set(profile.user_id, profile);
+            });
+            return newMap;
           });
-          return newMap;
-        });
+        }
+      } catch (error) {
+        console.error("Error fetching user profiles:", error);
       }
-    } catch (error) {
-      console.error('Error fetching user profiles:', error);
-    }
-  }, [userProfiles]);
+    },
+    [userProfiles],
+  );
 
   // Get current user
   useEffect(() => {
@@ -91,7 +118,7 @@ export function useChatMessages(): UseChatMessagesReturn {
   // Fetch initial messages - only run once on mount
   useEffect(() => {
     let isMounted = true;
-    
+
     const fetchMessages = async () => {
       try {
         // Use explicit type casting to avoid TypeScript generics issue
@@ -102,7 +129,7 @@ export function useChatMessages(): UseChatMessagesReturn {
           .limit(MESSAGE_LIMIT);
 
         if (!isMounted) return;
-        
+
         if (error) {
           console.error("Supabase error:", error);
           setIsLoading(false);
@@ -120,7 +147,7 @@ export function useChatMessages(): UseChatMessagesReturn {
     };
 
     fetchMessages();
-    
+
     return () => {
       isMounted = false;
     };
@@ -128,7 +155,7 @@ export function useChatMessages(): UseChatMessagesReturn {
 
   // Fetch user profiles when messages change
   useEffect(() => {
-    const userIds = [...new Set(messages.map(m => m.user_id))];
+    const userIds = [...new Set(messages.map((m) => m.user_id))];
     if (userIds.length > 0) {
       fetchUserProfiles(userIds);
     }
@@ -226,6 +253,128 @@ export function useChatMessages(): UseChatMessagesReturn {
     [currentUserId, toast],
   );
 
+  const sendQuizShare = useCallback(
+    async (payload: QuizSharePayload): Promise<boolean> => {
+      if (!currentUserId) {
+        toast({
+          title: "Chưa đăng nhập",
+          description: "Vui lòng đăng nhập để chia sẻ quiz",
+          variant: "destructive",
+        });
+        return false;
+      }
+
+      if (!payload.quiz_id) {
+        toast({
+          title: "Thiếu dữ liệu",
+          description: "Quiz không hợp lệ",
+          variant: "destructive",
+        });
+        return false;
+      }
+
+      const now = Date.now();
+      const recent = shareTimestampsRef.current.filter(
+        (ts) => now - ts < SHARE_WINDOW_MS,
+      );
+      if (recent.length >= SHARE_MAX) {
+        const waitSeconds = Math.ceil(
+          (SHARE_WINDOW_MS - (now - recent[0])) / 1000,
+        );
+        toast({
+          title: "Chia sẻ quá nhanh",
+          description: `Vui lòng đợi ${waitSeconds}s trước khi chia sẻ tiếp.`,
+          variant: "destructive",
+        });
+        return false;
+      }
+      shareTimestampsRef.current = [...recent, now];
+
+      const content = JSON.stringify({
+        type: "quiz_share",
+        data: {
+          ...payload,
+        },
+      });
+
+      try {
+        const { error } = await (supabase as any).from("chat_messages").insert({
+          user_id: currentUserId,
+          content,
+        });
+
+        if (error) {
+          console.error("Insert share error:", error);
+          throw error;
+        }
+        return true;
+      } catch (error) {
+        console.error("Error sending quiz share:", error);
+        toast({
+          title: "Lỗi",
+          description: "Không thể chia sẻ quiz",
+          variant: "destructive",
+        });
+        return false;
+      }
+    },
+    [currentUserId, toast],
+  );
+
+  const sendStreakShare = useCallback(
+    async (payload: StreakSharePayload): Promise<boolean> => {
+      if (!currentUserId) {
+        toast({
+          title: "Chưa đăng nhập",
+          description: "Vui lòng đăng nhập để chia sẻ streak",
+          variant: "destructive",
+        });
+        return false;
+      }
+
+      const now = Date.now();
+      const recent = shareTimestampsRef.current.filter(
+        (ts) => now - ts < SHARE_WINDOW_MS,
+      );
+      if (recent.length >= SHARE_MAX) {
+        const waitSeconds = Math.ceil(
+          (SHARE_WINDOW_MS - (now - recent[0])) / 1000,
+        );
+        toast({
+          title: "Chia sẻ quá nhanh",
+          description: `Vui lòng đợi ${waitSeconds}s trước khi chia sẻ tiếp.`,
+          variant: "destructive",
+        });
+        return false;
+      }
+      shareTimestampsRef.current = [...recent, now];
+
+      const content = JSON.stringify({
+        type: "streak_share",
+        data: payload,
+      });
+
+      try {
+        const { error } = await (supabase as any).from("chat_messages").insert({
+          user_id: currentUserId,
+          content,
+        });
+
+        if (error) throw error;
+        return true;
+      } catch (error) {
+        console.error("Error sending streak share:", error);
+        toast({
+          title: "Lỗi",
+          description: "Không thể chia sẻ streak",
+          variant: "destructive",
+        });
+        return false;
+      }
+    },
+    [currentUserId, toast],
+  );
+
   // Delete message
   const deleteMessage = useCallback(
     async (messageId: string): Promise<boolean> => {
@@ -257,7 +406,9 @@ export function useChatMessages(): UseChatMessagesReturn {
     messages,
     isLoading,
     sendMessage,
+    sendQuizShare,
     deleteMessage,
+    sendStreakShare,
     currentUserId,
     userProfiles,
   };

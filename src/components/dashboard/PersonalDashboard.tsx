@@ -12,6 +12,7 @@ import { useDashboardStats } from "@/hooks/useDashboardStats";
 import { useProgressTrend } from "@/hooks/useProgressTrend";
 import { useRecentQuizzes } from "@/hooks/useRecentQuizzes";
 import { useCreatedQuizzes } from "@/hooks/useCreatedQuizzes";
+import { useUserProgress } from "@/hooks/useUserProgress";
 import { supabase } from "@/integrations/supabase/client";
 import { clearQuizProgress } from "@/hooks/useQuizProgress";
 import {
@@ -27,7 +28,7 @@ import {
   LogOut,
   BookOpen,
   BookOpenIcon,
-  ArrowRight
+  ArrowRight,
 } from "lucide-react";
 import { BackgroundDecorations } from "@/components/ui/BackgroundDecorations";
 import { gsap } from "gsap";
@@ -74,6 +75,8 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
     refetch: refetchCreated,
   } = useCreatedQuizzes(userId);
 
+  const { streak } = useUserProgress();
+
   // Check for level up events
   useLevelNotification(statistics);
 
@@ -111,7 +114,8 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
     });
   };
 
-  const isLoading = statsLoading || trendLoading || recentLoading || createdLoading;
+  const isLoading =
+    statsLoading || trendLoading || recentLoading || createdLoading;
   const hasError = statsError || trendError || recentError || createdError;
 
   // Check if user has any data
@@ -125,9 +129,7 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
       <div className="container mx-auto py-8 px-4">
         <Alert className="max-w-2xl mx-auto">
           <BarChart3Icon className="h-4 w-4" />
-          <AlertDescription>
-            {t('dashboard.error')}
-          </AlertDescription>
+          <AlertDescription>{t("dashboard.error")}</AlertDescription>
         </Alert>
       </div>
     );
@@ -139,7 +141,6 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
       <BackgroundDecorations />
 
       <Tabs defaultValue="overview" className="relative z-10">
-
         {/* Fixed Top Navbar */}
         <div className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 shadow-sm transition-all duration-300">
           <div className="container mx-auto px-4 h-16 flex items-center justify-between gap-4">
@@ -147,11 +148,12 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
             <div className="flex items-center shrink-0">
               <Button
                 variant="ghost"
-                onClick={() => navigate('/')}
-                className="rounded-full hover:bg-slate-100 text-slate-600 hover:text-primary transition-all duration-300 gap-2 px-3"
-              >
+                onClick={() => navigate("/")}
+                className="rounded-full hover:bg-slate-100 text-slate-600 hover:text-primary transition-all duration-300 gap-2 px-3">
                 <ChevronLeftIcon className="w-5 h-5" />
-                <span className="hidden md:inline font-bold">{t('nav.home')}</span>
+                <span className="hidden md:inline font-bold">
+                  {t("nav.home")}
+                </span>
               </Button>
             </div>
 
@@ -159,31 +161,33 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
             <TabsList className="flex-1 max-w-2xl mx-auto flex items-center justify-center bg-transparent border-0 p-0 shadow-none gap-1 sm:gap-4 h-full">
               <TabsTrigger
                 value="overview"
-                className="flex-1 sm:flex-none relative h-16 rounded-none border-b-2 border-transparent px-2 sm:px-6 hover:bg-slate-50 hover:text-primary data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 transition-all flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 text-[10px] sm:text-sm uppercase tracking-wide sm:normal-case sm:tracking-normal"
-              >
+                className="flex-1 sm:flex-none relative h-16 rounded-none border-b-2 border-transparent px-2 sm:px-6 hover:bg-slate-50 hover:text-primary data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 transition-all flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 text-[10px] sm:text-sm uppercase tracking-wide sm:normal-case sm:tracking-normal">
                 <LayoutDashboard className="w-5 h-5 sm:w-4 sm:h-4" />
-                <span className="hidden sm:inline">{t('dashboard.tabs.overview')}</span>
+                <span className="hidden sm:inline">
+                  {t("dashboard.tabs.overview")}
+                </span>
               </TabsTrigger>
               <TabsTrigger
                 value="exchange"
-                className="flex-1 sm:flex-none relative h-16 rounded-none border-b-2 border-transparent px-2 sm:px-6 hover:bg-slate-50 hover:text-violet-600 data-[state=active]:border-violet-600 data-[state=active]:text-violet-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 transition-all flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 text-[10px] sm:text-sm uppercase tracking-wide sm:normal-case sm:tracking-normal"
-              >
+                className="flex-1 sm:flex-none relative h-16 rounded-none border-b-2 border-transparent px-2 sm:px-6 hover:bg-slate-50 hover:text-violet-600 data-[state=active]:border-violet-600 data-[state=active]:text-violet-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 transition-all flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 text-[10px] sm:text-sm uppercase tracking-wide sm:normal-case sm:tracking-normal">
                 <Store className="w-5 h-5 sm:w-4 sm:h-4" />
-                <span className="hidden sm:inline">{t('dashboard.tabs.exchange')}</span>
+                <span className="hidden sm:inline">
+                  {t("dashboard.tabs.exchange")}
+                </span>
               </TabsTrigger>
               <TabsTrigger
                 value="inventory"
-                className="flex-1 sm:flex-none relative h-16 rounded-none border-b-2 border-transparent px-2 sm:px-6 hover:bg-slate-50 hover:text-teal-600 data-[state=active]:border-teal-600 data-[state=active]:text-teal-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 transition-all flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 text-[10px] sm:text-sm uppercase tracking-wide sm:normal-case sm:tracking-normal"
-              >
+                className="flex-1 sm:flex-none relative h-16 rounded-none border-b-2 border-transparent px-2 sm:px-6 hover:bg-slate-50 hover:text-teal-600 data-[state=active]:border-teal-600 data-[state=active]:text-teal-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 transition-all flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 text-[10px] sm:text-sm uppercase tracking-wide sm:normal-case sm:tracking-normal">
                 <Package className="w-5 h-5 sm:w-4 sm:h-4" />
-                <span className="hidden sm:inline">{t('inventory.title')}</span>
+                <span className="hidden sm:inline">{t("inventory.title")}</span>
               </TabsTrigger>
               <TabsTrigger
                 value="settings"
-                className="flex-1 sm:flex-none relative h-16 rounded-none border-b-2 border-transparent px-2 sm:px-6 hover:bg-slate-50 hover:text-slate-600 data-[state=active]:border-slate-600 data-[state=active]:text-slate-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 transition-all flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 text-[10px] sm:text-sm uppercase tracking-wide sm:normal-case sm:tracking-normal"
-              >
+                className="flex-1 sm:flex-none relative h-16 rounded-none border-b-2 border-transparent px-2 sm:px-6 hover:bg-slate-50 hover:text-slate-600 data-[state=active]:border-slate-600 data-[state=active]:text-slate-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 transition-all flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 text-[10px] sm:text-sm uppercase tracking-wide sm:normal-case sm:tracking-normal">
                 <Settings className="w-5 h-5 sm:w-4 sm:h-4" />
-                <span className="hidden sm:inline">{t('dashboard.tabs.settings')}</span>
+                <span className="hidden sm:inline">
+                  {t("dashboard.tabs.settings")}
+                </span>
               </TabsTrigger>
               <button
                 onClick={async () => {
@@ -191,10 +195,9 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
                   clearQuizProgress();
                   navigate("/");
                 }}
-                className="flex-1 sm:flex-none relative h-16 rounded-none border-b-2 border-transparent px-2 sm:px-6 hover:bg-slate-50 hover:text-slate-600 font-bold text-slate-500 transition-all flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 text-[10px] sm:text-sm uppercase tracking-wide sm:normal-case sm:tracking-normal"
-              >
+                className="flex-1 sm:flex-none relative h-16 rounded-none border-b-2 border-transparent px-2 sm:px-6 hover:bg-slate-50 hover:text-slate-600 font-bold text-slate-500 transition-all flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 text-[10px] sm:text-sm uppercase tracking-wide sm:normal-case sm:tracking-normal">
                 <LogOut className="w-5 h-5 sm:w-4 sm:h-4" />
-                <span className="hidden sm:inline">{t('nav.logout')}</span>
+                <span className="hidden sm:inline">{t("nav.logout")}</span>
               </button>
             </TabsList>
 
@@ -205,30 +208,43 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
 
         {/* Main Content Container */}
         <div className="container mx-auto py-8 px-3 md:px-6 mt-16 space-y-8">
-
           {/* OVERVIEW CONTENT */}
-          <TabsContent value="overview" className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 focus-visible:outline-none">
-
+          <TabsContent
+            value="overview"
+            className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 focus-visible:outline-none">
             {/* Playful Header Section (Moved inside Overview) */}
             <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-8 pt-6">
               <div className="text-center md:text-left space-y-2">
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 backdrop-blur-sm border-2 border-primary text-primary font-bold text-sm shadow-sm animate-fade-in">
                   <Sparkles className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                  <span>{t('dashboard.welcomeBack')}</span>
+                  <span>{t("dashboard.welcomeBack")}</span>
                 </div>
 
                 <h1 className="font-heading text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground drop-shadow-sm">
-                  Hello, <span className="text-primary relative inline-block">
-                    {user?.user_metadata?.full_name || user?.email?.split('@')[0] || "Quizzer"}
-                    <svg className="absolute -bottom-2 left-0 w-full h-3 text-yellow-300 -z-10 opacity-60" viewBox="0 0 100 10" preserveAspectRatio="none">
-                      <path d="M0 5 Q 50 15 100 5" stroke="currentColor" strokeWidth="12" fill="none" />
+                  Hello,{" "}
+                  <span className="text-primary relative inline-block">
+                    {user?.user_metadata?.full_name ||
+                      user?.email?.split("@")[0] ||
+                      "Quizzer"}
+                    <svg
+                      className="absolute -bottom-2 left-0 w-full h-3 text-yellow-300 -z-10 opacity-60"
+                      viewBox="0 0 100 10"
+                      preserveAspectRatio="none">
+                      <path
+                        d="M0 5 Q 50 15 100 5"
+                        stroke="currentColor"
+                        strokeWidth="12"
+                        fill="none"
+                      />
                     </svg>
                   </span>
-                  <span className="inline-block animate-wave ml-2 origin-[70%_70%]">👋</span>
+                  <span className="inline-block animate-wave ml-2 origin-[70%_70%]">
+                    👋
+                  </span>
                 </h1>
 
                 <p className="text-base md:text-lg text-muted-foreground font-medium max-w-lg">
-                  {t('dashboard.subtitle')}
+                  {t("dashboard.subtitle")}
                 </p>
               </div>
 
@@ -240,12 +256,12 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
                   className="group rounded-2xl shadow-lg border-2 border-primary hover:border-primary-foreground/20 bg-primary text-white font-bold text-sm px-4 py-2.5 h-auto transition-all duration-200 active:scale-95 hover:-translate-y-0.5"
                   onMouseEnter={handleHoverEnter}
                   onMouseLeave={handleHoverLeave}>
-                  <span className="mr-1.5">{t('dashboard.createQuiz')}</span>
+                  <span className="mr-1.5">{t("dashboard.createQuiz")}</span>
                   <PlusCircleIcon className="w-4 h-4 text-white" />
                 </Button>
 
                 <Button
-                  onClick={() => navigate('/english')}
+                  onClick={() => navigate("/english")}
                   size="default"
                   variant="hero"
                   className="group rounded-2xl shadow-lg border-2 border-blue-400 hover:border-blue-300 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-bold text-sm px-4 py-2.5 h-auto transition-all duration-200 active:scale-95 hover:-translate-y-0.5"
@@ -256,18 +272,19 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
                 </Button>
 
                 <Button
-                  onClick={() => navigate('/english/notebook')}
+                  onClick={() => navigate("/english/notebook")}
                   size="default"
                   variant="hero"
                   className="group rounded-2xl shadow-lg border-2 border-amber-400 hover:border-amber-300 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold text-sm px-4 py-2.5 h-auto transition-all duration-200 active:scale-95 hover:-translate-y-0.5"
                   onMouseEnter={handleHoverEnter}
                   onMouseLeave={handleHoverLeave}>
-                  <span className="mr-1.5">{t('dashboard.notebook.title', 'Sổ tay')}</span>
+                  <span className="mr-1.5">
+                    {t("dashboard.notebook.title", "Sổ tay")}
+                  </span>
                   <BookOpen className="w-4 h-4 text-white" />
                 </Button>
               </div>
             </div>
-
 
             {/* Welcome message for new users - Playful Style */}
             {hasNoData && (
@@ -284,29 +301,33 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
                       </div>
 
                       <h2 className="text-3xl md:text-4xl font-heading font-bold mb-4 text-foreground">
-                        {t('dashboard.welcome.title')}
+                        {t("dashboard.welcome.title")}
                       </h2>
                       <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
-                        {t('dashboard.welcome.description')}
+                        {t("dashboard.welcome.description")}
                       </p>
 
                       <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <Button
                           size="lg"
-                          onClick={() => (window.location.href = "/#quiz-generator")}
+                          onClick={() =>
+                            (window.location.href = "/#quiz-generator")
+                          }
                           className="rounded-2xl shadow-lg bg-primary text-white font-bold hover:bg-primary/90 hover:-translate-y-0.5 transition-all"
                           onMouseEnter={handleHoverEnter}
                           onMouseLeave={handleHoverLeave}>
-                          {t('dashboard.welcome.createButton')}
+                          {t("dashboard.welcome.createButton")}
                         </Button>
                         <Button
                           size="lg"
                           variant="outline"
-                          onClick={() => (window.location.href = "/#quiz-library")}
+                          onClick={() =>
+                            (window.location.href = "/#quiz-library")
+                          }
                           className="rounded-2xl border-2 hover:border-primary/50 font-bold hover:bg-secondary transition-all"
                           onMouseEnter={handleHoverEnter}
                           onMouseLeave={handleHoverLeave}>
-                          {t('dashboard.welcome.exploreButton')}
+                          {t("dashboard.welcome.exploreButton")}
                         </Button>
                       </div>
                     </div>
@@ -330,17 +351,24 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
                   statistics={statistics}
                   isLoading={statsLoading}
                   className="w-full h-full rounded-[2rem] shadow-lg border-2 border-white bg-white/60 backdrop-blur-sm"
+                  streak={streak}
                 />
               </div>
 
               {/* Statistics Cards */}
-              <StatisticsCards statistics={statistics} isLoading={statsLoading} />
+              <StatisticsCards
+                statistics={statistics}
+                isLoading={statsLoading}
+              />
             </div>
 
             {/* Charts & Lists */}
             <div className="space-y-6 lg:space-y-8">
               <div className="w-full transform hover:translate-y-[-4px] transition-transform duration-300">
-                <ProgressTrendline trendData={trendData} isLoading={trendLoading} />
+                <ProgressTrendline
+                  trendData={trendData}
+                  isLoading={trendLoading}
+                />
               </div>
 
               <div className="w-full">
@@ -360,15 +388,21 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
             </div>
           </TabsContent>
 
-          <TabsContent value="exchange" className="min-h-[500px] pt-4 focus-visible:outline-none">
+          <TabsContent
+            value="exchange"
+            className="min-h-[500px] pt-4 focus-visible:outline-none">
             <ExchangeTab />
           </TabsContent>
 
-          <TabsContent value="inventory" className="min-h-[500px] pt-4 focus-visible:outline-none">
+          <TabsContent
+            value="inventory"
+            className="min-h-[500px] pt-4 focus-visible:outline-none">
             <InventoryTab />
           </TabsContent>
 
-          <TabsContent value="settings" className="min-h-[500px] pt-4 focus-visible:outline-none">
+          <TabsContent
+            value="settings"
+            className="min-h-[500px] pt-4 focus-visible:outline-none">
             <div className="max-w-4xl mx-auto">
               <ApiKeySettings />
             </div>

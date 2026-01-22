@@ -211,6 +211,16 @@
             "inputPlaceholderCount": "Select a number above...",
             "questionsCount": "{{count}} questions",
             "botName": "Quizken AI",
+            "share": {
+                "title": "Share your quiz",
+                "subtitle": "Select a completed quiz to send to chat.",
+                "loadError": "Unable to load quizzes. Please try again.",
+                "empty": "You have no completed quizzes yet.",
+                "completed": "Completed",
+                "send": "Send",
+                "openQuiz": "Open quiz",
+                "questions": "questions"
+            },
             "suggestions": {
                 "python": "Python Basics",
                 "marketing": "Marketing 101"
