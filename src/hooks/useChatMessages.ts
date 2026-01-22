@@ -10,14 +10,25 @@ export interface ChatMessage {
   avatar_url?: string;
   display_name?: string;
   reactions?: Record<string, string[]>; // emoji -> userIds[]
+  reply_to_id?: string | null;
+  reply_to?: {
+    id: string;
+    content: string;
+    user_id: string;
+  } | null;
 }
 
-// ...
+export interface UserProfile {
+  user_id: string;
+  display_name?: string;
+  avatar_url?: string;
+  user_level?: number;
+}
 
 export interface UseChatMessagesReturn {
   messages: ChatMessage[];
   isLoading: boolean;
-  sendMessage: (content: string) => Promise<boolean>;
+  sendMessage: (content: string, replyToId?: string) => Promise<boolean>;
   sendQuizShare: (payload: QuizSharePayload) => Promise<boolean>;
   sendStreakShare: (payload: StreakSharePayload) => Promise<boolean>;
   deleteMessage: (messageId: string) => Promise<boolean>;
@@ -118,11 +129,11 @@ export function useChatMessages(): UseChatMessagesReturn {
 
     const fetchMessages = async () => {
       try {
-        // Use explicit type casting to avoid TypeScript generics issue
-        const { data, error } = await (supabase as any)
+        // 1. Fetch recent messages raw (without join)
+        const { data: rawMessages, error } = await (supabase as any)
           .from("chat_messages")
           .select("*")
-          .order("created_at", { ascending: false }) // Fetch newest first
+          .order("created_at", { ascending: false })
           .limit(MESSAGE_LIMIT);
 
         if (!isMounted) return;
@@ -132,9 +143,42 @@ export function useChatMessages(): UseChatMessagesReturn {
           setIsLoading(false);
           return;
         }
-        console.log("Fetched messages:", data);
+
+        const messages = rawMessages as ChatMessage[];
+        
+        // 2. Identify parent IDs that need fetching
+        const replyIds = [...new Set(
+          messages
+            .filter(m => m.reply_to_id)
+            .map(m => m.reply_to_id)
+        )] as string[];
+
+        // 3. Fetch parent messages if any
+        let replyMap = new Map<string, any>();
+        if (replyIds.length > 0) {
+          const { data: parents, error: parentError } = await supabase
+            .from("chat_messages")
+            .select("id, content, user_id")
+            .in("id", replyIds);
+            
+          if (!parentError && parents) {
+            parents.forEach((p: any) => replyMap.set(p.id, p));
+          }
+        }
+
+        // 4. Stitch valid parents into messages
+        const enrichedMessages = messages.map(m => {
+          if (m.reply_to_id && replyMap.has(m.reply_to_id)) {
+            return {
+              ...m,
+              reply_to: replyMap.get(m.reply_to_id)
+            };
+          }
+          return m;
+        });
+
         // Reverse to show oldest to newest
-        setMessages((data as ChatMessage[]).reverse() || []);
+        setMessages(enrichedMessages.reverse());
       } catch (error) {
         console.error("Error fetching messages:", error);
       } finally {
@@ -175,8 +219,27 @@ export function useChatMessages(): UseChatMessagesReturn {
           setMessages((prev) => {
             // Avoid duplicates
             if (prev.some((m) => m.id === newMessage.id)) return prev;
+
+            // Populate reply_to from existing messages if reply_to_id exists
+            let enrichedMessage = newMessage;
+            if (newMessage.reply_to_id) {
+              const parentMessage = prev.find(
+                (m) => m.id === newMessage.reply_to_id,
+              );
+              if (parentMessage) {
+                enrichedMessage = {
+                  ...newMessage,
+                  reply_to: {
+                    id: parentMessage.id,
+                    content: parentMessage.content,
+                    user_id: parentMessage.user_id,
+                  },
+                };
+              }
+            }
+
             // Keep only last MESSAGE_LIMIT messages
-            const updated = [...prev, newMessage];
+            const updated = [...prev, enrichedMessage];
             if (updated.length > MESSAGE_LIMIT) {
               return updated.slice(-MESSAGE_LIMIT);
             }
@@ -221,7 +284,7 @@ export function useChatMessages(): UseChatMessagesReturn {
 
   // Send message
   const sendMessage = useCallback(
-    async (content: string): Promise<boolean> => {
+    async (content: string, replyToId?: string): Promise<boolean> => {
       if (!currentUserId) {
         toast({
           title: "Chưa đăng nhập",
@@ -242,9 +305,11 @@ export function useChatMessages(): UseChatMessagesReturn {
       }
 
       try {
+        console.log("Sending message with replyToId:", replyToId);
         const { error } = await (supabase as any).from("chat_messages").insert({
           user_id: currentUserId,
           content: trimmedContent,
+          reply_to_id: replyToId ? replyToId : null,
         });
 
         if (error) {

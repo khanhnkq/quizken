@@ -3,13 +3,18 @@ import { Send, LogIn, Share2, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
+// Add ChatMessage interface if not imported
+import type { ChatMessage } from "@/hooks/useChatMessages";
+
 interface ChatInputProps {
-  onSendMessage: (content: string) => Promise<boolean>;
+  onSendMessage: (content: string, replyToId?: string) => Promise<boolean>;
   onOpenShare?: () => void;
   onShareStreak?: () => void;
   isAuthenticated: boolean;
   onLoginClick?: () => void;
   disabled?: boolean;
+  replyingTo?: ChatMessage | null;
+  onCancelReply?: () => void;
 }
 
 export function ChatInput({
@@ -19,6 +24,8 @@ export function ChatInput({
   isAuthenticated,
   onLoginClick,
   disabled,
+  replyingTo,
+  onCancelReply,
 }: ChatInputProps) {
   const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
@@ -28,9 +35,10 @@ export function ChatInput({
     if (!message.trim() || isSending || !isAuthenticated) return;
 
     setIsSending(true);
-    const success = await onSendMessage(message);
+    const success = await onSendMessage(message, replyingTo?.id);
     if (success) {
       setMessage("");
+      onCancelReply?.();
       textareaRef.current?.focus();
     }
     setIsSending(false);
@@ -60,6 +68,45 @@ export function ChatInput({
   return (
     <div className="border-t bg-background p-4">
       <div className="max-w-2xl">
+        {replyingTo && (() => {
+          // Parse special content types for nice display
+          let contentPreview: React.ReactNode = replyingTo.content;
+          if (replyingTo.content?.startsWith("{")) {
+            try {
+              const parsed = JSON.parse(replyingTo.content);
+              if (parsed?.type === "quiz_share" && parsed.data) {
+                contentPreview = `📖 ${parsed.data.quiz_title}`;
+              } else if (parsed?.type === "streak_share" && parsed.data) {
+                contentPreview = `🔥 Streak ${parsed.data.streak} ngày`;
+              }
+            } catch (e) {
+              // Keep original
+            }
+          }
+          return (
+            <div className="flex items-center justify-between bg-muted/50 p-2 rounded-t-lg mb-1 border-l-4 border-primary text-xs">
+              <div className="truncate flex-1 mr-2">
+                <span className="font-bold">
+                  Replying to {replyingTo.display_name || "User"}:
+                </span>{" "}
+                <span className="text-muted-foreground line-clamp-1">
+                  {contentPreview}
+                </span>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-5 w-5 shrink-0"
+                onClick={onCancelReply}>
+                <span className="sr-only">Cancel Reply</span>
+                <span aria-hidden="true" className="text-lg leading-none">
+                  ×
+                </span>
+              </Button>
+            </div>
+          );
+        })()}
+
         <div className="flex gap-2 items-end">
           <Textarea
             ref={textareaRef}

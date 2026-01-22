@@ -1,6 +1,6 @@
 import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
-import { Trash2, User, BookOpenCheck, ArrowRight, Flame, Smile } from "lucide-react";
+import { Trash2, User, BookOpenCheck, ArrowRight, Flame, Smile, Reply } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
@@ -24,7 +24,9 @@ interface ChatMessageProps {
   onDelete?: (messageId: string) => void;
   onAvatarClick?: () => void;
   onToggleReaction?: (messageId: string, emoji: string) => void;
+  onReply?: (message: ChatMessageType) => void;
   currentUserId?: string | null;
+  userProfiles?: Map<string, { display_name?: string; avatar_url?: string; user_level?: number }>;
 }
 
 // Generate a consistent color based on user_id
@@ -47,7 +49,9 @@ export function ChatMessage({
   onDelete,
   onAvatarClick,
   onToggleReaction,
+  onReply,
   currentUserId,
+  userProfiles,
 }: ChatMessageProps) {
   const timeAgo = formatDistanceToNow(new Date(message.created_at), {
     addSuffix: true,
@@ -263,6 +267,60 @@ export function ChatMessage({
                 ? "bg-primary text-primary-foreground rounded-tr-sm"
                 : "bg-muted rounded-tl-sm",
             )}>
+            {/* Quoted Reply */}
+            {message.reply_to && message.reply_to.content && (() => {
+              const replyAuthorProfile = userProfiles?.get(message.reply_to.user_id);
+              const replyAuthorName = message.reply_to.user_id === currentUserId
+                ? t("chat.you", "You")
+                : replyAuthorProfile?.display_name || "User";
+
+              // Parse special content types
+              let replyPreview: React.ReactNode = message.reply_to.content;
+              if (message.reply_to.content.startsWith("{")) {
+                try {
+                  const parsed = JSON.parse(message.reply_to.content);
+                  if (parsed?.type === "quiz_share" && parsed.data) {
+                    replyPreview = (
+                      <span className="flex items-center gap-1">
+                        <BookOpenCheck className="h-3 w-3 shrink-0" />
+                        <span className="truncate">{parsed.data.quiz_title}</span>
+                      </span>
+                    );
+                  } else if (parsed?.type === "streak_share" && parsed.data) {
+                    replyPreview = (
+                      <span className="flex items-center gap-1">
+                        <Flame className="h-3 w-3 shrink-0 text-orange-400" />
+                        <span>Streak {parsed.data.streak} ngày</span>
+                      </span>
+                    );
+                  }
+                } catch (e) {
+                  // Keep original content
+                }
+              }
+
+              return (
+                <div className={cn(
+                  "mb-2 text-xs p-2 rounded border-l-4",
+                  isOwnMessage
+                    ? "bg-white/20 border-white/60"
+                    : "bg-black/10 border-primary/50"
+                )}>
+                  <span className={cn(
+                    "font-bold block mb-0.5",
+                    isOwnMessage ? "text-white" : "text-primary"
+                  )}>
+                    {replyAuthorName}
+                  </span>
+                  <span className={cn(
+                    "line-clamp-2 block",
+                    isOwnMessage ? "text-white/80" : "text-foreground/70"
+                  )}>
+                    {replyPreview}
+                  </span>
+                </div>
+              );
+            })()}
             {renderContent()}
           </div>
 
@@ -307,11 +365,14 @@ export function ChatMessage({
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Smile className="h-3 w-3 text-muted-foreground hover:text-primary" />
+                    className="h-6 w-6 text-muted-foreground/50 hover:text-muted-foreground transition-colors"
+                  >
+                    <Smile className="h-4 w-4" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-1 flex gap-1" align="center">
+                <PopoverContent
+                  className="w-auto p-1 flex gap-1"
+                  align="center">
                   {["👍", "❤️", "😂", "😮", "😢", "🔥"].map((emoji) => (
                     <button
                       key={emoji}
@@ -324,13 +385,24 @@ export function ChatMessage({
               </Popover>
             )}
 
+            {/* Reply Button */}
+            {onReply && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 text-primary hover:bg-primary/10 transition-colors"
+                onClick={() => onReply(message)}>
+                <Reply className="h-4 w-4" />
+              </Button>
+            )}
+
             {isOwnMessage && onDelete && (
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity"
+                className="h-6 w-6 text-muted-foreground/50 hover:text-destructive transition-colors"
                 onClick={() => onDelete(message.id)}>
-                <Trash2 className="h-3 w-3 text-muted-foreground hover:text-destructive" />
+                <Trash2 className="h-4 w-4" />
               </Button>
             )}
           </div>

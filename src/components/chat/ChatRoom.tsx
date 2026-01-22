@@ -90,6 +90,20 @@ export function ChatRoom({ onLoginClick }: ChatRoomProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [autoScroll, setAutoScroll] = useState(true);
   const [isShareOpen, setIsShareOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<"quiz" | "streak">("quiz");
+  const [replyingTo, setReplyingTo] = useState<any | null>(null);
+
+  const handleReply = (message: any) => {
+    const profile = userProfiles.get(message.user_id);
+    setReplyingTo({
+      ...message,
+      display_name: profile?.display_name || "User",
+    });
+  };
+
+  const cancelReply = () => {
+    setReplyingTo(null);
+  };
   const { toast } = useToast();
 
   const handleShareStreak = async () => {
@@ -194,6 +208,8 @@ export function ChatRoom({ onLoginClick }: ChatRoomProps) {
                     streak={message.user_id === currentUserId ? streak : 0}
                     currentUserId={currentUserId}
                     onToggleReaction={toggleReaction}
+                    onReply={handleReply}
+                    userProfiles={userProfiles}
                     onDelete={
                       message.user_id === currentUserId
                         ? deleteMessage
@@ -212,11 +228,13 @@ export function ChatRoom({ onLoginClick }: ChatRoomProps) {
       <div className="relative z-10">
         <ChatInput
           onSendMessage={sendMessage}
+          onOpenShare={() => setIsShareOpen(true)}
+          onShareStreak={handleShareStreak}
           isAuthenticated={!!currentUserId}
           onLoginClick={onLoginClick}
           disabled={isLoading}
-          onOpenShare={() => setIsShareOpen(true)}
-          onShareStreak={handleShareStreak}
+          replyingTo={replyingTo}
+          onCancelReply={cancelReply}
         />
       </div>
 
