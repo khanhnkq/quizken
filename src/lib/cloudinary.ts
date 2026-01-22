@@ -1,4 +1,4 @@
-export const uploadImage = async (file: File): Promise<string> => {
+export const uploadImage = async (file: File, folder: string = "quizken/manual_quiz"): Promise<string> => {
   const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
   const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
 
@@ -9,7 +9,7 @@ export const uploadImage = async (file: File): Promise<string> => {
   const formData = new FormData();
   formData.append("file", file);
   formData.append("upload_preset", uploadPreset);
-  formData.append("folder", "quizken/manual_quiz"); // Store in specific folder as requested
+  formData.append("folder", folder);
 
   try {
     const response = await fetch(
@@ -32,3 +32,9 @@ export const uploadImage = async (file: File): Promise<string> => {
     throw error;
   }
 };
+
+// Helper function specifically for avatar uploads
+export const uploadAvatar = (file: File): Promise<string> => {
+  return uploadImage(file, "quizken/avatars");
+};
+

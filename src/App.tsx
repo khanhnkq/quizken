@@ -23,6 +23,7 @@ const Phase2View = lazy(() => import("./components/english/phases/Phase2View"));
 const MyNotebook = lazy(() => import("./components/english/MyNotebook"));
 const QuizCreatePage = lazy(() => import("./pages/QuizCreatePage"));
 const QuizEditPage = lazy(() => import("./pages/QuizEditPage"));
+const ChatPage = lazy(() => import("./pages/ChatPage"));
 
 // Preload functions for faster navigation
 const preloadRoutes = () => {
@@ -94,6 +95,9 @@ const AppRoutes = () => {
 
         {/* User Domain */}
         <Route path="/user/dashboard" element={<Dashboard />} />
+
+        {/* Chat */}
+        <Route path="/chat" element={<ChatPage />} />
 
         {/* Legacy redirects (optional - can remove later) */}
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

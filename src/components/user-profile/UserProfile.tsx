@@ -1,11 +1,13 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { gsap } from "gsap";
 import { shouldReduceAnimations } from "@/utils/deviceDetection";
 import type { UserProfileProps } from "@/types/user";
-import { Sparkles, Calendar, Zap, User as UserIcon } from "lucide-react";
+import { Sparkles, Calendar, Zap, User as UserIcon, Pencil } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { calculateXP, calculateLevel, calculateNextLevelXP, calculateCurrentLevelBaseXP } from "@/utils/levelSystem";
+import { EditProfileDialog } from "./EditProfileDialog";
+import { useProfile } from "@/hooks/useProfile";
 
 /**
  * Main UserProfile component - Redesigned for "Playful & Cute" aesthetic
@@ -20,6 +22,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({
   const cardRef = useRef<HTMLDivElement>(null);
   const avatarRef = useRef<HTMLImageElement>(null);
   const badgeRef = useRef<HTMLDivElement>(null);
+  const [showEditDialog, setShowEditDialog] = useState(false);
 
   // GSAP animations for hover effects (Bounce & Rotate)
   useEffect(() => {
@@ -111,8 +114,12 @@ export const UserProfile: React.FC<UserProfileProps> = ({
     );
   }
 
-  const userName = user.user_metadata?.name || user.user_metadata?.full_name || user.email?.split('@')[0] || "Quizzer";
-  const avatarUrl = user.user_metadata?.avatar_url;
+  // Fetch custom profile data from profiles table
+  const { profileData } = useProfile(user?.id);
+
+  // Use profiles data with fallback to Google metadata
+  const userName = profileData?.display_name || user.user_metadata?.name || user.user_metadata?.full_name || user.email?.split('@')[0] || "Quizzer";
+  const avatarUrl = profileData?.avatar_url || user.user_metadata?.avatar_url;
   const joinDate = user.created_at
     ? new Date(user.created_at).toLocaleDateString(i18n.language === 'en' ? "en-US" : "vi-VN", { month: "long", year: "numeric" })
     : "";
@@ -142,7 +149,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({
       <div className="relative z-10 flex flex-col md:flex-row items-center h-full p-6 md:p-8 gap-6">
 
         {/* Avatar Section */}
-        <div className="relative shrink-0">
+        <div className="relative shrink-0 group/avatar">
           {/* Blob Background for Avatar */}
           <div className="absolute inset-0 bg-gradient-to-tr from-pink-300 to-purple-300 rounded-full blur-sm opacity-60 transform scale-110" />
 
@@ -153,15 +160,42 @@ export const UserProfile: React.FC<UserProfileProps> = ({
             className="relative w-24 h-24 md:w-32 md:h-32 rounded-full object-cover border-4 border-white shadow-md z-10"
           />
 
+          {/* Edit Button Overlay */}
+          <button
+            onClick={() => setShowEditDialog(true)}
+            className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover/avatar:opacity-100 transition-opacity cursor-pointer z-20"
+            title="Chỉnh sửa hồ sơ"
+          >
+            <Pencil className="w-6 h-6 text-white" />
+          </button>
+
+          {/* Edit Icon Badge - Always visible */}
+          <button
+            onClick={() => setShowEditDialog(true)}
+            className="absolute -top-1 -right-1 z-30 bg-white hover:bg-primary hover:text-white text-gray-600 p-1.5 rounded-full shadow-md border-2 border-white transition-colors cursor-pointer"
+            title="Chỉnh sửa hồ sơ"
+          >
+            <Pencil className="w-3 h-3" />
+          </button>
+
           {/* Level Badge floating on Avatar */}
           <div
             ref={badgeRef}
-            className="absolute -bottom-2 -right-2 z-20 bg-yellow-300 text-yellow-900 px-3 py-1 rounded-full text-xs font-bold shadow-sm border-2 border-white flex items-center gap-1"
+            className="absolute -bottom-2 -right-2 z-30 bg-yellow-300 text-yellow-900 px-3 py-1 rounded-full text-xs font-bold shadow-sm border-2 border-white flex items-center gap-1"
           >
             <Zap className="w-3 h-3 fill-yellow-900" />
             {t('profile.level')} {level}
           </div>
         </div>
+
+        {/* Edit Profile Dialog */}
+        {user && (
+          <EditProfileDialog
+            open={showEditDialog}
+            onOpenChange={setShowEditDialog}
+            user={user}
+          />
+        )}
 
         {/* Info Section */}
         <div className="flex-1 text-center md:text-left space-y-2">
