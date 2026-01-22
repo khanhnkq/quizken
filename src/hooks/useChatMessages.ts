@@ -438,31 +438,10 @@ export function useChatMessages(): UseChatMessagesReturn {
       );
 
       try {
-        // Fetch current reactions first to ensure atomicity/freshness (simplified for JSONB)
-        const { data: currentMsg, error: fetchError } = await (supabase as any)
-          .from("chat_messages")
-          .select("reactions")
-          .eq("id", messageId)
-          .single();
-
-        if (fetchError) throw fetchError;
-
-        const currentReactions =
-          (currentMsg.reactions as Record<string, string[]>) || {};
-        const users = currentReactions[emoji] || [];
-        let newReactions = { ...currentReactions };
-
-        if (users.includes(currentUserId)) {
-          newReactions[emoji] = users.filter((id) => id !== currentUserId);
-          if (newReactions[emoji].length === 0) delete newReactions[emoji];
-        } else {
-          newReactions[emoji] = [...users, currentUserId];
-        }
-
-        const { error } = await (supabase as any)
-          .from("chat_messages")
-          .update({ reactions: newReactions })
-          .eq("id", messageId);
+        const { error } = await (supabase as any).rpc("toggle_chat_reaction", {
+          p_message_id: messageId,
+          p_emoji: emoji,
+        });
 
         if (error) throw error;
         return true;
@@ -473,6 +452,8 @@ export function useChatMessages(): UseChatMessagesReturn {
           description: "Không thể thả cảm xúc",
           variant: "destructive",
         });
+        // Revert optimistic update if needed, but we'll rely on fast failure or eventual consistency for now
+        // A full revert would require refetching or restoring previous state
         return false;
       }
     },
