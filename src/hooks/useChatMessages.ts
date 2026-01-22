@@ -196,6 +196,20 @@ export function useChatMessages(): UseChatMessagesReturn {
           setMessages((prev) => prev.filter((m) => m.id !== deletedId));
         },
       )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "chat_messages",
+        },
+        (payload) => {
+          const updatedMessage = payload.new as ChatMessage;
+          setMessages((prev) =>
+            prev.map((m) => (m.id === updatedMessage.id ? updatedMessage : m)),
+          );
+        },
+      )
       .subscribe();
 
     return () => {
