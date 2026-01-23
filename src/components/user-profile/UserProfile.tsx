@@ -134,11 +134,11 @@ export const UserProfile: React.FC<
     return (
       <div
         className={cn(
-          "w-full h-full min-h-[220px] rounded-[2.5rem] bg-white border-2 border-dashed border-gray-200 flex flex-col items-center justify-center p-8 text-center",
+          "w-full h-full min-h-[220px] rounded-[2.5rem] bg-white dark:bg-slate-900 border-2 border-dashed border-gray-200 dark:border-gray-800 flex flex-col items-center justify-center p-8 text-center",
           className,
         )}>
-        <UserIcon className="w-12 h-12 text-gray-300 mb-2" />
-        <p className="text-gray-500 font-medium">
+        <UserIcon className="w-12 h-12 text-gray-300 dark:text-gray-600 mb-2" />
+        <p className="text-gray-500 dark:text-gray-400 font-medium">
           {t("library.toasts.loginRequired")}
         </p>
       </div>
@@ -195,8 +195,8 @@ export const UserProfile: React.FC<
       ref={cardRef}
       className={cn(
         "relative w-full h-full min-h-[220px] rounded-[2.5rem] overflow-hidden transition-all duration-300 cursor-default",
-        "bg-gradient-to-br from-pink-50 via-white to-blue-50",
-        "border-4 border-white shadow-xl",
+        "bg-gradient-to-br from-pink-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900",
+        "border-4 border-white dark:border-slate-700 shadow-xl",
         className,
       )}>
       {/* Decorative Blobs */}
@@ -216,7 +216,7 @@ export const UserProfile: React.FC<
               `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=random&color=fff`
             }
             alt={userName}
-            className="relative w-24 h-24 md:w-32 md:h-32 rounded-full object-cover border-4 border-white shadow-md z-10"
+            className="relative w-24 h-24 md:w-32 md:h-32 rounded-full object-cover border-4 border-white dark:border-slate-700 shadow-md z-10"
           />
 
           {/* Edit Button Overlay */}
@@ -242,7 +242,7 @@ export const UserProfile: React.FC<
           {/* Level Badge floating on Avatar */}
           <div
             ref={badgeRef}
-            className="absolute -bottom-2 -right-2 z-30 bg-yellow-300 text-yellow-900 px-3 py-1 rounded-full text-xs font-bold shadow-sm border-2 border-white flex items-center gap-1">
+            className="absolute -bottom-2 -right-2 z-30 bg-yellow-300 text-yellow-900 px-3 py-1 rounded-full text-xs font-bold shadow-sm border-2 border-white dark:border-slate-700 flex items-center gap-1">
             <Zap className="w-3 h-3 fill-yellow-900" />
             {t("profile.level")} {level}
           </div>
@@ -259,22 +259,22 @@ export const UserProfile: React.FC<
 
         {/* Info Section */}
         <div className="flex-1 text-center md:text-left space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/60 backdrop-blur-sm rounded-full text-blue-600/80 text-xs font-bold uppercase tracking-wider mb-1 shadow-sm">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/60 dark:bg-slate-700/60 backdrop-blur-sm rounded-full text-blue-600/80 dark:text-blue-400 text-xs font-bold uppercase tracking-wider mb-1 shadow-sm">
             <Sparkles className="w-3 h-3" />
             {t("profile.member")}
           </div>
 
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-yellow-400/20 backdrop-blur-sm rounded-full text-yellow-700 text-xs font-bold uppercase tracking-wider mb-1 shadow-sm ml-2 border border-yellow-200">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-yellow-400/20 backdrop-blur-sm rounded-full text-yellow-700 dark:text-yellow-400 text-xs font-bold uppercase tracking-wider mb-1 shadow-sm ml-2 border border-yellow-200 dark:border-yellow-400/30">
             <span className="text-sm">🪙</span>
             {statistics?.zcoin || 0} ZCoin
           </div>
 
-          <h2 className="text-3xl md:text-4xl font-heading font-black text-gray-800 tracking-tight leading-none">
+          <h2 className="text-3xl md:text-4xl font-heading font-black text-gray-800 dark:text-white tracking-tight leading-none">
             {userName}
           </h2>
 
-          <div className="flex flex-col md:flex-row items-center md:items-start gap-3 text-sm font-medium text-gray-500">
-            <div className="flex items-center gap-1.5 bg-white/50 px-2 py-1 rounded-lg">
+          <div className="flex flex-col md:flex-row items-center md:items-start gap-3 text-sm font-medium text-gray-500 dark:text-gray-400">
+            <div className="flex items-center gap-1.5 bg-white/50 dark:bg-slate-800/50 px-2 py-1 rounded-lg">
               <Calendar className="w-4 h-4 text-pink-400" />
               <span>
                 {t("profile.joined")} {joinDate}
@@ -282,7 +282,7 @@ export const UserProfile: React.FC<
             </div>
 
             {/* Email/ID (Truncated) */}
-            <div className="hidden md:flex items-center gap-1.5 bg-white/50 px-2 py-1 rounded-lg opacity-70">
+            <div className="hidden md:flex items-center gap-1.5 bg-white/50 dark:bg-slate-800/50 px-2 py-1 rounded-lg opacity-70">
               <UserIcon className="w-4 h-4 text-blue-400" />
               <span>#{user.id.slice(0, 8)}</span>
             </div>
@@ -291,32 +291,32 @@ export const UserProfile: React.FC<
           {/* Quick Stats Grid */}
           <div className="flex items-center gap-3 mt-4">
             {/* Quizzes Taken */}
-            <div className="flex-1 bg-white/50 rounded-xl p-2 flex flex-col items-center">
+            <div className="flex-1 bg-white/50 dark:bg-slate-800/50 rounded-xl p-2 flex flex-col items-center">
               <CheckCircle2 className="w-4 h-4 text-green-500 mb-1" />
-              <span className="text-sm font-bold text-gray-800">
+              <span className="text-sm font-bold text-gray-800 dark:text-gray-200">
                 {statistics?.total_quizzes_taken || 0}
               </span>
-              <span className="text-[10px] text-gray-500 uppercase font-bold">
+              <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-bold">
                 {t("dashboard.taken", "Taken")}
               </span>
             </div>
 
             {/* Quizzes Created */}
-            <div className="flex-1 bg-white/50 rounded-xl p-2 flex flex-col items-center">
+            <div className="flex-1 bg-white/50 dark:bg-slate-800/50 rounded-xl p-2 flex flex-col items-center">
               <PenTool className="w-4 h-4 text-purple-500 mb-1" />
-              <span className="text-sm font-bold text-gray-800">
+              <span className="text-sm font-bold text-gray-800 dark:text-gray-200">
                 {statistics?.total_quizzes_created || 0}
               </span>
-              <span className="text-[10px] text-gray-500 uppercase font-bold">
+              <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-bold">
                 {t("dashboard.created", "Created")}
               </span>
             </div>
 
             {/* Streak */}
-            <div className="flex-1 bg-white/50 rounded-xl p-2 flex flex-col items-center">
+            <div className="flex-1 bg-white/50 dark:bg-slate-800/50 rounded-xl p-2 flex flex-col items-center">
               <Flame className="w-4 h-4 text-orange-500 mb-1" />
-              <span className="text-sm font-bold text-gray-800">{streak}</span>
-              <span className="text-[10px] text-gray-500 uppercase font-bold">
+              <span className="text-sm font-bold text-gray-800 dark:text-gray-200">{streak}</span>
+              <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-bold">
                 {t("dashboard.streak", "Streak")}
               </span>
             </div>

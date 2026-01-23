@@ -127,15 +127,15 @@ export function CreatedQuizzes({
 
     if (!quizzes || quizzes.length === 0) {
         return (
-            <Card className="rounded-[2.5rem] border-0 shadow-sm bg-white/50 text-center py-12">
+            <Card className="rounded-[2.5rem] border-0 shadow-sm bg-white/50 dark:bg-slate-900/50 text-center py-12">
                 <CardContent>
-                    <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4 animate-float">
+                    <div className="w-20 h-20 bg-blue-50 dark:bg-blue-900/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-float">
                         <PenTool className="w-10 h-10 text-blue-400" />
                     </div>
-                    <h3 className="text-xl font-bold text-gray-800 mb-2">
+                    <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2">
                         {t('dashboard.createdQuizzes.empty')}
                     </h3>
-                    <p className="text-gray-500 mb-6">
+                    <p className="text-gray-500 dark:text-gray-400 mb-6">
                         {t('dashboard.createdQuizzes.emptyDescription')}
                     </p>
                     <Button onClick={() => navigate('/')} className="rounded-xl">
@@ -149,8 +149,8 @@ export function CreatedQuizzes({
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between px-2 cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}>
-                <h3 className="text-2xl font-heading font-bold flex items-center gap-3 text-gray-800 group select-none">
-                    <div className="p-2 bg-blue-100 rounded-xl text-blue-600">
+                <h3 className="text-2xl font-heading font-bold flex items-center gap-3 text-gray-800 dark:text-white group select-none">
+                    <div className="p-2 bg-blue-100 dark:bg-blue-900/40 rounded-xl text-blue-600 dark:text-blue-400">
                         <PenTool className="h-6 w-6" />
                     </div>
                     {t('dashboard.createdQuizzes.title')}
@@ -175,7 +175,7 @@ export function CreatedQuizzes({
                     return (
                         <div
                             key={quiz.id}
-                            className="group bg-white rounded-[1.5rem] p-4 md:p-5 shadow-sm border-2 border-gray-100/60 hover:border-blue-500/30 hover:shadow-lg transition-all duration-300 relative overflow-hidden"
+                            className="group bg-white dark:bg-slate-900 rounded-[1.5rem] p-4 md:p-5 shadow-sm border-2 border-gray-100/60 dark:border-slate-800 hover:border-blue-500/30 dark:hover:border-blue-500/30 hover:shadow-lg transition-all duration-300 relative overflow-hidden"
                         >
                             <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between relative z-10">
 

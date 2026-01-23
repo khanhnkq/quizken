@@ -37,7 +37,7 @@ export function LanguageSwitcher() {
             </Button>
 
             {/* Desktop: Toggle Switch */}
-            <div className="hidden md:flex bg-card items-center p-1 rounded-3xl border-4 border-border h-10 w-[100px] relative gap-1">
+            <div className="hidden md:flex bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm items-center p-1 rounded-full border-2 border-slate-200 dark:border-slate-800 h-10 w-[100px] relative gap-1 shadow-sm transition-all duration-300">
                 {/* Background slide animation */}
                 <div className="absolute inset-1 flex items-center pointer-events-none z-0">
                     <motion.div

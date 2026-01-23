@@ -120,7 +120,7 @@ export const BackgroundDecorations = ({ density = "high" }: { density?: "high" |
     );
 
     return (
-        <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+        <div className="absolute inset-0 pointer-events-none overflow-hidden z-0 dark:hidden">
             {/* 1. Dot Pattern Background */}
             <div className="absolute inset-0 opacity-[0.03]"
                 style={{

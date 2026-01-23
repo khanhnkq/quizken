@@ -89,8 +89,11 @@ export function Toaster(props: ToasterProps) {
           fontFamily: "Ubuntu, sans-serif",
           fontSize: "14px",
           lineHeight: "1.4",
+          background: "hsl(var(--card))",
+          color: "hsl(var(--card-foreground))",
+          border: "1px solid hsl(var(--border))",
         },
-        className: "toast-animation",
+        className: "toast-animation shadow-lg",
       }}
       {...props}
     />

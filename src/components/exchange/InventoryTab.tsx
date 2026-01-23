@@ -69,19 +69,19 @@ export function InventoryTab() {
             <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-6">
                 <div className="text-center md:text-left space-y-2">
                     {/* Badge */}
-                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 backdrop-blur-sm border-2 border-teal-400 text-teal-600 font-bold text-sm shadow-sm animate-fade-in">
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-2 border-teal-400 dark:border-teal-600 text-teal-600 dark:text-teal-400 font-bold text-sm shadow-sm animate-fade-in">
                         <Sparkles className="w-4 h-4 text-yellow-400 fill-yellow-400" />
                         <span>{t('inventory.badge')}</span>
                     </div>
 
                     {/* Title with SVG underline */}
-                    <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground drop-shadow-sm">
+                    <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground dark:text-white drop-shadow-sm">
                         {t('inventory.welcomeTitle')}
                         <span className="inline-block animate-wave ml-2 origin-[70%_70%]">🎒</span>
                     </h1>
 
                     {/* Subtitle */}
-                    <p className="text-lg text-muted-foreground font-medium max-w-lg">
+                    <p className="text-lg text-muted-foreground dark:text-gray-400 font-medium max-w-lg">
                         {t('inventory.subtitle')}
                     </p>
                 </div>
@@ -109,7 +109,7 @@ export function InventoryTab() {
             </div>
 
             {/* Filter & Search Bar - Matching Shop Style */}
-            <div className="sticky top-4 z-30 bg-white/90 backdrop-blur-md p-2 rounded-2xl shadow-lg border border-slate-100 flex flex-col md:flex-row gap-4 items-center justify-between">
+            <div className="sticky top-4 z-30 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md p-2 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-800 flex flex-col md:flex-row gap-4 items-center justify-between">
 
                 {/* Category Pills */}
                 <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 px-2 scrollbar-hide">
@@ -121,7 +121,7 @@ export function InventoryTab() {
                                 flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm whitespace-nowrap transition-all duration-200 border-2
                                 ${selectedFilter === cat.id
                                     ? `${cat.color} border-current shadow-md scale-105`
-                                    : 'bg-slate-50 text-slate-500 border-transparent hover:bg-slate-100'}
+                                    : 'bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-transparent hover:bg-slate-100 dark:hover:bg-slate-700'}
                             `}
                         >
                             <cat.icon className="w-4 h-4" />
@@ -137,7 +137,7 @@ export function InventoryTab() {
                         placeholder={t('exchange.searchPlaceholder')}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-10 h-11 rounded-xl border-slate-200 bg-slate-50 focus:bg-white transition-all shadow-inner"
+                        className="pl-10 h-11 rounded-xl border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 dark:text-white focus:bg-white dark:focus:bg-slate-900 transition-all shadow-inner"
                     />
                 </div>
             </div>
@@ -158,7 +158,7 @@ export function InventoryTab() {
                                 className="group relative flex flex-col p-1 rounded-[2rem] transition-all h-full"
                             >
                                 {/* Card Body - Claymorphism matching Shop */}
-                                <div className="relative flex flex-col h-full rounded-[1.8rem] p-5 bg-white border-2 border-slate-100 shadow-[0_10px_20px_rgba(0,0,0,0.05),inset_0_-5px_0_rgba(0,0,0,0.02)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.1),inset_0_-5px_0_rgba(0,0,0,0.02)] hover:border-teal-200 transition-all duration-300">
+                                <div className="relative flex flex-col h-full rounded-[1.8rem] p-5 bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 shadow-[0_10px_20px_rgba(0,0,0,0.05),inset_0_-5px_0_rgba(0,0,0,0.02)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.1),inset_0_-5px_0_rgba(0,0,0,0.02)] hover:border-teal-200 dark:hover:border-teal-800 transition-all duration-300">
 
                                     {/* Type Badge */}
                                     <div className="absolute top-4 left-4 z-10">
@@ -190,7 +190,7 @@ export function InventoryTab() {
                                                 <img
                                                     src={item.details.image_url}
                                                     alt={item.details.name}
-                                                    className="relative w-24 h-24 object-cover rounded-2xl shadow-lg border-4 border-white transform rotate-3 hover:rotate-6 transition-all"
+                                                    className="relative w-24 h-24 object-cover rounded-2xl shadow-lg border-4 border-white dark:border-slate-700 transform rotate-3 hover:rotate-6 transition-all"
                                                 />
                                             ) : (
                                                 <div className="relative text-7xl filter drop-shadow-xl transform -rotate-3 hover:rotate-0 transition-all cursor-default">
@@ -202,10 +202,10 @@ export function InventoryTab() {
 
                                     {/* Content */}
                                     <div className="text-center space-y-3 mb-4">
-                                        <h3 className="font-extrabold text-xl text-slate-800 leading-tight">
+                                        <h3 className="font-extrabold text-xl text-slate-800 dark:text-white leading-tight">
                                             {item.details.name}
                                         </h3>
-                                        <p className="text-xs font-medium text-slate-400 line-clamp-2 min-h-[2.5em] px-2">
+                                        <p className="text-xs font-medium text-slate-400 dark:text-slate-500 line-clamp-2 min-h-[2.5em] px-2">
                                             {item.details.description}
                                         </p>
                                     </div>
@@ -224,7 +224,7 @@ export function InventoryTab() {
                                         )}
 
                                         {/* Owned Status & Date */}
-                                        <div className="flex items-center justify-center gap-2 py-2 px-3 bg-slate-50 rounded-xl text-xs font-medium text-slate-500">
+                                        <div className="flex items-center justify-center gap-2 py-2 px-3 bg-slate-50 dark:bg-slate-800 rounded-xl text-xs font-medium text-slate-500 dark:text-slate-400">
                                             <Calendar className="w-3.5 h-3.5" />
                                             <span>
                                                 {t('inventory.item.owned')} • {new Date(item.purchased_at).toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'vi-VN')}
@@ -234,7 +234,7 @@ export function InventoryTab() {
                                 </div>
 
                                 {/* Background Layer for depth */}
-                                <div className="absolute inset-0 rounded-[2rem] transform translate-y-2 translate-x-0 bg-slate-200 -z-10"></div>
+                                <div className="absolute inset-0 rounded-[2rem] transform translate-y-2 translate-x-0 bg-slate-200 dark:bg-slate-800 -z-10"></div>
                             </motion.div>
                         ))}
                     </div>
@@ -247,7 +247,7 @@ export function InventoryTab() {
                                 <Search className="w-10 h-10 text-slate-300" />
                             )}
                         </div>
-                        <h3 className="text-xl font-bold text-slate-600">
+                        <h3 className="text-xl font-bold text-slate-600 dark:text-gray-300">
                             {ownedItems.length === 0 ? t('inventory.empty.title') : t('inventory.noResults')}
                         </h3>
                         <p className="text-slate-400">

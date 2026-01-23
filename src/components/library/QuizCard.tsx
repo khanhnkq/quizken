@@ -61,18 +61,18 @@ export const QuizCard: React.FC<QuizCardProps> = ({
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty?.toLowerCase()) {
       case "easy":
-        return "bg-green-100 text-green-700 border-green-200";
+        return "bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800";
       case "medium":
-        return "bg-yellow-100 text-yellow-700 border-yellow-200";
+        return "bg-yellow-100 text-yellow-700 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-800";
       case "hard":
-        return "bg-red-100 text-red-700 border-red-200";
+        return "bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800";
       default:
-        return "bg-gray-100 text-gray-700 border-gray-200";
+        return "bg-gray-100 text-gray-700 border-gray-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700";
     }
   };
 
   return (
-    <Card className="h-full flex flex-col rounded-3xl border-4 border-primary/20 hover:border-primary/40 shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 bg-white group overflow-hidden">
+    <Card className="h-full flex flex-col rounded-3xl border-4 border-primary/20 hover:border-primary/40 dark:border-primary/10 dark:hover:border-primary/30 shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 bg-white dark:bg-slate-900 group overflow-hidden">
       {/* Visual Header - Game Cartridge Style */}
       <div className="relative h-36 overflow-hidden bg-gradient-to-br from-secondary/50 to-secondary/20">
         {/* Decorative Pattern */}
@@ -95,7 +95,7 @@ export const QuizCard: React.FC<QuizCardProps> = ({
 
         {/* Category Sticker */}
         <div className="absolute bottom-4 left-4 z-10">
-          <Badge variant="secondary" className="rounded-xl border-2 border-white/50 shadow-sm bg-white/80 backdrop-blur-sm text-primary hover:bg-white">
+          <Badge variant="secondary" className="rounded-xl border-2 border-white/50 dark:border-slate-700/50 shadow-sm bg-white/80 dark:bg-slate-800/90 backdrop-blur-sm text-primary dark:text-slate-100 hover:bg-white dark:hover:bg-slate-700">
             {t(getCategoryLabel(quiz.category))}
           </Badge>
         </div>
@@ -118,7 +118,7 @@ export const QuizCard: React.FC<QuizCardProps> = ({
             <BookOpen className="w-3.5 h-3.5" />
             <span>{questionCount} {t('library.card.questions')}</span>
           </div>
-          <div className="flex items-center gap-1.5 bg-green-50 text-green-600 rounded-full px-3 py-1.5 text-xs font-medium">
+          <div className="flex items-center gap-1.5 bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full px-3 py-1.5 text-xs font-medium">
             <TrendingUp className="w-3.5 h-3.5" />
             <span>{formatNumber(quiz.usage_count || 0)}</span>
           </div>
@@ -142,7 +142,7 @@ export const QuizCard: React.FC<QuizCardProps> = ({
       </CardContent>
 
       {/* Action Buttons - Match Hero Section Style */}
-      <div className="p-5 pt-4 mt-auto border-t-2 border-border/30 bg-secondary/10">
+      <div className="p-5 pt-4 mt-auto border-t-2 border-border/30 bg-secondary/10 dark:bg-secondary/5">
         <div className="flex gap-3">
           <Button
             className="flex-1 rounded-3xl font-heading shadow-xl border-4 border-primary hover:border-primary-foreground/50 active:scale-95 transition-all duration-200 text-sm bg-primary text-white"
@@ -157,7 +157,7 @@ export const QuizCard: React.FC<QuizCardProps> = ({
           <Button
             variant="ghost"
             size="icon"
-            className="h-12 w-12 rounded-3xl border-4 border-border bg-white text-muted-foreground hover:border-primary/50 hover:bg-primary/10 hover:text-primary active:scale-95 transition-all duration-200"
+            className="h-12 w-12 rounded-3xl border-4 border-border bg-white dark:bg-slate-800 text-muted-foreground hover:border-primary/50 hover:bg-primary/10 hover:text-primary active:scale-95 transition-all duration-200"
             onClick={onPreview}
             title={t('library.card.preview')}
           >
@@ -167,7 +167,7 @@ export const QuizCard: React.FC<QuizCardProps> = ({
           <Button
             variant="ghost"
             size="icon"
-            className="h-12 w-12 rounded-3xl border-4 border-border bg-white text-muted-foreground hover:border-purple-400 hover:bg-purple-50 hover:text-purple-500 active:scale-95 transition-all duration-200"
+            className="h-12 w-12 rounded-3xl border-4 border-border bg-white dark:bg-slate-800 text-muted-foreground hover:border-purple-400 hover:bg-purple-50 hover:text-purple-500 active:scale-95 transition-all duration-200"
             onClick={(e) => {
               e.stopPropagation();
               onShare();
@@ -180,7 +180,7 @@ export const QuizCard: React.FC<QuizCardProps> = ({
           <Button
             variant="ghost"
             size="icon"
-            className="h-12 w-12 rounded-3xl border-4 border-border bg-white text-muted-foreground hover:border-blue-400 hover:bg-blue-50 hover:text-blue-500 active:scale-95 transition-all duration-200"
+            className="h-12 w-12 rounded-3xl border-4 border-border bg-white dark:bg-slate-800 text-muted-foreground hover:border-blue-400 hover:bg-blue-50 hover:text-blue-500 active:scale-95 transition-all duration-200"
             onClick={onDownload}
             title={t('library.card.download')}
           >

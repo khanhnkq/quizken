@@ -1223,7 +1223,7 @@ const QuizGenerator = () => {
     <>
       <section
         id="generator"
-        className="relative overflow-hidden bg-white h-screen">
+        className="relative overflow-hidden bg-white dark:bg-slate-950 h-screen">
         <div className="w-full h-full relative z-10">
           {/* Quota Limit Dialog */}
           <QuotaLimitDialog
@@ -1314,7 +1314,7 @@ const QuizGenerator = () => {
             initialTab={quickDialogTab}
           />
 
-          <Card className="border-none bg-white shadow-none rounded-none overflow-hidden ring-0 relative w-full h-full">
+          <Card className="border-none bg-white dark:bg-slate-950 shadow-none rounded-none overflow-hidden ring-0 relative w-full h-full">
             <CardContent className="p-0 flex flex-col justify-center relative z-10 h-full">
               {/* Show Form OR Loading Progress */}
               {loading ? (
@@ -1393,14 +1393,14 @@ const QuizGenerator = () => {
 
                     {/* Mode Toggle */}
                     <div className="flex justify-center -mb-4 z-20 relative">
-                      <div className="bg-white/80 backdrop-blur-sm p-1.5 rounded-full border border-slate-200 shadow-sm flex items-center gap-1 cursor-pointer hover:shadow-md transition-all">
-                        <div className="px-4 py-1.5 rounded-full bg-slate-900 text-white text-sm font-bold shadow-sm flex items-center gap-2">
+                      <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm p-1.5 rounded-full border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-1 cursor-pointer hover:shadow-md transition-all">
+                        <div className="px-4 py-1.5 rounded-full bg-slate-900 dark:bg-slate-700 text-white text-sm font-bold shadow-sm flex items-center gap-2">
                           <Sparkles className="w-4 h-4 text-green-400" />
                           <span>AI Generator</span>
                         </div>
                         <button
                           onClick={() => navigate("/quiz/create")}
-                          className="px-4 py-1.5 rounded-full text-slate-500 text-sm font-bold hover:bg-slate-100 hover:text-slate-900 transition-all flex items-center gap-2">
+                          className="px-4 py-1.5 rounded-full text-slate-500 dark:text-slate-400 text-sm font-bold hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200 transition-all flex items-center gap-2">
                           <PenLine className="w-4 h-4" />
                           <span>{t("manualQuiz.title", "Manual")}</span>
                         </button>
@@ -1411,10 +1411,10 @@ const QuizGenerator = () => {
                     <div className="w-full max-w-5xl mx-auto z-20 px-4 mt-8">
                       <div
                         className={cn(
-                          "flex items-center gap-2 p-2 pl-2 rounded-[2rem] md:rounded-[3rem] bg-white shadow-[0_10px_40px_-15px_rgba(0,0,0,0.1)] border-2 transition-all duration-300 transform w-full",
+                          "flex items-center gap-2 p-2 pl-2 rounded-[2rem] md:rounded-[3rem] bg-white dark:bg-slate-900 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.1)] border-2 transition-all duration-300 transform w-full",
                           isPromptValid
-                            ? "border-green-200 ring-4 ring-green-50/50 shadow-green-100 hover:shadow-green-200"
-                            : "border-slate-100 hover:border-slate-200 hover:shadow-lg focus-within:border-orange-200 focus-within:ring-4 focus-within:ring-orange-50/50",
+                            ? "border-green-200 dark:border-green-900 ring-4 ring-green-50/50 dark:ring-green-900/30 shadow-green-100 dark:shadow-green-900/20 hover:shadow-green-200 dark:hover:shadow-green-900/40"
+                            : "border-slate-100 dark:border-slate-800 hover:border-slate-200 dark:hover:border-slate-700 hover:shadow-lg focus-within:border-orange-200 dark:focus-within:border-orange-900 focus-within:ring-4 focus-within:ring-orange-50/50 dark:focus-within:ring-orange-900/30",
                         )}>
                         {/* Settings (Question Count) */}
                         <Popover>
@@ -1422,17 +1422,17 @@ const QuizGenerator = () => {
                             <Button
                               variant="ghost"
                               className={cn(
-                                "h-11 md:h-12 px-2 md:pl-2 md:pr-5 rounded-full shrink-0 font-extrabold transition-all duration-300 gap-1.5 md:gap-2 border-2",
+                                  "h-11 md:h-12 px-2 md:pl-2 md:pr-5 rounded-full shrink-0 font-extrabold transition-all duration-300 gap-1.5 md:gap-2 border-2",
                                 isQuestionCountSelected
-                                  ? "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100 hover:border-amber-300 shadow-sm"
-                                  : "bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100 hover:border-slate-300",
+                                  ? "bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800 hover:bg-amber-100 dark:hover:bg-amber-900/50 hover:border-amber-300"
+                                  : "bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 hover:border-slate-300",
                               )}>
                               {isQuestionCountSelected ? (
                                 <>
                                   <div
                                     className={cn(
                                       "flex items-center justify-center w-8 h-8 md:w-9 md:h-9 rounded-full shadow-sm border",
-                                      "bg-white border-amber-100 text-amber-600",
+                                      "bg-white dark:bg-slate-900 border-amber-100 dark:border-amber-900 text-amber-600 dark:text-amber-400",
                                     )}>
                                     <span className="text-sm md:text-base font-black">
                                       {questionCount}
@@ -1444,7 +1444,7 @@ const QuizGenerator = () => {
                                 </>
                               ) : (
                                 <>
-                                  <div className="flex items-center justify-center w-8 h-8 md:w-9 md:h-9 rounded-full bg-white shadow-sm border border-slate-200">
+                                  <div className="flex items-center justify-center w-8 h-8 md:w-9 md:h-9 rounded-full bg-white dark:bg-slate-900 shadow-sm border border-slate-200 dark:border-slate-700">
                                     <Layers className="w-4 h-4 md:w-5 md:h-5 text-slate-400" />
                                   </div>
                                   <span className="hidden md:inline text-xs font-bold">
@@ -1508,7 +1508,7 @@ const QuizGenerator = () => {
                               "quizGenerator.ui.inputPlaceholder",
                               "Nhập chủ đề...",
                             )}
-                            className="min-h-[32px] max-h-[200px] w-full bg-transparent !border-0 !border-transparent !shadow-none !ring-0 !ring-offset-0 focus-visible:!ring-0 focus-visible:!ring-offset-0 focus:!ring-0 focus:!border-0 focus:!outline-none !outline-none resize-none text-2xl placeholder:text-slate-300 font-medium leading-relaxed p-0"
+                            className="min-h-[32px] max-h-[200px] w-full bg-transparent !border-0 !border-transparent !shadow-none !ring-0 !ring-offset-0 focus-visible:!ring-0 focus-visible:!ring-offset-0 focus:!ring-0 focus:!border-0 focus:!outline-none !outline-none resize-none text-2xl text-slate-800 dark:text-slate-100 placeholder:text-slate-300 dark:placeholder:text-slate-500 font-medium leading-relaxed p-0"
                             rows={1}
                             onInput={(e) => {
                               // Auto-grow hack
@@ -1532,7 +1532,7 @@ const QuizGenerator = () => {
                             "h-11 w-11 md:h-12 md:w-12 rounded-full shrink-0 transition-all duration-300 shadow-md flex items-center justify-center",
                             isPromptValid && isQuestionCountSelected
                               ? "bg-gradient-to-tr from-green-400 to-green-600 text-white shadow-green-500/30 hover:shadow-green-500/50 hover:scale-105 active:scale-95"
-                              : "bg-slate-200 text-slate-400 cursor-not-allowed",
+                              : "bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-600 cursor-not-allowed",
                           )}>
                           {loading ? (
                             <Loader2 className="w-5 h-5 animate-spin" />
@@ -1563,7 +1563,7 @@ const QuizGenerator = () => {
                       {user && (
                         <div className="mt-12 flex justify-center opacity-80 hover:opacity-100 transition-opacity">
                           {hasApiKey ? (
-                            <div className="bg-white/90 backdrop-blur-md rounded-full px-5 py-2.5 flex items-center gap-3 border-2 border-orange-100 shadow-[0_4px_20px_rgba(251,146,60,0.2)] hover:scale-105 transition-transform cursor-default scale-110">
+                            <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-full px-5 py-2.5 flex items-center gap-3 border-2 border-orange-100 dark:border-orange-900/50 shadow-[0_4px_20px_rgba(251,146,60,0.2)] hover:scale-105 transition-transform cursor-default scale-110">
                               <div className="bg-gradient-to-br from-orange-400 to-red-500 rounded-full p-1.5 shadow-inner">
                                 <Zap className="w-4 h-4 text-white fill-white" />
                               </div>
@@ -1572,11 +1572,11 @@ const QuizGenerator = () => {
                               </span>
                             </div>
                           ) : (
-                            <div className="bg-slate-50 rounded-full px-4 py-1.5 flex items-center gap-3 border border-slate-100">
-                              <span className="text-xs font-bold text-slate-400 uppercase">
+                            <div className="bg-slate-50 dark:bg-slate-900 rounded-full px-4 py-1.5 flex items-center gap-3 border border-slate-100 dark:border-slate-800">
+                              <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase">
                                 Daily Limit
                               </span>
-                              <div className="w-20 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                              <div className="w-20 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
                                 <div
                                   className="h-full bg-green-500 rounded-full"
                                   style={{
@@ -1584,7 +1584,7 @@ const QuizGenerator = () => {
                                   }}
                                 />
                               </div>
-                              <span className="text-xs font-bold text-slate-600">
+                              <span className="text-xs font-bold text-slate-600 dark:text-slate-400">
                                 {userRemaining}/{userLimit}
                               </span>
                             </div>
@@ -1595,6 +1595,7 @@ const QuizGenerator = () => {
                   </div>
                 </>
               )}
+            
             </CardContent>
           </Card>
         </div>

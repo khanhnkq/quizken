@@ -1,6 +1,7 @@
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import { AuthProvider } from "./lib/auth.tsx";
+import { ThemeProvider } from "./components/theme-provider";
 import "./index.css";
 import { warmupPdfWorker } from "./lib/pdfWorkerClient";
 import { injectSpeedInsights } from "@vercel/speed-insights";
@@ -12,7 +13,9 @@ injectSpeedInsights();
 warmupPdfWorker().catch(() => {});
 
 createRoot(document.getElementById("root")!).render(
-  <AuthProvider>
-    <App />
-  </AuthProvider>
+  <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+    <AuthProvider>
+      <App />
+    </AuthProvider>
+  </ThemeProvider>
 );

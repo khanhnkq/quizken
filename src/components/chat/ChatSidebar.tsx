@@ -140,10 +140,10 @@ export function ChatSidebar({ onBack }: ChatSidebarProps) {
                   <div
                     key={item.id}
                     className={cn(
-                      "p-3 rounded-lg border",
+                      "p-3 rounded-lg border transition-colors",
                       item.type === 'event' 
-                        ? "bg-gradient-to-br from-purple-50 to-pink-50 border-purple-100" 
-                        : "bg-gradient-to-br from-primary/5 to-primary/10 border-primary/10"
+                        ? "bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-purple-100 dark:border-purple-800/50" 
+                        : "bg-gradient-to-br from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/20 border-primary/10 dark:border-primary/20"
                     )}
                   >
                     <p className="text-sm font-medium">{item.title}</p>
@@ -157,12 +157,12 @@ export function ChatSidebar({ onBack }: ChatSidebarProps) {
 
 
           {/* Daily Gift */}
-          <button className="w-full p-3 rounded-lg bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-100 hover:from-purple-100 hover:to-pink-100 transition-colors">
+          <button className="w-full p-3 rounded-lg bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border border-purple-100 dark:border-purple-800/50 hover:from-purple-100 hover:to-pink-100 dark:hover:from-purple-900/30 dark:hover:to-pink-900/30 transition-colors">
             <div className="flex items-center gap-2">
-              <Gift className="h-5 w-5 text-purple-500" />
-              <span className="font-semibold text-purple-700">Nhận quà hàng ngày</span>
+              <Gift className="h-5 w-5 text-purple-500 dark:text-purple-400" />
+              <span className="font-semibold text-purple-700 dark:text-purple-300">Nhận quà hàng ngày</span>
             </div>
-            <p className="text-xs text-purple-600 mt-1 text-left">
+            <p className="text-xs text-purple-600 dark:text-purple-400 mt-1 text-left">
               Click để mở hộp quà bí ẩn!
             </p>
           </button>

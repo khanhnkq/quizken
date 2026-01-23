@@ -52,17 +52,17 @@ export function ShareDialog({ isOpen, onClose, url, title, quizTitle, questionCo
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md border-0 bg-transparent shadow-none p-0 overflow-visible">
-        <div className="bg-gradient-to-br from-violet-50 to-pink-50 border-4 border-white p-6 rounded-[2.5rem] shadow-2xl relative overflow-hidden">
+        <div className="bg-gradient-to-br from-violet-50 to-pink-50 dark:from-slate-900 dark:to-slate-800 border-4 border-white dark:border-slate-700 p-6 rounded-[2.5rem] shadow-2xl relative overflow-hidden">
             {/* Background Decorations */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-yellow-200/50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
             <div className="absolute bottom-0 left-0 w-32 h-32 bg-blue-200/50 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none" />
 
             <div className="relative text-center space-y-6">
                 <DialogHeader>
-                  <DialogTitle className="text-2xl font-black text-gray-800 tracking-tight">
+                  <DialogTitle className="text-2xl font-black text-gray-800 dark:text-white tracking-tight">
                     {title || t('share.title')}
                   </DialogTitle>
-                  <DialogDescription className="text-gray-500 font-medium">
+                  <DialogDescription className="text-gray-500 dark:text-gray-400 font-medium">
                      {t('share.description')}
                   </DialogDescription>
                 </DialogHeader>
@@ -87,10 +87,10 @@ export function ShareDialog({ isOpen, onClose, url, title, quizTitle, questionCo
 
                   {/* Quiz Info Badge */}
                   {quizTitle && (
-                      <div className="bg-white/80 backdrop-blur-sm p-4 rounded-2xl border border-white/50 shadow-sm w-full max-w-[240px]">
-                          <h3 className="font-bold text-gray-800 truncate leading-tight mb-1">{quizTitle}</h3>
+                      <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm p-4 rounded-2xl border border-white/50 dark:border-slate-700/50 shadow-sm w-full max-w-[240px]">
+                          <h3 className="font-bold text-gray-800 dark:text-white truncate leading-tight mb-1">{quizTitle}</h3>
                           {questionCount !== undefined && (
-                              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                   {questionCount} {t('share.questions')}
                               </p>
                           )}
@@ -98,8 +98,8 @@ export function ShareDialog({ isOpen, onClose, url, title, quizTitle, questionCo
                   )}
                   
                   {/* Link & Copy Button */}
-                  <div className="flex items-center space-x-2 w-full bg-white p-1.5 rounded-full border border-gray-200 shadow-sm">
-                    <div className="flex-1 px-4 truncate font-mono text-xs text-gray-500">
+                  <div className="flex items-center space-x-2 w-full bg-white dark:bg-slate-950 p-1.5 rounded-full border border-gray-200 dark:border-slate-800 shadow-sm">
+                    <div className="flex-1 px-4 truncate font-mono text-xs text-gray-500 dark:text-gray-400">
                         {url}
                     </div>
                     <Button 

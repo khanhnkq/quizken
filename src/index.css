@@ -1,7 +1,7 @@
 /* Ubuntu Font Family - Optimized for Performance */
 @font-face {
-  font-family: 'Fredoka';
-  src: url('/fonts/vn/DVN-Fredoka-Bold.ttf') format('truetype');
+  font-family: "Fredoka";
+  src: url("/fonts/vn/DVN-Fredoka-Bold.ttf") format("truetype");
   font-weight: 400 900;
   /* Use this file for all weights for now since it is the only one provided */
   font-style: normal;
@@ -12,7 +12,8 @@
 /* Removed: Thin (100), Light (300), and all italic variants */
 @font-face {
   font-family: "Ubuntu";
-  src: url("./assets/fonts/ubuntu-viethoa/Ubuntu.woff2") format("woff2"),
+  src:
+    url("./assets/fonts/ubuntu-viethoa/Ubuntu.woff2") format("woff2"),
     url("./assets/fonts/ubuntu-viethoa/Ubuntu.woff") format("woff");
   font-weight: 400;
   font-style: normal;
@@ -22,7 +23,8 @@
 
 @font-face {
   font-family: "Ubuntu";
-  src: url("./assets/fonts/ubuntu-viethoa/Ubuntu-Medium.woff2") format("woff2"),
+  src:
+    url("./assets/fonts/ubuntu-viethoa/Ubuntu-Medium.woff2") format("woff2"),
     url("./assets/fonts/ubuntu-viethoa/Ubuntu-Medium.woff") format("woff");
   font-weight: 500;
   font-style: normal;
@@ -31,7 +33,8 @@
 
 @font-face {
   font-family: "Ubuntu";
-  src: url("./assets/fonts/ubuntu-viethoa/Ubuntu-Bold.woff2") format("woff2"),
+  src:
+    url("./assets/fonts/ubuntu-viethoa/Ubuntu-Bold.woff2") format("woff2"),
     url("./assets/fonts/ubuntu-viethoa/Ubuntu-Bold.woff") format("woff");
   font-weight: 700;
   font-style: normal;
@@ -203,9 +206,11 @@ All colors MUST be HSL.
   html,
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    font-feature-settings:
+      "rlig" 1,
+      "calt" 1;
     overflow-x: hidden;
-    cursor: url('/assets/cursors/custom-cursor.png'), auto;
+    cursor: url("/assets/cursors/custom-cursor.png"), auto;
   }
 
   /* Custom ID for Pointer/Hover state */
@@ -216,7 +221,7 @@ All colors MUST be HSL.
   input[type="reset"],
   input[type="button"],
   .cursor-pointer {
-    cursor: url('/assets/cursors/custom-cursor-hover.png'), pointer !important;
+    cursor: url("/assets/cursors/custom-cursor-hover.png"), pointer !important;
   }
 
   h1,
@@ -225,7 +230,7 @@ All colors MUST be HSL.
   h4,
   h5,
   h6 {
-    font-family: 'Fredoka', sans-serif;
+    font-family: "Fredoka", sans-serif;
   }
 
   [data-hot-toast],
@@ -241,11 +246,20 @@ All colors MUST be HSL.
     right: 1rem !important;
     transform: translate3d(0, 0, 0) !important;
   }
+
+  /* Global Invisible Scrollbar */
+  *::-webkit-scrollbar {
+    display: none;
+  }
+
+  * {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
 }
 
 @layer utilities {
   @keyframes slow-blink {
-
     0%,
     50% {
       opacity: 1;
@@ -293,14 +307,16 @@ All colors MUST be HSL.
   }
 
   .progress-stripes {
-    background-image: linear-gradient(45deg,
-        rgba(255, 255, 255, 0.3) 25%,
-        transparent 25%,
-        transparent 50%,
-        rgba(255, 255, 255, 0.3) 50%,
-        rgba(255, 255, 255, 0.3) 75%,
-        transparent 75%,
-        transparent);
+    background-image: linear-gradient(
+      45deg,
+      rgba(255, 255, 255, 0.3) 25%,
+      transparent 25%,
+      transparent 50%,
+      rgba(255, 255, 255, 0.3) 50%,
+      rgba(255, 255, 255, 0.3) 75%,
+      transparent 75%,
+      transparent
+    );
     background-size: 16px 16px;
     animation: stripes-move 1s linear infinite;
     opacity: 0.35;
@@ -309,7 +325,6 @@ All colors MUST be HSL.
   }
 
   @keyframes bounce-slow {
-
     0%,
     100% {
       transform: translateY(-5%);
@@ -323,7 +338,6 @@ All colors MUST be HSL.
   }
 
   @keyframes float {
-
     0%,
     100% {
       transform: translateY(0);
@@ -343,7 +357,6 @@ All colors MUST be HSL.
   }
 
   @keyframes heart-beat {
-
     0%,
     100% {
       transform: scale(1);

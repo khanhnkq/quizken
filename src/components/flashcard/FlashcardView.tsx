@@ -223,7 +223,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
 
   return (
     <>
-      <Card className="border-4 border-primary/20 rounded-3xl shadow-2xl bg-white/90 backdrop-blur-md">
+      <Card className="border-4 border-primary/20 dark:border-slate-800 rounded-3xl shadow-2xl bg-white/90 dark:bg-slate-900/95 backdrop-blur-md">
         <CardHeader className="pb-6">
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
             <div className="flex-1">
@@ -245,7 +245,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
                 onClick={onBack}
                 variant="outline"
                 size="sm"
-                className="flex-1 lg:flex-initial rounded-3xl border-4 border-border hover:bg-destructive hover:text-white hover:border-destructive transition-all duration-200 active:scale-95">
+                className="flex-1 lg:flex-initial rounded-3xl border-4 border-border hover:bg-destructive hover:text-white hover:border-destructive transition-all duration-200 active:scale-95 text-foreground dark:text-foreground">
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 <span className="hidden xs:inline">{t('quizGenerator.flashcard.backToQuiz')}</span>
                 <span className="xs:hidden">{t('quizGenerator.flashcard.back')}</span>

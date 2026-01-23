@@ -421,8 +421,8 @@ export function ChatMessage({
                       className={cn(
                         "text-[10px] px-1.5 py-0.5 rounded-full border flex items-center gap-1 transition-colors",
                         hasReacted
-                          ? "bg-blue-100 border-blue-200 text-blue-700"
-                          : "bg-white border-border text-muted-foreground hover:bg-muted",
+                          ? "bg-blue-100 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300"
+                          : "bg-white dark:bg-muted border-border text-muted-foreground hover:bg-muted dark:hover:bg-muted/80",
                       )}>
                       <span>{emoji}</span>
                       <span className="font-bold">{count}</span>

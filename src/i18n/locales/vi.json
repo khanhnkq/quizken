@@ -10,7 +10,8 @@
         "language": "Ngôn ngữ",
         "account": "Tài khoản",
         "loggedInWith": "Đã đăng nhập với",
-        "apiSettings": "Cài đặt API"
+        "apiSettings": "Cài đặt API",
+        "profile": "Cài đặt tài khoản"
     },
     "auth": {
         "title": "Xác thực",

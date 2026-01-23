@@ -320,14 +320,14 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
     <div className={cn("flex flex-col", isDialog ? "h-[500px]" : "w-full pb-20")}>
       {/* Header - Sticky (Only for Dialog) */}
       {isDialog && (
-      <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-emerald-50 to-teal-50 shrink-0">
+      <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950 dark:to-teal-950 dark:border-slate-800 shrink-0">
         <div className="flex items-center gap-3">
           {onCancel && (
             <button 
               onClick={onCancel}
-              className="p-2 hover:bg-white/50 rounded-full transition-colors"
+              className="p-2 hover:bg-white/50 dark:hover:bg-slate-800/50 rounded-full transition-colors"
             >
-              <ArrowLeft className="w-5 h-5 text-gray-600" />
+              <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
             </button>
           )}
           {/* Icon placeholder - can be replaced later */}
@@ -335,8 +335,8 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
             <PenLine className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h2 className="text-sm font-bold text-gray-800">{quizId ? t("manualQuiz.editTitle") : t("manualQuiz.title")}</h2>
-            <p className="text-xs text-gray-500">{t("manualQuiz.subtitle")}</p>
+            <h2 className="text-sm font-bold text-gray-800 dark:text-gray-100">{quizId ? t("manualQuiz.editTitle") : t("manualQuiz.title")}</h2>
+            <p className="text-xs text-gray-500 dark:text-gray-400">{t("manualQuiz.subtitle")}</p>
           </div>
         </div>
         <Button 
@@ -385,7 +385,7 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
                 />
               </div>
 
-              <div className="flex items-center justify-between space-x-2 bg-slate-50 p-4 rounded-xl border border-slate-100">
+              <div className="flex items-center justify-between space-x-2 bg-slate-50 dark:bg-slate-900 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
                 <div className="flex flex-col space-y-1">
                   <Label htmlFor="public-mode" className="text-base font-medium">{t("manualQuiz.public")}</Label>
                   <span className="text-xs text-slate-500">{t("manualQuiz.publicDesc")}</span>
@@ -429,7 +429,7 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
                       variant="ghost"
                       size="icon"
                       onClick={() => removeQuestion(qIndex)}
-                      className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                      className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/20"
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
@@ -463,7 +463,7 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
                             </div>
                         </div>
                     ) : (
-                        <div className="border-2 border-dashed border-slate-200 rounded-lg p-6 hover:border-blue-400 hover:bg-blue-50/30 transition-all text-center">
+                        <div className="border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-lg p-6 hover:border-blue-400 dark:hover:border-blue-400 hover:bg-blue-50/30 dark:hover:bg-blue-900/10 transition-all text-center">
                             {uploadingImage === qIndex ? (
                                 <div className="flex flex-col items-center gap-2 text-blue-500">
                                     <Loader2 className="w-8 h-8 animate-spin" />
@@ -471,10 +471,10 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
                                 </div>
                             ) : (
                                 <label className="cursor-pointer flex flex-col items-center gap-2">
-                                    <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors">
+                                    <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                                         <ImageIcon className="w-5 h-5" />
                                     </div>
-                                    <span className="text-sm font-medium text-slate-600">{t("manualQuiz.addImage")}</span>
+                                    <span className="text-sm font-medium text-slate-600 dark:text-slate-400">{t("manualQuiz.addImage")}</span>
                                     <input 
                                         type="file" 
                                         className="hidden" 
@@ -499,7 +499,7 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
                             "w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all",
                             q.correctAnswer === optIndex
                               ? "bg-green-500 border-green-500 text-white"
-                              : "border-gray-300 hover:border-green-400"
+                              : "border-gray-300 dark:border-slate-600 hover:border-green-400 dark:hover:border-green-400 text-gray-400 dark:text-slate-400"
                           )}
                           title={t("manualQuiz.markCorrect")}
                         >
@@ -516,7 +516,7 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
                             variant="ghost"
                             size="icon"
                             onClick={() => removeOption(qIndex, optIndex)}
-                            className="text-gray-400 hover:text-red-500"
+                            className="text-gray-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400"
                           >
                             <X className="w-4 h-4" />
                           </Button>
@@ -553,7 +553,7 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
             
             <Button 
               variant="outline" 
-              className="w-full border-dashed border-2 py-8 text-slate-500 hover:text-primary hover:border-primary hover:bg-primary/5 transition-all mt-4"
+              className="w-full border-dashed border-2 py-8 text-slate-500 dark:text-slate-400 dark:border-slate-700 hover:text-primary hover:border-primary hover:bg-primary/5 dark:hover:bg-primary/10 transition-all mt-4"
               onClick={addQuestion}
             >
               <Plus className="w-5 h-5 mr-2" />
@@ -564,7 +564,7 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
       </div>
       {/* Sticky Footer for Page Mode */}
       {!isDialog && (
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t z-50">
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-white dark:bg-slate-950 border-t dark:border-slate-800 z-50">
           <div className="max-w-4xl mx-auto flex items-center justify-between">
             <p className="text-sm text-slate-500 hidden md:block">
               {t("manualQuiz.questionsCount", { count: questions.length })}

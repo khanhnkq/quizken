@@ -153,8 +153,8 @@ export function GlobalChatTicker() {
           transition={{ duration: 0.4, ease: "easeOut" }}
           className="pointer-events-auto cursor-pointer group"
           onClick={() => navigate("/chat")}>
-          <div className="flex items-center gap-3 bg-white/90 backdrop-blur-md border border-green-200 shadow-lg rounded-full pl-2 pr-5 py-3 hover:shadow-xl hover:border-green-300 transition-all">
-            <Avatar className="h-8 w-8 ring-2 ring-white shadow-sm">
+          <div className="flex items-center gap-3 bg-white/60 dark:bg-slate-900/60 backdrop-blur-lg border border-white/30 dark:border-slate-700/30 shadow-sm rounded-full pl-1 pr-4 py-1 hover:bg-white/80 dark:hover:bg-slate-900/80 hover:shadow-md hover:border-white/50 dark:hover:border-slate-600 transition-all">
+            <Avatar className="h-8 w-8 ring-2 ring-white dark:ring-slate-800 shadow-sm">
               {latestMessage.profiles?.avatar_url && (
                 <AvatarImage src={latestMessage.profiles.avatar_url} />
               )}
@@ -164,19 +164,19 @@ export function GlobalChatTicker() {
             </Avatar>
 
             <div className="flex flex-col max-w-[200px] md:max-w-xs">
-              <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider leading-none mb-0.5 flex items-center gap-1.5">
+              <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider leading-none mb-0.5 flex items-center gap-1.5">
                 {latestMessage.profiles?.display_name || "Quizzer"}
-                <span className="w-1 h-1 rounded-full bg-gray-300"></span>
-                <span className="text-gray-400 font-normal">vừa xong</span>
+                <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600"></span>
+                <span className="text-gray-400 dark:text-gray-500 font-normal">vừa xong</span>
               </span>
               <p
-                className={`text-sm leading-tight truncate ${isSpecial ? "italic text-green-600 font-medium" : "text-gray-700"}`}>
+                className={`text-xs leading-tight truncate ${isSpecial ? "italic text-green-700 dark:text-green-400 font-medium" : "text-gray-800 dark:text-gray-200"}`}>
                 {contentText}
               </p>
             </div>
 
-            <div className="w-6 h-6 rounded-full bg-green-50 flex items-center justify-center group-hover:bg-green-100 transition-colors ml-2">
-              <MessageCircle className="h-3 w-3 text-green-600" />
+            <div className="w-6 h-6 rounded-full bg-green-50 dark:bg-green-900/20 flex items-center justify-center group-hover:bg-green-100 dark:group-hover:bg-green-900/30 transition-colors ml-2">
+              <MessageCircle className="h-3 w-3 text-green-600 dark:text-green-400" />
             </div>
           </div>
         </motion.div>

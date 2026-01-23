@@ -32,10 +32,10 @@ export function ExchangeItemCard({ item, userZCoin, isOwned, isPurchasing, onBuy
             {/* Claymorphism Card Body */}
             <div className={`
                 relative flex flex-col h-full rounded-[1.8rem] p-5
-                bg-white border-2 border-slate-100
+                bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800
                 shadow-[0_10px_20px_rgba(0,0,0,0.05),inset_0_-5px_0_rgba(0,0,0,0.02)]
                 hover:shadow-[0_20px_40px_rgba(0,0,0,0.1),inset_0_-5px_0_rgba(0,0,0,0.02)]
-                hover:border-violet-200 transition-all duration-300
+                hover:border-violet-200 dark:hover:border-violet-800 transition-all duration-300
             `}>
 
                 {/* Type Badge */}
@@ -58,7 +58,7 @@ export function ExchangeItemCard({ item, userZCoin, isOwned, isPurchasing, onBuy
                             <Check className="w-4 h-4 stroke-[3]" />
                         </div>
                     ) : !canAfford ? (
-                        <div className="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-400 shadow-sm" title={t('exchange.noZCoin')}>
+                        <div className="w-8 h-8 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center text-slate-400 dark:text-slate-500 shadow-sm" title={t('exchange.noZCoin')}>
                             <Lock className="w-4 h-4 stroke-[3]" />
                         </div>
                     ) : null}
@@ -74,7 +74,7 @@ export function ExchangeItemCard({ item, userZCoin, isOwned, isPurchasing, onBuy
                             <img
                                 src={item.image_url}
                                 alt={item.name}
-                                className="relative w-24 h-24 object-cover rounded-2xl shadow-lg border-4 border-white transform rotate-3 hover:rotate-6 transition-all"
+                                className="relative w-24 h-24 object-cover rounded-2xl shadow-lg border-4 border-white dark:border-slate-700 transform rotate-3 hover:rotate-6 transition-all"
                             />
                         ) : (
                             <div className="relative text-7xl filter drop-shadow-xl transform -rotate-3 hover:rotate-0 transition-all cursor-default">
@@ -86,10 +86,10 @@ export function ExchangeItemCard({ item, userZCoin, isOwned, isPurchasing, onBuy
 
                 {/* Content */}
                 <div className="text-center space-y-3 mb-4">
-                    <h3 className="font-extrabold text-xl text-slate-800 leading-tight">
+                    <h3 className="font-extrabold text-xl text-slate-800 dark:text-white leading-tight">
                         {item.name}
                     </h3>
-                    <p className="text-xs font-medium text-slate-400 line-clamp-2 min-h-[2.5em] px-2">
+                    <p className="text-xs font-medium text-slate-400 dark:text-slate-500 line-clamp-2 min-h-[2.5em] px-2">
                         {item.description}
                     </p>
                 </div>
@@ -102,10 +102,10 @@ export function ExchangeItemCard({ item, userZCoin, isOwned, isPurchasing, onBuy
                         className={`
                             relative w-full rounded-2xl h-12 font-bold text-sm tracking-wide shadow-md transition-all duration-200
                             ${isOwned
-                                ? 'bg-slate-100 text-slate-400 hover:bg-slate-100 shadow-none border border-slate-200'
+                                ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 shadow-none border border-slate-200 dark:border-slate-700'
                                 : canAfford
                                     ? 'bg-gradient-to-b from-violet-500 to-violet-600 hover:from-violet-400 hover:to-violet-500 text-white shadow-violet-200 hover:shadow-violet-300 hover:-translate-y-1 active:translate-y-0'
-                                    : 'bg-slate-200 text-slate-400 opacity-70 hover:bg-slate-200'
+                                    : 'bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-600 opacity-70 hover:bg-slate-200 dark:hover:bg-slate-800'
                             }
                         `}
                     >
@@ -115,9 +115,9 @@ export function ExchangeItemCard({ item, userZCoin, isOwned, isPurchasing, onBuy
                             t('exchange.owned')
                         ) : (
                             <div className="flex items-center gap-1.5">
-                                <span className={canAfford ? 'text-violet-100' : 'text-slate-500'}>{t('exchange.buyWith')}</span>
+                                <span className={canAfford ? 'text-violet-100' : 'text-slate-500 dark:text-slate-400'}>{t('exchange.buyWith')}</span>
                                 <span className="text-lg">{item.price}</span>
-                                <Coins className={`w-4 h-4 ${canAfford ? 'text-yellow-300 fill-yellow-300' : 'text-slate-500'}`} />
+                                <Coins className={`w-4 h-4 ${canAfford ? 'text-yellow-300 fill-yellow-300' : 'text-slate-500 dark:text-slate-400'}`} />
                             </div>
                         )}
                     </Button>
@@ -125,7 +125,7 @@ export function ExchangeItemCard({ item, userZCoin, isOwned, isPurchasing, onBuy
             </div>
 
             {/* Background Layer for depth */}
-            <div className={`absolute inset-0 rounded-[2rem] transform translate-y-2 translate-x-0 bg-slate-200 -z-10`}></div>
+            <div className={`absolute inset-0 rounded-[2rem] transform translate-y-2 translate-x-0 bg-slate-200 dark:bg-slate-800 -z-10`}></div>
         </motion.div>
     );
 }

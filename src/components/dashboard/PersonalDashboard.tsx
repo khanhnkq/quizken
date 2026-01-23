@@ -13,6 +13,7 @@ import { useProgressTrend } from "@/hooks/useProgressTrend";
 import { useRecentQuizzes } from "@/hooks/useRecentQuizzes";
 import { useCreatedQuizzes } from "@/hooks/useCreatedQuizzes";
 import { useUserProgress } from "@/hooks/useUserProgress";
+import { useProfile } from "@/hooks/useProfile";
 import { supabase } from "@/integrations/supabase/client";
 import { clearQuizProgress } from "@/hooks/useQuizProgress";
 import {
@@ -76,6 +77,7 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
   } = useCreatedQuizzes(userId);
 
   const { streak } = useUserProgress();
+  const { profileData } = useProfile(userId || user?.id);
 
   // Check for level up events
   useLevelNotification(statistics);
@@ -136,13 +138,14 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-slate-50/50">
+    <div className="min-h-screen relative overflow-hidden bg-slate-50/50 dark:bg-slate-950">
       {/* Playful Background */}
       <BackgroundDecorations />
 
+
       <Tabs defaultValue="overview" className="relative z-10">
         {/* Fixed Top Navbar */}
-        <div className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 shadow-sm transition-all duration-300">
+        <div className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200/60 dark:border-slate-800/60 shadow-sm transition-all duration-300">
           <div className="container mx-auto px-4 h-16 flex items-center justify-between gap-4">
             {/* Left: Home Button / Brand */}
             <div className="flex items-center shrink-0">
@@ -207,7 +210,7 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
         </div>
 
         {/* Main Content Container */}
-        <div className="container mx-auto py-8 px-3 md:px-6 mt-16 space-y-8">
+        <div className="container mx-auto py-8 px-3 md:px-6 mt-16 space-y-8 min-h-screen">
           {/* OVERVIEW CONTENT */}
           <TabsContent
             value="overview"
@@ -223,7 +226,8 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
                 <h1 className="font-heading text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground drop-shadow-sm">
                   Hello,{" "}
                   <span className="text-primary relative inline-block">
-                    {user?.user_metadata?.full_name ||
+                    {profileData?.display_name ||
+                      user?.user_metadata?.full_name ||
                       user?.email?.split("@")[0] ||
                       "Quizzer"}
                     <svg
@@ -253,7 +257,7 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
                   onClick={handleCreateQuiz}
                   size="default"
                   variant="hero"
-                  className="group rounded-2xl shadow-lg border-2 border-primary hover:border-primary-foreground/20 bg-primary text-white font-bold text-sm px-4 py-2.5 h-auto transition-all duration-200 active:scale-95 hover:-translate-y-0.5"
+                  className="group rounded-2xl shadow-lg border-2 border-primary dark:border-primary/50 hover:border-primary-foreground/20 bg-primary dark:bg-primary/90 text-white font-bold text-sm px-4 py-2.5 h-auto transition-all duration-200 active:scale-95 hover:-translate-y-0.5"
                   onMouseEnter={handleHoverEnter}
                   onMouseLeave={handleHoverLeave}>
                   <span className="mr-1.5">{t("dashboard.createQuiz")}</span>
@@ -264,7 +268,7 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
                   onClick={() => navigate("/english")}
                   size="default"
                   variant="hero"
-                  className="group rounded-2xl shadow-lg border-2 border-blue-400 hover:border-blue-300 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-bold text-sm px-4 py-2.5 h-auto transition-all duration-200 active:scale-95 hover:-translate-y-0.5"
+                  className="group rounded-2xl shadow-lg border-2 border-blue-400 dark:border-blue-500/50 hover:border-blue-300 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-bold text-sm px-4 py-2.5 h-auto transition-all duration-200 active:scale-95 hover:-translate-y-0.5"
                   onMouseEnter={handleHoverEnter}
                   onMouseLeave={handleHoverLeave}>
                   <span className="mr-1.5">English Hub</span>
@@ -275,7 +279,7 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
                   onClick={() => navigate("/english/notebook")}
                   size="default"
                   variant="hero"
-                  className="group rounded-2xl shadow-lg border-2 border-amber-400 hover:border-amber-300 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold text-sm px-4 py-2.5 h-auto transition-all duration-200 active:scale-95 hover:-translate-y-0.5"
+                  className="group rounded-2xl shadow-lg border-2 border-amber-400 dark:border-amber-500/50 hover:border-amber-300 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold text-sm px-4 py-2.5 h-auto transition-all duration-200 active:scale-95 hover:-translate-y-0.5"
                   onMouseEnter={handleHoverEnter}
                   onMouseLeave={handleHoverLeave}>
                   <span className="mr-1.5">

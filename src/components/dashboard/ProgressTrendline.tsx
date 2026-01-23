@@ -91,7 +91,7 @@ export function ProgressTrendline({
         <div className="bg-white p-4 border-2 border-primary rounded-xl shadow-xl">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <p className="font-bold text-gray-900 text-sm">{label}</p>
+              <p className="font-bold text-gray-900 dark:text-slate-900 text-sm">{label}</p>
             </div>
           </div>
           <div className="space-y-1">
@@ -111,13 +111,13 @@ export function ProgressTrendline({
   };
 
   return (
-    <Card className="rounded-[2.5rem] border-2 border-gray-100 shadow-xl bg-white overflow-hidden relative group transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
+    <Card className="rounded-[2.5rem] border-2 border-gray-100 dark:border-slate-800 shadow-xl bg-white dark:bg-slate-900 overflow-hidden relative group transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
       {/* Background Decor */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-green-50 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none opacity-50"></div>
 
       <CardHeader className="border-b-0 pb-0 relative z-10">
-        <CardTitle className="flex items-center gap-3 text-2xl font-heading font-bold text-gray-800">
-          <div className="p-2 bg-green-100 rounded-xl text-green-600">
+        <CardTitle className="flex items-center gap-3 text-2xl font-heading font-bold text-gray-800 dark:text-white">
+          <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-xl text-green-600 dark:text-green-400">
             <TrendingUpIcon className="h-6 w-6" />
           </div>
           <span className="hidden sm:inline">{t('dashboard.progressTrend.title')}</span>

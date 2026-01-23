@@ -312,8 +312,8 @@ const ApiKeySettings: React.FC = () => {
 
   if (!user) {
     return (
-      <div className="flex justify-center items-center p-12 bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200">
-        <p className="text-muted-foreground font-medium flex items-center gap-2">
+      <div className="flex justify-center items-center p-12 bg-slate-50 dark:bg-slate-900 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-800">
+        <p className="text-muted-foreground dark:text-gray-400 font-medium flex items-center gap-2">
           <Shield className="w-5 h-5" />
           {t("apiKeySettings.loginRequired")}
         </p>
@@ -343,9 +343,9 @@ const ApiKeySettings: React.FC = () => {
         </div>
 
         {/* Title */}
-        <h1 className="font-heading text-4xl md:text-5xl font-black tracking-tight text-slate-800 drop-shadow-sm">
+        <h1 className="font-heading text-4xl md:text-5xl font-black tracking-tight text-slate-800 dark:text-white drop-shadow-sm">
           API{' '}
-          <span className="relative inline-block text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-indigo-600">
+          <span className="relative inline-block text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-indigo-600 dark:from-violet-400 dark:to-indigo-400">
             Settings
             <svg className="absolute -bottom-2 left-0 w-full h-3 text-violet-300 -z-10 opacity-50" viewBox="0 0 100 10" preserveAspectRatio="none">
               <path d="M0 5 Q 50 15 100 5" stroke="currentColor" strokeWidth="12" fill="none" />
@@ -355,7 +355,7 @@ const ApiKeySettings: React.FC = () => {
         </h1>
 
         {/* Subtitle */}
-        <p className="text-lg text-slate-500 font-medium max-w-lg">
+        <p className="text-lg text-slate-500 dark:text-slate-400 font-medium max-w-lg">
           {t('dashboard.settings.description')}
         </p>
       </div>
@@ -365,7 +365,7 @@ const ApiKeySettings: React.FC = () => {
         {/* Decorative elements behind */}
         <div className="absolute -inset-1 bg-gradient-to-r from-violet-200 via-indigo-200 to-cyan-200 rounded-[2.5rem] blur opacity-30 group-hover:opacity-50 transition duration-500"></div>
 
-        <div className="relative bg-white rounded-[2rem] border-2 border-indigo-50 shadow-[0_20px_40px_rgba(0,0,0,0.05),inset_0_-2px_6px_rgba(0,0,0,0.02)] p-6 md:p-10 overflow-hidden">
+        <div className="relative bg-white dark:bg-slate-900 rounded-[2rem] border-2 border-indigo-50 dark:border-indigo-900 shadow-[0_20px_40px_rgba(0,0,0,0.05),inset_0_-2px_6px_rgba(0,0,0,0.02)] p-6 md:p-10 overflow-hidden">
 
           {/* Header inside card */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
@@ -374,10 +374,10 @@ const ApiKeySettings: React.FC = () => {
                 <Cpu className="w-8 h-8" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
+                <h2 className="text-2xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
                   Gemini AI
                   {isGeminiConnected && (
-                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-600 text-xs font-bold border border-emerald-200 flex items-center gap-1">
+                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 text-xs font-bold border border-emerald-200 dark:border-emerald-800 flex items-center gap-1">
                       <Check className="w-3 h-3 stroke-[3]" />
                       {t("apiKeySettings.connected")}
                     </span>
@@ -399,7 +399,7 @@ const ApiKeySettings: React.FC = () => {
           {/* Form */}
           <div className="space-y-6">
             <div className="space-y-3">
-              <Label htmlFor="gemini-key" className="text-sm font-bold text-slate-700 uppercase tracking-wide ml-1">
+              <Label htmlFor="gemini-key" className="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide ml-1">
                 {t("apiKeySettings.pasteKey")}
               </Label>
 
@@ -413,7 +413,7 @@ const ApiKeySettings: React.FC = () => {
                   placeholder={t("apiKeySettings.placeholder")}
                   value={geminiKey}
                   onChange={(e) => setGeminiKey(e.target.value)}
-                  className="pl-12 pr-12 h-14 rounded-2xl border-2 border-slate-200 bg-slate-50 hover:bg-white focus:bg-white focus:border-violet-400 focus:ring-4 focus:ring-violet-100 text-lg transition-all duration-300 font-medium text-slate-800 placeholder:text-slate-400"
+                  className="pl-12 pr-12 h-14 rounded-2xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 dark:text-white hover:bg-white dark:hover:bg-slate-900 focus:bg-white dark:focus:bg-slate-900 focus:border-violet-400 dark:focus:border-violet-600 focus:ring-4 focus:ring-violet-100 dark:focus:ring-violet-900/20 text-lg transition-all duration-300 font-medium text-slate-800 placeholder:text-slate-400"
                 />
                 <Button
                   type="button"
@@ -486,7 +486,7 @@ const ApiKeySettings: React.FC = () => {
                   onClick={testApiKey}
                   disabled={testLoading || geminiKey === "••••••••••••••••••••••••••••••••" || !isValid}
                   variant="outline"
-                  className="flex-1 h-12 rounded-xl border-2 border-slate-200 hover:border-violet-300 hover:bg-violet-50 text-slate-700 hover:text-violet-700 font-bold transition-all"
+                  className="flex-1 h-12 rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-violet-300 dark:hover:border-violet-700 hover:bg-violet-50 dark:hover:bg-violet-900/20 text-slate-700 dark:text-gray-200 hover:text-violet-700 dark:hover:text-violet-300 font-bold transition-all"
                 >
                   {testLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : t("apiKeySettings.test")}
                 </Button>
@@ -495,7 +495,7 @@ const ApiKeySettings: React.FC = () => {
                   type="button"
                   variant="outline"
                   onClick={handlePasteFromClipboard}
-                  className="flex-1 h-12 rounded-xl border-2 border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-600 font-bold transition-all"
+                  className="flex-1 h-12 rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-gray-300 font-bold transition-all"
                   title={t("apiKeySettings.pasteFromClipboard")}
                 >
                   <ClipboardPaste className="h-4 w-4 mr-2" />
@@ -520,14 +520,14 @@ const ApiKeySettings: React.FC = () => {
 
       {/* Tip Card - Sticky Note Style */}
       <div className="relative transform rotate-1 hover:rotate-0 transition-transform duration-300 max-w-lg mx-auto">
-        <div className="absolute top-0 left-0 w-full h-full bg-yellow-400 rounded-2xl transform translate-x-2 translate-y-2 -z-10 rounded-br-[3rem]"></div>
-        <div className="bg-gradient-to-br from-yellow-50 to-amber-50 border-2 border-amber-200 rounded-2xl p-5 rounded-br-[3rem] shadow-sm flex items-start gap-4">
-          <div className="bg-yellow-100 p-2.5 rounded-xl border border-yellow-200 shrink-0 transform -rotate-6">
+        <div className="absolute top-0 left-0 w-full h-full bg-yellow-400 dark:bg-yellow-600 rounded-2xl transform translate-x-2 translate-y-2 -z-10 rounded-br-[3rem]"></div>
+        <div className="bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 border-2 border-amber-200 dark:border-amber-800 rounded-2xl p-5 rounded-br-[3rem] shadow-sm flex items-start gap-4">
+          <div className="bg-yellow-100 dark:bg-yellow-900/40 p-2.5 rounded-xl border border-yellow-200 dark:border-yellow-700 shrink-0 transform -rotate-6">
             <Sparkles className="w-6 h-6 text-amber-500 fill-amber-500" />
           </div>
           <div>
-            <h4 className="font-bold text-amber-800 text-lg mb-1 font-heading">{t("apiKeySettings.tip.title")}</h4>
-            <p className="text-amber-700/80 text-sm font-medium leading-relaxed">
+            <h4 className="font-bold text-amber-800 dark:text-amber-200 text-lg mb-1 font-heading">{t("apiKeySettings.tip.title")}</h4>
+            <p className="text-amber-700/80 dark:text-amber-400/80 text-sm font-medium leading-relaxed">
               {t("apiKeySettings.tip.description")}
             </p>
           </div>

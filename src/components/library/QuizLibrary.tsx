@@ -465,25 +465,24 @@ const QuizLibrary: React.FC = () => {
           <section className="relative overflow-hidden bg-gradient-to-b from-secondary/30 via-background to-background min-h-[60vh] flex flex-col justify-center py-12 px-2 md:py-20 md:px-4">
             {/* Enhanced Background Decorations */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-              {/* Animated Gradient Blobs - Matched with Main Hero */}
-              <div className="absolute top-0 left-1/4 w-72 h-72 bg-primary/20 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>
-              <div className="absolute top-0 right-1/4 w-72 h-72 bg-purple-300/30 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
-              <div className="absolute -bottom-8 left-1/3 w-72 h-72 bg-pink-300/30 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-4000"></div>
+              {/* Animated Gradient Blobs - Matched with Screenshot Request */}
+              <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-emerald-500/20 dark:bg-emerald-500/10 rounded-full mix-blend-screen filter blur-[100px] opacity-70 animate-blob"></div>
+              <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-purple-500/20 dark:bg-purple-500/10 rounded-full mix-blend-screen filter blur-[100px] opacity-70 animate-blob animation-delay-2000"></div>
 
               {/* Floating Icons Style from Hero.tsx */}
               <div className="hidden lg:block absolute inset-0">
                 <div className="absolute top-[10%] left-[15%] animate-float hover:scale-110 transition-transform duration-1000">
-                  <div className="bg-white p-4 rounded-2xl shadow-lg border border-border/50 rotate-[-10deg]">
+                  <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-lg border border-border/50 rotate-[-10deg]">
                     <div className="w-8 h-8 text-primary flex items-center justify-center text-3xl">🧠</div>
                   </div>
                 </div>
                 <div className="absolute top-[20%] right-[15%] animate-float animation-delay-2000 hover:scale-110 transition-transform duration-1000">
-                  <div className="bg-white p-4 rounded-2xl shadow-lg border border-border/50 rotate-[10deg]">
+                  <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-lg border border-border/50 rotate-[10deg]">
                     <div className="w-8 h-8 text-yellow-400 flex items-center justify-center text-3xl">✨</div>
                   </div>
                 </div>
                 <div className="absolute bottom-[40%] left-[20%] animate-float animation-delay-4000 hover:scale-110 transition-transform duration-1000">
-                  <div className="bg-white p-4 rounded-2xl shadow-lg border border-border/50 rotate-[5deg]">
+                  <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-lg border border-border/50 rotate-[5deg]">
                     <div className="w-8 h-8 text-blue-400 flex items-center justify-center text-3xl">🧩</div>
                   </div>
                 </div>
@@ -522,13 +521,13 @@ const QuizLibrary: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6 mb-16">
                 {/* Quizzes Card */}
                 <Card className={cn(
-                  "stats-card rounded-3xl border-4 border-primary/20 bg-gradient-to-br from-green-50 to-white backdrop-blur-md shadow-xl transition-all duration-300 group cursor-pointer overflow-hidden",
+                  "stats-card rounded-3xl border-4 border-primary/20 dark:border-primary/10 bg-gradient-to-br from-green-50 to-white dark:from-green-950/30 dark:to-slate-900/50 backdrop-blur-md shadow-xl transition-all duration-300 group cursor-pointer overflow-hidden",
                   !isMobile && "hover:-translate-y-2 hover:shadow-2xl"
                 )}>
                   <CardContent className="p-6 text-center relative">
                     {/* Floating Icon */}
-                    <div className="absolute -top-2 -right-2 p-3 bg-primary/10 rounded-full transform rotate-12 group-hover:rotate-0 group-hover:scale-110 transition-all duration-300">
-                      <BookOpen className="w-8 h-8 text-primary" />
+                    <div className="absolute -top-2 -right-2 p-3 bg-primary/10 dark:bg-primary/20 rounded-full transform rotate-12 group-hover:rotate-0 group-hover:scale-110 transition-all duration-300">
+                      <BookOpen className="w-8 h-8 text-primary dark:text-primary-400" />
                     </div>
                     <div
                       ref={totalQuizzesRef}
@@ -543,13 +542,13 @@ const QuizLibrary: React.FC = () => {
 
                 {/* Topics Card */}
                 <Card className={cn(
-                  "stats-card rounded-3xl border-4 border-purple-200 bg-gradient-to-br from-purple-50 to-white backdrop-blur-md shadow-xl transition-all duration-300 group cursor-pointer overflow-hidden",
+                  "stats-card rounded-3xl border-4 border-purple-200 dark:border-purple-900/30 bg-gradient-to-br from-purple-50 to-white dark:from-purple-950/30 dark:to-slate-900/50 backdrop-blur-md shadow-xl transition-all duration-300 group cursor-pointer overflow-hidden",
                   !isMobile && "hover:-translate-y-2 hover:shadow-2xl"
                 )}>
                   <CardContent className="p-6 text-center relative">
                     {/* Floating Icon */}
-                    <div className="absolute -top-2 -right-2 p-3 bg-purple-100 rounded-full transform rotate-12 group-hover:rotate-0 group-hover:scale-110 transition-all duration-300">
-                      <Sparkles className="w-8 h-8 text-purple-500" />
+                    <div className="absolute -top-2 -right-2 p-3 bg-purple-100 dark:bg-purple-900/30 rounded-full transform rotate-12 group-hover:rotate-0 group-hover:scale-110 transition-all duration-300">
+                      <Sparkles className="w-8 h-8 text-purple-500 dark:text-purple-400" />
                     </div>
                     <div
                       ref={totalCategoriesRef}
@@ -564,13 +563,13 @@ const QuizLibrary: React.FC = () => {
 
                 {/* Creators Card */}
                 <Card className={cn(
-                  "stats-card rounded-3xl border-4 border-orange-200 bg-gradient-to-br from-orange-50 to-white backdrop-blur-md shadow-xl transition-all duration-300 group cursor-pointer overflow-hidden",
+                  "stats-card rounded-3xl border-4 border-orange-200 dark:border-orange-900/30 bg-gradient-to-br from-orange-50 to-white dark:from-orange-950/30 dark:to-slate-900/50 backdrop-blur-md shadow-xl transition-all duration-300 group cursor-pointer overflow-hidden",
                   !isMobile && "hover:-translate-y-2 hover:shadow-2xl"
                 )}>
                   <CardContent className="p-6 text-center relative">
                     {/* Floating Icon */}
-                    <div className="absolute -top-2 -right-2 p-3 bg-orange-100 rounded-full transform rotate-12 group-hover:rotate-0 group-hover:scale-110 transition-all duration-300">
-                      <Star className="w-8 h-8 text-orange-500" />
+                    <div className="absolute -top-2 -right-2 p-3 bg-orange-100 dark:bg-orange-900/30 rounded-full transform rotate-12 group-hover:rotate-0 group-hover:scale-110 transition-all duration-300">
+                      <Star className="w-8 h-8 text-orange-500 dark:text-orange-400" />
                     </div>
                     <div
                       ref={totalCreatorsRef}
@@ -783,7 +782,7 @@ const QuizLibrary: React.FC = () => {
 
               {!loading && quizzes.length > 0 && totalPages > 1 && (
                 <div className="mt-12 mb-20 flex justify-center">
-                  <div className="bg-white/90 backdrop-blur-xl rounded-full border-4 border-white shadow-2xl p-2 inline-block">
+                  <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-full border-4 border-white dark:border-slate-800 shadow-2xl p-2 inline-block">
                     <Pagination>
                       <PaginationContent className="gap-2">
                         <PaginationItem>
@@ -793,7 +792,7 @@ const QuizLibrary: React.FC = () => {
                               "rounded-full px-4 h-10 font-heading font-bold transition-all duration-300",
                               currentPage === 1
                                 ? "pointer-events-none opacity-50"
-                                : "hover:bg-white hover:text-primary hover:shadow-md hover:-translate-x-1 cursor-pointer"
+                                : "hover:bg-white dark:hover:bg-slate-800 hover:text-primary hover:shadow-md hover:-translate-x-1 cursor-pointer"
                             )}
                           />
                         </PaginationItem>

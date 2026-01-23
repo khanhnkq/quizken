@@ -85,33 +85,33 @@ const HomeHero = () => {
     }, []);
 
     return (
-        <section ref={heroRef} className="relative min-h-[90vh] md:min-h-screen pt-24 pb-12 overflow-hidden flex items-center bg-slate-50/50">
+        <section ref={heroRef} className="relative min-h-[90vh] md:min-h-screen pt-24 pb-12 overflow-hidden flex items-center bg-slate-50/50 dark:bg-transparent">
             <BackgroundDecorations />
             {/* Background Decoration (Preserved Colors: Blue/Purple/Indigo) - Denser Version */}
-            <div className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-green-100/40 rounded-full mix-blend-multiply filter blur-[80px] opacity-50 animate-blob" />
-            <div className="absolute top-[20%] left-[-10%] w-[600px] h-[600px] bg-emerald-100/40 rounded-full mix-blend-multiply filter blur-[80px] opacity-50 animate-blob animation-delay-2000" />
-            <div className="absolute bottom-[-10%] right-[20%] w-[600px] h-[600px] bg-teal-100/40 rounded-full mix-blend-multiply filter blur-[80px] opacity-50 animate-blob animation-delay-4000" />
-            <div className="absolute bottom-[10%] left-[-5%] w-[400px] h-[400px] bg-lime-100/40 rounded-full mix-blend-multiply filter blur-[60px] opacity-40 animate-blob animation-delay-6000" />
+            <div className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-green-100/40 dark:bg-green-900/20 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-[80px] opacity-50 animate-blob" />
+            <div className="absolute top-[20%] left-[-10%] w-[600px] h-[600px] bg-emerald-100/40 dark:bg-emerald-900/20 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-[80px] opacity-50 animate-blob animation-delay-2000" />
+            <div className="absolute bottom-[-10%] right-[20%] w-[600px] h-[600px] bg-teal-100/40 dark:bg-teal-900/20 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-[80px] opacity-50 animate-blob animation-delay-4000" />
+            <div className="absolute bottom-[10%] left-[-5%] w-[400px] h-[400px] bg-lime-100/40 dark:bg-lime-900/20 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-[60px] opacity-40 animate-blob animation-delay-6000" />
 
             {/* Floating Icons - Denser Version */}
             <div className="hidden lg:block absolute inset-0 pointer-events-none z-0">
                 <div className="absolute top-[15%] left-[5%] animate-float hover:scale-110 transition-transform duration-1000">
-                    <div className="bg-white/80 backdrop-blur-sm p-4 rounded-3xl shadow-xl border border-white/50 rotate-[-6deg]">
+                    <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm p-4 rounded-3xl shadow-xl border border-white/50 dark:border-slate-700/50 rotate-[-6deg]">
                         <Brain className="w-10 h-10 text-emerald-500" />
                     </div>
                 </div>
                 <div className="absolute top-[10%] left-[45%] animate-float animation-delay-2000 hover:scale-110 transition-transform duration-1000">
-                    <div className="bg-white/80 backdrop-blur-sm p-4 rounded-3xl shadow-xl border border-white/50 rotate-[12deg]">
+                    <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm p-4 rounded-3xl shadow-xl border border-white/50 dark:border-slate-700/50 rotate-[12deg]">
                         <Sparkles className="w-10 h-10 text-yellow-500" />
                     </div>
                 </div>
                 <div className="absolute bottom-[20%] left-[8%] animate-float animation-delay-4000 hover:scale-110 transition-transform duration-1000">
-                    <div className="bg-white/80 backdrop-blur-sm p-4 rounded-3xl shadow-xl border border-white/50 rotate-[3deg]">
+                    <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm p-4 rounded-3xl shadow-xl border border-white/50 dark:border-slate-700/50 rotate-[3deg]">
                         <Zap className="w-8 h-8 text-blue-500" />
                     </div>
                 </div>
                 <div className="absolute bottom-[25%] right-[25%] animate-float animation-delay-5000 hover:scale-110 transition-transform duration-1000">
-                    <div className="bg-white/80 backdrop-blur-sm p-4 rounded-3xl shadow-xl border border-white/50 rotate-[-8deg]">
+                    <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm p-4 rounded-3xl shadow-xl border border-white/50 dark:border-slate-700/50 rotate-[-8deg]">
                         <Lightbulb className="w-8 h-8 text-orange-400" />
                     </div>
                 </div>
@@ -129,7 +129,7 @@ const HomeHero = () => {
                         </div>
 
                         {/* Title */}
-                        <h1 className="hero-title font-heading text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-black tracking-tight leading-[1.1] text-slate-900 drop-shadow-sm opacity-0">
+                        <h1 className="hero-title font-heading text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-black tracking-tight leading-[1.1] text-slate-900 dark:text-slate-50 drop-shadow-sm opacity-0">
                             {t("hero.titlePart1", "Create")}{" "}
                             <span className="text-[#23c45d] relative inline-block">
                                 {t("hero.titlePart2", "Quizzes")}
@@ -143,7 +143,7 @@ const HomeHero = () => {
                         </h1>
 
                         {/* Description */}
-                        <p className="hero-subtitle text-lg sm:text-xl text-slate-500 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-medium opacity-0">
+                        <p className="hero-subtitle text-lg sm:text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-medium opacity-0">
                             {t("hero.subtitle", "Transform any text into a gamified quiz instantly. Perfect for teachers, students, and lifelong learners.")}
                         </p>
 
@@ -163,7 +163,7 @@ const HomeHero = () => {
                             <Button
                                 variant="outline"
                                 size="xl"
-                                className="w-full sm:w-auto text-lg px-8 py-7 rounded-[2rem] border-2 border-slate-200 hover:border-[#23c45d]/30 hover:bg-white text-slate-600 hover:text-[#23c45d] font-bold"
+                                className="w-full sm:w-auto text-lg px-8 py-7 rounded-[2rem] border-2 border-slate-200 dark:border-slate-700 hover:border-[#23c45d]/30 hover:bg-white dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-[#23c45d] font-bold"
                                 onClick={() => navigate("/quiz/library")}
                             >
                                 {t("hero.viewExamplesButton", "See Examples")}
@@ -177,7 +177,7 @@ const HomeHero = () => {
                                 { icon: CheckCircle, text: "Free to use" },
                                 { icon: CheckCircle, text: "Export PDF" }
                             ].map((item, i) => (
-                                <div key={i} className="flex items-center gap-2 text-sm font-bold text-slate-500 bg-white px-3 py-1.5 rounded-full shadow-sm border border-slate-100">
+                                <div key={i} className="flex items-center gap-2 text-sm font-bold text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-800/80 px-3 py-1.5 rounded-full shadow-sm border border-slate-100 dark:border-slate-700">
                                     <item.icon className="w-4 h-4 text-[#23c45d]" />
                                     {item.text}
                                 </div>
@@ -188,13 +188,13 @@ const HomeHero = () => {
                     {/* RIGHT COLUMN: Character/Card Visual - Hidden on mobile */}
                     <div className="relative order-1 lg:order-2 hidden lg:flex justify-center lg:justify-end h-[500px] lg:h-[600px] items-center">
                         {/* Background Shapes for the 'Character' */}
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-green-50/50 rounded-[3rem] -rotate-6 z-0" />
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-green-50/50 dark:bg-emerald-900/20 rounded-[3rem] -rotate-6 z-0" />
 
                         {/* Main Card (The "Character") */}
                         <div className="hero-card relative z-10 w-full max-w-md aspect-[4/5] perspective-1000 opacity-0">
                             <div className="w-full h-full relative preserve-3d transition-transform duration-500 hover:rotate-y-6">
                                 {/* The 'Card' Body */}
-                                <div className="absolute inset-0 bg-white rounded-[3rem] shadow-2xl border-4 border-white overflow-hidden flex flex-col">
+                                <div className="absolute inset-0 bg-white dark:bg-slate-900 rounded-[3rem] shadow-2xl border-4 border-white dark:border-slate-800 overflow-hidden flex flex-col">
                                     {/* Illustration Area */}
                                     <div className={`flex-1 ${activeFeature.color} bg-opacity-10 relative flex items-center justify-center p-8 transition-colors duration-500`}>
                                         <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]" />
@@ -216,18 +216,18 @@ const HomeHero = () => {
                                     </div>
 
                                     {/* Card Info Area */}
-                                    <div className="p-6 bg-white/80 backdrop-blur-md relative z-10">
+                                    <div className="p-6 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md relative z-10">
                                         <div className="flex justify-between items-start mb-4">
                                             <div>
-                                                <h3 className="text-3xl font-black text-slate-800 tracking-tight">{activeFeature.name}</h3>
+                                                <h3 className="text-3xl font-black text-slate-800 dark:text-slate-100 tracking-tight">{activeFeature.name}</h3>
                                                 <p className="text-slate-500 font-bold text-sm uppercase tracking-wider">{activeFeature.role}</p>
                                             </div>
-                                            <div className="px-3 py-1 rounded-full bg-slate-100 font-bold text-slate-600 text-xs">
+                                            <div className="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 font-bold text-slate-600 dark:text-slate-300 text-xs">
                                                 lvl 99
                                             </div>
                                         </div>
 
-                                        <p className="text-slate-600 font-medium leading-relaxed mb-6">
+                                        <p className="text-slate-600 dark:text-slate-400 font-medium leading-relaxed mb-6">
                                             {activeFeature.desc}
                                         </p>
 
@@ -237,7 +237,7 @@ const HomeHero = () => {
                                                 <span>Power</span>
                                                 <span>98/100</span>
                                             </div>
-                                            <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                                            <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                                                 <div className={`h-full ${activeFeature.color} w-[98%] rounded-full`} />
                                             </div>
                                         </div>
@@ -251,15 +251,15 @@ const HomeHero = () => {
                                             key={f.id}
                                             onClick={() => setActiveFeature(f)}
                                             className={cn(
-                                                "hero-selector flex items-center gap-3 p-3 bg-white rounded-2xl shadow-lg border-2 transition-all duration-200 hover:scale-105 text-left w-48 opacity-0",
-                                                activeFeature.id === f.id ? "border-green-500 ring-2 ring-green-100" : "border-white"
+                                                "hero-selector flex items-center gap-3 p-3 bg-white dark:bg-slate-800 rounded-2xl shadow-lg border-2 transition-all duration-200 hover:scale-105 text-left w-48 opacity-0",
+                                                activeFeature.id === f.id ? "border-green-500 ring-2 ring-green-100 dark:ring-green-900" : "border-white dark:border-slate-700"
                                             )}
                                         >
                                             <div className={`p-2 rounded-xl ${f.color} text-white`}>
                                                 <f.icon className="w-4 h-4" />
                                             </div>
                                             <div>
-                                                <div className="font-bold text-slate-700 text-sm">{f.name}</div>
+                                                <div className="font-bold text-slate-700 dark:text-slate-200 text-sm">{f.name}</div>
                                                 <div className="text-[10px] text-slate-400 font-bold uppercase">{f.role}</div>
                                             </div>
                                         </button>
@@ -267,14 +267,14 @@ const HomeHero = () => {
                                 </div>
 
                                 {/* Floating Badge Top Right */}
-                                <div className="hero-floating-badge absolute top-8 -right-8 bg-white p-4 rounded-2xl shadow-xl border-2 border-white animate-float animation-delay-2000 hidden sm:block opacity-0">
+                                <div className="hero-floating-badge absolute top-8 -right-8 bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-xl border-2 border-white dark:border-slate-700 animate-float animation-delay-2000 hidden sm:block opacity-0">
                                     <div className="flex items-center gap-3">
-                                        <div className="bg-green-100 p-2 rounded-full text-green-600">
+                                        <div className="bg-green-100 dark:bg-green-900/30 p-2 rounded-full text-green-600 dark:text-green-400">
                                             <CheckCircle className="w-6 h-6" />
                                         </div>
                                         <div>
-                                            <div className="font-black text-slate-800">Verified</div>
-                                            <div className="text-xs text-slate-500 font-bold">Best AI Tool</div>
+                                            <div className="font-black text-slate-800 dark:text-slate-100">Verified</div>
+                                            <div className="text-xs text-slate-500 dark:text-slate-400 font-bold">Best AI Tool</div>
                                         </div>
                                     </div>
                                 </div>

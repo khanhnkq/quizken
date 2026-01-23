@@ -100,12 +100,12 @@ export function RecentQuizzes({
 
   if (!recentAttempts || recentAttempts.length === 0) {
     return (
-      <Card className="rounded-[2.5rem] border-0 shadow-sm bg-white/50 text-center py-12">
+      <Card className="rounded-[2.5rem] border-0 shadow-sm bg-white/50 dark:bg-slate-900/50 text-center py-12">
         <CardContent>
-          <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-float">
-            <ClockIcon className="w-10 h-10 text-gray-400" />
+          <div className="w-20 h-20 bg-gray-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 animate-float">
+            <ClockIcon className="w-10 h-10 text-gray-400 dark:text-gray-500" />
           </div>
-          <p className="text-gray-500 font-medium">
+          <p className="text-gray-500 dark:text-gray-400 font-medium">
             {t('dashboard.recentQuizzes.empty')}
           </p>
         </CardContent>
@@ -116,8 +116,8 @@ export function RecentQuizzes({
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between px-2 cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}>
-        <h3 className="text-2xl font-heading font-bold flex items-center gap-3 text-gray-800 group select-none">
-          <div className="p-2 bg-purple-100 rounded-xl text-purple-600">
+        <h3 className="text-2xl font-heading font-bold flex items-center gap-3 text-gray-800 dark:text-white group select-none">
+          <div className="p-2 bg-purple-100 dark:bg-purple-900/40 rounded-xl text-purple-600 dark:text-purple-400">
             <ClockIcon className="h-6 w-6" />
           </div>
           {t('dashboard.recentQuizzes.title')}
@@ -144,7 +144,7 @@ export function RecentQuizzes({
             <div
               key={attempt.attempt_id}
               onClick={() => navigate(`/quiz/result/${attempt.attempt_id}`)}
-              className="group bg-white rounded-[1.25rem] p-3 md:p-4 shadow-md border-2 border-gray-100/60 hover:border-primary/50 hover:shadow-xl transition-all duration-300 cursor-pointer hover:-translate-y-1 relative overflow-hidden"
+              className="group bg-white dark:bg-slate-900 rounded-[1.25rem] p-3 md:p-4 shadow-md border-2 border-gray-100/60 dark:border-slate-800 hover:border-primary/50 hover:shadow-xl transition-all duration-300 cursor-pointer hover:-translate-y-1 relative overflow-hidden"
             >
               {/* Background Highlight on Hover */}
               <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -163,16 +163,16 @@ export function RecentQuizzes({
 
                 {/* Content - Compact */}
                 <div className="flex-1 min-w-0 space-y-0.5">
-                  <h4 className="font-bold text-base md:text-lg truncate pr-4 text-gray-900 group-hover:text-primary transition-colors">
+                  <h4 className="font-bold text-base md:text-lg truncate pr-4 text-gray-900 dark:text-gray-100 group-hover:text-primary transition-colors">
                     {formatQuizTitle(attempt.quiz_title)}
                   </h4>
 
-                  <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500 font-medium">
-                    <span className="flex items-center gap-1 bg-gray-50 px-2 py-0.5 rounded-md">
+                  <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500 dark:text-gray-400 font-medium">
+                    <span className="flex items-center gap-1 bg-gray-50 dark:bg-slate-800 px-2 py-0.5 rounded-md">
                       <CalendarIcon className="w-3 h-3" />
                       {formatDate(attempt.completed_at)}
                     </span>
-                    <span className="flex items-center gap-1 bg-gray-50 px-2 py-0.5 rounded-md">
+                    <span className="flex items-center gap-1 bg-gray-50 dark:bg-slate-800 px-2 py-0.5 rounded-md">
                       <ClockIcon className="w-3 h-3" />
                       {formatTime(attempt.time_taken_seconds)}
                     </span>

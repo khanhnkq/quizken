@@ -11,6 +11,7 @@ import logo from "@/assets/logo/logo.png";
 import { useTranslation } from "react-i18next";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { cn } from "@/lib/utils";
+import { ModeToggle } from "@/components/mode-toggle";
 import { QuickGeneratorDialog } from "@/components/quiz/QuickGeneratorDialog";
 import { useToast } from "@/hooks/use-toast";
 import { useActiveGeneration } from "@/hooks/useActiveGeneration";
@@ -32,8 +33,19 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Bell, Megaphone, Loader2 } from "lucide-react";
 import { useAnnouncements } from "@/hooks/useAnnouncements";
+import { useProfile } from "@/hooks/useProfile";
 import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { LogOut } from "lucide-react";
 
 
 const Navbar = () => {
@@ -46,7 +58,8 @@ const Navbar = () => {
   const [showGeneratorDialog, setShowGeneratorDialog] = useState(false);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const { user, loading } = useAuth();
+  const { user, loading, signOut } = useAuth();
+  const { profileData } = useProfile(user?.id);
   const { announcements, isLoading: isLoadingAnnouncements } = useAnnouncements();
   const { play } = useAudio();
   const playClick = () => play("click");
@@ -95,8 +108,8 @@ const Navbar = () => {
     <nav
       ref={navRef}
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 transition-all duration-300",
-        scrolled && "shadow-md"
+        "fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border-b border-slate-200/60 dark:border-slate-800/60 transition-all duration-300",
+        scrolled && "shadow-md dark:shadow-slate-900/50"
       )}>
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
@@ -119,7 +132,7 @@ const Navbar = () => {
                   "h-16 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 px-3 sm:px-5 font-bold text-[10px] sm:text-sm transition-all duration-200 border-b-2",
                   isActive(item.path)
                     ? "border-primary text-primary"
-                    : "border-transparent text-slate-400 hover:text-primary hover:bg-slate-50/50"
+                    : "border-transparent text-slate-500 dark:text-slate-400 hover:text-primary hover:bg-slate-50/50 dark:hover:bg-slate-800/50"
                 )}
                 onPointerDown={playClick}>
                 <item.icon className="w-5 h-5 sm:w-4 sm:h-4" />
@@ -142,16 +155,16 @@ const Navbar = () => {
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  className="rounded-full w-9 h-9 relative hover:bg-muted text-muted-foreground hover:text-foreground hidden sm:flex"
+                  className="rounded-full w-10 h-10 relative bg-white/50 dark:bg-slate-900/50 hover:bg-white dark:hover:bg-slate-800 border-2 border-slate-200 dark:border-slate-800 text-slate-500 hover:text-foreground hidden sm:flex transition-all duration-300 hidden sm:flex"
                 >
                   <Bell className="w-5 h-5" />
                   {announcements.length > 0 && (
-                    <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white" />
+                    <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-slate-900" />
                   )}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-80 p-0" align="end">
-                <div className="p-3 border-b bg-muted/30">
+                <div className="p-3 border-b bg-muted/30 dark:bg-slate-900/50">
                   <h3 className="font-semibold text-sm flex items-center gap-2">
                     <Megaphone className="w-4 h-4 text-primary" />
                     Thông báo
@@ -177,8 +190,8 @@ const Navbar = () => {
                           className={cn(
                             "p-3 rounded-lg border text-left",
                             item.type === 'event' 
-                              ? "bg-purple-50/50 border-purple-100" 
-                              : "bg-muted/30 border-border/50"
+                              ? "bg-purple-50/50 dark:bg-purple-900/20 border-purple-100 dark:border-purple-800/50" 
+                              : "bg-muted/30 dark:bg-slate-800/50 border-border/50 dark:border-slate-700/50"
                           )}
                         >
                           <p className="text-sm font-medium leading-none mb-1.5">{item.title}</p>
@@ -218,22 +231,59 @@ const Navbar = () => {
                 </button>
               </div>
             )}
+            <ModeToggle />
             <LanguageSwitcher />
             {!loading && (
               <>
                 {user ? (
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => {
-                      playClick();
-                      navigate("/user/dashboard");
-                    }}
-                    className="rounded-3xl border-4 border-border hover:border-primary hover:text-primary hover:bg-primary/10 transition-all duration-200 active:scale-95 w-10 h-10"
-                    title={user.email?.split("@")[0] || "Dashboard"}
-                  >
-                    <User className="w-5 h-5" />
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        className="relative h-10 w-10 rounded-full ml-1"
+                      >
+                        <Avatar className="h-10 w-10 border-2 border-slate-200 dark:border-slate-800 shadow-sm transition-all hover:ring-2 hover:ring-primary/50">
+                          <AvatarImage src={profileData?.avatar_url || user.user_metadata?.avatar_url} alt={user.email || ""} />
+                          <AvatarFallback className="bg-gradient-to-br from-primary to-purple-500 text-white font-bold">
+                            {user.email?.charAt(0).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56">
+                      <DropdownMenuLabel>
+                        <div className="flex flex-col space-y-1">
+                          <p className="text-sm font-medium leading-none">{profileData?.display_name || user.email?.split("@")[0]}</p>
+                          <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+                        </div>
+                      </DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => navigate("/user/dashboard")}>
+                        <LayoutDashboard className="mr-2 h-4 w-4" />
+                        <span>{t('nav.dashboard') || "Dashboard"}</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => {
+                        toast({
+                          title: t('common.featureComingSoon', "Tính năng đang phát triển"),
+                          description: t('common.featureComingSoonDesc', "Tính năng này sẽ sớm ra mắt!"),
+                          variant: "default",
+                        });
+                      }}>
+                        <Settings className="mr-2 h-4 w-4" />
+                        <span>{t('nav.profile')}</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem 
+                        onClick={() => {
+                          signOut();
+                        }}
+                        className="text-red-600 focus:text-red-600"
+                      >
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span>{t('nav.logout') || "Đăng xuất"}</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 ) : (
                   <Button
                     variant="outline"

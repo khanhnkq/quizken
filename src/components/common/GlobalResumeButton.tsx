@@ -45,7 +45,7 @@ export const GlobalResumeButton = () => {
     const total = progress.totalQuestions;
 
     return createPortal(
-        <div className="fixed bottom-4 left-4 md:bottom-8 md:left-8 z-50 flex items-center gap-1 p-1 bg-white border-2 border-primary shadow-lg shadow-primary/20 rounded-full animate-in slide-in-from-bottom-10 fade-in duration-500 hover:scale-105 transition-transform hover:shadow-xl hover:shadow-primary/30">
+        <div className="fixed bottom-4 left-4 md:bottom-8 md:left-8 z-50 flex items-center gap-1 p-1 bg-white dark:bg-slate-900/90 dark:backdrop-blur-md border-2 border-primary dark:border-primary/50 shadow-lg shadow-primary/20 dark:shadow-slate-900/50 rounded-full animate-in slide-in-from-bottom-10 fade-in duration-500 hover:scale-105 transition-transform hover:shadow-xl hover:shadow-primary/30">
             <button
                 onClick={() => {
                     play("click");
@@ -68,7 +68,7 @@ export const GlobalResumeButton = () => {
                     e.stopPropagation();
                     clear();
                 }}
-                className="p-2 rounded-full hover:bg-red-100 text-slate-400 hover:text-red-500 transition-colors mr-0.5"
+                className="p-2 rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors mr-0.5"
                 title="Hủy quiz"
             >
                 <X className="w-3.5 h-3.5" />

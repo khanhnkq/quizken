@@ -284,7 +284,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
 
           {/* TOP ENTRY: Badge / Topic Name - High Visibilty */}
           <div className="relative z-20 flex flex-col items-center justify-center -mt-4 mb-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 sm:px-5 sm:py-2 rounded-full bg-white/90 backdrop-blur-sm border-2 border-primary/20 text-primary font-bold shadow-sm hover:scale-105 transition-transform duration-300 cursor-default">
+            <div className="inline-flex items-center gap-2 px-3 py-1 sm:px-5 sm:py-2 rounded-full bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-2 border-primary/20 dark:border-primary/10 text-primary font-bold shadow-sm hover:scale-105 transition-transform duration-300 cursor-default">
               <span className="text-[10px] sm:text-sm uppercase tracking-wider text-muted-foreground mr-1">
                 {t("quizContent.topicPrefix")}
               </span>
@@ -300,7 +300,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
 
           {/* Main Playful Title */}
           <h1 className="font-heading text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-foreground drop-shadow-sm mb-4 relative inline-block z-10">
-            <span className="relative z-10 bg-gradient-to-r from-primary to-emerald-600 bg-clip-text text-transparent">
+            <span className="relative z-10 bg-gradient-to-r from-primary to-emerald-600 dark:from-primary-400 dark:to-emerald-400 bg-clip-text text-transparent">
               {showFlashcard
                 ? t("quizContent.modeTitleFlashcard")
                 : t("quizContent.modeTitleQuiz")}
@@ -337,14 +337,14 @@ export const QuizContent: React.FC<QuizContentProps> = ({
             }`}>
             <Card
               ref={cardRef}
-              className="border-4 border-primary/20 rounded-3xl shadow-2xl bg-white/90 backdrop-blur-md overflow-hidden min-h-[500px] flex flex-col">
+              className="border-4 border-primary/20 dark:border-slate-800 rounded-3xl shadow-2xl bg-white/90 dark:bg-slate-900/95 backdrop-blur-md overflow-hidden min-h-[500px] flex flex-col">
               <CardHeader className="pb-6">
                 <div className="flex flex-col-reverse sm:flex-row items-center justify-between gap-4 mb-6">
                   {/* Left: Stopwatch Timer */}
                   <div
-                    className={`flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/50 border-2 border-border/50 transition-opacity duration-500 ${userAnswers.some((a) => a !== -1) ? "opacity-100" : "opacity-40"}`}>
-                    <Clock className="w-5 h-5 text-primary animate-pulse" />
-                    <span className="font-mono font-bold text-lg text-primary">
+                    className={`flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/50 dark:bg-secondary/20 border-2 border-border/50 dark:border-border/30 transition-opacity duration-500 ${userAnswers.some((a) => a !== -1) ? "opacity-100" : "opacity-40"}`}>
+                    <Clock className="w-5 h-5 text-primary dark:text-primary-400 animate-pulse" />
+                    <span className="font-mono font-bold text-lg text-primary dark:text-primary-400">
                       {formatTime(timerSeconds)}
                     </span>
                   </div>
@@ -359,7 +359,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                         variant="outline"
                         size="default"
                         sound="alert"
-                        className="flex-1 sm:flex-none rounded-3xl border-4 border-border hover:bg-destructive hover:text-white hover:border-destructive transition-all duration-200 active:scale-95">
+                        className="flex-1 sm:flex-none rounded-3xl border-4 border-border hover:bg-destructive hover:text-white hover:border-destructive transition-all duration-200 active:scale-95 text-foreground dark:text-foreground">
                         {t("quizContent.retake")}
                       </Button>
                     )}
@@ -369,7 +369,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                       onClick={() => setIsShareDialogOpen(true)}
                       variant="outline"
                       size="icon"
-                      className="rounded-full border-4 border-border hover:border-primary hover:text-primary hover:bg-primary/10 transition-all duration-200 active:scale-95 w-10 h-10"
+                      className="rounded-full border-4 border-border hover:border-primary hover:text-primary hover:bg-primary/10 transition-all duration-200 active:scale-95 w-10 h-10 text-foreground dark:text-foreground"
                       title={t("quizContent.share") || "Share"}>
                       <Share className="w-4 h-4" />
                     </Button>
@@ -403,7 +403,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                       variant="outline"
                       size="default"
                       sound="success"
-                      className="flex-1 sm:flex-none rounded-3xl border-4 border-border hover:border-primary hover:text-primary hover:bg-primary/10 transition-all duration-200 active:scale-95">
+                      className="flex-1 sm:flex-none rounded-3xl border-4 border-border hover:border-primary hover:text-primary hover:bg-primary/10 transition-all duration-200 active:scale-95 text-foreground dark:text-foreground">
                       <Download className="mr-2 h-4 w-4" />
                       <span className="hidden xs:inline">
                         {t("quizContent.downloadPDF")}
@@ -467,8 +467,8 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                           : isCurrent
                             ? "bg-primary text-white border-primary shadow-md ring-2 ring-primary ring-offset-2 scale-110 font-bold z-10"
                             : isAnswered
-                              ? "bg-primary/20 text-primary border-primary/50"
-                              : "bg-background text-muted-foreground border-border hover:bg-accent hover:text-accent-foreground";
+                              ? "bg-primary/20 text-primary border-primary/50 dark:bg-primary/30 dark:text-primary-300"
+                              : "bg-background text-muted-foreground border-border hover:bg-accent hover:text-accent-foreground dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700 dark:hover:bg-slate-700";
 
                       return (
                         <Button
@@ -507,9 +507,9 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                   key={currentQuestionIndex}>
                   {currentQuestion && (
                     <>
-                      <div className="p-3 sm:p-6 md:p-8 space-y-3 sm:space-y-4 border-2 rounded-2xl hover:border-primary/50 transition-colors">
-                        <h3 className="text-xl md:text-2xl font-heading font-medium text-foreground leading-relaxed flex gap-3 items-start">
-                          <span className="flex-shrink-0 mt-1 p-1.5 bg-primary/10 rounded-lg">
+                      <div className="p-3 sm:p-6 md:p-8 space-y-3 sm:space-y-4 border-2 rounded-2xl hover:border-primary/50 transition-colors dark:border-slate-700 dark:hover:border-primary/50">
+                        <h3 className="text-xl md:text-2xl font-heading font-medium text-foreground dark:text-slate-100 leading-relaxed flex gap-3 items-start">
+                          <span className="flex-shrink-0 mt-1 p-1.5 bg-primary/10 rounded-lg dark:bg-primary/20">
                             <CircleHelp className="w-5 h-5 text-primary" />
                           </span>
                           {currentQuestion.question}
@@ -517,7 +517,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
 
                         {/* Question Image */}
                         {currentQuestion.image && (
-                          <div className="rounded-xl overflow-hidden mb-6 border border-border/50 max-h-[400px] flex justify-center bg-gray-50">
+                          <div className="rounded-xl overflow-hidden mb-6 border border-border/50 max-h-[400px] flex justify-center bg-gray-50 dark:bg-slate-800">
                             <img
                               src={currentQuestion.image}
                               alt="Question Illustration"
@@ -550,8 +550,8 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                                         : userSelectedCorrect
                                           ? "bg-green-50 border-green-500 shadow-[0_4px_0_0_#22c55e] translate-y-[-2px]"
                                           : isSelected
-                                            ? "bg-primary/5 border-primary shadow-[0_4px_0_0_#FF6B6B] translate-y-[-2px]"
-                                            : "bg-white border-border/60 hover:border-primary/50 hover:shadow-lg hover:-translate-y-1"
+                                            ? "bg-primary/5 border-primary shadow-[0_4px_0_0_#FF6B6B] translate-y-[-2px] dark:bg-primary/20 dark:border-primary/80"
+                                            : "bg-white border-border/60 hover:border-primary/50 hover:shadow-lg hover:-translate-y-1 dark:bg-slate-800 dark:border-slate-700 dark:hover:border-primary/50 dark:hover:bg-slate-750"
                                   }`}>
                                   <input
                                     type="radio"
@@ -573,12 +573,12 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                                     className={`
                                             w-10 h-10 rounded-xl flex items-center justify-center 
                                             font-heading font-bold text-lg transition-colors shrink-0
-                                            ${isSelected || (showResults && isCorrect) ? "bg-primary text-white" : "bg-secondary/30 text-secondary-foreground group-hover:bg-primary group-hover:text-white"}
+                                            ${isSelected || (showResults && isCorrect) ? "bg-primary text-white" : "bg-secondary/30 text-secondary-foreground group-hover:bg-primary group-hover:text-white dark:bg-slate-700 dark:text-slate-300"}
                                           `}>
                                     {String.fromCharCode(65 + optIdx)}
                                   </div>
                                   <div className="flex-1">
-                                    <span className="text-base sm:text-lg font-medium leading-snug">
+                                    <span className="text-base sm:text-lg font-medium leading-snug text-foreground dark:text-slate-200">
                                       {option}
                                     </span>
                                   </div>

@@ -34,20 +34,20 @@ const Footer = () => {
       <div className="absolute inset-0 bg-gradient-to-b from-secondary/30 to-background -z-20"></div>
 
       {/* Peeking Mascots */}
-      <div className="absolute top-10 left-[10%] opacity-20 hidden md:block animate-bounce-slow" style={{ animationDelay: '0s' }}>
+      <div className="absolute top-10 left-[10%] opacity-20 hidden md:block animate-bounce-slow dark:hidden" style={{ animationDelay: '0s' }}>
         <Star className="w-24 h-24 text-primary rotate-[-12deg]" />
       </div>
-      <div className="absolute top-20 right-[15%] opacity-20 hidden md:block animate-bounce-slow" style={{ animationDelay: '1s' }}>
+      <div className="absolute top-20 right-[15%] opacity-20 hidden md:block animate-bounce-slow dark:hidden" style={{ animationDelay: '1s' }}>
         <Music className="w-20 h-20 text-primary rotate-[12deg]" />
       </div>
-      <div className="absolute bottom-32 left-[20%] opacity-10 hidden lg:block animate-bounce-slow" style={{ animationDelay: '0.5s' }}>
+      <div className="absolute bottom-32 left-[20%] opacity-10 hidden lg:block animate-bounce-slow dark:hidden" style={{ animationDelay: '0.5s' }}>
         <Heart className="w-16 h-16 text-primary rotate-[6deg]" />
       </div>
 
       {/* CTA Section */}
       <div className="relative container mx-auto px-4 z-10">
         <div className="max-w-3xl mx-auto text-center space-y-8">
-          <div className="inline-flex justify-center p-4 bg-white/50 backdrop-blur-sm rounded-full shadow-lg mb-4 animate-bounce-slow">
+          <div className="inline-flex justify-center p-4 bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm rounded-full shadow-lg mb-4 animate-bounce-slow">
             <Sparkles className="w-12 h-12 text-primary" />
           </div>
 
@@ -66,7 +66,7 @@ const Footer = () => {
               variant="hero"
               size="xl"
               onClick={scrollToGenerator}
-              className="relative z-10 px-10 py-8 text-xl rounded-[2rem] shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border-[6px] border-white/50 hover:border-white ring-4 ring-primary/20 hover:ring-primary/40 group overflow-visible"
+              className="relative z-10 px-10 py-8 text-xl rounded-[2rem] shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border-[6px] border-white/50 dark:border-slate-700/50 hover:border-white dark:hover:border-slate-600 ring-4 ring-primary/20 hover:ring-primary/40 group overflow-visible"
             >
               <span className="mr-3">{t('footer.ctaButton')}</span>
               <div className="bg-primary p-1.5 rounded-xl group-hover:rotate-12 transition-transform duration-300 shadow-sm">

@@ -39,21 +39,21 @@ export function EnglishStatsCard() {
     }, [isLessonCompleted, lessonScores]);
 
     return (
-        <Card className="rounded-[2.5rem] border-4 border-blue-200 bg-blue-100 transform transition-all duration-200 hover:-translate-y-2 hover:scale-[1.02] hover:shadow-xl cursor-default group overflow-hidden relative">
+        <Card className="rounded-[2.5rem] border-4 border-blue-200 dark:border-blue-900 bg-blue-100 dark:bg-blue-950/40 transform transition-all duration-200 hover:-translate-y-2 hover:scale-[1.02] hover:shadow-xl cursor-default group overflow-hidden relative">
             {/* Background Decor */}
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/30 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/30 dark:bg-blue-500/10 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
             <div className="absolute bottom-0 left-0 w-24 h-24 bg-blue-200/50 rounded-full blur-xl -ml-6 -mb-6 pointer-events-none"></div>
 
             <CardContent className="p-6 md:p-8 relative z-10">
                 {/* Header */}
                 <div className="flex justify-between items-start mb-6">
                     <div className="flex items-center gap-3">
-                        <div className="p-3 rounded-2xl bg-blue-200 text-blue-600 shadow-sm transform group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300">
+                        <div className="p-3 rounded-2xl bg-blue-200 dark:bg-blue-900 text-blue-600 dark:text-blue-300 shadow-sm transform group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300">
                             <BookOpen className="w-7 h-7" />
                         </div>
                         <div>
-                            <h3 className="text-xl font-bold text-blue-700">English Hub</h3>
-                            <p className="text-sm text-blue-500/70 font-medium">CEFR Vocabulary Journey</p>
+                            <h3 className="text-xl font-bold text-blue-700 dark:text-blue-200">English Hub</h3>
+                            <p className="text-sm text-blue-500/70 dark:text-blue-400 font-medium">CEFR Vocabulary Journey</p>
                         </div>
                     </div>
                     <button
@@ -67,10 +67,10 @@ export function EnglishStatsCard() {
                 {/* Stats Grid */}
                 <div className="grid grid-cols-3 gap-3">
                     {/* Progress */}
-                    <div className="p-4 bg-white/60 backdrop-blur-sm rounded-2xl border border-blue-200/50">
+                    <div className="p-4 bg-white/60 dark:bg-slate-900/40 backdrop-blur-sm rounded-2xl border border-blue-200/50 dark:border-blue-800/50">
                         <div className="flex items-center gap-2 mb-2">
                             <Target className="w-4 h-4 text-emerald-500" />
-                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Progress</span>
+                            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Progress</span>
                         </div>
                         <div className="text-3xl font-black text-emerald-600 mb-2">
                             {stats.progress}%
@@ -81,10 +81,10 @@ export function EnglishStatsCard() {
                     </div>
 
                     {/* Streak - GitHub Style */}
-                    <div className="p-4 bg-white/60 backdrop-blur-sm rounded-2xl border border-blue-200/50">
+                    <div className="p-4 bg-white/60 dark:bg-slate-900/40 backdrop-blur-sm rounded-2xl border border-blue-200/50 dark:border-blue-800/50">
                         <div className="flex items-center gap-2 mb-2">
                             <Flame className="w-4 h-4 text-orange-500" />
-                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Streak</span>
+                            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Streak</span>
                         </div>
 
                         {/* GitHub Grid */}
@@ -94,7 +94,7 @@ export function EnglishStatsCard() {
                                     key={index}
                                     className={`w-3 h-3 rounded-sm transition-all ${isActive
                                         ? 'bg-gradient-to-br from-emerald-400 to-green-500 shadow-sm'
-                                        : 'bg-slate-200'
+                                        : 'bg-slate-200 dark:bg-slate-700'
                                         }`}
                                 />
                             ))}
@@ -107,10 +107,10 @@ export function EnglishStatsCard() {
                     </div>
 
                     {/* Avg Score */}
-                    <div className="p-4 bg-white/60 backdrop-blur-sm rounded-2xl border border-blue-200/50">
+                    <div className="p-4 bg-white/60 dark:bg-slate-900/40 backdrop-blur-sm rounded-2xl border border-blue-200/50 dark:border-blue-800/50">
                         <div className="flex items-center gap-2 mb-2">
                             <Trophy className="w-4 h-4 text-yellow-500" />
-                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Avg Score</span>
+                            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Avg Score</span>
                         </div>
                         <div className="text-3xl font-black text-yellow-600">
                             {stats.avgScore}%

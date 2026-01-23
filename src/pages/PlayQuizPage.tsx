@@ -215,7 +215,7 @@ export default function PlayQuizPage() {
     // Loading State
     if (isLoading) {
         return (
-            <div className="min-h-screen bg-gray-50/50 p-8">
+            <div className="min-h-screen bg-gray-50/50 dark:bg-slate-950 p-8">
                 <div className="container mx-auto space-y-8">
                     <Skeleton className="h-12 w-64 rounded-full" />
                     <Skeleton className="h-96 w-full rounded-[2.5rem]" />
@@ -227,16 +227,16 @@ export default function PlayQuizPage() {
     // Error State
     if (error || !quiz) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+            <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex items-center justify-center p-4">
                 <BackgroundDecorations />
-                <Card className="rounded-[2rem] shadow-xl border-dashed border-4 border-gray-200 p-8 text-center max-w-md bg-white/80 backdrop-blur">
-                    <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <XCircleIcon className="w-8 h-8 text-red-500" />
+                <Card className="rounded-[2rem] shadow-xl border-dashed border-4 border-gray-200 dark:border-slate-800 p-8 text-center max-w-md bg-white/80 dark:bg-slate-900/80 backdrop-blur">
+                    <div className="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <XCircleIcon className="w-8 h-8 text-red-500 dark:text-red-400" />
                     </div>
-                    <h2 className="text-xl font-heading font-bold text-gray-800 mb-2">
+                    <h2 className="text-xl font-heading font-bold text-gray-800 dark:text-gray-200 mb-2">
                         {t("playQuiz.notFound.title")}
                     </h2>
-                    <p className="text-gray-500 mb-6">
+                    <p className="text-gray-500 dark:text-gray-400 mb-6">
                         {error || t("playQuiz.notFound.description")}
                     </p>
                     <Button onClick={() => navigate("/quiz/library")} className="rounded-full">
@@ -248,7 +248,7 @@ export default function PlayQuizPage() {
     }
 
     return (
-        <div className="h-screen flex flex-col overflow-hidden relative bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+        <div className="h-screen flex flex-col overflow-hidden relative bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
             {/* Base Pattern - FIXED */}
             <div className="fixed inset-0 pointer-events-none z-0">
                 <BackgroundDecorations density="medium" />
@@ -265,37 +265,37 @@ export default function PlayQuizPage() {
             {/* Hero-style Floating 3D Icons - FIXED */}
             <div className="hidden xl:block fixed inset-0 pointer-events-none z-0">
                 <div className="absolute top-[15%] left-[5%] animate-float hover:scale-110 transition-transform duration-1000">
-                    <div className="bg-white/80 backdrop-blur-sm p-4 rounded-3xl shadow-xl border border-white/50 rotate-[-12deg]">
+                    <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm p-4 rounded-3xl shadow-xl border border-white/50 dark:border-slate-700/50 rotate-[-12deg]">
                         <Brain className="w-10 h-10 text-primary" />
                     </div>
                 </div>
                 <div className="absolute top-[20%] right-[5%] animate-float animation-delay-2000 hover:scale-110 transition-transform duration-1000">
-                    <div className="bg-white/80 backdrop-blur-sm p-4 rounded-3xl shadow-xl border border-white/50 rotate-[12deg]">
+                    <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm p-4 rounded-3xl shadow-xl border border-white/50 dark:border-slate-700/50 rotate-[12deg]">
                         <Sparkles className="w-10 h-10 text-yellow-400" />
                     </div>
                 </div>
                 <div className="absolute bottom-[30%] left-[8%] animate-float animation-delay-4000 hover:scale-110 transition-transform duration-1000">
-                    <div className="bg-white/80 backdrop-blur-sm p-4 rounded-3xl shadow-xl border border-white/50 rotate-[6deg]">
+                    <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm p-4 rounded-3xl shadow-xl border border-white/50 dark:border-slate-700/50 rotate-[6deg]">
                         <Zap className="w-8 h-8 text-blue-400" />
                     </div>
                 </div>
                 <div className="absolute bottom-[20%] right-[8%] animate-float animation-delay-5000 hover:scale-110 transition-transform duration-1000">
-                    <div className="bg-white/80 backdrop-blur-sm p-4 rounded-3xl shadow-xl border border-white/50 rotate-[-8deg]">
+                    <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm p-4 rounded-3xl shadow-xl border border-white/50 dark:border-slate-700/50 rotate-[-8deg]">
                         <Lightbulb className="w-8 h-8 text-orange-400" />
                     </div>
                 </div>
             </div>
 
             {/* Fixed Header */}
-            <div className="flex-none z-50 w-full px-4 sm:px-6 py-4 bg-gradient-to-b from-white/80 to-transparent backdrop-blur-sm">
+            <div className="flex-none z-50 w-full px-4 sm:px-6 py-4 bg-gradient-to-b from-white/80 to-transparent dark:from-slate-950/80 dark:to-transparent backdrop-blur-sm">
                 <div className="container mx-auto flex justify-between items-center">
                     <Button
                         variant="ghost"
                         onClick={() => navigate("/quiz/library")}
-                        className="rounded-full bg-white/80 hover:bg-white shadow-sm hover:shadow-md transition-all group px-3 sm:px-4 backdrop-blur-md"
+                        className="rounded-full bg-white/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-700 shadow-sm hover:shadow-md transition-all group px-3 sm:px-4 backdrop-blur-md"
                     >
-                        <ArrowLeftIcon className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform text-gray-500" />
-                        <span className="font-bold text-gray-600">
+                        <ArrowLeftIcon className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform text-gray-500 dark:text-gray-300" />
+                        <span className="font-bold text-gray-600 dark:text-gray-200">
                             {t("playQuiz.backToLibrary")}
                         </span>
                     </Button>
@@ -308,7 +308,7 @@ export default function PlayQuizPage() {
                                     clearProgress();
                                     navigate("/quiz/library");
                                 }}
-                                className="rounded-full bg-white/80 hover:bg-red-50 text-red-500 hover:text-red-600 shadow-sm hover:shadow-md transition-all group px-3 sm:px-4 backdrop-blur-md"
+                                className="rounded-full bg-white/80 dark:bg-slate-800/80 hover:bg-red-50 dark:hover:bg-red-900/30 text-red-500 hover:text-red-600 shadow-sm hover:shadow-md transition-all group px-3 sm:px-4 backdrop-blur-md"
                             >
                                 <XCircleIcon className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
                                 <span className="font-bold">

@@ -31,10 +31,10 @@ export function StatisticsCards({
       title: t('dashboard.statistics.quizzesCreated'),
       icon: FileTextIcon,
       // Pink Theme
-      bgColor: "bg-pink-100",
-      iconBg: "bg-pink-200",
-      iconColor: "text-pink-600",
-      borderColor: "border-pink-200",
+      bgColor: "bg-pink-100 dark:bg-pink-900/20",
+      iconBg: "bg-pink-200 dark:bg-pink-800/40",
+      iconColor: "text-pink-600 dark:text-pink-300",
+      borderColor: "border-pink-200 dark:border-pink-800/50",
       description: t('dashboard.statistics.createdDesc'),
       ref: totalCreatedRef,
       rotate: "rotate-[-2deg]",
@@ -44,10 +44,10 @@ export function StatisticsCards({
       title: t('dashboard.statistics.quizzesTaken'),
       icon: CheckCircleIcon,
       // Blue Theme
-      bgColor: "bg-blue-100",
-      iconBg: "bg-blue-200",
-      iconColor: "text-blue-600",
-      borderColor: "border-blue-200",
+      bgColor: "bg-blue-100 dark:bg-blue-900/20",
+      iconBg: "bg-blue-200 dark:bg-blue-800/40",
+      iconColor: "text-blue-600 dark:text-blue-300",
+      borderColor: "border-blue-200 dark:border-blue-800/50",
       description: t('dashboard.statistics.takenDesc'),
       ref: totalTakenRef,
       rotate: "rotate-[2deg]",
@@ -57,10 +57,10 @@ export function StatisticsCards({
       title: t('dashboard.statistics.highestScore'),
       icon: TrophyIcon,
       // Yellow Theme
-      bgColor: "bg-yellow-100",
-      iconBg: "bg-yellow-200",
-      iconColor: "text-yellow-700",
-      borderColor: "border-yellow-200",
+      bgColor: "bg-yellow-100 dark:bg-yellow-900/20",
+      iconBg: "bg-yellow-200 dark:bg-yellow-800/40",
+      iconColor: "text-yellow-700 dark:text-yellow-300",
+      borderColor: "border-yellow-200 dark:border-yellow-800/50",
       description: t('dashboard.statistics.highestScoreDesc'),
       ref: highestScoreRef,
       suffix: "%",
@@ -119,7 +119,7 @@ export function StatisticsCards({
                   <span ref={card.ref}>0</span>
                   {card.suffix}
                 </p>
-                <h3 className="text-base md:text-lg font-bold text-gray-800 opacity-80">
+                <h3 className="text-base md:text-lg font-bold text-gray-800 dark:text-slate-200 opacity-80">
                   {card.title}
                 </h3>
               </div>

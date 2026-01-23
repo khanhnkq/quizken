@@ -108,13 +108,13 @@ export function ExchangeTab() {
                 {/* Title Section - Matching Dashboard Style */}
                 <div className="text-center md:text-left space-y-2">
                     {/* Badge - Same style as Dashboard "Welcome Back" badge */}
-                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 backdrop-blur-sm border-2 border-violet-400 text-violet-600 font-bold text-sm shadow-sm animate-fade-in">
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-2 border-violet-400 dark:border-violet-600 text-violet-600 dark:text-violet-400 font-bold text-sm shadow-sm animate-fade-in">
                         <Sparkles className="w-4 h-4 text-yellow-400 fill-yellow-400" />
                         <span>{t('exchange.badge')}</span>
                     </div>
 
                     {/* Title - Same style as Dashboard "Hello, {name}" */}
-                    <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground drop-shadow-sm">
+                    <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground dark:text-white drop-shadow-sm">
                         {t('exchange.welcome')}{' '}
                         <span className="text-violet-600 relative inline-block">
                             ZCoin Bazaar
@@ -126,7 +126,7 @@ export function ExchangeTab() {
                     </h1>
 
                     {/* Subtitle - Same style as Dashboard */}
-                    <p className="text-lg text-muted-foreground font-medium max-w-lg">
+                    <p className="text-lg text-muted-foreground dark:text-gray-400 font-medium max-w-lg">
                         {t('exchange.subtitle')}
                     </p>
                 </div>
@@ -159,7 +159,7 @@ export function ExchangeTab() {
 
 
             {/* Filter & Search Bar */}
-            <div className="sticky top-4 z-30 bg-white/90 backdrop-blur-md p-2 rounded-2xl shadow-lg border border-slate-100 flex flex-col md:flex-row gap-4 items-center justify-between">
+            <div className="sticky top-4 z-30 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md p-2 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-800 flex flex-col md:flex-row gap-4 items-center justify-between">
 
                 {/* Category Pills */}
                 <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 px-2 scrollbar-hide">
@@ -171,7 +171,7 @@ export function ExchangeTab() {
                                 flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm whitespace-nowrap transition-all duration-200 border-2
                                 ${selectedFilter === cat.id
                                     ? `${cat.color} border-current shadow-md scale-105`
-                                    : 'bg-slate-50 text-slate-500 border-transparent hover:bg-slate-100'}
+                                    : 'bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-transparent hover:bg-slate-100 dark:hover:bg-slate-700'}
                             `}
                         >
                             <cat.icon className="w-4 h-4" />
@@ -187,7 +187,7 @@ export function ExchangeTab() {
                         placeholder={t('exchange.searchPlaceholder')}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-10 h-11 rounded-xl border-slate-200 bg-slate-50 focus:bg-white transition-all shadow-inner"
+                        className="pl-10 h-11 rounded-xl border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 dark:text-white focus:bg-white dark:focus:bg-slate-900 transition-all shadow-inner"
                     />
                 </div>
             </div>
@@ -222,7 +222,7 @@ export function ExchangeTab() {
                     <div className="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
                         <Search className="w-10 h-10 text-slate-300" />
                     </div>
-                    <h3 className="text-xl font-bold text-slate-600">{t('exchange.noResults')}</h3>
+                    <h3 className="text-xl font-bold text-slate-600 dark:text-slate-300">{t('exchange.noResults')}</h3>
                     <p className="text-slate-400">{t('exchange.noResultsDesc')}</p>
                 </div>
             )}

@@ -37,14 +37,14 @@ export const FlashcardCard: React.FC<FlashcardCardProps> = ({
           <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-lg font-bold">
             ✓
           </div>
-          <span className="text-lg font-semibold text-foreground">
+          <span className="text-lg font-semibold text-foreground dark:text-slate-100">
             {t('quizGenerator.flashcard.correctAnswer')}
           </span>
         </div>
 
         <div className="w-full max-w-md">
-          <div className="bg-card border-2 border-primary/20 rounded-lg p-4 shadow-md">
-            <span className="text-foreground text-base font-medium leading-relaxed text-center break-words">
+          <div className="bg-card dark:bg-slate-800 border-2 border-primary/20 rounded-lg p-4 shadow-md">
+            <span className="text-foreground dark:text-slate-100 text-base font-medium leading-relaxed text-center break-words">
               {flashcard.answer}
             </span>
           </div>
@@ -59,8 +59,8 @@ export const FlashcardCard: React.FC<FlashcardCardProps> = ({
               {t('quizGenerator.flashcard.explanation')}
             </span>
           </div>
-          <div className="bg-card border border-border rounded-lg p-3 shadow-sm">
-            <p className="text-sm text-muted-foreground leading-relaxed text-center break-words">
+          <div className="bg-card dark:bg-slate-800 border border-border rounded-lg p-3 shadow-sm">
+            <p className="text-sm text-muted-foreground dark:text-slate-400 leading-relaxed text-center break-words">
               {flashcard.explanation}
             </p>
           </div>
@@ -107,7 +107,12 @@ export const FlashcardCard: React.FC<FlashcardCardProps> = ({
         }
         showSubtitle={false}
         aria-label={`Flashcard ${currentIndex + 1}`}
-        className={cn("mx-auto w-full h-full", entryClass)}
+        className={cn(
+          "mx-auto w-full h-full", 
+          // FORCE DARK TEXT on Front Title (h3) because background is always light paper
+          "[&_h3]:text-slate-900 dark:[&_h3]:text-slate-900 [&_h3]:drop-shadow-none",
+          entryClass
+        )}
         autoHeight={true}
         isImagePreloaded={isImagePreloaded}
       />

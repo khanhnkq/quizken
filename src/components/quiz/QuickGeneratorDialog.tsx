@@ -533,7 +533,7 @@ export function QuickGeneratorDialog({ open, onOpenChange, initialTab = null }: 
 
                     {loading ? (
                         /* Loading State - Show Cute Progress */
-                        <div className="relative overflow-hidden bg-white/95 backdrop-blur-xl border-2 border-primary/10 shadow-2xl rounded-3xl p-8">
+                        <div className="relative overflow-hidden bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-2 border-primary/10 dark:border-primary/20 shadow-2xl rounded-3xl p-8">
                             <GenerationProgress
                                 generationStatus={genStatus ?? generationStatus ?? "processing"}
                                 generationProgress={genProgress || generationProgress || t("quizGenerator.toasts.preparing")}
@@ -542,40 +542,40 @@ export function QuickGeneratorDialog({ open, onOpenChange, initialTab = null }: 
                         </div>
                     ) : activeTab === null ? (
                         /* Mode Selection - Messenger/Telegram Style */
-                        <div className="bg-white/95 backdrop-blur-xl border-2 border-primary/10 shadow-2xl rounded-3xl overflow-hidden">
+                        <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-2 border-primary/10 dark:border-primary/20 shadow-2xl rounded-3xl overflow-hidden">
                             {/* Header */}
-                            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gray-50/50">
-                                <h2 className="text-lg font-bold text-gray-800">{t("quickGenerator.title")}</h2>
+                            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-900/50">
+                                <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100">{t("quickGenerator.title")}</h2>
                                 <button 
                                     onClick={() => onOpenChange(false)}
-                                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                                    className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-colors"
                                 >
-                                    <X className="w-5 h-5 text-gray-500" />
+                                    <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                                 </button>
                             </div>
                             
                             {/* Chat Room List */}
-                            <div className="divide-y divide-gray-100">
+                            <div className="divide-y divide-gray-100 dark:divide-slate-800">
                                 {/* AI Mode Row */}
                                 <button
                                     onClick={() => setActiveTab("ai")}
-                                    className="w-full flex items-center gap-4 px-4 py-4 hover:bg-gray-50 transition-colors text-left"
+                                    className="w-full flex items-center gap-4 px-4 py-4 hover:bg-gray-50 dark:hover:bg-slate-800/60 transition-colors text-left group"
                                 >
                                     <div className="relative shrink-0">
-                                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-violet-100 to-indigo-100 flex items-center justify-center overflow-hidden">
+                                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-violet-100 to-indigo-100 dark:from-violet-900 dark:to-indigo-900 flex items-center justify-center overflow-hidden border border-transparent dark:border-white/10 group-hover:dark:border-white/20 transition-colors">
                                             <img src={logo} alt="AI Bot" className="w-10 h-10 object-contain" />
                                         </div>
                                         {/* Online indicator */}
-                                        <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white" />
+                                        <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white dark:border-slate-900 shadow-sm" />
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center justify-between">
-                                            <h3 className="font-semibold text-gray-900">{t("modeSelection.aiTitle")}</h3>
-                                            <span className="text-xs text-violet-600 font-medium bg-violet-100 px-2 py-0.5 rounded-full">HOT</span>
+                                            <h3 className="font-semibold text-gray-900 dark:text-gray-100 group-hover:text-primary transition-colors">{t("modeSelection.aiTitle")}</h3>
+                                            <span className="text-xs text-violet-600 dark:text-violet-300 font-medium bg-violet-100 dark:bg-violet-900/50 px-2 py-0.5 rounded-full border border-violet-200 dark:border-violet-700/50">HOT</span>
                                         </div>
-                                        <p className="text-sm text-gray-500 truncate mt-0.5">{t("modeSelection.aiDescription")}</p>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400 truncate mt-0.5">{t("modeSelection.aiDescription")}</p>
                                     </div>
-                                    <div className="shrink-0 text-gray-400">
+                                    <div className="shrink-0 text-gray-400 dark:text-slate-600 group-hover:text-primary dark:group-hover:text-primary transition-colors">
                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                         </svg>
@@ -585,20 +585,20 @@ export function QuickGeneratorDialog({ open, onOpenChange, initialTab = null }: 
                                 {/* Manual Mode Row */}
                                 <button
                                     onClick={() => setActiveTab("manual")}
-                                    className="w-full flex items-center gap-4 px-4 py-4 hover:bg-gray-50 transition-colors text-left"
+                                    className="w-full flex items-center gap-4 px-4 py-4 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors text-left group"
                                 >
                                     <div className="relative shrink-0">
-                                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
+                                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center border border-transparent dark:border-white/10 group-hover:dark:border-white/20 transition-colors">
                                             <PenLine className="w-6 h-6 text-white" />
                                         </div>
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center justify-between">
-                                            <h3 className="font-semibold text-gray-900">{t("manualQuiz.title")}</h3>
+                                            <h3 className="font-semibold text-gray-900 dark:text-gray-100 group-hover:text-primary transition-colors">{t("manualQuiz.title")}</h3>
                                         </div>
-                                        <p className="text-sm text-gray-500 truncate mt-0.5">{t("modeSelection.manualDescription")}</p>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400 truncate mt-0.5">{t("modeSelection.manualDescription")}</p>
                                     </div>
-                                    <div className="shrink-0 text-gray-400">
+                                    <div className="shrink-0 text-gray-400 dark:text-slate-600 group-hover:text-primary dark:group-hover:text-primary transition-colors">
                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                         </svg>
@@ -608,7 +608,8 @@ export function QuickGeneratorDialog({ open, onOpenChange, initialTab = null }: 
                         </div>
                     ) : activeTab === "ai" ? (
                         /* AI Chat Interface */
-                        <div className="bg-white/95 backdrop-blur-xl border-2 border-primary/10 shadow-2xl rounded-3xl overflow-hidden">
+
+                        <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-2 border-primary/10 dark:border-primary/20 shadow-2xl rounded-3xl overflow-hidden h-[600px] flex flex-col">
                             <ChatInterface
                                 onComplete={(topic, count) => {
                                     setPrompt(topic);
@@ -623,7 +624,8 @@ export function QuickGeneratorDialog({ open, onOpenChange, initialTab = null }: 
                         </div>
                     ) : (
                         /* Manual Quiz Editor */
-                        <div className="bg-white/95 backdrop-blur-xl border-2 border-primary/10 shadow-2xl rounded-3xl overflow-hidden">
+
+                        <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-2 border-primary/10 dark:border-primary/20 shadow-2xl rounded-3xl overflow-hidden">
                             <ManualQuizEditor
                                 onComplete={(quizId) => {
                                     onOpenChange(false);

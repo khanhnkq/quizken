@@ -144,16 +144,16 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ onComplete, onCanc
     const countOptions = ["10", "15", "20", "25", "30"];
 
     return (
-        <div className="flex flex-col h-[500px] w-full max-w-2xl mx-auto rounded-2xl overflow-hidden border bg-background/95 backdrop-blur-sm shadow-xl">
+        <div className="flex flex-col h-full w-full bg-transparent">
             {/* Header */}
             <div className="bg-primary/5 p-4 flex items-center justify-between border-b">
                 <div className="flex items-center gap-3">
                     {/* Back Button */}
                     <button 
                         onClick={onCancel}
-                        className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                        className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-colors"
                     >
-                        <ArrowLeft className="w-5 h-5 text-gray-600" />
+                        <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
                     </button>
                     <div className="relative">
                         <img src={logo} alt="Bot" className="w-10 h-10 object-contain hover:animate-bounce cursor-pointer" />
