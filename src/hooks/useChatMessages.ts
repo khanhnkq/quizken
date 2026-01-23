@@ -31,6 +31,7 @@ export interface UseChatMessagesReturn {
   sendMessage: (content: string, replyToId?: string) => Promise<boolean>;
   sendQuizShare: (payload: QuizSharePayload) => Promise<boolean>;
   sendStreakShare: (payload: StreakSharePayload) => Promise<boolean>;
+  sendZCoinShare: (payload: ZCoinSharePayload) => Promise<boolean>;
   deleteMessage: (messageId: string) => Promise<boolean>;
   toggleReaction: (messageId: string, emoji: string) => Promise<boolean>; // NEW
   currentUserId: string | null;
@@ -51,6 +52,12 @@ export interface QuizSharePayload {
 
 export interface StreakSharePayload {
   streak: number;
+  slogan: string;
+  imageId: number;
+}
+
+export interface ZCoinSharePayload {
+  zcoin: number;
   slogan: string;
   imageId: number;
 }
@@ -452,6 +459,60 @@ export function useChatMessages(): UseChatMessagesReturn {
     [currentUserId, toast],
   );
 
+  const sendZCoinShare = useCallback(
+    async (payload: ZCoinSharePayload): Promise<boolean> => {
+      if (!currentUserId) {
+        toast({
+          title: "Chưa đăng nhập",
+          description: "Vui lòng đăng nhập để khoe ZCoin",
+          variant: "destructive",
+        });
+        return false;
+      }
+
+      const now = Date.now();
+      const recent = shareTimestampsRef.current.filter(
+        (ts) => now - ts < SHARE_WINDOW_MS,
+      );
+      if (recent.length >= SHARE_MAX) {
+        const waitSeconds = Math.ceil(
+          (SHARE_WINDOW_MS - (now - recent[0])) / 1000,
+        );
+        toast({
+          title: "Chia sẻ quá nhanh",
+          description: `Vui lòng đợi ${waitSeconds}s trước khi chia sẻ tiếp.`,
+          variant: "destructive",
+        });
+        return false;
+      }
+      shareTimestampsRef.current = [...recent, now];
+
+      const content = JSON.stringify({
+        type: "zcoin_share",
+        data: payload,
+      });
+
+      try {
+        const { error } = await (supabase as any).from("chat_messages").insert({
+          user_id: currentUserId,
+          content,
+        });
+
+        if (error) throw error;
+        return true;
+      } catch (error) {
+        console.error("Error sending zcoin share:", error);
+        toast({
+          title: "Lỗi",
+          description: "Không thể khoe ZCoin",
+          variant: "destructive",
+        });
+        return false;
+      }
+    },
+    [currentUserId, toast],
+  );
+
   // Delete message
   const deleteMessage = useCallback(
     async (messageId: string): Promise<boolean> => {
@@ -546,6 +607,7 @@ export function useChatMessages(): UseChatMessagesReturn {
     sendQuizShare,
     deleteMessage,
     sendStreakShare,
+    sendZCoinShare,
     toggleReaction,
     currentUserId,
     userProfiles,

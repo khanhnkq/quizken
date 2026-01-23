@@ -1,9 +1,11 @@
 import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
-import { Trash2, User, BookOpenCheck, ArrowRight, Flame, Smile, Reply } from "lucide-react";
+import { Trash2, User, BookOpenCheck, ArrowRight, Flame, Smile, Reply, Coins } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
+import { CHAT_BACKGROUND_URLS } from "@/lib/chatImages";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { ChatMessage as ChatMessageType } from "@/hooks/useChatMessages";
@@ -82,7 +84,14 @@ export function ChatMessage({
         imageId = (hash % 4) + 1;
       }
 
-      const bgImage = `/images/streak/fire-${imageId}.jpg`;
+      // Dynamic Image Loading from src/assets/chat-backgrounds
+      const bgIndex = (imageId || 1) - 1;
+      // Ensure we don't crash if list is empty (though unlikely in dev/prod)
+      const safeIndex = Math.max(0, Math.min(bgIndex, Math.max(0, CHAT_BACKGROUND_URLS.length - 1)));
+      // Handling empty array case
+      const bgImage = CHAT_BACKGROUND_URLS.length > 0 
+        ? CHAT_BACKGROUND_URLS[safeIndex] 
+        : ""; // Fallback or handle graceful failure
 
       return (
         <div
@@ -117,6 +126,63 @@ export function ChatMessage({
               </span>
               <span className="text-[10px] uppercase font-bold text-orange-200 drop-shadow-sm tracking-widest">
                 Ngày liên tiếp
+              </span>
+            </div>
+
+            <div className="mt-3 pt-3 border-t border-white/20">
+              <p className="text-sm italic text-center text-white/95 font-medium drop-shadow-md">
+                "{slogan}"
+              </p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    if (parsed?.type === "zcoin_share" && parsed.data) {
+      const { zcoin, slogan, imageId } = parsed.data;
+      
+      // Dynamic Image Loading from src/assets/chat-backgrounds
+      const bgIndex = (imageId || 1) - 1;
+      const safeIndex = Math.max(0, Math.min(bgIndex, Math.max(0, CHAT_BACKGROUND_URLS.length - 1)));
+      const bgImage = CHAT_BACKGROUND_URLS.length > 0 
+        ? CHAT_BACKGROUND_URLS[safeIndex] 
+        : "";
+      
+      return (
+        <div
+          className={cn(
+            "block rounded-xl overflow-hidden mt-1 mb-1 max-w-[280px] relative transition-all hover:scale-[1.02]",
+            isOwnMessage
+              ? "border border-yellow-500/30 shadow-lg shadow-yellow-500/20"
+              : "border border-yellow-200 shadow-lg shadow-yellow-500/10",
+          )}
+          style={{
+            backgroundImage: `url('${bgImage}')`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+          }}
+          >
+          {/* Overlay to ensure text readability - matches Streak Master style */}
+          <div className="absolute inset-0 z-0 bg-black/60 backdrop-blur-[1px]" />
+          
+          <div className="p-4 relative z-10">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="p-1.5 bg-yellow-500 rounded-full text-white shadow-lg animate-pulse">
+                <Coins className="h-4 w-4 fill-white" />
+              </div>
+              <span className="font-bold text-xs uppercase tracking-wider text-yellow-100 drop-shadow-md">
+                ZCoin Flexer
+              </span>
+            </div>
+
+            <div className="text-center py-2">
+              <span className="text-5xl font-black block leading-none mb-1 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
+                {zcoin.toLocaleString()}
+              </span>
+              <span className="text-[10px] uppercase font-bold text-yellow-200 drop-shadow-sm tracking-widest">
+                ZCoin Wallet
               </span>
             </div>
 
@@ -293,6 +359,13 @@ export function ChatMessage({
                         <span>Streak {parsed.data.streak} ngày</span>
                       </span>
                     );
+                  } else if (parsed?.type === "zcoin_share" && parsed.data) {
+                    replyPreview = (
+                      <span className="flex items-center gap-1">
+                        <Coins className="h-3 w-3 shrink-0 text-yellow-500" />
+                        <span>{parsed.data.zcoin.toLocaleString()} ZCoin</span>
+                      </span>
+                    );
                   }
                 } catch (e) {
                   // Keep original content
@@ -373,7 +446,7 @@ export function ChatMessage({
                 <PopoverContent
                   className="w-auto p-1 flex gap-1"
                   align="center">
-                  {["👍", "❤️", "😂", "😮", "😢", "🔥"].map((emoji) => (
+                  {["👍", "❤️", "😂", "😮", "😢", "🔥","💩","👎"].map((emoji) => (
                     <button
                       key={emoji}
                       onClick={() => onToggleReaction(message.id, emoji)}

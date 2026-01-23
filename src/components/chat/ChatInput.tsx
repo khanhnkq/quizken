@@ -1,5 +1,5 @@
 import { useState, useRef, KeyboardEvent } from "react";
-import { Send, LogIn, Share2, Flame } from "lucide-react";
+import { Send, LogIn, Share2, Flame, Coins } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -10,6 +10,7 @@ interface ChatInputProps {
   onSendMessage: (content: string, replyToId?: string) => Promise<boolean>;
   onOpenShare?: () => void;
   onShareStreak?: () => void;
+  onShareZCoin?: () => void;
   isAuthenticated: boolean;
   onLoginClick?: () => void;
   disabled?: boolean;
@@ -21,6 +22,7 @@ export function ChatInput({
   onSendMessage,
   onOpenShare,
   onShareStreak,
+  onShareZCoin,
   isAuthenticated,
   onLoginClick,
   disabled,
@@ -78,6 +80,8 @@ export function ChatInput({
                 contentPreview = `📖 ${parsed.data.quiz_title}`;
               } else if (parsed?.type === "streak_share" && parsed.data) {
                 contentPreview = `🔥 Streak ${parsed.data.streak} ngày`;
+              } else if (parsed?.type === "zcoin_share" && parsed.data) {
+                contentPreview = `🪙 ${parsed.data.zcoin.toLocaleString()} ZCoin`;
               }
             } catch (e) {
               // Keep original
@@ -136,8 +140,21 @@ export function ChatInput({
               size="icon"
               className="shrink-0 h-[44px] w-[44px] text-orange-500 hover:text-orange-600"
               onClick={onShareStreak}
-              disabled={disabled || isSending}>
+              disabled={disabled || isSending}
+              title="Khoe Streak">
               <Flame className="h-5 w-5 fill-current" />
+            </Button>
+          )}
+          {onShareZCoin && (
+            <Button
+              type="button"
+              variant="secondary"
+              size="icon"
+              className="shrink-0 h-[44px] w-[44px] text-yellow-500 hover:text-yellow-600"
+              onClick={onShareZCoin}
+              disabled={disabled || isSending}
+              title="Khoe ZCoin">
+              <Coins className="h-5 w-5" />
             </Button>
           )}
           <Button

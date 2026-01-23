@@ -132,6 +132,9 @@ export function GlobalChatTicker() {
       } else if (parsed.type === "quiz_share") {
         contentText = `📚 Đã chia sẻ một bài quiz: ${parsed.data.quiz_title}`;
         isSpecial = true;
+      } else if (parsed.type === "zcoin_share") {
+        contentText = `🪙 Đã khoe ${parsed.data.zcoin.toLocaleString()} ZCoin!`;
+        isSpecial = true;
       }
     } catch (e) {
       // ignore

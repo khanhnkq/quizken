@@ -24,6 +24,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Bell, Megaphone, Loader2 } from "lucide-react";
+import { useAnnouncements } from "@/hooks/useAnnouncements";
+import { formatDistanceToNow } from "date-fns";
+import { vi } from "date-fns/locale";
 
 
 const Navbar = () => {
@@ -37,6 +47,7 @@ const Navbar = () => {
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { user, loading } = useAuth();
+  const { announcements, isLoading: isLoadingAnnouncements } = useAnnouncements();
   const { play } = useAudio();
   const playClick = () => play("click");
   const navRef = useRef<HTMLElement | null>(null);
@@ -121,8 +132,68 @@ const Navbar = () => {
 
 
 
+
+          
           {/* Right: Auth / User Dropdown */}
           <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
+             {/* Announcements Bell */}
+             <Popover>
+              <PopoverTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="rounded-full w-9 h-9 relative hover:bg-muted text-muted-foreground hover:text-foreground hidden sm:flex"
+                >
+                  <Bell className="w-5 h-5" />
+                  {announcements.length > 0 && (
+                    <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white" />
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80 p-0" align="end">
+                <div className="p-3 border-b bg-muted/30">
+                  <h3 className="font-semibold text-sm flex items-center gap-2">
+                    <Megaphone className="w-4 h-4 text-primary" />
+                    Thông báo
+                    <span className="ml-auto text-xs font-normal text-muted-foreground">
+                      {announcements.length} mới
+                    </span>
+                  </h3>
+                </div>
+                <ScrollArea className="h-[300px]">
+                  {isLoadingAnnouncements ? (
+                    <div className="flex items-center justify-center py-8">
+                       <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+                    </div>
+                  ) : announcements.length === 0 ? (
+                    <div className="py-8 text-center text-muted-foreground text-sm">
+                      Không có thông báo mới
+                    </div>
+                  ) : (
+                    <div className="p-2 space-y-2">
+                      {announcements.map((item) => (
+                        <div
+                          key={item.id}
+                          className={cn(
+                            "p-3 rounded-lg border text-left",
+                            item.type === 'event' 
+                              ? "bg-purple-50/50 border-purple-100" 
+                              : "bg-muted/30 border-border/50"
+                          )}
+                        >
+                          <p className="text-sm font-medium leading-none mb-1.5">{item.title}</p>
+                          <p className="text-xs text-muted-foreground leading-relaxed">{item.content}</p>
+                          <p className="text-[10px] text-muted-foreground mt-2 opacity-70">
+                            {formatDistanceToNow(new Date(item.created_at), { addSuffix: true, locale: vi })}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </ScrollArea>
+              </PopoverContent>
+            </Popover>
+
             {/* Global Loading Indicator (Navbar Integration) */}
             {isProcessing && (
               <div className="flex items-center gap-2 md:bg-primary/10 md:border md:border-primary/20 rounded-full md:px-3 md:py-1 animate-in fade-in slide-in-from-right-4 duration-300 pointer-events-none md:pointer-events-auto">

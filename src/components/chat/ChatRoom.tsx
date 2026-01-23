@@ -1,15 +1,16 @@
 import { useEffect, useRef, useState } from "react";
-import { MessageCircle, Users, Loader2, ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { MessageCircle, Users, Loader2 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useChatMessages } from "@/hooks/useChatMessages";
 import { useOnlinePresence } from "@/hooks/useOnlinePresence";
 import { useUserProgress } from "@/hooks/useUserProgress";
+import { useDashboardStats } from "@/hooks/useDashboardStats";
 import { ChatMessage } from "./ChatMessage";
 import { ChatInput } from "./ChatInput";
 import { ShareQuizModal } from "./ShareQuizModal";
 import { ShareableQuiz } from "@/hooks/useShareableQuizzes";
 import { useToast } from "@/hooks/use-toast";
+import { CHAT_BACKGROUND_URLS } from "@/lib/chatImages";
 
 const STREAK_SLOGANS = [
   "Tui đang đạt chuỗi {streak} ngày nè! Ghê chưa? 😎",
@@ -80,12 +81,15 @@ export function ChatRoom({ onLoginClick }: ChatRoomProps) {
     sendMessage,
     sendQuizShare,
     sendStreakShare,
+    sendZCoinShare,
     deleteMessage,
     toggleReaction,
     currentUserId,
     userProfiles,
   } = useChatMessages();
   const { streak } = useUserProgress();
+  const { statistics } = useDashboardStats(currentUserId || undefined);
+  const zcoin = statistics?.zcoin || 0;
   const { onlineCount, isConnected } = useOnlinePresence(currentUserId);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [autoScroll, setAutoScroll] = useState(true);
@@ -119,12 +123,42 @@ export function ChatRoom({ onLoginClick }: ChatRoomProps) {
     const randomSlogan =
       STREAK_SLOGANS[Math.floor(Math.random() * STREAK_SLOGANS.length)];
     const slogan = randomSlogan.replace("{streak}", streak.toString());
-    const imageId = Math.floor(Math.random() * 4) + 1; // 1 to 4
+    
+    // Random image ID (1-based index corresponding to our sorted URL list)
+    // If list is empty, fallback to 1 to avoid 0 (though unlikely)
+    const totalImages = Math.max(1, CHAT_BACKGROUND_URLS.length);
+    const imageId = Math.floor(Math.random() * totalImages) + 1;
 
     await sendStreakShare({
       streak,
       slogan,
       imageId,
+    });
+  };
+
+  const handleShareZCoin = async () => {
+    if (zcoin <= 0) {
+      toast({
+        title: "Chưa có ZCoin",
+        description: "Hãy làm quiz và tạo quiz để kiếm ZCoin nhé!",
+      });
+      return;
+    }
+
+    // Use STREAK_SLOGANS ("giang hồ") as requested
+    const randomSlogan =
+      STREAK_SLOGANS[Math.floor(Math.random() * STREAK_SLOGANS.length)];
+    // Slogan replacement adaptations...
+    let adaptedSlogan = randomSlogan.replace("{streak} ngày", `${zcoin.toLocaleString()} ZCoin`);
+    adaptedSlogan = adaptedSlogan.replace("{streak}", `${zcoin.toLocaleString()} ZCoin`);
+    
+    const totalImages = Math.max(1, CHAT_BACKGROUND_URLS.length);
+    const imageId = Math.floor(Math.random() * totalImages) + 1;
+
+    await sendZCoinShare({
+      zcoin,
+      slogan: adaptedSlogan,
+      imageId, 
     });
   };
 
@@ -230,6 +264,7 @@ export function ChatRoom({ onLoginClick }: ChatRoomProps) {
           onSendMessage={sendMessage}
           onOpenShare={() => setIsShareOpen(true)}
           onShareStreak={handleShareStreak}
+          onShareZCoin={handleShareZCoin}
           isAuthenticated={!!currentUserId}
           onLoginClick={onLoginClick}
           disabled={isLoading}
