@@ -37,6 +37,7 @@ const preloadRoutes = () => {
 
 import { SoundProvider } from "@/contexts/SoundContext";
 import { ChillMusicProvider } from "@/contexts/ChillMusicContext";
+import { ChatImagesProvider } from "@/contexts/ChatImagesContext";
 import { Analytics } from "@vercel/analytics/react";
 import "@/i18n"; // Initialize i18n
 import { GlobalLevelNotification } from "@/components/common/GlobalLevelNotification";
@@ -223,19 +224,21 @@ const App = () => {
       <SoundProvider>
         <TooltipProvider>
           <ChillMusicProvider>
-            {/* 👇 Toaster nằm ngoài ScrollSmoother */}
-            <HotToaster />
-            <GlobalLevelNotification />
-            <ToastBroadcastReceiver />
-            <BrowserRouter
-              future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-              <AppRoutes />
-              <GlobalResumeButton />
-              <GlobalCreateButton />
-              <GlobalChatTicker />
-              <GlobalQuizListener />
-            </BrowserRouter>
-            <Analytics />
+            <ChatImagesProvider>
+              {/* 👇 Toaster nằm ngoài ScrollSmoother */}
+              <HotToaster />
+              <GlobalLevelNotification />
+              <ToastBroadcastReceiver />
+              <BrowserRouter
+                future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+                <AppRoutes />
+                <GlobalResumeButton />
+                <GlobalCreateButton />
+                <GlobalChatTicker />
+                <GlobalQuizListener />
+              </BrowserRouter>
+              <Analytics />
+            </ChatImagesProvider>
           </ChillMusicProvider>
         </TooltipProvider>
       </SoundProvider>

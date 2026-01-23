@@ -10,7 +10,7 @@ import { ChatInput } from "./ChatInput";
 import { ShareQuizModal } from "./ShareQuizModal";
 import { ShareableQuiz } from "@/hooks/useShareableQuizzes";
 import { useToast } from "@/hooks/use-toast";
-import { CHAT_BACKGROUND_URLS } from "@/lib/chatImages";
+import { useChatImages } from "@/contexts/ChatImagesContext";
 
 const STREAK_SLOGANS = [
   "Tui đang đạt chuỗi {streak} ngày nè! Ghê chưa? 😎",
@@ -75,6 +75,8 @@ interface ChatRoomProps {
 }
 
 export function ChatRoom({ onLoginClick }: ChatRoomProps) {
+  const { images } = useChatImages();
+
   const {
     messages,
     isLoading,
@@ -126,7 +128,7 @@ export function ChatRoom({ onLoginClick }: ChatRoomProps) {
     
     // Random image ID (1-based index corresponding to our sorted URL list)
     // If list is empty, fallback to 1 to avoid 0 (though unlikely)
-    const totalImages = Math.max(1, CHAT_BACKGROUND_URLS.length);
+    const totalImages = Math.max(1, images.length);
     const imageId = Math.floor(Math.random() * totalImages) + 1;
 
     await sendStreakShare({
@@ -152,7 +154,8 @@ export function ChatRoom({ onLoginClick }: ChatRoomProps) {
     let adaptedSlogan = randomSlogan.replace("{streak} ngày", `${zcoin.toLocaleString()} ZCoin`);
     adaptedSlogan = adaptedSlogan.replace("{streak}", `${zcoin.toLocaleString()} ZCoin`);
     
-    const totalImages = Math.max(1, CHAT_BACKGROUND_URLS.length);
+    // Random image ID (1-based index)
+    const totalImages = Math.max(1, images.length);
     const imageId = Math.floor(Math.random() * totalImages) + 1;
 
     await sendZCoinShare({

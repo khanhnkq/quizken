@@ -4,7 +4,6 @@ import { Trash2, User, BookOpenCheck, ArrowRight, Flame, Smile, Reply, Coins } f
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
-import { CHAT_BACKGROUND_URLS } from "@/lib/chatImages";
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -15,6 +14,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useChatImages } from "@/contexts/ChatImagesContext";
 
 interface ChatMessageProps {
   message: ChatMessageType;
@@ -60,6 +60,7 @@ export function ChatMessage({
     locale: vi,
   });
   const { t } = useTranslation();
+  const { images } = useChatImages();
 
   const avatarColor = getUserColor(message.user_id);
 
@@ -84,14 +85,14 @@ export function ChatMessage({
         imageId = (hash % 4) + 1;
       }
 
-      // Dynamic Image Loading from src/assets/chat-backgrounds
+      // Dynamic Image Loading from Context
       const bgIndex = (imageId || 1) - 1;
-      // Ensure we don't crash if list is empty (though unlikely in dev/prod)
-      const safeIndex = Math.max(0, Math.min(bgIndex, Math.max(0, CHAT_BACKGROUND_URLS.length - 1)));
+      // Ensure we don't crash if list is empty
+      const safeIndex = Math.max(0, Math.min(bgIndex, Math.max(0, images.length - 1)));
       // Handling empty array case
-      const bgImage = CHAT_BACKGROUND_URLS.length > 0 
-        ? CHAT_BACKGROUND_URLS[safeIndex] 
-        : ""; // Fallback or handle graceful failure
+      const bgImage = images.length > 0 
+        ? images[safeIndex] 
+        : ""; // Fallback will be empty string if totally failed
 
       return (
         <div
@@ -142,11 +143,11 @@ export function ChatMessage({
     if (parsed?.type === "zcoin_share" && parsed.data) {
       const { zcoin, slogan, imageId } = parsed.data;
       
-      // Dynamic Image Loading from src/assets/chat-backgrounds
+      // Dynamic Image Loading from Context
       const bgIndex = (imageId || 1) - 1;
-      const safeIndex = Math.max(0, Math.min(bgIndex, Math.max(0, CHAT_BACKGROUND_URLS.length - 1)));
-      const bgImage = CHAT_BACKGROUND_URLS.length > 0 
-        ? CHAT_BACKGROUND_URLS[safeIndex] 
+      const safeIndex = Math.max(0, Math.min(bgIndex, Math.max(0, images.length - 1)));
+      const bgImage = images.length > 0 
+        ? images[safeIndex] 
         : "";
       
       return (
@@ -231,7 +232,8 @@ export function ChatMessage({
                       ? "text-primary-foreground"
                       : "text-foreground",
                   )}>
-                  {q.quiz_title}
+                  {q.question_count || 0}{" "}
+                  {t("chat.share.questions", "questions")}
                 </h4>
                 <div
                   className={cn(
@@ -241,8 +243,7 @@ export function ChatMessage({
                       : "text-muted-foreground",
                   )}>
                   <span className="font-medium">
-                    {q.question_count || 0}{" "}
-                    {t("chat.share.questions", "questions")}
+                    {q.quiz_title}
                   </span>
                 </div>
               </div>
