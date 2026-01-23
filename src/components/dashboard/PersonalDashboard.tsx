@@ -34,7 +34,7 @@ import {
 import { BackgroundDecorations } from "@/components/ui/BackgroundDecorations";
 import { gsap } from "gsap";
 import { shouldReduceAnimations } from "@/utils/deviceDetection";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { killActiveScroll, scrollToTarget } from "@/lib/scroll";
 import { useAuth } from "@/lib/auth";
 import { useTranslation } from "react-i18next";
@@ -50,6 +50,9 @@ interface PersonalDashboardProps {
 
 export function PersonalDashboard({ userId }: PersonalDashboardProps) {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get("tab") || "overview";
+  
   const { user, signOut } = useAuth();
   const { t } = useTranslation();
 
@@ -143,7 +146,11 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
       <BackgroundDecorations />
 
 
-      <Tabs defaultValue="overview" className="relative z-10">
+      <Tabs 
+        value={activeTab} 
+        onValueChange={(val) => setSearchParams({ tab: val })}
+        className="relative z-10"
+      >
         {/* Fixed Top Navbar */}
         <div className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200/60 dark:border-slate-800/60 shadow-sm transition-all duration-300">
           <div className="container mx-auto px-4 h-16 flex items-center justify-between gap-4">

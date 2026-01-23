@@ -170,13 +170,13 @@ export function GlobalChatTicker() {
                 <span className="text-gray-400 dark:text-gray-500 font-normal">vừa xong</span>
               </span>
               <p
-                className={`text-xs leading-tight truncate ${isSpecial ? "italic text-green-700 dark:text-green-400 font-medium" : "text-gray-800 dark:text-gray-200"}`}>
+                className={`text-xs leading-tight truncate ${isSpecial ? "italic text-primary font-bold" : "text-gray-800 dark:text-gray-200"}`}>
                 {contentText}
               </p>
             </div>
 
-            <div className="w-6 h-6 rounded-full bg-green-50 dark:bg-green-900/20 flex items-center justify-center group-hover:bg-green-100 dark:group-hover:bg-green-900/30 transition-colors ml-2">
-              <MessageCircle className="h-3 w-3 text-green-600 dark:text-green-400" />
+            <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors ml-2">
+              <MessageCircle className="h-3 w-3 text-primary" />
             </div>
           </div>
         </motion.div>

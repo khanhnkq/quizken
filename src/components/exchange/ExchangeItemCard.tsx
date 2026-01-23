@@ -68,7 +68,7 @@ export function ExchangeItemCard({ item, userZCoin, isOwned, isPurchasing, onBuy
                 <div className="flex-1 flex flex-col items-center justify-center py-6">
                     <div className="relative group-hover:scale-110 transition-transform duration-300 ease-out">
                         {/* Glow effect behind */}
-                        <div className={`absolute inset-0 bg-gradient-to-tr ${item.color.replace('border-', 'from-').replace('bg-', 'to-')} opacity-20 blur-xl rounded-full`}></div>
+                        <div className={`absolute inset-0 bg-gradient-to-tr ${(item.color || 'bg-slate-200').replace('border-', 'from-').replace('bg-', 'to-')} opacity-20 blur-xl rounded-full`}></div>
 
                         {item.image_url ? (
                             <img

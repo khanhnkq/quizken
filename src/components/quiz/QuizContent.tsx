@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
+import { VietnamFlagIcon } from "@/components/icons/VietnamFlagIcon"; 
+import { useProfile } from "@/hooks/useProfile";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import {
@@ -141,6 +143,9 @@ export const QuizContent: React.FC<QuizContentProps> = ({
   const cardRef = React.useRef<HTMLDivElement | null>(null);
   const sectionRef = React.useRef<HTMLElement | null>(null);
   const scoreRef = React.useRef<HTMLDivElement | null>(null);
+
+  const { profileData } = useProfile(userId);
+  const isVietnamTheme = profileData?.equipped_theme === 'theme_vietnam_spirit';
 
   // Auto-activate flashcard mode from URL param
   React.useEffect(() => {
@@ -481,8 +486,8 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                           title={`${t("quizContent.question")} ${idx + 1}`}>
                           <span className="relative z-10">{idx + 1}</span>
                           {showResults && isCorrect && (
-                            <span className="pointer-events-none absolute -right-1 -top-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-green-500 text-white border-2 border-white text-[10px] font-bold shadow-sm">
-                              ✓
+                            <span className="pointer-events-none absolute -right-1 -top-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-green-500 text-white border-2 border-white text-[10px] font-bold shadow-sm overflow-hidden">
+                              {isVietnamTheme ? <VietnamFlagIcon className="w-full h-full scale-110 object-cover" /> : "✓"}
                             </span>
                           )}
                           {showResults && isIncorrect && (
@@ -583,12 +588,18 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                                     </span>
                                   </div>
                                   {showResults && isCorrect && (
-                                    <div className="absolute -top-20 -right-12 z-20 animate-in zoom-in spin-in-6 duration-500">
-                                      <Mascot
-                                        emotion="amazed"
-                                        size={180}
-                                        className="drop-shadow-xl rotate-12"
-                                      />
+                                    <div className="absolute -top-12 -right-6 z-20 animate-in zoom-in spin-in-6 duration-500">
+                                      {isVietnamTheme ? (
+                                        <div className="relative w-16 h-16 md:w-20 md:h-20 rotate-12 drop-shadow-xl animate-pulse">
+                                           <VietnamFlagIcon className="w-full h-full rounded-2xl shadow-xl" />
+                                        </div>
+                                      ) : (
+                                        <Mascot
+                                          emotion="amazed"
+                                          size={180}
+                                          className="drop-shadow-xl rotate-12"
+                                        />
+                                      )}
                                     </div>
                                   )}
                                   {userSelectedWrong && (

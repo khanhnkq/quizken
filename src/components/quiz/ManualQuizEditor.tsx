@@ -14,6 +14,9 @@ import { Plus, Trash2, Check, X, GripVertical, Sparkles, ArrowLeft, PenLine, Ima
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { uploadImage } from "@/lib/cloudinary";
+import { useProfile } from "@/hooks/useProfile";
+import { VietnamMapIcon, VietnamStarIcon, VietnamDrumIcon, VietnamLotusIcon } from "@/components/icons/VietnamIcons";
+import { NeonBoltIcon, NeonCyberSkullIcon, PastelCloudIcon, PastelHeartIcon, ComicPowIcon, ComicBoomIcon } from "@/components/icons/ThemeIcons";
 import type { Question, Quiz } from "@/types/quiz";
 
 interface ManualQuizEditorProps {
@@ -28,6 +31,43 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
   const { toast } = useToast();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { profileData } = useProfile(user?.id);
+
+  const themeConfig = React.useMemo(() => {
+    const theme = profileData?.equipped_theme;
+    switch (theme) {
+      case 'theme_vietnam_spirit':
+        return {
+          headerIcon: VietnamLotusIcon,
+          headerGradient: "from-pink-500 to-rose-500",
+          saveIcon: VietnamStarIcon,
+        };
+      case 'theme_neon_night':
+        return {
+          headerIcon: NeonCyberSkullIcon,
+          headerGradient: "from-cyan-500 to-blue-600",
+          saveIcon: NeonBoltIcon,
+        };
+      case 'theme_pastel_dream':
+        return {
+          headerIcon: PastelCloudIcon,
+          headerGradient: "from-pink-300 to-purple-400",
+          saveIcon: PastelHeartIcon,
+        };
+      case 'theme_comic_manga':
+        return {
+          headerIcon: ComicPowIcon,
+          headerGradient: "from-yellow-400 to-orange-500 border-2 border-black",
+          saveIcon: ComicBoomIcon,
+        };
+      default:
+        return {
+           headerIcon: PenLine,
+           headerGradient: "from-emerald-500 to-teal-500",
+           saveIcon: Sparkles,
+        };
+    }
+  }, [profileData?.equipped_theme]);
 
   // Quiz metadata
   const [title, setTitle] = useState("");
@@ -331,8 +371,8 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
             </button>
           )}
           {/* Icon placeholder - can be replaced later */}
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shrink-0">
-            <PenLine className="w-5 h-5 text-white" />
+          <div className={cn("w-10 h-10 rounded-full bg-gradient-to-br flex items-center justify-center shrink-0", themeConfig.headerGradient)}>
+            <themeConfig.headerIcon className="w-5 h-5 text-white" />
           </div>
           <div>
             <h2 className="text-sm font-bold text-gray-800 dark:text-gray-100">{quizId ? t("manualQuiz.editTitle") : t("manualQuiz.title")}</h2>
@@ -349,7 +389,7 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
             <span className="animate-pulse">{t("common.saving")}</span>
           ) : (
             <>
-              <Sparkles className="w-4 h-4 mr-1" />
+              <themeConfig.saveIcon className="w-4 h-4 mr-1" />
               {t("manualQuiz.saveQuiz")}
             </>
           )}
@@ -582,7 +622,7 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
                   <span className="animate-pulse">{t("common.saving")}</span>
                 ) : (
                   <>
-                    <Sparkles className="w-4 h-4 mr-2" />
+                    <themeConfig.saveIcon className="w-4 h-4 mr-2" />
                     {quizId ? t("manualQuiz.updateQuiz") : t("manualQuiz.saveQuiz")}
                   </>
                 )}

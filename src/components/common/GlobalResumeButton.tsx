@@ -51,7 +51,7 @@ export const GlobalResumeButton = () => {
                     play("click");
                     navigate(`/quiz/play/${progress.quizId}`);
                 }}
-                className="flex items-center gap-3 pl-4 pr-5 py-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white font-bold shadow-sm hover:brightness-110 transition-all"
+                className="flex items-center gap-3 pl-4 pr-5 py-2 rounded-full bg-primary text-primary-foreground font-bold shadow-sm hover:brightness-110 transition-all border border-black/10 dark:border-white/10"
                 title={progress.quizTitle}
             >
                 <div className="flex items-center gap-1.5 border-r border-white/30 pr-3 mr-1">

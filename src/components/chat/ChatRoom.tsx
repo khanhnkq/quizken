@@ -11,6 +11,9 @@ import { ShareQuizModal } from "./ShareQuizModal";
 import { ShareableQuiz } from "@/hooks/useShareableQuizzes";
 import { useToast } from "@/hooks/use-toast";
 import { useChatImages } from "@/contexts/ChatImagesContext";
+import { useProfile } from "@/hooks/useProfile";
+import { VietnamFlagIcon } from "@/components/icons/VietnamFlagIcon";
+import { NeonCyberSkullIcon, PastelCloudIcon, ComicBoomIcon } from "@/components/icons/ThemeIcons";
 
 const STREAK_SLOGANS = [
   "Tui đang đạt chuỗi {streak} ngày nè! Ghê chưa? 😎",
@@ -181,19 +184,44 @@ export function ChatRoom({ onLoginClick }: ChatRoomProps) {
       target.scrollHeight - target.scrollTop - target.clientHeight < 50;
     setAutoScroll(isAtBottom);
   };
+  
+  const { profileData } = useProfile(currentUserId);
+
+  // Theme Background Config
+  const getThemeBackground = () => {
+     switch (profileData?.equipped_theme) {
+         case 'theme_vietnam_spirit':
+             return { Icon: VietnamFlagIcon, className: "opacity-80 mix-blend-multiply dark:mix-blend-screen grayscale-[0.2]" };
+         case 'theme_neon_night':
+             return { Icon: NeonCyberSkullIcon, className: "opacity-20 text-cyan-500 drop-shadow-[0_0_10px_rgba(0,255,255,0.5)]" };
+         case 'theme_pastel_dream':
+             return { Icon: PastelCloudIcon, className: "opacity-30 text-pink-300" };
+         case 'theme_comic_manga':
+             return { Icon: ComicBoomIcon, className: "opacity-10 text-yellow-500 rotate-12 scale-150" };
+         default:
+             return null;
+     }
+  };
+  const themeBg = getThemeBackground();
 
   return (
     <div className="flex flex-col h-full bg-background overflow-hidden relative">
       {/* Background Decor */}
-      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden text-foreground">
-        {/* Dot Pattern - Polka Dots */}
-        <div
-          className="absolute inset-0 opacity-[0.4]"
-          style={{
-            backgroundImage: "radial-gradient(#cbd5e1 2px, transparent 2px)",
-            backgroundSize: "24px 24px",
-          }}
-        />
+      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden text-foreground flex items-center justify-center">
+        {themeBg ? (
+           <div className="absolute inset-0 flex items-center justify-center opacity-[0.05]">
+              <themeBg.Icon className={`w-[80%] h-auto ${themeBg.className}`} />
+           </div>
+        ) : (
+          /* Dot Pattern - Polka Dots */
+          <div
+            className="absolute inset-0 opacity-[0.4]"
+            style={{
+              backgroundImage: "radial-gradient(#cbd5e1 2px, transparent 2px)",
+              backgroundSize: "24px 24px",
+            }}
+          />
+        )}
       </div>
 
       {/* Header */}

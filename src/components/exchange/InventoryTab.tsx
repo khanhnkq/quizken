@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '@/lib/auth';
+import { useProfile } from '@/hooks/useProfile';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 import { useUserItems } from '@/hooks/useUserItems';
 import { useItems } from '@/hooks/useItems';
-import { Loader2, PackageOpen, Download, Package, Sparkles, Search, Shirt, Palette, Zap, FileText, Check, Calendar } from 'lucide-react';
+import { Loader2, PackageOpen, Download, Package, Sparkles, Search, Shirt, Palette, Zap, FileText, Check, Calendar, Power } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -50,6 +54,67 @@ export function InventoryTab() {
         { id: 'powerup', label: t('exchange.filter.powerup'), icon: Zap, color: 'bg-amber-100 text-amber-600' },
         { id: 'document', label: t('exchange.filter.document'), icon: FileText, color: 'bg-emerald-100 text-emerald-600' },
     ];
+
+    const { user } = useAuth();
+    const { profileData, refetch: refetchProfile } = useProfile(user?.id);
+
+    const handleEquip = async (item: any) => {
+        const isTheme = item.details.type === 'theme';
+        const isAvatar = item.details.type === 'avatar';
+        
+        console.log("Attempting to equip/unequip:", item.details.name, "Type:", item.details.type);
+
+        const isEquipped = (isTheme && profileData?.equipped_theme === item.item_id) ||
+                           (isAvatar && profileData?.equipped_avatar_frame === item.item_id);
+
+        console.log("Current status - Equipped:", isEquipped);
+        console.log("Profile Data:", profileData);
+
+        try {
+            const updateData: any = {};
+            
+            // Logic Toggle: If equipped -> unequip (null), else equip
+            if (isEquipped) {
+                 if (isTheme) updateData.equipped_theme = null;
+                 if (isAvatar) updateData.equipped_avatar_frame = null;
+            } else {
+                 if (isTheme) updateData.equipped_theme = item.item_id;
+                 if (isAvatar) updateData.equipped_avatar_frame = item.item_id;
+            }
+
+            console.log("Update Payload:", updateData);
+
+            if (Object.keys(updateData).length === 0) {
+                console.warn("No fields to update! Check item type.");
+                toast.error("Không thể xác định loại vật phẩm.");
+                return;
+            }
+
+            const { error } = await supabase
+                .from('profiles')
+                .update(updateData)
+                .eq('id', user?.id);
+
+            if (error) {
+                console.error("Supabase update error:", error);
+                throw error;
+            }
+
+            if (isEquipped) {
+                toast.info(t('inventory.unequipped', 'Đã gỡ bỏ trang bị.'));
+            } else {
+                toast.success(t('inventory.equipSuccess', 'Đã thay đổi thành công!'));
+            }
+            
+            // Force immediate refetch
+            await refetchProfile();
+            console.log("Profile refetched.");
+
+        } catch (error) {
+            console.error('Error equipping item:', error);
+            toast.error(t('inventory.equipError', 'Lỗi khi thay đổi trang bị.'));
+        }
+    };
 
     const handleDownload = (url: string) => {
         window.open(url, '_blank', 'noopener,noreferrer');
@@ -212,6 +277,47 @@ export function InventoryTab() {
 
                                     {/* Action Area */}
                                     <div className="mt-auto space-y-3">
+                                        {/* Equip/Use Buttons */}
+                                        {(item.details.type === 'theme' || item.details.type === 'avatar') && (
+                                            <Button
+                                                onClick={() => handleEquip(item)}
+                                                // Remove disabled prop to allow un-equipping
+                                                variant={(
+                                                    (item.details.type === 'theme' && profileData?.equipped_theme === item.item_id) ||
+                                                    (item.details.type === 'avatar' && profileData?.equipped_avatar_frame === item.item_id)
+                                                ) ? "outline" : "default"}
+                                                className={`w-full rounded-2xl h-12 font-bold text-sm transition-all
+                                                    ${((item.details.type === 'theme' && profileData?.equipped_theme === item.item_id) ||
+                                                       (item.details.type === 'avatar' && profileData?.equipped_avatar_frame === item.item_id))
+                                                        ? 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-red-500 border border-slate-200 dark:border-slate-700'
+                                                        : 'bg-gradient-to-b from-violet-500 to-violet-600 hover:from-violet-400 hover:to-violet-500 text-white shadow-violet-200 hover:shadow-violet-300 hover:-translate-y-1 active:translate-y-0'
+                                                    }
+                                                `}
+                                            >
+                                                {((item.details.type === 'theme' && profileData?.equipped_theme === item.item_id) ||
+                                                  (item.details.type === 'avatar' && profileData?.equipped_avatar_frame === item.item_id)) ? (
+                                                    <span className="flex items-center group-hover:hidden">
+                                                        <Check className="w-4 h-4 mr-2" />
+                                                        {t('inventory.equipped', 'Đang sử dụng')}
+                                                    </span>
+                                                ) : (
+                                                    <>
+                                                        <Power className="w-4 h-4 mr-2" />
+                                                        {t('inventory.equip', 'Sử dụng')}
+                                                    </>
+                                                )}
+                                                
+                                                {/* Hover Text for Unequip */}
+                                                {((item.details.type === 'theme' && profileData?.equipped_theme === item.item_id) ||
+                                                  (item.details.type === 'avatar' && profileData?.equipped_avatar_frame === item.item_id)) && (
+                                                    <span className="hidden group-hover:flex items-center text-red-500">
+                                                        <Power className="w-4 h-4 mr-2" />
+                                                        {t('inventory.unequip', 'Gỡ bỏ')}
+                                                    </span>
+                                                )}
+                                            </Button>
+                                        )}
+
                                         {/* Download Button for Document Items */}
                                         {item.details.type === 'document' && item.details.download_url && (
                                             <Button

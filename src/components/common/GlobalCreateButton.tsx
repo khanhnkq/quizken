@@ -42,7 +42,7 @@ export const GlobalCreateButton = () => {
             <div className="fixed bottom-4 right-4 md:bottom-8 md:right-8 z-[100] flex items-center gap-1 p-1 bg-white dark:bg-slate-900/90 dark:backdrop-blur-md border-2 border-primary dark:border-primary/50 shadow-lg shadow-primary/20 dark:shadow-slate-900/50 rounded-full animate-in slide-in-from-bottom-10 fade-in duration-500 hover:scale-105 transition-transform hover:shadow-xl hover:shadow-primary/30">
                 <button
                     onClick={handleClick}
-                    className="flex items-center gap-0 sm:gap-2 p-2 sm:pl-3 sm:pr-4 sm:py-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white font-bold shadow-sm hover:brightness-110 transition-all"
+                    className="flex items-center gap-0 sm:gap-2 p-2 sm:pl-3 sm:pr-4 sm:py-2 rounded-full bg-primary text-primary-foreground font-bold shadow-sm hover:brightness-110 transition-all border border-black/10 dark:border-white/10"
                     title={t("common.createQuiz", "Tạo Quiz")}
                 >
                     <PlusCircle className="w-4 h-4 animate-pulse" />

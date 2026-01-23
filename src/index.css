@@ -196,7 +196,252 @@ All colors MUST be HSL.
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
+
+  /* === Custom Themes === */
+  
+  /* === Custom Themes === */
+  
+  /* Neon Night (Cyberpunk) */
+  .theme-neon {
+    --background: 260 50% 5%; /* Pitch black/purple */
+    --foreground: 280 100% 95%; /* Glowing white/purple */
+    
+    --card: 260 50% 8%;
+    --card-foreground: 280 100% 95%;
+    
+    --popover: 260 50% 8%;
+    --popover-foreground: 280 100% 95%;
+    
+    --primary: 290 100% 50%; /* Hot Neon Pink */
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary: 180 100% 50%; /* Neon Cyan */
+    --secondary-foreground: 260 50% 5%;
+    
+    --muted: 260 30% 15%;
+    --muted-foreground: 260 20% 70%;
+    
+    --accent: 320 100% 60%; 
+    --accent-foreground: 0 0% 100%;
+    
+    --destructive: 0 100% 50%; /* Neon Red */
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 290 80% 40%; /* Pinkish Border */
+    --input: 260 40% 20%;
+    --ring: 290 100% 50%;
+    
+    --radius: 0.5rem; /* Sharper corners for Cyberpunk feel */
+  }
+
+  /* Pastel Dream (Soft/Cute) */
+  .theme-pastel {
+    --background: 340 50% 97%; /* Very soft pink white */
+    --foreground: 340 40% 30%; /* Warm brownish text */
+    
+    --card: 0 0% 100%;
+    --card-foreground: 340 40% 30%;
+    
+    --popover: 0 0% 100%;
+    --popover-foreground: 340 40% 30%;
+    
+    --primary: 330 80% 85%; /* Pastel Pink */
+    --primary-foreground: 340 50% 40%;
+    
+    --secondary: 200 70% 90%; /* Pastel Blue */
+    --secondary-foreground: 200 50% 40%;
+    
+    --muted: 340 30% 94%;
+    --muted-foreground: 340 20% 60%;
+    
+    --accent: 45 90% 85%; /* Pastel Yellow */
+    --accent-foreground: 40 50% 40%;
+    
+    --destructive: 0 80% 85%; /* Pastel Red */
+    --destructive-foreground: 0 50% 40%;
+
+    --border: 330 40% 90%;
+    --input: 330 40% 95%;
+    --ring: 330 70% 80%;
+    
+    --radius: 1.5rem; /* Very rounded corners for soft feel */
+  }
+
+  /* Comic Pop (Manga/Comic Book) */
+  .theme-comic {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 0%;
+    
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 0%;
+    
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 0%;
+    
+    --primary: 47 100% 50%; /* Bright Comic Yellow */
+    --primary-foreground: 0 0% 0%;
+    
+    --secondary: 0 0% 90%;
+    --secondary-foreground: 0 0% 0%;
+    
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 40%;
+    
+    --accent: 198 100% 50%; /* Comic Cyan */
+    --accent-foreground: 0 0% 0%;
+    
+    --destructive: 0 100% 50%; /* Red */
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 0%; /* PURE BLACK BORDER */
+    --input: 0 0% 100%;
+    --ring: 0 0% 0%;
+    
+    --radius: 0.25rem;
+  }
+
+  /* Hào Khí Việt Nam (Vietnam Spirit) */
+  .theme-vn {
+    --background: 45 30% 96%; /* Warm Cream/Gold tint */
+    --foreground: 360 100% 20%; /* Deep Dark Red text */
+    
+    --card: 0 0% 100%;
+    --card-foreground: 360 80% 30%;
+    
+    --popover: 0 0% 100%;
+    --popover-foreground: 360 80% 30%;
+    
+    --primary: 354 85% 55%; /* Flag Red */
+    --primary-foreground: 48 100% 50%; /* Gold Text on Red */
+    
+    --secondary: 48 100% 50%; /* Star Gold */
+    --secondary-foreground: 360 100% 30%;
+    
+    --muted: 45 20% 90%;
+    --muted-foreground: 360 40% 50%;
+    
+    --accent: 48 100% 60%; /* Bright Yellow */
+    --accent-foreground: 360 100% 30%;
+    
+    --destructive: 0 0% 20%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 354 50% 80%; /* Reddish border */
+    --input: 354 20% 95%;
+    --ring: 354 85% 55%;
+    
+    --radius: 0.75rem; 
+  }
 }
+
+/* Global Visual Overrides based on Theme Class */
+
+/* Vietnam Spirit Background */
+html.theme-vn body {
+  background-color: hsl(45, 30%, 96%);
+  background-image: 
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 20px,
+      rgba(218, 37, 28, 0.03) 20px,
+      rgba(218, 37, 28, 0.03) 40px
+    ),
+    radial-gradient(circle at 100% 0%, rgba(255, 215, 0, 0.2), transparent 50%),
+    radial-gradient(circle at 0% 100%, rgba(218, 37, 28, 0.1), transparent 50%);
+}
+
+html.theme-vn .button,
+html.theme-vn button {
+  font-weight: bold;
+  letter-spacing: 0.02em;
+  box-shadow: 0 4px 6px -1px rgba(218, 37, 28, 0.2);
+}
+
+html.theme-vn h1, html.theme-vn h2 {
+  color: hsl(354, 85%, 50%); /* Always Red Headers */
+  text-shadow: 1px 1px 0px rgba(255, 215, 0, 0.5);
+}
+
+/* Comic Book Halftones & Borders */
+html.theme-comic body {
+  background-image: 
+    radial-gradient(circle, #000 1px, transparent 1px);
+  background-size: 20px 20px;
+  background-color: #fff;
+}
+
+/* Specific elements only - avoid global mess */
+html.theme-comic .card,
+html.theme-comic [class*="card"],
+html.theme-comic .button,
+html.theme-comic button,
+html.theme-comic input,
+html.theme-comic .badge,
+html.theme-comic [class*="badge"] {
+  border: 2px solid black !important;
+  box-shadow: 4px 4px 0px 0px rgba(0,0,0,1) !important;
+  transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html.theme-comic .button:active,
+html.theme-comic button:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px 0px rgba(0,0,0,1) !important;
+}
+
+html.theme-comic h1, 
+html.theme-comic h2,
+html.theme-comic h3,
+html.theme-comic h4 {
+  text-transform: uppercase;
+  font-weight: 900 !important;
+  letter-spacing: 0.05em;
+  text-shadow: 2px 2px 0px #fff, 4px 4px 0px rgba(0,0,0,0.1);
+}
+
+/* Neon Glows */
+html.theme-neon body {
+  background-image: 
+    radial-gradient(circle at 50% 0%, hsl(290, 80%, 15%), transparent 40%),
+    radial-gradient(circle at 0% 100%, hsl(180, 80%, 10%), transparent 40%);
+  text-shadow: 0 0 1px rgba(255,255,255,0.2);
+}
+
+html.theme-neon .button, 
+html.theme-neon button {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 0 10px -2px var(--primary);
+  border: 1px solid var(--border);
+}
+
+html.theme-neon .card,
+html.theme-neon [class*="card"] {
+  border: 1px solid hsl(290, 80%, 30%);
+  box-shadow: 0 0 15px -3px rgba(200, 0, 255, 0.15);
+}
+
+/* Pastel Softness */
+html.theme-pastel body {
+  background-image: 
+    radial-gradient(circle at 10% 10%, hsl(330, 50%, 95%), transparent 40%),
+    radial-gradient(circle at 90% 90%, hsl(200, 50%, 95%), transparent 40%);
+  font-family: 'Fredoka', sans-serif !important; /* Force rounded font */
+}
+
+html.theme-pastel .button,
+html.theme-pastel button {
+  box-shadow: 4px 4px 0px 0px rgba(0,0,0,0.05) !important;
+  transition: transform 0.1s;
+}
+
+html.theme-pastel .button:active,
+html.theme-pastel button:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.05) !important;
+}
+
 
 @layer base {
   * {

@@ -1,4 +1,5 @@
 import { useLayoutEffect, useEffect, lazy, Suspense } from "react";
+import { ThemeManager } from "@/components/ThemeManager";
 import { Toaster as HotToaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -222,6 +223,7 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <SoundProvider>
+        <ThemeManager />
         <TooltipProvider>
           <ChillMusicProvider>
             <ChatImagesProvider>

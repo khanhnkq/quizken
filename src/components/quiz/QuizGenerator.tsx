@@ -100,6 +100,9 @@ import {
   calculateCreateReward,
 } from "@/utils/levelSystem";
 import Mascot from "@/components/ui/Mascot";
+import { useProfile } from "@/hooks/useProfile";
+import { VietnamMapIcon, VietnamStarIcon, VietnamDrumIcon, VietnamLotusIcon } from "@/components/icons/VietnamIcons";
+import { NeonBoltIcon, NeonCyberSkullIcon, PastelCloudIcon, PastelHeartIcon, ComicPowIcon, ComicBoomIcon } from "@/components/icons/ThemeIcons";
 
 type TokenUsage = { prompt: number; candidates: number; total: number };
 
@@ -163,6 +166,63 @@ const QuizGenerator = () => {
   const [generationProgress, setGenerationProgress] = useState<string>("");
   const { toast } = useToast();
   const { user, loading: authLoading } = useAuth();
+  const { profileData } = useProfile(user?.id);
+
+  const themeConfig = React.useMemo(() => {
+    const theme = profileData?.equipped_theme;
+    switch (theme) {
+      case 'theme_vietnam_spirit':
+        return {
+          aiIcon: VietnamStarIcon,
+          manualIcon: VietnamLotusIcon,
+          generateIcon: VietnamDrumIcon,
+          aiColor: "text-red-500",
+          generateBtnGradient: "from-red-600 to-yellow-500 shadow-red-500/30 hover:shadow-red-500/50",
+          generateIconClass: "",
+          inputBorderActive: "border-red-200 dark:border-red-900 ring-red-50/50 dark:ring-red-900/30 shadow-red-100 dark:shadow-red-900/20 hover:shadow-red-200 dark:hover:shadow-red-900/40",
+        };
+      case 'theme_neon_night':
+        return {
+          aiIcon: NeonBoltIcon,
+          manualIcon: NeonCyberSkullIcon,
+          generateIcon: NeonBoltIcon,
+          aiColor: "text-cyan-400",
+          generateBtnGradient: "from-cyan-500 to-blue-600 shadow-cyan-500/30 hover:shadow-cyan-500/50",
+          generateIconClass: "",
+          inputBorderActive: "border-cyan-200 dark:border-cyan-900 ring-cyan-50/50 dark:ring-cyan-900/30 shadow-cyan-100 dark:shadow-cyan-900/20 hover:shadow-cyan-200 dark:hover:shadow-cyan-900/40",
+        };
+      case 'theme_pastel_dream':
+        return {
+          aiIcon: PastelCloudIcon,
+          manualIcon: PastelHeartIcon,
+          generateIcon: PastelCloudIcon,
+          aiColor: "text-pink-400",
+          generateBtnGradient: "from-pink-300 to-purple-400 shadow-pink-500/30 hover:shadow-pink-500/50",
+          generateIconClass: "",
+          inputBorderActive: "border-pink-200 dark:border-pink-900 ring-pink-50/50 dark:ring-pink-900/30 shadow-pink-100 dark:shadow-pink-900/20 hover:shadow-pink-200 dark:hover:shadow-pink-900/40",
+        };
+      case 'theme_comic_manga':
+        return {
+          aiIcon: ComicBoomIcon,
+          manualIcon: ComicPowIcon,
+          generateIcon: ComicBoomIcon,
+          aiColor: "text-yellow-500",
+          generateBtnGradient: "from-yellow-400 to-orange-500 border-2 border-black shadow-yellow-500/30 hover:shadow-yellow-500/50",
+          generateIconClass: "",
+          inputBorderActive: "border-yellow-200 dark:border-yellow-900 ring-yellow-50/50 dark:ring-yellow-900/30 shadow-yellow-100 dark:shadow-yellow-900/20 hover:shadow-yellow-200 dark:hover:shadow-yellow-900/40",
+        };
+      default:
+        return {
+          aiIcon: Sparkles,
+          manualIcon: PenLine,
+          generateIcon: ArrowUp,
+          aiColor: "text-green-400",
+          generateBtnGradient: "bg-gradient-to-tr from-green-400 to-green-600 shadow-green-500/30 hover:shadow-green-500/50",
+          generateIconClass: "rotate-90",
+          inputBorderActive: "border-green-200 dark:border-green-900 ring-4 ring-green-50/50 dark:ring-green-900/30 shadow-green-100 dark:shadow-green-900/20 hover:shadow-green-200 dark:hover:shadow-green-900/40",
+        };
+    }
+  }, [profileData?.equipped_theme]);
 
   const { t, i18n } = useTranslation(); // Add i18n support
   const { statistics, refetch: refetchStats } = useDashboardStats(user?.id);
@@ -1395,13 +1455,13 @@ const QuizGenerator = () => {
                     <div className="flex justify-center -mb-4 z-20 relative">
                       <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm p-1.5 rounded-full border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-1 cursor-pointer hover:shadow-md transition-all">
                         <div className="px-4 py-1.5 rounded-full bg-slate-900 dark:bg-slate-700 text-white text-sm font-bold shadow-sm flex items-center gap-2">
-                          <Sparkles className="w-4 h-4 text-green-400" />
+                          <themeConfig.aiIcon className={cn("w-4 h-4", themeConfig.aiColor)} />
                           <span>AI Generator</span>
                         </div>
                         <button
                           onClick={() => navigate("/quiz/create")}
                           className="px-4 py-1.5 rounded-full text-slate-500 dark:text-slate-400 text-sm font-bold hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200 transition-all flex items-center gap-2">
-                          <PenLine className="w-4 h-4" />
+                          <themeConfig.manualIcon className="w-4 h-4" />
                           <span>{t("manualQuiz.title", "Manual")}</span>
                         </button>
                       </div>
@@ -1413,7 +1473,7 @@ const QuizGenerator = () => {
                         className={cn(
                           "flex items-center gap-2 p-2 pl-2 rounded-[2rem] md:rounded-[3rem] bg-white dark:bg-slate-900 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.1)] border-2 transition-all duration-300 transform w-full",
                           isPromptValid
-                            ? "border-green-200 dark:border-green-900 ring-4 ring-green-50/50 dark:ring-green-900/30 shadow-green-100 dark:shadow-green-900/20 hover:shadow-green-200 dark:hover:shadow-green-900/40"
+                            ? themeConfig.inputBorderActive
                             : "border-slate-100 dark:border-slate-800 hover:border-slate-200 dark:hover:border-slate-700 hover:shadow-lg focus-within:border-orange-200 dark:focus-within:border-orange-900 focus-within:ring-4 focus-within:ring-orange-50/50 dark:focus-within:ring-orange-900/30",
                         )}>
                         {/* Settings (Question Count) */}
@@ -1531,13 +1591,13 @@ const QuizGenerator = () => {
                           className={cn(
                             "h-11 w-11 md:h-12 md:w-12 rounded-full shrink-0 transition-all duration-300 shadow-md flex items-center justify-center",
                             isPromptValid && isQuestionCountSelected
-                              ? "bg-gradient-to-tr from-green-400 to-green-600 text-white shadow-green-500/30 hover:shadow-green-500/50 hover:scale-105 active:scale-95"
+                              ? cn(themeConfig.generateBtnGradient, (profileData?.equipped_theme === "theme_comic_manga" ? "bg-amber-400" : "bg-gradient-to-tr" ), "text-white hover:scale-105 active:scale-95")
                               : "bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-600 cursor-not-allowed",
                           )}>
                           {loading ? (
                             <Loader2 className="w-5 h-5 animate-spin" />
                           ) : (
-                            <ArrowUp className="w-5 h-5 md:w-6 md:h-6 rotate-90" />
+                            <themeConfig.generateIcon className={cn("w-5 h-5 md:w-6 md:h-6", themeConfig.generateIconClass)} />
                           )}
                         </Button>
                       </div>

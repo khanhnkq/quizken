@@ -40,6 +40,10 @@ import { useGenerationPersistence } from "@/hooks/useGenerationPersistence";
 import { ApiKeyErrorDialog } from "./ApiKeyErrorDialog";
 import { Sparkles, PenLine, ArrowLeft, X } from "lucide-react";
 import logo from "@/assets/logo/logo.png";
+import { useProfile } from "@/hooks/useProfile";
+import { VietnamMapIcon, VietnamStarIcon, VietnamDrumIcon, VietnamLotusIcon } from "@/components/icons/VietnamIcons";
+import { NeonBoltIcon, NeonCyberSkullIcon, PastelCloudIcon, PastelHeartIcon, ComicPowIcon, ComicBoomIcon } from "@/components/icons/ThemeIcons";
+import { cn } from "@/lib/utils";
 
 interface QuickGeneratorDialogProps {
     open: boolean;
@@ -63,6 +67,38 @@ export function QuickGeneratorDialog({ open, onOpenChange, initialTab = null }: 
     } = useUserQuota(user?.id);
     const { hasProgress, clear: clearQuizProgress } = useQuizProgress();
     const { read: readPersist, write: writePersist, clear: clearPersist } = useGenerationPersistence();
+    const { profileData } = useProfile(user?.id);
+
+    const themeConfig = React.useMemo(() => {
+        const theme = profileData?.equipped_theme;
+        switch (theme) {
+            case 'theme_vietnam_spirit':
+                return {
+                    manualIcon: VietnamLotusIcon,
+                    manualGradient: "from-pink-500 to-rose-500",
+                };
+            case 'theme_neon_night':
+                return {
+                    manualIcon: NeonCyberSkullIcon,
+                    manualGradient: "from-cyan-500 to-blue-600",
+                };
+            case 'theme_pastel_dream':
+                return {
+                    manualIcon: PastelHeartIcon,
+                    manualGradient: "from-pink-300 to-purple-400",
+                };
+            case 'theme_comic_manga':
+                return {
+                    manualIcon: ComicPowIcon,
+                    manualGradient: "from-yellow-400 to-orange-500 border-2 border-black",
+                };
+            default:
+                return {
+                    manualIcon: PenLine,
+                    manualGradient: "from-emerald-500 to-teal-500",
+                };
+        }
+    }, [profileData?.equipped_theme]);
 
     // State
     const [prompt, setPrompt] = useState("");
@@ -588,8 +624,8 @@ export function QuickGeneratorDialog({ open, onOpenChange, initialTab = null }: 
                                     className="w-full flex items-center gap-4 px-4 py-4 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors text-left group"
                                 >
                                     <div className="relative shrink-0">
-                                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center border border-transparent dark:border-white/10 group-hover:dark:border-white/20 transition-colors">
-                                            <PenLine className="w-6 h-6 text-white" />
+                                        <div className={cn("w-12 h-12 rounded-full bg-gradient-to-br flex items-center justify-center border border-transparent dark:border-white/10 group-hover:dark:border-white/20 transition-colors", themeConfig.manualGradient)}>
+                                            <themeConfig.manualIcon className="w-6 h-6 text-white" />
                                         </div>
                                     </div>
                                     <div className="flex-1 min-w-0">
