@@ -2,7 +2,14 @@ import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Download, Sparkles, BookOpen, Brain, Clock, CircleHelp } from "@/lib/icons";
+import {
+  Download,
+  Sparkles,
+  BookOpen,
+  Brain,
+  Clock,
+  CircleHelp,
+} from "@/lib/icons";
 import { Share } from "lucide-react";
 import { BackgroundDecorations } from "@/components/ui/BackgroundDecorations";
 import {
@@ -23,8 +30,13 @@ import { useFlashcardPersistence } from "@/hooks/useFlashcardPersistence";
 import FlashcardView from "@/components/flashcard/FlashcardView";
 import { useTranslation } from "react-i18next";
 import { useDashboardStats } from "@/hooks/useDashboardStats";
-import { calculateXP, calculateLevel, calculateAttemptReward } from "@/utils/levelSystem";
+import {
+  calculateXP,
+  calculateLevel,
+  calculateAttemptReward,
+} from "@/utils/levelSystem";
 import { useToast } from "@/hooks/use-toast";
+import Mascot from "@/components/ui/Mascot";
 
 interface TokenUsage {
   prompt: number;
@@ -55,8 +67,13 @@ async function saveQuizAttempt(
   _totalQuestions: number, // Unused - calculated server-side
   _correctAnswers: number, // Unused - calculated server-side
   answers: number[],
-  timeTakenSeconds: number
-): Promise<{ success: boolean; score?: number; correct_answers?: number; total_questions?: number }> {
+  timeTakenSeconds: number,
+): Promise<{
+  success: boolean;
+  score?: number;
+  correct_answers?: number;
+  total_questions?: number;
+}> {
   try {
     // Get current session for auth token
     const { data: sessionData } = await supabase.auth.getSession();
@@ -68,16 +85,19 @@ async function saveQuizAttempt(
     }
 
     // Call Edge Function for server-side validation
-    const { data, error } = await supabase.functions.invoke("submit-quiz-attempt", {
-      body: {
-        quiz_id: quizId,
-        answers: answers,
-        time_taken_seconds: timeTakenSeconds,
+    const { data, error } = await supabase.functions.invoke(
+      "submit-quiz-attempt",
+      {
+        body: {
+          quiz_id: quizId,
+          answers: answers,
+          time_taken_seconds: timeTakenSeconds,
+        },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
       },
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+    );
 
     if (error) {
       console.error("Error submitting quiz attempt:", error);
@@ -97,7 +117,6 @@ async function saveQuizAttempt(
   }
 }
 
-
 export const QuizContent: React.FC<QuizContentProps> = ({
   quiz,
   userAnswers,
@@ -115,10 +134,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
   const { toast } = useToast();
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const { statistics, refetch: refetchStats } = useDashboardStats(userId);
-  const {
-    activateFlashcard,
-    deactivateFlashcard,
-  } =
+  const { activateFlashcard, deactivateFlashcard } =
     useFlashcardPersistence(null);
   const [showFlashcard, setShowFlashcard] = React.useState(false);
   const questionRefs = React.useRef<(HTMLDivElement | null)[]>([]);
@@ -139,7 +155,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
 
   // Timer logic: Sync with real startTime and run interval
   React.useEffect(() => {
-    const hasStarted = userAnswers.some(a => a !== -1);
+    const hasStarted = userAnswers.some((a) => a !== -1);
 
     // If we have a startTime and the quiz has started (or we have previous answers), sync the timer
     if (startTime && hasStarted) {
@@ -158,7 +174,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
           const elapsed = Math.floor((Date.now() - startTime) / 1000);
           setTimerSeconds(elapsed > 0 ? elapsed : 0);
         } else {
-          setTimerSeconds(prev => prev + 1);
+          setTimerSeconds((prev) => prev + 1);
         }
       }, 1000);
     }
@@ -168,7 +184,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
 
   // Reset timer on reset
   React.useEffect(() => {
-    if (!userAnswers.some(a => a !== -1)) {
+    if (!userAnswers.some((a) => a !== -1)) {
       setTimerSeconds(0);
       setCurrentQuestionIndex(0);
     }
@@ -179,12 +195,12 @@ export const QuizContent: React.FC<QuizContentProps> = ({
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
   const answeredCount = React.useMemo(
     () => userAnswers.filter((ans) => ans !== undefined && ans !== -1).length,
-    [userAnswers]
+    [userAnswers],
   );
 
   // Handle flashcard view toggle
@@ -209,7 +225,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
     setCurrentQuestionIndex(index);
     // Scroll to top of card to ensure visibility
     if (cardRef.current) {
-      cardRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      cardRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   };
 
@@ -221,18 +237,16 @@ export const QuizContent: React.FC<QuizContentProps> = ({
   const handleAnswerSelect = (
     questionIndex: number,
     answerIndex: number,
-    inputEl?: HTMLInputElement
+    inputEl?: HTMLInputElement,
   ) => {
     onAnswerSelect(questionIndex, answerIndex);
-
-
   };
 
   const scrollToTop = () => {
     setTimeout(() => {
       killActiveScroll();
       const scoreElement = document.querySelector(
-        "[data-score-display]"
+        "[data-score-display]",
       ) as HTMLElement | null;
       if (scoreElement) {
         scrollToTarget(scoreElement, { align: "center" });
@@ -249,7 +263,6 @@ export const QuizContent: React.FC<QuizContentProps> = ({
       ref={sectionRef}
       id="quiz"
       className="quiz-content relative py-8 sm:py-20 px-2 sm:px-4">
-
       <div className="mx-auto max-w-4xl px-0 sm:px-4 relative z-10">
         <div className="text-center mb-12 relative py-4">
           {/* Animated Background Blobs - Playful Colors */}
@@ -272,11 +285,15 @@ export const QuizContent: React.FC<QuizContentProps> = ({
           {/* TOP ENTRY: Badge / Topic Name - High Visibilty */}
           <div className="relative z-20 flex flex-col items-center justify-center -mt-4 mb-4">
             <div className="inline-flex items-center gap-2 px-3 py-1 sm:px-5 sm:py-2 rounded-full bg-white/90 backdrop-blur-sm border-2 border-primary/20 text-primary font-bold shadow-sm hover:scale-105 transition-transform duration-300 cursor-default">
-              <span className="text-[10px] sm:text-sm uppercase tracking-wider text-muted-foreground mr-1">{t('quizContent.topicPrefix')}</span>
+              <span className="text-[10px] sm:text-sm uppercase tracking-wider text-muted-foreground mr-1">
+                {t("quizContent.topicPrefix")}
+              </span>
               <span className="text-xs sm:text-base">{quiz.title}</span>
               <div className="w-px h-4 bg-border mx-1"></div>
-              <Badge variant="secondary" className="text-[10px] sm:text-xs font-bold rounded-lg px-2">
-                {quiz.questions.length} {t('quizContent.questions')}
+              <Badge
+                variant="secondary"
+                className="text-[10px] sm:text-xs font-bold rounded-lg px-2">
+                {quiz.questions.length} {t("quizContent.questions")}
               </Badge>
             </div>
           </div>
@@ -284,37 +301,52 @@ export const QuizContent: React.FC<QuizContentProps> = ({
           {/* Main Playful Title */}
           <h1 className="font-heading text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-foreground drop-shadow-sm mb-4 relative inline-block z-10">
             <span className="relative z-10 bg-gradient-to-r from-primary to-emerald-600 bg-clip-text text-transparent">
-              {showFlashcard ? t('quizContent.modeTitleFlashcard') : t('quizContent.modeTitleQuiz')}
+              {showFlashcard
+                ? t("quizContent.modeTitleFlashcard")
+                : t("quizContent.modeTitleQuiz")}
             </span>
             {/* Cute wavy underline */}
-            <svg className="absolute -bottom-3 left-0 w-full h-4 text-yellow-300 -z-10 opacity-80" viewBox="0 0 100 10" preserveAspectRatio="none">
-              <path d="M0 5 Q 25 10 50 5 T 100 5" stroke="currentColor" strokeWidth="8" fill="none" strokeLinecap="round" />
+            <svg
+              className="absolute -bottom-3 left-0 w-full h-4 text-yellow-300 -z-10 opacity-80"
+              viewBox="0 0 100 10"
+              preserveAspectRatio="none">
+              <path
+                d="M0 5 Q 25 10 50 5 T 100 5"
+                stroke="currentColor"
+                strokeWidth="8"
+                fill="none"
+                strokeLinecap="round"
+              />
             </svg>
             {/* Cute Sparkle Decor */}
             <Sparkles className="absolute -top-6 -right-8 w-10 h-10 text-yellow-400 animate-bounce-slow" />
           </h1>
 
           <p className="text-base md:text-xl text-muted-foreground max-w-2xl mx-auto font-medium leading-relaxed relative z-10">
-            {quiz.description || t('quizContent.defaultDescription')}
+            {quiz.description || t("quizContent.defaultDescription")}
           </p>
         </div>
 
         {/* Flashcard View - Conditionally Rendered */}
         <div className="relative w-full">
           <div
-            className={`transition-all duration-500 ease-in-out transform-gpu ${showFlashcard
-              ? "opacity-0 scale-95 rotate-y-90 pointer-events-none absolute"
-              : "opacity-100 scale-100 rotate-y-0"
-              }`}>
+            className={`transition-all duration-500 ease-in-out transform-gpu ${
+              showFlashcard
+                ? "opacity-0 scale-95 rotate-y-90 pointer-events-none absolute"
+                : "opacity-100 scale-100 rotate-y-0"
+            }`}>
             <Card
               ref={cardRef}
               className="border-4 border-primary/20 rounded-3xl shadow-2xl bg-white/90 backdrop-blur-md overflow-hidden min-h-[500px] flex flex-col">
               <CardHeader className="pb-6">
                 <div className="flex flex-col-reverse sm:flex-row items-center justify-between gap-4 mb-6">
                   {/* Left: Stopwatch Timer */}
-                  <div className={`flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/50 border-2 border-border/50 transition-opacity duration-500 ${userAnswers.some(a => a !== -1) ? 'opacity-100' : 'opacity-40'}`}>
+                  <div
+                    className={`flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/50 border-2 border-border/50 transition-opacity duration-500 ${userAnswers.some((a) => a !== -1) ? "opacity-100" : "opacity-40"}`}>
                     <Clock className="w-5 h-5 text-primary animate-pulse" />
-                    <span className="font-mono font-bold text-lg text-primary">{formatTime(timerSeconds)}</span>
+                    <span className="font-mono font-bold text-lg text-primary">
+                      {formatTime(timerSeconds)}
+                    </span>
                   </div>
 
                   <div className="flex flex-wrap justify-center sm:justify-end gap-2 w-full sm:w-auto">
@@ -328,19 +360,18 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                         size="default"
                         sound="alert"
                         className="flex-1 sm:flex-none rounded-3xl border-4 border-border hover:bg-destructive hover:text-white hover:border-destructive transition-all duration-200 active:scale-95">
-                        {t('quizContent.retake')}
+                        {t("quizContent.retake")}
                       </Button>
                     )}
-                    
+
                     {/* Share Button */}
                     <Button
                       onClick={() => setIsShareDialogOpen(true)}
                       variant="outline"
                       size="icon"
                       className="rounded-full border-4 border-border hover:border-primary hover:text-primary hover:bg-primary/10 transition-all duration-200 active:scale-95 w-10 h-10"
-                      title={t('quizContent.share') || "Share"}
-                    >
-                        <Share className="w-4 h-4" />
+                      title={t("quizContent.share") || "Share"}>
+                      <Share className="w-4 h-4" />
                     </Button>
 
                     <Button
@@ -350,16 +381,21 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                       variant={showFlashcard ? "default" : "outline"}
                       size="default"
                       sound="success"
-                      className={`flex-1 sm:flex-none rounded-3xl border-4 transition-all duration-200 active:scale-95 ${showFlashcard
-                        ? "bg-primary text-white border-primary hover:bg-primary/90 shadow-lg scale-105"
-                        : "border-border hover:border-primary text-muted-foreground hover:text-primary hover:bg-primary/10"
-                        }`}>
+                      className={`flex-1 sm:flex-none rounded-3xl border-4 transition-all duration-200 active:scale-95 ${
+                        showFlashcard
+                          ? "bg-primary text-white border-primary hover:bg-primary/90 shadow-lg scale-105"
+                          : "border-border hover:border-primary text-muted-foreground hover:text-primary hover:bg-primary/10"
+                      }`}>
                       <BookOpen className="mr-2 h-4 w-4" />
                       <span className="hidden xs:inline">
-                        {showFlashcard ? t('quizContent.studying') : t('quizContent.flashcard')}
+                        {showFlashcard
+                          ? t("quizContent.studying")
+                          : t("quizContent.flashcard")}
                       </span>
                       <span className="xs:hidden">
-                        {showFlashcard ? t('quizContent.study') : t('quizContent.card')}
+                        {showFlashcard
+                          ? t("quizContent.study")
+                          : t("quizContent.card")}
                       </span>
                     </Button>
                     <Button
@@ -369,15 +405,17 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                       sound="success"
                       className="flex-1 sm:flex-none rounded-3xl border-4 border-border hover:border-primary hover:text-primary hover:bg-primary/10 transition-all duration-200 active:scale-95">
                       <Download className="mr-2 h-4 w-4" />
-                      <span className="hidden xs:inline">{t('quizContent.downloadPDF')}</span>
-                      <span className="xs:hidden">{t('quizContent.pdf')}</span>
+                      <span className="hidden xs:inline">
+                        {t("quizContent.downloadPDF")}
+                      </span>
+                      <span className="xs:hidden">{t("quizContent.pdf")}</span>
                     </Button>
                   </div>
                 </div>
 
                 <div className="mt-0">
                   <div className="flex items-center justify-between mb-2 text-sm text-muted-foreground">
-                    <span>{t('quizContent.progress')}</span>
+                    <span>{t("quizContent.progress")}</span>
                     <span>
                       {answeredCount}/{quiz.questions.length}
                     </span>
@@ -385,8 +423,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                   <div className="w-full bg-secondary/50 rounded-full h-3">
                     <div
                       className="bg-primary h-3 rounded-full transition-all duration-300 relative overflow-hidden"
-                      style={{ width: `${completionPercent}%` }}
-                    >
+                      style={{ width: `${completionPercent}%` }}>
                       <div className="absolute inset-0 bg-white/20 animate-progress-indeterminate w-full h-full" />
                     </div>
                   </div>
@@ -396,10 +433,10 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                       data-score-display
                       className="mt-4 p-4 bg-primary/10 rounded-lg">
                       <h4 className="text-lg font-semibold">
-                        {t('quizContent.yourScore')}: {calculateScore()}/{quiz.questions.length}{" "}
-                        (
+                        {t("quizContent.yourScore")}: {calculateScore()}/
+                        {quiz.questions.length} (
                         {Math.round(
-                          (calculateScore() / quiz.questions.length) * 100
+                          (calculateScore() / quiz.questions.length) * 100,
                         )}
                         %)
                       </h4>
@@ -410,7 +447,9 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                   {/* Question Navigation Grid */}
                   <div className="flex flex-wrap justify-center gap-2 max-h-[150px] overflow-y-auto p-2 scrollbar-thin">
                     {quiz.questions.map((_, idx) => {
-                      const isAnswered = userAnswers[idx] !== undefined && userAnswers[idx] !== -1;
+                      const isAnswered =
+                        userAnswers[idx] !== undefined &&
+                        userAnswers[idx] !== -1;
                       const isCurrent = currentQuestionIndex === idx;
                       const isCorrect =
                         showResults &&
@@ -439,8 +478,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                           size="icon"
                           className={`relative w-10 h-10 rounded-xl border-2 transition-all duration-200 ${stateClasses}`}
                           onClick={() => handleNavigateQuestion(idx)}
-                          title={`${t('quizContent.question')} ${idx + 1}`}
-                        >
+                          title={`${t("quizContent.question")} ${idx + 1}`}>
                           <span className="relative z-10">{idx + 1}</span>
                           {showResults && isCorrect && (
                             <span className="pointer-events-none absolute -right-1 -top-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-green-500 text-white border-2 border-white text-[10px] font-bold shadow-sm">
@@ -457,14 +495,16 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                     })}
                   </div>
                   <p className="mt-3 text-center text-xs text-muted-foreground">
-                    {t('quizContent.navigationHelp')}
+                    {t("quizContent.navigationHelp")}
                   </p>
                 </div>
               </CardHeader>
 
               <CardContent className="space-y-4 flex-1">
                 {/* Single Question Render */}
-                <div className="animate-in fade-in slide-in-from-right-4 duration-300" key={currentQuestionIndex}>
+                <div
+                  className="animate-in fade-in slide-in-from-right-4 duration-300"
+                  key={currentQuestionIndex}>
                   {currentQuestion && (
                     <>
                       <div className="p-3 sm:p-6 md:p-8 space-y-3 sm:space-y-4 border-2 rounded-2xl hover:border-primary/50 transition-colors">
@@ -478,20 +518,22 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                         {/* Question Image */}
                         {currentQuestion.image && (
                           <div className="rounded-xl overflow-hidden mb-6 border border-border/50 max-h-[400px] flex justify-center bg-gray-50">
-                            <img 
-                              src={currentQuestion.image} 
-                              alt="Question Illustration" 
+                            <img
+                              src={currentQuestion.image}
+                              alt="Question Illustration"
                               className="object-contain max-h-full max-w-full"
                             />
                           </div>
                         )}
 
                         <div className="flex flex-col gap-2 mt-6">
-                          {currentQuestion.options && Array.isArray(currentQuestion.options) ? (
+                          {currentQuestion.options &&
+                          Array.isArray(currentQuestion.options) ? (
                             currentQuestion.options.map((option, optIdx) => {
                               const isSelected =
                                 userAnswers[currentQuestionIndex] === optIdx;
-                              const isCorrect = optIdx === currentQuestion.correctAnswer;
+                              const isCorrect =
+                                optIdx === currentQuestion.correctAnswer;
                               const userSelectedWrong =
                                 showResults && isSelected && !isCorrect;
                               const userSelectedCorrect =
@@ -500,16 +542,17 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                               return (
                                 <label
                                   key={optIdx}
-                                  className={`group w-full text-left p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200 active:scale-[0.98] flex items-center gap-4 ${showResults && isCorrect
-                                    ? "bg-green-50 border-green-500 shadow-[0_4px_0_0_#22c55e] translate-y-[-2px]"
-                                    : userSelectedWrong
-                                      ? "bg-red-50 border-red-500 shadow-[0_4px_0_0_#ef4444] translate-y-[-2px]"
-                                      : userSelectedCorrect
-                                        ? "bg-green-50 border-green-500 shadow-[0_4px_0_0_#22c55e] translate-y-[-2px]"
-                                        : isSelected
-                                          ? "bg-primary/5 border-primary shadow-[0_4px_0_0_#FF6B6B] translate-y-[-2px]"
-                                          : "bg-white border-border/60 hover:border-primary/50 hover:shadow-lg hover:-translate-y-1"
-                                    }`}>
+                                  className={`relative group w-full text-left p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200 active:scale-[0.98] flex items-center gap-4 ${
+                                    showResults && isCorrect
+                                      ? "bg-green-50 border-green-500 shadow-[0_4px_0_0_#22c55e] translate-y-[-2px]"
+                                      : userSelectedWrong
+                                        ? "bg-red-50 border-red-500 shadow-[0_4px_0_0_#ef4444] translate-y-[-2px]"
+                                        : userSelectedCorrect
+                                          ? "bg-green-50 border-green-500 shadow-[0_4px_0_0_#22c55e] translate-y-[-2px]"
+                                          : isSelected
+                                            ? "bg-primary/5 border-primary shadow-[0_4px_0_0_#FF6B6B] translate-y-[-2px]"
+                                            : "bg-white border-border/60 hover:border-primary/50 hover:shadow-lg hover:-translate-y-1"
+                                  }`}>
                                   <input
                                     type="radio"
                                     name={`question-${currentQuestionIndex}`}
@@ -520,16 +563,17 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                                       handleAnswerSelect(
                                         currentQuestionIndex,
                                         optIdx,
-                                        e.currentTarget
+                                        e.currentTarget,
                                       );
                                     }}
                                     disabled={showResults}
                                     className="sr-only"
                                   />
-                                  <div className={`
+                                  <div
+                                    className={`
                                             w-10 h-10 rounded-xl flex items-center justify-center 
                                             font-heading font-bold text-lg transition-colors shrink-0
-                                            ${isSelected || (showResults && isCorrect) ? 'bg-primary text-white' : 'bg-secondary/30 text-secondary-foreground group-hover:bg-primary group-hover:text-white'}
+                                            ${isSelected || (showResults && isCorrect) ? "bg-primary text-white" : "bg-secondary/30 text-secondary-foreground group-hover:bg-primary group-hover:text-white"}
                                           `}>
                                     {String.fromCharCode(65 + optIdx)}
                                   </div>
@@ -539,13 +583,17 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                                     </span>
                                   </div>
                                   {showResults && isCorrect && (
-                                    <span className="text-green-600 font-bold text-sm bg-white px-2 py-1 rounded-lg border border-green-200 shadow-sm shrink-0">
-                                      {t('quizContent.correctAnswer')}
-                                    </span>
+                                    <div className="absolute -top-20 -right-12 z-20 animate-in zoom-in spin-in-6 duration-500">
+                                      <Mascot
+                                        emotion="amazed"
+                                        size={180}
+                                        className="drop-shadow-xl rotate-12"
+                                      />
+                                    </div>
                                   )}
                                   {userSelectedWrong && (
                                     <span className="text-red-600 font-bold text-sm bg-white px-2 py-1 rounded-lg border border-red-200 shadow-sm shrink-0">
-                                      {t('quizContent.yourAnswer')}
+                                      {t("quizContent.yourAnswer")}
                                     </span>
                                   )}
                                 </label>
@@ -553,7 +601,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                             })
                           ) : (
                             <div className="text-red-500">
-                              {t('quizContent.noOptions')}
+                              {t("quizContent.noOptions")}
                             </div>
                           )}
                         </div>
@@ -562,7 +610,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                             <p className="text-sm text-muted-foreground bg-secondary/30 p-4 rounded-xl">
                               <span className="font-bold flex items-center gap-2 mb-1 text-foreground">
                                 <Brain className="w-4 h-4 text-primary" />
-                                {t('quizContent.explanation')}:
+                                {t("quizContent.explanation")}:
                               </span>
                               {currentQuestion.explanation}
                             </p>
@@ -577,7 +625,8 @@ export const QuizContent: React.FC<QuizContentProps> = ({
               <CardFooter className="flex flex-col sm:flex-row justify-end gap-4 pt-6 pb-8 border-t bg-muted/20 min-h-[5rem]">
                 {!showResults ? (
                   // Show Grade button if on last question OR all questions answered
-                  (currentQuestionIndex === quiz.questions.length - 1 || answeredCount === quiz.questions.length) && (
+                  (currentQuestionIndex === quiz.questions.length - 1 ||
+                    answeredCount === quiz.questions.length) && (
                     <Button
                       onClick={async () => {
                         // OPTIMISTIC UI: Grade immediately, save to server in background
@@ -588,7 +637,11 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                         scrollToTop();
 
                         // 2. Save to server in background (non-blocking)
-                        if (userId && answeredCount === quiz.questions.length && quiz.id) {
+                        if (
+                          userId &&
+                          answeredCount === quiz.questions.length &&
+                          quiz.id
+                        ) {
                           // Calculate actual time taken based on startTime (or fallback to timerSeconds)
                           const timeTaken = startTime
                             ? Math.floor((Date.now() - startTime) / 1000)
@@ -598,11 +651,16 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                           const localCorrectCount = userAnswers.reduce(
                             (count, answer, idx) => {
                               const question = quiz.questions[idx];
-                              return count + (answer === question.correctAnswer ? 1 : 0);
+                              return (
+                                count +
+                                (answer === question.correctAnswer ? 1 : 0)
+                              );
                             },
-                            0
+                            0,
                           );
-                          const localScore = Math.round((localCorrectCount / quiz.questions.length) * 100);
+                          const localScore = Math.round(
+                            (localCorrectCount / quiz.questions.length) * 100,
+                          );
 
                           // Fire and forget - don't await
                           saveQuizAttempt(
@@ -612,24 +670,33 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                             quiz.questions.length,
                             localCorrectCount,
                             userAnswers,
-                            timeTaken
+                            timeTaken,
                           ).then((result) => {
                             if (result.success) {
-                              console.log("✅ Quiz attempt saved (server-validated)");
+                              console.log(
+                                "✅ Quiz attempt saved (server-validated)",
+                              );
 
                               // Use local score for reward (server validates but we trust local for display)
                               const currentXP = calculateXP(statistics);
                               const currentLevel = calculateLevel(currentXP);
-                              const zcoinReward = calculateAttemptReward(currentLevel, result.score ?? localScore);
+                              const zcoinReward = calculateAttemptReward(
+                                currentLevel,
+                                result.score ?? localScore,
+                              );
 
                               // Refresh stats to trigger global level up check
                               refetchStats();
 
                               toast({
-                                title: t('notifications.zcoinReward.attempt', { amount: zcoinReward, xp: result.score ?? localScore }),
-                                description: t('quizDetail.quizResult'),
+                                title: t("notifications.zcoinReward.attempt", {
+                                  amount: zcoinReward,
+                                  xp: result.score ?? localScore,
+                                }),
+                                description: t("quizDetail.quizResult"),
                                 variant: "success",
                                 duration: 3000,
+                                icon: <Mascot emotion="party" size={60} className="drop-shadow-sm -mt-1 -ml-1" />,
                               });
                             } else {
                               console.log("❌ Failed to save quiz attempt");
@@ -638,14 +705,19 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                         }
                       }}
                       disabled={answeredCount !== quiz.questions.length}
-                      variant={answeredCount === quiz.questions.length ? "hero" : "outline"}
+                      variant={
+                        answeredCount === quiz.questions.length
+                          ? "hero"
+                          : "outline"
+                      }
                       size="xl"
                       sound="success"
-                      className={`w-full sm:w-auto text-sm sm:text-base md:text-lg min-h-[3rem] sm:min-h-[3.5rem] py-3 sm:py-4 px-4 sm:px-6 rounded-2xl sm:rounded-3xl border-2 sm:border-4 shadow-xl transition-all duration-200 active:scale-95 ${answeredCount === quiz.questions.length
-                        ? "border-primary hover:shadow-2xl hover:border-primary-foreground/20"
-                        : "border-border opacity-50 cursor-not-allowed"
-                        }`}>
-                      {t('quizContent.grade')}
+                      className={`w-full sm:w-auto text-sm sm:text-base md:text-lg min-h-[3rem] sm:min-h-[3.5rem] py-3 sm:py-4 px-4 sm:px-6 rounded-2xl sm:rounded-3xl border-2 sm:border-4 shadow-xl transition-all duration-200 active:scale-95 ${
+                        answeredCount === quiz.questions.length
+                          ? "border-primary hover:shadow-2xl hover:border-primary-foreground/20"
+                          : "border-border opacity-50 cursor-not-allowed"
+                      }`}>
+                      {t("quizContent.grade")}
                     </Button>
                   )
                 ) : (
@@ -658,7 +730,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                     size="xl"
                     sound="alert"
                     className="min-w-[200px] rounded-3xl border-4 border-primary hover:border-primary-foreground/20 shadow-xl active:scale-95 transition-all duration-200">
-                    {t('quizContent.retake')}
+                    {t("quizContent.retake")}
                   </Button>
                 )}
               </CardFooter>
@@ -666,10 +738,11 @@ export const QuizContent: React.FC<QuizContentProps> = ({
           </div>
 
           <div
-            className={`transition-all duration-500 ease-in-out transform-gpu ${showFlashcard
-              ? "opacity-100 scale-100 rotate-y-0"
-              : "opacity-0 scale-95 -rotate-y-90 pointer-events-none absolute"
-              }`}>
+            className={`transition-all duration-500 ease-in-out transform-gpu ${
+              showFlashcard
+                ? "opacity-100 scale-100 rotate-y-0"
+                : "opacity-0 scale-95 -rotate-y-90 pointer-events-none absolute"
+            }`}>
             <FlashcardView
               quiz={quiz}
               onBack={() => {
@@ -683,11 +756,11 @@ export const QuizContent: React.FC<QuizContentProps> = ({
         isOpen={isShareDialogOpen}
         onClose={() => setIsShareDialogOpen(false)}
         url={`${window.location.origin}/quiz/play/${quiz.id}`}
-        title={t('share.title', 'Share Quiz')}
+        title={t("share.title", "Share Quiz")}
         quizTitle={quiz.title}
         questionCount={quiz.questions.length}
       />
-    </section >
+    </section>
   );
 };
 

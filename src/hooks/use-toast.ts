@@ -13,6 +13,7 @@ type ToastOptions = {
   duration?: number;
   variant?: Variant;
   action?: React.ReactNode;
+  icon?: React.ReactNode;
 };
 
 type ToastHandle = {
@@ -30,7 +31,8 @@ function renderContent(
   title?: React.ReactNode,
   description?: React.ReactNode,
   variant?: Variant,
-  action?: React.ReactNode
+  action?: React.ReactNode,
+  customIcon?: React.ReactNode
 ) {
   const children: Array<React.ReactNode> = [];
 
@@ -59,7 +61,7 @@ function renderContent(
     }),
   };
 
-  const icon = variant ? iconMap[variant] : null;
+  const icon = customIcon || (variant ? iconMap[variant] : null);
 
   if (title) {
     children.push(
@@ -135,7 +137,7 @@ function renderContent(
 export function toast(opts: ToastOptions): ToastHandle {
   const id = hotToast.custom(
     () =>
-      renderContent(opts.title, opts.description, opts.variant, opts.action),
+      renderContent(opts.title, opts.description, opts.variant, opts.action, opts.icon),
     {
       duration: opts.duration ?? DEFAULT_DURATION,
     }
