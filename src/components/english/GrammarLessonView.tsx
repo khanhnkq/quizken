@@ -149,7 +149,7 @@ const GrammarLessonView: React.FC<GrammarLessonProps> = ({ lesson, theme, onComp
             </div>
 
             {/* Bottom Controls */}
-            <div className="relative z-10 w-full max-w-2xl mx-auto px-4 pb-8 pt-2 grid grid-cols-2 gap-4">
+            <div className="relative z-10 w-full max-w-2xl mx-auto px-4 pb-16 pt-2 grid grid-cols-2 gap-4">
                 <button
                     onClick={goToPrev}
                     disabled={currentSectionIndex === 0}

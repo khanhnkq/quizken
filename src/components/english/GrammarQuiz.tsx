@@ -298,7 +298,7 @@ const GrammarQuiz: React.FC<GrammarQuizProps> = ({ lesson, theme, onComplete, on
     }
 
     return (
-        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center p-4 bg-slate-50 overflow-hidden">
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center p-4 pb-24 bg-slate-50 overflow-hidden">
             <div className={`absolute inset-0 bg-gradient-to-br ${theme ? theme.color : 'from-indigo-50 to-purple-50'} opacity-10 pointer-events-none`} />
             <div className="absolute inset-0 opacity-40 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#94a3b8 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
 

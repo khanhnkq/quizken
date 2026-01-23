@@ -403,7 +403,7 @@ const SentenceBuilder: React.FC<SentenceBuilderProps> = ({
             onDragStart={handleDragStart}
             onDragEnd={handleDragEnd}
         >
-            <div className="fixed inset-0 z-50 flex flex-col items-center justify-center p-4 overflow-hidden bg-slate-50">
+            <div className="fixed inset-0 z-50 flex flex-col items-center justify-center p-4 pb-24 overflow-hidden bg-slate-50">
                 <div className={`absolute inset-0 bg-gradient-to-br ${categoryTheme ? categoryTheme.color : theme.gradient} ${categoryTheme ? 'opacity-10' : ''} pointer-events-none`} />
 
                 {/* Background FX */}
