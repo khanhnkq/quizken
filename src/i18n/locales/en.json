@@ -245,7 +245,6 @@
             "20questions": "20 questions",
             "25questions": "25 questions",
             "30questions": "30 questions",
-            "questions": "questions",
             "estimatedTime": "Estimated time",
             "loginUnlimited": "Login for unlimited",
             "fillAllFields": "Please fill in all fields",
@@ -1147,5 +1146,53 @@
         "copiedDesc": "Link copied to clipboard successfully.",
         "copyFailed": "Failed to copy",
         "copyFailedDesc": "Could not copy link to clipboard."
+    },
+    "themes": {
+        "vietnam_spirit": {
+            "badge": "Vietnam Pride",
+            "title1": "Vietnam",
+            "title1Highlight": "Spirit",
+            "title2": "Cultural",
+            "title2Highlight": "Identity",
+            "subtitle": "Proud of Vietnamese culture with a theme imbued with the soul of the mountains and rivers. Explore now!"
+        },
+        "neon_night": {
+            "badge": "CYBERPUNK 2077",
+            "title1": "NEON",
+            "title1Highlight": "NIGHT",
+            "title2": "FUTURE",
+            "title2Highlight": "VIBES",
+            "subtitle": "Immerse yourself in vibrant Neon lights and the energetic rhythm of the future city."
+        },
+        "pastel_dream": {
+            "badge": "Sweet Dreams",
+            "title1": "Pastel",
+            "title1Highlight": "Dream",
+            "title2": "Soft",
+            "title2Highlight": "World",
+            "subtitle": "A dreamy world with soft pastel colors, bringing a sense of relaxation."
+        },
+        "comic_manga": {
+            "badge": "COMIC MODE",
+            "title1": "COMIC",
+            "title1Highlight": "BOOM!",
+            "title2": "HERO",
+            "title2Highlight": "TIME",
+            "subtitle": "Energetic comic style! Turn learning into an exciting adventure."
+        },
+        "jujutsu_kaisen": {
+            "badge": "Unlimited Void",
+            "title1": "Domain",
+            "title1Highlight": "Expansion",
+            "title2": "Infinite",
+            "title2Highlight": "Void",
+            "subtitle": "Open the domain of knowledge. Dominate every exam with sorcerer power."
+        },
+        "premium_default": {
+            "badge": "Premium Theme",
+            "title1": "Premium",
+            "title1Highlight": "Theme",
+            "subtitle": "Experience high-quality dynamic themes."
+        }
     }
 }

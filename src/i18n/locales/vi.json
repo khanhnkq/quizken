@@ -248,7 +248,6 @@
             "20questions": "20 câu hỏi",
             "25questions": "25 câu hỏi",
             "30questions": "30 câu hỏi",
-            "questions": "câu",
             "estimatedTime": "Thời gian tạo khoảng",
             "loginUnlimited": "Đăng nhập để không giới hạn",
             "fillAllFields": "Vui lòng điền đầy đủ thông tin",
@@ -1152,5 +1151,53 @@
         "copiedDesc": "Link đã được lưu vào bộ nhớ tạm.",
         "copyFailed": "Sao chép thất bại",
         "copyFailedDesc": "Không thể lưu link vào bộ nhớ tạm."
+    },
+    "themes": {
+        "vietnam_spirit": {
+            "badge": "Tự hào Việt Nam",
+            "title1": "Hào Khí",
+            "title1Highlight": "Việt Nam",
+            "title2": "Bản Sắc",
+            "title2Highlight": "Dân Tộc",
+            "subtitle": "Tự hào văn hóa Việt với giao diện mang đậm hồn thiêng sông núi. Khám phá ngay!"
+        },
+        "neon_night": {
+            "badge": "CYBERPUNK 2077",
+            "title1": "NEON",
+            "title1Highlight": "NIGHT",
+            "title2": "FUTURE",
+            "title2Highlight": "VIBES",
+            "subtitle": "Hòa mình vào ánh đèn Neon rực rỡ và nhịp điệu sôi động của thành phố tương lai."
+        },
+        "pastel_dream": {
+            "badge": "Sweet Dreams",
+            "title1": "Pastel",
+            "title1Highlight": "Dream",
+            "title2": "Soft",
+            "title2Highlight": "World",
+            "subtitle": "Thế giới mộng mơ với những gam màu pastel nhẹ nhàng, mang lại cảm giác thư thái."
+        },
+        "comic_manga": {
+            "badge": "COMIC MODE",
+            "title1": "COMIC",
+            "title1Highlight": "BOOM!",
+            "title2": "HERO",
+            "title2Highlight": "TIME",
+            "subtitle": "Phong cách truyện tranh đầy năng lượng! Biến việc học thành cuộc phiêu lưu thú vị."
+        },
+        "jujutsu_kaisen": {
+            "badge": "Vô Lượng Hạn",
+            "title1": "Domain",
+            "title1Highlight": "Expansion",
+            "title2": "Infinite",
+            "title2Highlight": "Void",
+            "subtitle": "Khai mở lãnh địa tri thức. Thống trị mọi kỳ thi với sức mạnh chú thuật sư."
+        },
+        "premium_default": {
+            "badge": "Premium Theme",
+            "title1": "Premium",
+            "title1Highlight": "Theme",
+            "subtitle": "Trải nghiệm giao diện động chất lượng cao."
+        }
     }
 }

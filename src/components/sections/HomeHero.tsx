@@ -47,15 +47,25 @@ const HomeHero = () => {
                     active: true,
                     mascot: VietnamFlagIcon,
                     mascotClass: "w-56 h-auto drop-shadow-2xl filter transition-all duration-500 hover:scale-105",
-                    badgeText: "Tự hào là người Việt Nam",
-                    badgeClass: "bg-gradient-to-r from-red-600 to-red-700 text-yellow-400 border-yellow-400",
+                    badgeText: t("themes.vietnam_spirit.badge", "Tự hào Việt Nam"),
+                    badgeClass: "bg-gradient-to-r from-red-600 to-yellow-500 text-white border-yellow-400 font-bold",
                     badgeIcon: VietnamStarIcon,
                     floating: [
                         { Icon: VietnamStarIcon, color: "text-yellow-500", bg: "bg-card border-yellow-400", rotate: "-6deg" },
                         { Icon: VietnamDrumIcon, color: "text-primary", bg: "bg-card border-primary", rotate: "12deg" },
                         { Icon: VietnamLotusIcon, color: "text-pink-500", bg: "bg-white/90 border-pink-400", rotate: "-10deg", pos: "bottom-[20%] left-[10%]" },
                         { Icon: VietnamMapIcon, color: "text-red-600", bg: "bg-yellow-100/90 border-yellow-500", rotate: "5deg", pos: "top-[40%] right-[10%]" }
-                    ]
+                    ],
+                    header: {
+                        title: (
+                            <>
+                                {t("themes.vietnam_spirit.title1", "Hào Khí")} <span className="text-red-600">{t("themes.vietnam_spirit.title1Highlight", "Việt Nam")}</span>
+                                <br />
+                                {t("themes.vietnam_spirit.title2", "Bản Sắc")} <span className="text-yellow-500">{t("themes.vietnam_spirit.title2Highlight", "Dân Tộc")}</span>
+                            </>
+                        ),
+                        subtitle: t("themes.vietnam_spirit.subtitle", "Tự hào văn hóa Việt với giao diện mang đậm hồn thiêng sông núi. Khám phá ngay!")
+                    }
                 };
                 break;
             case 'theme_neon_night':
@@ -63,13 +73,23 @@ const HomeHero = () => {
                     active: true,
                     mascot: NeonCyberSkullIcon,
                     mascotClass: "w-48 h-48 drop-shadow-[0_0_15px_rgba(0,255,255,0.5)] animate-pulse",
-                    badgeText: "System Override",
-                    badgeClass: "bg-black text-neon-green border-neon-blue border shadow-[0_0_10px_#0ff]",
+                    badgeText: t("themes.neon_night.badge", "CYBERPUNK 2077"),
+                    badgeClass: "bg-black text-cyan-400 border-cyan-500 border shadow-[0_0_10px_#0ff] font-mono",
                     badgeIcon: NeonBoltIcon,
                     floating: [
                          { Icon: NeonBoltIcon, color: "text-yellow-400", bg: "bg-black/80 border-yellow-400", rotate: "-12deg" },
                          { Icon: NeonBoltIcon, color: "text-cyan-400", bg: "bg-black/80 border-cyan-400", rotate: "10deg" }
-                    ]
+                    ],
+                    header: {
+                        title: (
+                            <>
+                                {t("themes.neon_night.title1", "NEON")} <span className="text-cyan-400 drop-shadow-[0_0_10px_rgba(34,211,238,0.8)]">{t("themes.neon_night.title1Highlight", "NIGHT")}</span>
+                                <br />
+                                {t("themes.neon_night.title2", "FUTURE")} <span className="text-purple-500 drop-shadow-[0_0_10px_rgba(168,85,247,0.8)]">{t("themes.neon_night.title2Highlight", "VIBES")}</span>
+                            </>
+                        ),
+                        subtitle: t("themes.neon_night.subtitle", "Hòa mình vào ánh đèn Neon rực rỡ và nhịp điệu sôi động của thành phố tương lai.")
+                    }
                 };
                 break;
             case 'theme_pastel_dream':
@@ -77,13 +97,23 @@ const HomeHero = () => {
                     active: true,
                     mascot: PastelHeartIcon,
                     mascotClass: "w-48 h-48 text-pink-300 drop-shadow-xl animate-bounce-slow",
-                    badgeText: "Dream Big",
-                    badgeClass: "bg-white text-pink-400 border-blue-200",
+                    badgeText: t("themes.pastel_dream.badge", "Sweet Dreams"),
+                    badgeClass: "bg-white text-pink-400 border-blue-200 font-serif italic",
                     badgeIcon: PastelCloudIcon,
                     floating: [
                          { Icon: PastelCloudIcon, color: "text-blue-300", bg: "bg-white border-blue-200", rotate: "5deg" },
                          { Icon: PastelHeartIcon, color: "text-pink-300", bg: "bg-white border-pink-200", rotate: "-5deg" }
-                    ]
+                    ],
+                    header: {
+                        title: (
+                            <>
+                                {t("themes.pastel_dream.title1", "Pastel")} <span className="text-pink-300">{t("themes.pastel_dream.title1Highlight", "Dream")}</span>
+                                <br />
+                                {t("themes.pastel_dream.title2", "Soft")} <span className="text-blue-300">{t("themes.pastel_dream.title2Highlight", "World")}</span>
+                            </>
+                        ),
+                        subtitle: t("themes.pastel_dream.subtitle", "Thế giới mộng mơ với những gam màu pastel nhẹ nhàng, mang lại cảm giác thư thái.")
+                    }
                 };
                 break;
              case 'theme_comic_manga':
@@ -91,25 +121,45 @@ const HomeHero = () => {
                     active: true,
                     mascot: ComicBoomIcon,
                     mascotClass: "w-56 h-auto drop-shadow-xl scale-110",
-                    badgeText: "HERO MODE!",
+                    badgeText: t("themes.comic_manga.badge", "COMIC MODE"),
                     badgeClass: "bg-yellow-400 text-black border-black border-4 font-black italic",
                     badgeIcon: ComicPowIcon,
                     floating: [
                          { Icon: ComicPowIcon, color: "text-red-500", bg: "bg-white border-black border-2", rotate: "-15deg" },
                          { Icon: ComicBoomIcon, color: "text-blue-500", bg: "bg-white border-black border-2", rotate: "15deg" }
-                    ]
+                    ],
+                    header: {
+                        title: (
+                            <>
+                                {t("themes.comic_manga.title1", "COMIC")} <span className="text-yellow-500 outline-text-black">{t("themes.comic_manga.title1Highlight", "BOOM!")}</span>
+                                <br />
+                                {t("themes.comic_manga.title2", "HERO")} <span className="text-red-500 outline-text-black">{t("themes.comic_manga.title2Highlight", "TIME")}</span>
+                            </>
+                        ),
+                        subtitle: t("themes.comic_manga.subtitle", "Phong cách truyện tranh đầy năng lượng! Biến việc học thành cuộc phiêu lưu thú vị.")
+                    }
                 };
                 break;
              case 'theme_jujutsu_kaisen':
                 assets = {
                     active: true,
-                    badgeText: "Domain Expansion", // Distinctive text
-                    badgeClass: "bg-neutral-900 text-red-600 border-red-900 border-2 font-black shadow-[0_0_20px_rgba(220,38,38,0.5)]",
+                    badgeText: t("themes.jujutsu_kaisen.badge", "Vô Lượng Hạn"), 
+                    badgeClass: "bg-neutral-900 text-white border-purple-900 border-2 font-black shadow-[0_0_20px_rgba(147,51,234,0.5)]",
                     badgeIcon: Sparkles,
                     floating: [
-                        { Icon: Sparkles, color: "text-red-500", bg: "bg-black/80 border-red-600", rotate: "-10deg" },
-                        { Icon: Zap, color: "text-purple-500", bg: "bg-black/80 border-purple-600", rotate: "15deg" }
-                    ]
+                        { Icon: Sparkles, color: "text-purple-500", bg: "bg-black/90 border-purple-600", rotate: "-10deg" },
+                        { Icon: Zap, color: "text-red-500", bg: "bg-black/90 border-red-600", rotate: "15deg" }
+                    ],
+                    header: {
+                        title: (
+                            <>
+                                {t("themes.jujutsu_kaisen.title1", "Domain")} <span className="text-purple-600 drop-shadow-[0_0_15px_rgba(147,51,234,0.8)]">{t("themes.jujutsu_kaisen.title1Highlight", "Expansion")}</span>
+                                <br />
+                                {t("themes.jujutsu_kaisen.title2", "Infinite")} <span className="text-red-600">{t("themes.jujutsu_kaisen.title2Highlight", "Void")}</span>
+                            </>
+                        ),
+                        subtitle: t("themes.jujutsu_kaisen.subtitle", "Khai mở lãnh địa tri thức. Thống trị mọi kỳ thi với sức mạnh chú thuật sư.")
+                    }
                 };
                 break;
         }
@@ -126,6 +176,11 @@ const HomeHero = () => {
                 assets.badgeClass = "bg-primary/20 text-primary border-primary backdrop-blur-md";
                 assets.badgeIcon = Sparkles;
                 assets.floating = [];
+                // Default Header for video themes if not matched
+                assets.header = {
+                    title: <>Premium <span className="text-primary">Theme</span></>,
+                    subtitle: "Trải nghiệm giao diện động chất lượng cao."
+                };
             }
         }
 
@@ -291,21 +346,31 @@ const HomeHero = () => {
 
                         {/* Title */}
                         <h1 className="hero-title font-heading text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-black tracking-tight leading-[1.1] text-foreground drop-shadow-sm opacity-0">
-                            {t("hero.titlePart1", "Create")}{" "}
-                            <span className="text-primary relative inline-block">
-                                {t("hero.titlePart2", "Quizzes")}
-                                <svg className="absolute -bottom-2 left-0 w-full h-3 text-secondary -z-10" viewBox="0 0 100 10" preserveAspectRatio="none">
-                                    <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="8" fill="none" />
-                                </svg>
-                            </span>
-                            <br className="hidden md:block" />
-                            {t("hero.titlePart3", "with")}{" "}
-                            <span className="text-primary">{t("hero.titlePart4", "AI")}</span>
+                            {themeAssets.header ? (
+                                themeAssets.header.title
+                            ) : (
+                                <>
+                                    {t("hero.titlePart1", "Create")}{" "}
+                                    <span className="text-primary relative inline-block">
+                                        {t("hero.titlePart2", "Quizzes")}
+                                        <svg className="absolute -bottom-2 left-0 w-full h-3 text-secondary -z-10" viewBox="0 0 100 10" preserveAspectRatio="none">
+                                            <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="8" fill="none" />
+                                        </svg>
+                                    </span>
+                                    <br className="hidden md:block" />
+                                    {t("hero.titlePart3", "with")}{" "}
+                                    <span className="text-primary">{t("hero.titlePart4", "AI")}</span>
+                                </>
+                            )}
                         </h1>
 
                         {/* Description */}
                         <p className="hero-subtitle text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto lg:mx-0 leading-relaxed font-medium opacity-0">
-                            {t("hero.subtitle", "Transform any text into a gamified quiz instantly. Perfect for teachers, students, and lifelong learners.")}
+                            {themeAssets.header ? (
+                                themeAssets.header.subtitle
+                            ) : (
+                                t("hero.subtitle", "Transform any text into a gamified quiz instantly. Perfect for teachers, students, and lifelong learners.")
+                            )}
                         </p>
 
                         {/* Buttons */}
@@ -354,7 +419,7 @@ const HomeHero = () => {
                         )}
 
                         {/* Main Card (The "Character") */}
-                        <div className="hero-card relative z-10 w-full max-w-md aspect-[4/5] perspective-1000 opacity-0">
+                        <div className="hero-card relative z-10 w-full max-w-md aspect-[4/5] perspective-1000 opacity-0 rounded-[3rem]">
                             {themeAssets.active && (
                                 <div className="absolute -top-16 left-0 right-0 z-30 flex justify-center animate-bounce-slow">
                                      <span className={`${themeAssets.badgeClass} px-6 py-3 rounded-2xl shadow-xl border-4 text-base sm:text-lg uppercase tracking-widest transform -rotate-3 inline-flex items-center gap-2 whitespace-nowrap`}>
@@ -366,7 +431,10 @@ const HomeHero = () => {
                             )}
                             <div className="w-full h-full relative preserve-3d transition-transform duration-500 hover:rotate-y-6">
                                 {/* The 'Card' Body */}
-                                <div className="absolute inset-0 bg-card rounded-[3rem] shadow-2xl border-4 border-card overflow-hidden flex flex-col">
+                                <div className={cn(
+                                    "absolute inset-0 rounded-[3rem] overflow-hidden flex flex-col",
+                                    themeAssets.videoMode ? "bg-black border-0" : "bg-card shadow-2xl border-4 border-card"
+                                )}>
                                     
                                     {/* VIDEO MODE: Replaces entire card content */}
                                     {/* @ts-ignore */}
