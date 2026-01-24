@@ -47,6 +47,7 @@ import { GlobalCreateButton } from "@/components/common/GlobalCreateButton";
 import { GlobalChatTicker } from "@/components/chat/GlobalChatTicker";
 import { GlobalQuizListener } from "@/components/common/GlobalQuizListener";
 import { CustomCursor } from "@/components/ui/CustomCursor";
+import { IntroAnimation } from "@/components/layout/IntroAnimation";
 
 // GSAP plugins are loaded dynamically in useLayoutEffect to reduce initial bundle size
 
@@ -226,7 +227,12 @@ const App = () => {
         <ThemeManager />
         <TooltipProvider>
           <ChillMusicProvider>
+
+
+
+
             <ChatImagesProvider>
+              <IntroAnimation />
               {/* 👇 Toaster nằm ngoài ScrollSmoother */}
               <HotToaster />
               <GlobalLevelNotification />

@@ -308,6 +308,14 @@ const Navbar = () => {
                         <span>{t("inventory.title", "Kho đồ")}</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem
+                        onClick={() =>
+                          navigate("/user/dashboard?tab=exchange")
+                        }
+                      >
+                        <Store className="mr-2 h-4 w-4" />
+                        <span>{t("dashboard.tabs.exchange", "Cửa hàng")}</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
                         onClick={() => {
                           toast({
                             title: t(

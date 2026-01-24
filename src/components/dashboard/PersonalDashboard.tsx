@@ -182,7 +182,7 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
           className={cn(
             "fixed z-50 left-1/2 -translate-x-1/2",
             scrolled 
-              ? "rounded-full border border-slate-200/60 dark:border-slate-800/60 shadow-lg dark:shadow-slate-900/50 backdrop-blur-2xl bg-white/70 dark:bg-slate-950/70" 
+              ? "rounded-full border border-slate-200/60 dark:border-slate-800/60 shadow-lg dark:shadow-slate-900/50 backdrop-blur-2xl bg-white/90 dark:bg-slate-950/90" 
               : "border-b border-slate-200/60 dark:border-slate-800/60 backdrop-blur-xl bg-white/80 dark:bg-slate-900/80 shadow-sm rounded-none"
           )}
         >
