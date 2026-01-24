@@ -42,7 +42,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Bell, Megaphone, Loader2 } from "lucide-react";
+import { Bell, Megaphone, Loader2, Gift } from "lucide-react";
 import { useAnnouncements } from "@/hooks/useAnnouncements";
 import { useProfile } from "@/hooks/useProfile";
 import { formatDistanceToNow } from "date-fns";
@@ -316,6 +316,12 @@ const Navbar = () => {
                       >
                         <Store className="mr-2 h-4 w-4" />
                         <span>{t("dashboard.tabs.exchange", "Cửa hàng")}</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => navigate("/redeem")}
+                      >
+                        <Gift className="mr-2 h-4 w-4 text-indigo-500" />
+                        <span>{t("nav.redeem", "Nhập Code")}</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => {

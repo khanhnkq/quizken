@@ -32,6 +32,7 @@ import {
   BookOpen,
   BookOpenIcon,
   ArrowRight,
+  Gift,
 } from "lucide-react";
 import { BackgroundDecorations } from "@/components/ui/BackgroundDecorations";
 import { gsap } from "gsap";
@@ -227,6 +228,7 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
                   {t("dashboard.tabs.luckyDraw", "Lucky Draw")}
                 </span>
               </TabsTrigger>
+
               <TabsTrigger
                 value="inventory"
                 className="flex-1 sm:flex-none relative h-16 rounded-none border-b-2 border-transparent px-2 sm:px-6 hover:bg-slate-50 hover:text-teal-600 data-[state=active]:border-teal-600 data-[state=active]:text-teal-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 transition-all flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 text-[10px] sm:text-sm uppercase tracking-wide sm:normal-case sm:tracking-normal">
@@ -452,6 +454,8 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
             className="min-h-[500px] pt-4 focus-visible:outline-none">
             <GachaSystem />
           </TabsContent>
+
+
 
           <TabsContent
             value="inventory"
