@@ -1,5 +1,7 @@
-import { useState, useEffect, type MouseEvent } from "react";
+import { useState, useEffect, type MouseEvent, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { StatisticsCards } from "./StatisticsCards";
@@ -55,6 +57,22 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
   
   const { user, signOut } = useAuth();
   const { t } = useTranslation();
+  const [scrolled, setScrolled] = useState(() => window.scrollY > 20);
+
+  // Scroll shadow effect
+  useEffect(() => {
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        setScrolled(window.scrollY > 1);
+        ticking = false;
+      });
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   // Fetch data using hooks
   const {
@@ -152,7 +170,22 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
         className="relative z-10"
       >
         {/* Fixed Top Navbar */}
-        <div className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200/60 dark:border-slate-800/60 shadow-sm transition-all duration-300">
+        {/* Fixed Top Navbar */}
+        <motion.div 
+          initial={{ width: "90%", opacity: 0 }}
+          animate={{ 
+            width: scrolled ? "75%" : "100%", 
+            opacity: 1,
+            top: scrolled ? 16 : 0
+          }}
+          transition={{ duration: 0.7, ease: "easeInOut" }}
+          className={cn(
+            "fixed z-50 left-1/2 -translate-x-1/2",
+            scrolled 
+              ? "rounded-full border border-slate-200/60 dark:border-slate-800/60 shadow-lg dark:shadow-slate-900/50 backdrop-blur-2xl bg-white/70 dark:bg-slate-950/70" 
+              : "border-b border-slate-200/60 dark:border-slate-800/60 backdrop-blur-xl bg-white/80 dark:bg-slate-900/80 shadow-sm rounded-none"
+          )}
+        >
           <div className="container mx-auto px-4 h-16 flex items-center justify-between gap-4">
             {/* Left: Home Button / Brand */}
             <div className="flex items-center shrink-0">
@@ -214,7 +247,7 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
             {/* Right: Placeholder for balance */}
             <div className="w-[88px] shrink-0 hidden md:block"></div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Main Content Container */}
         <div className="container mx-auto py-8 px-3 md:px-6 mt-16 space-y-8 min-h-screen">
