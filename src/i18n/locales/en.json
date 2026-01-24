@@ -604,6 +604,7 @@
         "filter": {
             "all": "All",
             "avatar": "Avatar",
+            "avatar_frame": "Avatar Frame",
             "theme": "Theme",
             "powerup": "Power-up",
             "document": "Documents"

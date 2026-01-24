@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { motion, AnimatePresence } from 'framer-motion';
 
-type FilterType = 'all' | 'avatar' | 'theme' | 'powerup' | 'document';
+type FilterType = 'all' | 'avatar' | 'avatar_frame' | 'theme' | 'powerup' | 'document';
 
 export function InventoryTab() {
     const { t, i18n } = useTranslation();
@@ -31,7 +31,7 @@ export function InventoryTab() {
                 id: 'unknown',
                 price: 0,
                 icon: '❓',
-                type: owned.item_type as 'theme' | 'avatar' | 'powerup' | 'document',
+                type: owned.item_type as 'theme' | 'avatar' | 'avatar_frame' | 'powerup' | 'document',
                 color: 'bg-gray-100',
                 description: 'Item data not found',
                 download_url: null,
@@ -50,6 +50,7 @@ export function InventoryTab() {
     const categories = [
         { id: 'all', label: t('exchange.filter.all'), icon: Package, color: 'bg-teal-100 text-teal-600' },
         { id: 'avatar', label: t('exchange.filter.avatar'), icon: Shirt, color: 'bg-blue-100 text-blue-600' },
+        { id: 'avatar_frame', label: t('exchange.filter.avatar_frame', 'Viền Avatar'), icon: Sparkles, color: 'bg-yellow-100 text-yellow-600' },
         { id: 'theme', label: t('exchange.filter.theme'), icon: Palette, color: 'bg-pink-100 text-pink-600' },
         { id: 'powerup', label: t('exchange.filter.powerup'), icon: Zap, color: 'bg-amber-100 text-amber-600' },
         { id: 'document', label: t('exchange.filter.document'), icon: FileText, color: 'bg-emerald-100 text-emerald-600' },
@@ -61,11 +62,13 @@ export function InventoryTab() {
     const handleEquip = async (item: any) => {
         const isTheme = item.details.type === 'theme';
         const isAvatar = item.details.type === 'avatar';
+        const isFrame = item.details.type === 'avatar_frame';
         
         console.log("Attempting to equip/unequip:", item.details.name, "Type:", item.details.type);
 
         const isEquipped = (isTheme && profileData?.equipped_theme === item.item_id) ||
-                           (isAvatar && profileData?.equipped_avatar_frame === item.item_id);
+                           (isAvatar && profileData?.equipped_avatar_frame === item.item_id) ||
+                           (isFrame && profileData?.equipped_avatar_frame === item.item_id);
 
         console.log("Current status - Equipped:", isEquipped);
         console.log("Profile Data:", profileData);
@@ -76,10 +79,10 @@ export function InventoryTab() {
             // Logic Toggle: If equipped -> unequip (null), else equip
             if (isEquipped) {
                  if (isTheme) updateData.equipped_theme = null;
-                 if (isAvatar) updateData.equipped_avatar_frame = null;
+                 if (isAvatar || isFrame) updateData.equipped_avatar_frame = null;
             } else {
                  if (isTheme) updateData.equipped_theme = item.item_id;
-                 if (isAvatar) updateData.equipped_avatar_frame = item.item_id;
+                 if (isAvatar || isFrame) updateData.equipped_avatar_frame = item.item_id;
             }
 
             console.log("Update Payload:", updateData);
@@ -231,8 +234,9 @@ export function InventoryTab() {
                                             px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm
                                             ${item.item_type === 'avatar' ? 'bg-blue-100 text-blue-600' :
                                                 item.item_type === 'theme' ? 'bg-pink-100 text-pink-600' :
-                                                    item.item_type === 'powerup' ? 'bg-amber-100 text-amber-600' :
-                                                        'bg-emerald-100 text-emerald-600'}
+                                                    item.item_type === 'avatar_frame' ? 'bg-yellow-100 text-yellow-600' :
+                                                        item.item_type === 'powerup' ? 'bg-amber-100 text-amber-600' :
+                                                            'bg-emerald-100 text-emerald-600'}
                                         `}>
                                             {t(`exchange.filter.${item.item_type}`)}
                                         </div>
@@ -278,24 +282,27 @@ export function InventoryTab() {
                                     {/* Action Area */}
                                     <div className="mt-auto space-y-3">
                                         {/* Equip/Use Buttons */}
-                                        {(item.details.type === 'theme' || item.details.type === 'avatar') && (
+                                        {(item.details.type === 'theme' || item.details.type === 'avatar' || item.details.type === 'avatar_frame') && (
                                             <Button
                                                 onClick={() => handleEquip(item)}
                                                 // Remove disabled prop to allow un-equipping
                                                 variant={(
                                                     (item.details.type === 'theme' && profileData?.equipped_theme === item.item_id) ||
-                                                    (item.details.type === 'avatar' && profileData?.equipped_avatar_frame === item.item_id)
+                                                    (item.details.type === 'avatar' && profileData?.equipped_avatar_frame === item.item_id) ||
+                                                    (item.details.type === 'avatar_frame' && profileData?.equipped_avatar_frame === item.item_id)
                                                 ) ? "outline" : "default"}
                                                 className={`w-full rounded-2xl h-12 font-bold text-sm transition-all
                                                     ${((item.details.type === 'theme' && profileData?.equipped_theme === item.item_id) ||
-                                                       (item.details.type === 'avatar' && profileData?.equipped_avatar_frame === item.item_id))
+                                                       (item.details.type === 'avatar' && profileData?.equipped_avatar_frame === item.item_id) ||
+                                                       (item.details.type === 'avatar_frame' && profileData?.equipped_avatar_frame === item.item_id))
                                                         ? 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-red-500 border border-slate-200 dark:border-slate-700'
                                                         : 'bg-gradient-to-b from-violet-500 to-violet-600 hover:from-violet-400 hover:to-violet-500 text-white shadow-violet-200 hover:shadow-violet-300 hover:-translate-y-1 active:translate-y-0'
                                                     }
                                                 `}
                                             >
                                                 {((item.details.type === 'theme' && profileData?.equipped_theme === item.item_id) ||
-                                                  (item.details.type === 'avatar' && profileData?.equipped_avatar_frame === item.item_id)) ? (
+                                                  (item.details.type === 'avatar' && profileData?.equipped_avatar_frame === item.item_id) ||
+                                                  (item.details.type === 'avatar_frame' && profileData?.equipped_avatar_frame === item.item_id)) ? (
                                                     <span className="flex items-center group-hover:hidden">
                                                         <Check className="w-4 h-4 mr-2" />
                                                         {t('inventory.equipped', 'Đang sử dụng')}
@@ -309,7 +316,8 @@ export function InventoryTab() {
                                                 
                                                 {/* Hover Text for Unequip */}
                                                 {((item.details.type === 'theme' && profileData?.equipped_theme === item.item_id) ||
-                                                  (item.details.type === 'avatar' && profileData?.equipped_avatar_frame === item.item_id)) && (
+                                                  (item.details.type === 'avatar' && profileData?.equipped_avatar_frame === item.item_id) ||
+                                                  (item.details.type === 'avatar_frame' && profileData?.equipped_avatar_frame === item.item_id)) && (
                                                     <span className="hidden group-hover:flex items-center text-red-500">
                                                         <Power className="w-4 h-4 mr-2" />
                                                         {t('inventory.unequip', 'Gỡ bỏ')}

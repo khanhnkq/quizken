@@ -27,6 +27,14 @@ export function GachaSystem() {
   const [showAnimation, setShowAnimation] = useState(false);
   const [wonItem, setWonItem] = useState<ExchangeItem | null>(null);
   const [showResult, setShowResult] = useState(false);
+  const [selectedBannerId, setSelectedBannerId] = useState<string | null>(null);
+
+  // Auto-select first banner on load
+  React.useEffect(() => {
+    if (banners && banners.length > 0 && !selectedBannerId) {
+      setSelectedBannerId(banners[0].id);
+    }
+  }, [banners, selectedBannerId]);
 
   const handlePull = async (bannerId: string, cost: number) => {
     console.log("Pull initiated for banner:", bannerId, "Cost:", cost);
@@ -46,7 +54,7 @@ export function GachaSystem() {
 
     try {
       console.log("Calling gacha_pull RPC...");
-      const { data, error } = await supabase.rpc('gacha_pull', {
+      const { data, error } = await (supabase as any).rpc('gacha_pull', {
         p_banner_id: bannerId
       });
 
@@ -103,6 +111,8 @@ export function GachaSystem() {
     );
   }
 
+  const selectedBanner = banners.find(b => b.id === selectedBannerId) || banners[0];
+
   return (
     <div className="relative min-h-[500px] space-y-8">
       {/* Header Stats */}
@@ -149,19 +159,61 @@ export function GachaSystem() {
           </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-8">
-        {banners.map((banner) => (
-          <GachaBanner
-            key={banner.id}
-            id={banner.id}
-            name={banner.name}
-            description={banner.description}
-            imageUrl={banner.image_url}
-            cost={banner.cost}
-            onPull={() => handlePull(banner.id, banner.cost)}
-            disabled={isPulling}
-          />
-        ))}
+      <div className="flex flex-col lg:flex-row gap-6">
+        {/* Sidebar - Banner List */}
+        <div className="w-full lg:w-[320px] shrink-0 space-y-3">
+          <h3 className="font-bold text-lg px-2 text-muted-foreground">Sự kiện đang diễn ra</h3>
+          <div className="flex flex-col gap-3">
+             {banners.map(banner => (
+                <button
+                  key={banner.id}
+                  onClick={() => setSelectedBannerId(banner.id)}
+                  className={`relative p-3 rounded-2xl transition-all text-left flex items-center gap-3 border-2 group
+                    ${selectedBannerId === banner.id 
+                       ? 'bg-white dark:bg-slate-800 border-primary shadow-md scale-[1.02]' 
+                       : 'bg-white/50 dark:bg-slate-900/50 border-transparent hover:bg-white hover:dark:bg-slate-800 hover:border-slate-200'}
+                  `}
+                >
+                    <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 border border-slate-100 dark:border-slate-700 bg-slate-100">
+                       <img src={banner.image_url} alt={banner.name} className="w-full h-full object-cover" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                       <h4 className={`font-bold truncate ${selectedBannerId === banner.id ? 'text-primary' : 'text-foreground'}`}>
+                         {banner.name}
+                       </h4>
+                       <p className="text-xs text-muted-foreground truncate line-clamp-1">{banner.description}</p>
+                       <div className="mt-1 flex items-center gap-1">
+                          <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400">
+                             {banner.cost} ZCoin
+                          </span>
+                       </div>
+                    </div>
+                </button>
+             ))}
+          </div>
+        </div>
+
+        {/* Main Content - Selected Banner */}
+        <div className="flex-1 min-w-0">
+           {selectedBanner && (
+              <motion.div
+                key={selectedBanner.id}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                  <GachaBanner
+                    id={selectedBanner.id}
+                    name={selectedBanner.name}
+                    description={selectedBanner.description}
+                    imageUrl={selectedBanner.image_url}
+                    cost={selectedBanner.cost}
+                    onPull={() => handlePull(selectedBanner.id, selectedBanner.cost)}
+                    disabled={isPulling}
+                  />
+              </motion.div>
+           )}
+        </div>
       </div>
 
       <AnimatePresence>

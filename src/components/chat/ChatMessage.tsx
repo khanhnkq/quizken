@@ -6,8 +6,8 @@ import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { ChatMessage as ChatMessageType } from "@/hooks/useChatMessages";
+import { FramedAvatar } from "@/components/ui/FramedAvatar";
 import { UserProfilePopover } from "./UserProfilePopover";
 import {
   Popover,
@@ -28,7 +28,7 @@ interface ChatMessageProps {
   onToggleReaction?: (messageId: string, emoji: string) => void;
   onReply?: (message: ChatMessageType) => void;
   currentUserId?: string | null;
-  userProfiles?: Map<string, { display_name?: string; avatar_url?: string; user_level?: number }>;
+  userProfiles?: Map<string, { display_name?: string; avatar_url?: string; user_level?: number; equipped_avatar_frame?: string }>;
 }
 
 // Generate a consistent color based on user_id
@@ -63,6 +63,8 @@ export function ChatMessage({
   const { images } = useChatImages();
 
   const avatarColor = getUserColor(message.user_id);
+  const userProfile = userProfiles?.get(message.user_id);
+  const frameId = userProfile?.equipped_avatar_frame;
 
   let parsed: any = null;
   if (message.content?.startsWith("{")) {
@@ -299,27 +301,14 @@ export function ChatMessage({
           avatarUrl={avatarUrl}
           level={userLevel}
           streak={streak}>
-          <Avatar
-            className={cn(
-              "h-8 w-8 shrink-0 cursor-pointer transition-transform hover:scale-110 active:scale-95",
-            )}
-            onClick={onAvatarClick}>
-            {avatarUrl && (
-              <AvatarImage src={avatarUrl} alt={displayName || "User"} />
-            )}
-            <AvatarFallback
-              style={{
-                backgroundColor: isOwnMessage ? undefined : avatarColor,
-              }}
-              className={cn(
-                "text-xs font-medium",
-                isOwnMessage
-                  ? "bg-primary text-primary-foreground"
-                  : "text-white",
-              )}>
-              <User className="h-4 w-4" />
-            </AvatarFallback>
-          </Avatar>
+          <div className="cursor-pointer transition-transform hover:scale-110 active:scale-95" onClick={onAvatarClick}>
+            <FramedAvatar
+              avatarUrl={avatarUrl}
+              frameId={frameId}
+              fallbackName={displayName || "User"}
+              size="sm"
+            />
+          </div>
         </UserProfilePopover>
 
         <div

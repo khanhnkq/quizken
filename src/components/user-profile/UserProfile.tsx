@@ -13,6 +13,7 @@ import {
   PenTool,
   Flame,
 } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 import { useTranslation } from "react-i18next";
 import {
   calculateXP,
@@ -22,6 +23,7 @@ import {
 } from "@/utils/levelSystem";
 import { EditProfileDialog } from "./EditProfileDialog";
 import { useProfile } from "@/hooks/useProfile";
+import { FramedAvatar } from "@/components/ui/FramedAvatar";
 
 /**
  * Main UserProfile component - Redesigned for "Playful & Cute" aesthetic
@@ -171,7 +173,8 @@ export const UserProfile: React.FC<
     : "";
 
   // Calculate XP and Level using shared utility
-  const calculatedXP = calculateXP(statistics);
+  // Prefer XP from database (profileData) if available, otherwise calculate from statistics
+  const calculatedXP = profileData?.xp ?? calculateXP(statistics);
   const calculatedLevel = calculateLevel(calculatedXP);
 
   const level = overrideLevel || calculatedLevel;
@@ -209,14 +212,12 @@ export const UserProfile: React.FC<
           {/* Blob Background for Avatar */}
           <div className="absolute inset-0 bg-gradient-to-tr from-pink-300 to-purple-300 rounded-full blur-sm opacity-60 transform scale-110" />
 
-          <img
-            ref={avatarRef}
-            src={
-              avatarUrl ||
-              `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=random&color=fff`
-            }
-            alt={userName}
-            className="relative w-24 h-24 md:w-32 md:h-32 rounded-full object-cover border-4 border-white dark:border-slate-700 shadow-md z-10"
+          <FramedAvatar 
+            avatarUrl={avatarUrl}
+            frameId={profileData?.equipped_avatar_frame}
+            fallbackName={userName}
+            className="z-10"
+            size="md"
           />
 
           {/* Edit Button Overlay */}
@@ -286,6 +287,20 @@ export const UserProfile: React.FC<
               <UserIcon className="w-4 h-4 text-blue-400" />
               <span>#{user.id.slice(0, 8)}</span>
             </div>
+            </div>
+
+          {/* XP Progress Bar */}
+          <div className="w-full max-w-[280px] space-y-1.5 mt-1">
+             <div className="flex justify-between text-xs font-bold text-gray-500 dark:text-gray-400 px-1">
+                <span>XP</span>
+                <span>
+                  {Math.floor(totalXP - currentLevelBaseXP)} / {nextLevelXP - currentLevelBaseXP}
+                </span>
+             </div>
+             <Progress value={levelProgressPercent} className="h-2.5 bg-gray-200 dark:bg-slate-700 from-yellow-400 to-orange-500 [&>div]:bg-gradient-to-r" />
+             <div className="text-[10px] text-right text-gray-400 font-medium">
+                {Math.round(nextLevelXP - totalXP)} XP {t("profile.toNextLevel", "to next level")}
+             </div>
           </div>
 
           {/* Quick Stats Grid */}

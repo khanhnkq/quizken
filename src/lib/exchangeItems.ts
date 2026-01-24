@@ -3,7 +3,7 @@ export interface ExchangeItem {
     name: string;
     description: string;
     price: number;
-    type: 'theme' | 'avatar' | 'powerup' | 'document';
+    type: 'theme' | 'avatar' | 'avatar_frame' | 'powerup' | 'document';
     icon: string; // Emoji or image URL
     color: string; // Tailwind color class for card background
     download_url?: string | null; // URL to downloadable file (for 'document' type)
@@ -64,5 +64,25 @@ export const EXCHANGE_ITEMS: ExchangeItem[] = [
         type: 'theme',
         icon: '🤞',
         color: 'bg-neutral-900 border-red-600 text-red-500' 
+    },
+    {
+        id: 'frame_golden_glory',
+        name: 'Golden Glory Frame',
+        description: 'Viền avatar vàng rực rỡ cho người đẳng cấp.',
+        price: 800,
+        type: 'avatar_frame',
+        icon: '🖼️',
+        color: 'bg-yellow-100 border-yellow-400',
+        image_url: '/frames/frame_rank_gold_1769267264636.png' // Local generated frame
+    },
+    {
+        id: 'frame_neon_circle',
+        name: 'Neon Circle Frame',
+        description: 'Viền neon phát sáng cực chất.',
+        price: 600,
+        type: 'avatar_frame',
+        icon: '⭕',
+        color: 'bg-purple-100 border-purple-400',
+        image_url: '/frames/frame_style_cyberpunk_1769267300517.png' // Local generated frame
     }
 ];

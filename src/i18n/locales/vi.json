@@ -607,6 +607,7 @@
         "filter": {
             "all": "Tất cả",
             "avatar": "Avatar",
+            "avatar_frame": "Khung Avatar",
             "theme": "Theme",
             "powerup": "Power-up",
             "document": "Tài liệu"

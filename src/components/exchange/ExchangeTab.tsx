@@ -15,7 +15,7 @@ import { ExchangeItem } from '@/lib/exchangeItems';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 
-type FilterType = 'all' | 'avatar' | 'theme' | 'powerup' | 'document';
+type FilterType = 'all' | 'avatar' | 'avatar_frame' | 'theme' | 'powerup' | 'document';
 
 export function ExchangeTab() {
     const { t } = useTranslation();
@@ -87,6 +87,7 @@ export function ExchangeTab() {
     const categories = [
         { id: 'all', label: t('exchange.filter.all'), icon: Store, color: 'bg-violet-100 text-violet-600' },
         { id: 'avatar', label: t('exchange.filter.avatar'), icon: Shirt, color: 'bg-blue-100 text-blue-600' },
+        { id: 'avatar_frame', label: t('exchange.filter.avatarFrame', 'Viền Avatar'), icon: Sparkles, color: 'bg-yellow-100 text-yellow-600' },
         { id: 'theme', label: t('exchange.filter.theme'), icon: Palette, color: 'bg-pink-100 text-pink-600' },
         { id: 'powerup', label: t('exchange.filter.powerup'), icon: Zap, color: 'bg-amber-100 text-amber-600' },
         { id: 'document', label: t('exchange.filter.document'), icon: FileText, color: 'bg-emerald-100 text-emerald-600' },

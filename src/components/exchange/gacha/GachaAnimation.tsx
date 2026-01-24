@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Zap } from 'lucide-react';
 import confetti from 'canvas-confetti';
@@ -33,8 +34,8 @@ export const GachaAnimation: React.FC<GachaAnimationProps> = ({ onComplete }) =>
     };
   }, [onComplete]);
 
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden">
+  return createPortal(
+    <div className="fixed inset-0 z-[9990] flex items-center justify-center overflow-hidden">
       {/* Deep Cosmic Background */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-violet-900 via-indigo-950 to-black" />
       
@@ -117,7 +118,7 @@ export const GachaAnimation: React.FC<GachaAnimationProps> = ({ onComplete }) =>
             initial={{ opacity: 0 }}
             animate={{ opacity: [0, 1, 0] }}
             transition={{ duration: 0.3, ease: "easeOut" }} // Super fast flash
-            className="fixed inset-0 z-[200] bg-white pointer-events-none"
+            className="absolute inset-0 z-[200] bg-white pointer-events-none"
           />
         )}
       </AnimatePresence>
@@ -149,6 +150,7 @@ export const GachaAnimation: React.FC<GachaAnimationProps> = ({ onComplete }) =>
         </p>
       </motion.div>
 
-    </div>
+    </div>,
+    document.body
   );
 };

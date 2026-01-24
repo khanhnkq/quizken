@@ -44,8 +44,9 @@ export function ExchangeItemCard({ item, userZCoin, isOwned, isPurchasing, onBuy
                         px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm
                         ${item.type === 'avatar' ? 'bg-blue-100 text-blue-600' :
                             item.type === 'theme' ? 'bg-pink-100 text-pink-600' :
-                                item.type === 'powerup' ? 'bg-amber-100 text-amber-600' :
-                                    'bg-emerald-100 text-emerald-600'}
+                                item.type === 'avatar_frame' ? 'bg-yellow-100 text-yellow-600' :
+                                    item.type === 'powerup' ? 'bg-amber-100 text-amber-600' :
+                                        'bg-emerald-100 text-emerald-600'}
                    `}>
                         {t(`exchange.filter.${item.type}`)}
                     </div>

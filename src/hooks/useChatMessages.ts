@@ -23,6 +23,7 @@ export interface UserProfile {
   display_name?: string;
   avatar_url?: string;
   user_level?: number;
+  equipped_avatar_frame?: string;
 }
 
 export interface UseChatMessagesReturn {

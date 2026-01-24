@@ -7,6 +7,7 @@ interface ProfileData {
   equipped_theme?: string | null;
   equipped_avatar_frame?: string | null;
   zcoin?: number;
+  xp?: number;
 }
 
 interface UseProfileReturn {
@@ -22,12 +23,12 @@ export function useProfile(userId: string | undefined): UseProfileReturn {
       if (!userId) return null;
       
       const { data, error } = await (supabase as any)
-        .from("profiles")
-        .select("display_name, avatar_url, equipped_theme, equipped_avatar_frame, zcoin")
-        .eq("id", userId)
+        .rpc("get_user_profile_with_xp", {
+          target_user_id: userId,
+        })
         .single();
 
-      if (error && error.code !== "PGRST116") {
+      if (error) {
         console.error("Error fetching profile:", error);
         throw error;
       }
