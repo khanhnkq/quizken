@@ -12,6 +12,7 @@ import {
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { FramedAvatar } from "@/components/ui/FramedAvatar";
 import { Button } from "@/components/ui/button";
 import { useTopUsers } from "@/hooks/useTopUsers";
 import { useAnnouncements } from "@/hooks/useAnnouncements";
@@ -104,12 +105,15 @@ export function ChatSidebar({ onBack }: ChatSidebarProps) {
                     )}>
                       {index + 1}
                     </span>
-                    <Avatar className="h-7 w-7">
-                      {user.avatar_url && <AvatarImage src={user.avatar_url} />}
-                      <AvatarFallback className="text-xs bg-primary/10 text-primary">
-                        {user.display_name?.charAt(0) || "U"}
-                      </AvatarFallback>
-                    </Avatar>
+                    <div className="relative">
+                      <FramedAvatar 
+                        avatarUrl={user.avatar_url}
+                        frameId={user.equipped_avatar_frame}
+                        fallbackName={user.display_name}
+                        size="sm"
+                        className="w-9 h-9"
+                      />
+                    </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium truncate">{user.display_name}</p>
                       <p className="text-xs text-muted-foreground">

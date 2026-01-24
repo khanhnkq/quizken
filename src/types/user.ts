@@ -83,6 +83,7 @@ export interface UserProfileProps {
   overrideDisplayName?: string | null;
   overrideAvatarUrl?: string | null;
   streak?: number;
+  disableHoverEffects?: boolean;
 }
 
 /**

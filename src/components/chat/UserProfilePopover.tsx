@@ -30,7 +30,7 @@ export function UserProfilePopover({
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>{children}</PopoverTrigger>
-      <PopoverContent className="w-[400px] p-0 border-none bg-transparent shadow-none">
+      <PopoverContent className="w-[550px] p-0 border-none bg-transparent shadow-none">
         {isOpen && (
           <UserProfileContent
             userId={userId}
@@ -82,6 +82,7 @@ function UserProfileContent({
       disableHoverEffects={true}
       streak={streak}
       overrideLevel={level}
+      layout="horizontal"
     />
   );
 }

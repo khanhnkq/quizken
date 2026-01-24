@@ -29,7 +29,11 @@ import { FramedAvatar } from "@/components/ui/FramedAvatar";
  * Main UserProfile component - Redesigned for "Playful & Cute" aesthetic
  */
 export const UserProfile: React.FC<
-  UserProfileProps & { isEditable?: boolean; overrideLevel?: number }
+  UserProfileProps & { 
+    isEditable?: boolean; 
+    overrideLevel?: number;
+    layout?: 'responsive' | 'horizontal' | 'vertical';
+  }
 > = ({
   user,
   statistics,
@@ -41,6 +45,7 @@ export const UserProfile: React.FC<
   streak = 0,
   disableHoverEffects = false,
   overrideLevel,
+  layout = 'responsive',
 }) => {
   const { t, i18n } = useTranslation();
   const cardRef = useRef<HTMLDivElement>(null);
@@ -206,7 +211,12 @@ export const UserProfile: React.FC<
       <div className="absolute top-0 right-0 w-48 h-48 bg-purple-200/30 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-40 h-40 bg-yellow-200/30 rounded-full blur-3xl -ml-10 -mb-10 pointer-events-none" />
 
-      <div className="relative z-10 flex flex-col md:flex-row items-center h-full p-6 md:p-8 gap-6">
+      <div className={cn(
+        "relative z-10 flex items-center h-full p-6 md:p-8 gap-6",
+        layout === 'horizontal' ? "flex-row" :
+        layout === 'vertical' ? "flex-col" :
+        "flex-col md:flex-row"
+      )}>
         {/* Avatar Section */}
         <div className="relative shrink-0 group/avatar">
           {/* Blob Background for Avatar */}

@@ -5,6 +5,7 @@ interface TopUser {
   user_id: string;
   display_name: string;
   avatar_url: string | null;
+  equipped_avatar_frame?: string | null;
   user_level: number;
   total_xp: number;
 }
