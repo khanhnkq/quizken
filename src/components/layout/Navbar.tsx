@@ -46,7 +46,7 @@ import { Bell, Megaphone, Loader2, Gift } from "lucide-react";
 import { useAnnouncements } from "@/hooks/useAnnouncements";
 import { useProfile } from "@/hooks/useProfile";
 import { formatDistanceToNow } from "date-fns";
-import { vi } from "date-fns/locale";
+import { vi, enUS } from "date-fns/locale";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -76,6 +76,8 @@ const Navbar = () => {
   const { play } = useAudio();
   const playClick = () => play("click");
   const navRef = useRef<HTMLElement | null>(null);
+  const { i18n } = useTranslation();
+  const dateLocale = i18n.language === 'en' ? enUS : vi;
 
   // Global event to open auth modal
   useEffect(() => {
@@ -108,7 +110,7 @@ const Navbar = () => {
   const navItems = [
     { path: "/", label: t("nav.home"), icon: Home },
     { path: "/quiz/library", label: t("nav.library"), icon: BookOpen },
-    { path: "/english", label: "English Hub", icon: Store },
+    { path: "/english", label: t("nav.englishHub"), icon: Store },
     // { path: "/about", label: t('nav.about'), icon: Info },
   ];
 
@@ -185,9 +187,9 @@ const Navbar = () => {
                 <div className="p-3 border-b bg-muted/30 dark:bg-slate-900/50">
                   <h3 className="font-semibold text-sm flex items-center gap-2">
                     <Megaphone className="w-4 h-4 text-primary" />
-                    Thông báo
+                    {t('nav.notifications')}
                     <span className="ml-auto text-xs font-normal text-muted-foreground">
-                      {announcements.length} mới
+                      {announcements.length} {t('nav.newNotifications')}
                     </span>
                   </h3>
                 </div>
@@ -198,7 +200,7 @@ const Navbar = () => {
                     </div>
                   ) : announcements.length === 0 ? (
                     <div className="py-8 text-center text-muted-foreground text-sm">
-                      Không có thông báo mới
+                      {t('nav.noNotifications')}
                     </div>
                   ) : (
                     <div className="p-2 space-y-2">
@@ -221,7 +223,7 @@ const Navbar = () => {
                           <p className="text-[10px] text-muted-foreground mt-2 opacity-70">
                             {formatDistanceToNow(new Date(item.created_at), {
                               addSuffix: true,
-                              locale: vi,
+                              locale: dateLocale,
                             })}
                           </p>
                         </div>
@@ -321,24 +323,12 @@ const Navbar = () => {
                         onClick={() => navigate("/redeem")}
                       >
                         <Gift className="mr-2 h-4 w-4 text-indigo-500" />
-                        <span>{t("nav.redeem", "Nhập Code")}</span>
+                        <span>{t("nav.redeem")}</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        onClick={() => {
-                          toast({
-                            title: t(
-                              "common.featureComingSoon",
-                              "Tính năng đang phát triển",
-                            ),
-                            description: t(
-                              "common.featureComingSoonDesc",
-                              "Tính năng này sẽ sớm ra mắt!",
-                            ),
-                            variant: "default",
-                          });
-                        }}
+                        onClick={() => navigate("/profile")}
                       >
-                        <Settings className="mr-2 h-4 w-4" />
+                        <User className="mr-2 h-4 w-4" />
                         <span>{t("nav.profile")}</span>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />

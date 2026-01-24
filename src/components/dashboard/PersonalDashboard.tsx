@@ -503,21 +503,21 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
                             <div className="absolute top-0 right-0 p-4 opacity-20">
                                 <Trophy className="w-16 h-16 rotate-12" />
                             </div>
-                            <h3 className="text-lg font-bold uppercase tracking-wider mb-1 opacity-90">Hạng hiện tại</h3>
+                            <h3 className="text-lg font-bold uppercase tracking-wider mb-1 opacity-90">{t('userProfile.currentRank')}</h3>
                             <div className="text-3xl font-black flex items-center justify-center gap-2">
                                 <Star className="w-8 h-8 fill-white" />
-                                <span>Quiz Master</span>
+                                <span>{t('userProfile.rankName')}</span>
                             </div>
-                            <p className="text-sm mt-2 opacity-90 font-medium">Top 5% người chơi xuất sắc nhất</p>
+                            <p className="text-sm mt-2 opacity-90 font-medium">{t('userProfile.rankBadgeDesc')}</p>
                         </motion.div>
 
                         <div className="grid grid-cols-1 gap-4 text-slate-600 dark:text-slate-300">
                              <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 flex items-center justify-between">
                                 <div>
-                                    <p className="text-xs font-bold uppercase text-slate-400 mb-1">Tham gia từ</p>
+                                    <p className="text-xs font-bold uppercase text-slate-400 mb-1">{t('userProfile.joinedDate')}</p>
                                     <p className="text-sm font-bold flex items-center gap-2">
                                         <Calendar className="w-4 h-4 text-slate-400" />
-                                        {profileData?.created_at ? new Date(profileData.created_at).toLocaleDateString('vi-VN') : 'Mới tham gia'}
+                                        {profileData?.created_at ? new Date(profileData.created_at).toLocaleDateString('vi-VN') : t('userProfile.justJoined')}
                                     </p>
                                 </div>
                                 <div className="p-3 bg-slate-100 dark:bg-slate-800 rounded-full">
@@ -526,10 +526,10 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
                              </div>
                              <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 flex items-center justify-between">
                                 <div>
-                                    <p className="text-xs font-bold uppercase text-slate-400 mb-1">Phong độ</p>
+                                    <p className="text-xs font-bold uppercase text-slate-400 mb-1">{t('userProfile.performance')}</p>
                                     <p className="text-sm font-bold flex items-center gap-2">
                                         <Zap className="w-4 h-4 text-orange-400" />
-                                        {streak} Ngày Streak
+                                        {t('userProfile.streakDays', { streak })}
                                     </p>
                                 </div>
                                 <div className="p-3 bg-orange-50 dark:bg-orange-900/20 rounded-full">
@@ -543,28 +543,28 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
                         <div className="grid grid-cols-2 gap-4">
                             <ProfileStatCard 
                                 icon={BookOpen} 
-                                label="Đã làm" 
+                                label={t('userProfile.statsAttempted')} 
                                 value={statistics?.total_quizzes_taken || 0} 
                                 color="bg-blue-500" 
                                 delay={0.1} 
                             />
                             <ProfileStatCard 
                                 icon={PlusCircleIcon} 
-                                label="Đã tạo" 
+                                label={t('userProfile.statsCreated')} 
                                 value={statistics?.total_quizzes_created || 0} 
                                 color="bg-indigo-500" 
                                 delay={0.2} 
                             />
                             <ProfileStatCard 
                                 icon={Trophy} 
-                                label="Điểm cao" 
+                                label={t('userProfile.statsHighest')} 
                                 value={statistics?.highest_score || 0} 
                                 color="bg-amber-500" 
                                 delay={0.3} 
                             />
                              <ProfileStatCard 
                                 icon={Zap} 
-                                label="ZCoin" 
+                                label={t('userProfile.zcoin')} 
                                 value={statistics?.zcoin?.toLocaleString() || 0} 
                                 color="bg-yellow-500" 
                                 delay={0.4} 
@@ -584,7 +584,7 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
                                 <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg text-indigo-600 dark:text-indigo-400">
                                     <Info className="w-6 h-6" />
                                 </div>
-                                Giới thiệu
+                                {t('userProfile.aboutMe')}
                             </h3>
                             
                             <div className="space-y-8 relative z-10">
@@ -597,14 +597,14 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
                                                 <span className="text-2xl text-indigo-300 font-serif ml-2">"</span>
                                             </>
                                         ) : (
-                                            "Bạn chưa cập nhật tiểu sử."
+                                            t('userProfile.notUpdatedBio')
                                         )}
                                     </p>
                                 </div>
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                                     <div className="space-y-4">
-                                        <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">Kết nối</h4>
+                                        <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">{t('userProfile.connect')}</h4>
                                         <div className="space-y-3">
                                             {profileData?.facebook_url ? (
                                                 <a 
@@ -618,7 +618,7 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
                                                 </a>
                                             ) : (
                                                 <div className="p-4 bg-slate-50 dark:bg-slate-800/30 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-700 opacity-50 text-sm italic">
-                                                    Chưa thêm Facebook
+                                                    {t('userProfile.notLinked')}
                                                 </div>
                                             )}
 
@@ -629,22 +629,22 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
                                                 </div>
                                             ) : (
                                                 <div className="p-4 bg-slate-50 dark:bg-slate-800/30 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-700 opacity-50 text-sm italic">
-                                                    Chưa thêm Zalo
+                                                    {t('userProfile.notLinked')}
                                                 </div>
                                             )}
                                         </div>
                                     </div>
 
                                     <div className="space-y-4">
-                                        <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">Thành tựu</h4>
+                                        <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">{t('userProfile.achievements')}</h4>
                                         <div className="grid grid-cols-2 gap-3">
                                             <div className="p-3 bg-yellow-400/10 border border-yellow-400/20 rounded-xl flex flex-col items-center justify-center text-center gap-1">
                                                 <Shield className="w-6 h-6 text-yellow-500 fill-yellow-500/20" />
-                                                <span className="text-[10px] font-black uppercase text-yellow-700 dark:text-yellow-400">Newbie</span>
+                                                <span className="text-[10px] font-black uppercase text-yellow-700 dark:text-yellow-400">{t('userProfile.newbie')}</span>
                                             </div>
                                             <div className="p-3 bg-purple-400/10 border border-purple-400/20 rounded-xl flex flex-col items-center justify-center text-center gap-1">
                                                 <Star className="w-6 h-6 text-purple-500 fill-purple-500/20" />
-                                                <span className="text-[10px] font-black uppercase text-purple-700 dark:text-purple-400">Quiz-er</span>
+                                                <span className="text-[10px] font-black uppercase text-purple-700 dark:text-purple-400">{t('userProfile.top100')}</span>
                                             </div>
                                         </div>
                                     </div>

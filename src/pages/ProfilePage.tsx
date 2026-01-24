@@ -75,9 +75,9 @@ export default function ProfilePage() {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center space-y-4 bg-slate-50 dark:bg-slate-950">
                <div className="w-24 h-24 bg-slate-200 dark:bg-slate-800 rounded-full animate-pulse mx-auto" />
-               <h2 className="text-2xl font-bold">Chưa đăng nhập</h2>
-               <p className="text-muted-foreground max-w-md">Vui lòng đăng nhập để xem hồ sơ cá nhân và thành tích của bạn.</p>
-               <Button onClick={() => navigate('/')} size="lg" className="rounded-full px-8">Về trang chủ</Button>
+               <h2 className="text-2xl font-bold">{t('userProfile.notLoggedIn')}</h2>
+               <p className="text-muted-foreground max-w-md">{t('userProfile.notLoggedInDesc')}</p>
+               <Button onClick={() => navigate('/')} size="lg" className="rounded-full px-8">{t('dashboard.goHome')}</Button>
             </div>
         );
     }
@@ -86,8 +86,8 @@ export default function ProfilePage() {
 
     const handleShare = () => {
         navigator.clipboard.writeText(window.location.href);
-        toast.success("Đã sao chép link profile!", {
-            description: "Hãy chia sẻ với bạn bè để cùng thi đấu nhé.",
+        toast.success(t('userProfile.shareProfile'), {
+            description: t('userProfile.shareProfileDesc'),
             icon: <Share2 className="w-4 h-4 text-green-500" />
         });
     };
@@ -129,7 +129,7 @@ export default function ProfilePage() {
                         )}
                     >
                         <ArrowLeft className="w-5 h-5" />
-                        <span className="font-bold">Quay lại</span>
+                        <span className="font-bold">{t('userProfile.back')}</span>
                     </Button>
                     
                     <div className="flex gap-2">
@@ -197,21 +197,21 @@ export default function ProfilePage() {
                             <div className="absolute top-0 right-0 p-4 opacity-20">
                                 <Trophy className="w-16 h-16 rotate-12" />
                             </div>
-                            <h3 className="text-lg font-bold uppercase tracking-wider mb-1 opacity-90">Hạng hiện tại</h3>
+                            <h3 className="text-lg font-bold uppercase tracking-wider mb-1 opacity-90">{t('userProfile.currentRank')}</h3>
                             <div className="text-3xl font-black flex items-center justify-center gap-2">
                                 <Star className="w-8 h-8 fill-white" />
-                                <span>Quiz Master</span>
+                                <span>{t('userProfile.rankName')}</span>
                             </div>
-                            <p className="text-sm mt-2 opacity-90 font-medium">Top 5% người chơi xuất sắc nhất</p>
+                            <p className="text-sm mt-2 opacity-90 font-medium">{t('userProfile.rankBadgeDesc')}</p>
                         </motion.div>
 
                         <div className="grid grid-cols-1 gap-4 text-slate-600 dark:text-slate-300">
                              <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 flex items-center justify-between">
                                 <div>
-                                    <p className="text-xs font-bold uppercase text-slate-400 mb-1">Tham gia từ</p>
+                                    <p className="text-xs font-bold uppercase text-slate-400 mb-1">{t('userProfile.joinedDate')}</p>
                                     <p className="text-sm font-bold flex items-center gap-2">
                                         <Calendar className="w-4 h-4 text-slate-400" />
-                                        {profileData?.created_at ? new Date(profileData.created_at).toLocaleDateString('vi-VN') : 'Unknown'}
+                                        {profileData?.created_at ? new Date(profileData.created_at).toLocaleDateString('vi-VN') : t('userProfile.justJoined')}
                                     </p>
                                 </div>
                                 <div className="p-3 bg-slate-100 dark:bg-slate-800 rounded-full">
@@ -220,7 +220,7 @@ export default function ProfilePage() {
                              </div>
                              <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 flex items-center justify-between">
                                 <div>
-                                    <p className="text-xs font-bold uppercase text-slate-400 mb-1">Khu vực</p>
+                                    <p className="text-xs font-bold uppercase text-slate-400 mb-1">{t('userProfile.region')}</p>
                                     <p className="text-sm font-bold flex items-center gap-2">
                                         <MapPin className="w-4 h-4 text-red-400" />
                                         Vietnam
@@ -237,28 +237,28 @@ export default function ProfilePage() {
                         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                             <StatCard 
                                 icon={Target} 
-                                label="Đã tạo" 
+                                label={t('userProfile.statsCreated')} 
                                 value={statistics?.total_quizzes_created || 0} 
                                 color="bg-blue-500" 
                                 delay={0.1} 
                             />
                             <StatCard 
                                 icon={Activity} 
-                                label="Đã làm" 
+                                label={t('userProfile.statsAttempted')} 
                                 value={statistics?.total_quizzes_taken || 0} 
                                 color="bg-indigo-500" 
                                 delay={0.2} 
                             />
                             <StatCard 
                                 icon={Trophy} 
-                                label="Điểm cao" 
+                                label={t('userProfile.statsHighest')} 
                                 value={statistics?.highest_score || 0} 
                                 color="bg-amber-500" 
                                 delay={0.3} 
                             />
                              <StatCard 
                                 icon={Zap} 
-                                label="ZCoin" 
+                                label={t('userProfile.zcoin')} 
                                 value={statistics?.zcoin?.toLocaleString() || 0} 
                                 color="bg-yellow-500" 
                                 delay={0.4} 
@@ -278,14 +278,14 @@ export default function ProfilePage() {
                                 <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg text-indigo-600 dark:text-indigo-400">
                                     <Info className="w-6 h-6" />
                                 </div>
-                                Giới thiệu
+                                {t('userProfile.aboutMe')}
                             </h3>
                             
                             <div className="space-y-8 relative z-10">
                                 <div>
                                     <div className="flex items-center gap-2 mb-3">
                                         <Badge variant="outline" className="rounded-full px-3 py-1 border-indigo-200 bg-indigo-50 text-indigo-700 dark:bg-indigo-900/20 dark:border-indigo-800 dark:text-indigo-300">
-                                            Tiểu sử
+                                            {t('userProfile.bioTitle')}
                                         </Badge>
                                     </div>
                                     <p className="text-slate-600 dark:text-slate-300 leading-relaxed font-medium bg-gradient-to-br from-slate-50 to-white dark:from-slate-800/50 dark:to-slate-900/50 p-6 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-inner">
@@ -297,7 +297,7 @@ export default function ProfilePage() {
                                             </>
                                         ) : (
                                             <span className="italic text-slate-400 flex items-center justify-center p-4">
-                                                "Người dùng này chưa cập nhật tiểu sử."
+                                                "{t('userProfile.bioEmpty')}"
                                             </span>
                                         )}
                                     </p>
@@ -306,7 +306,7 @@ export default function ProfilePage() {
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                                     <div className="space-y-4">
                                         <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                                            <Share2 className="w-3 h-3" /> Kết nối
+                                            <Share2 className="w-3 h-3" /> {t('userProfile.connect')}
                                         </h4>
                                         <div className="space-y-3">
                                             {profileData?.facebook_url ? (
@@ -316,12 +316,12 @@ export default function ProfilePage() {
                                                     rel="noopener noreferrer"
                                                     className="flex items-center gap-4 p-4 bg-white dark:bg-slate-800 rounded-2xl border-2 border-slate-100 dark:border-slate-800 hover:border-blue-200 dark:hover:border-blue-900 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all group"
                                                 >
-                                                    <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-full text-blue-600 group-hover:scale-110 transition-transform">
+                                                     <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-full text-blue-600 group-hover:scale-110 transition-transform">
                                                         <Facebook className="w-5 h-5" />
                                                     </div>
                                                     <div className="flex flex-col">
                                                         <span className="text-xs font-bold text-muted-foreground uppercase">Facebook</span>
-                                                        <span className="font-bold text-slate-700 dark:text-slate-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">Kết nối ngay</span>
+                                                        <span className="font-bold text-slate-700 dark:text-slate-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">{t('userProfile.connect')}</span>
                                                     </div>
                                                 </a>
                                             ) : (
@@ -329,7 +329,7 @@ export default function ProfilePage() {
                                                     <div className="p-2 bg-slate-200 dark:bg-slate-700 rounded-full text-slate-400">
                                                         <Facebook className="w-5 h-5" />
                                                     </div>
-                                                    <span className="text-sm font-medium text-slate-500">Chưa liên kết</span>
+                                                    <span className="text-sm font-medium text-slate-500">{t('userProfile.notLinked')}</span>
                                                 </div>
                                             )}
 
@@ -348,7 +348,7 @@ export default function ProfilePage() {
                                                     <div className="p-2 bg-slate-200 dark:bg-slate-700 rounded-full text-slate-400">
                                                         <Phone className="w-5 h-5" />
                                                     </div>
-                                                    <span className="text-sm font-medium text-slate-500">Chưa liên kết</span>
+                                                    <span className="text-sm font-medium text-slate-500">{t('userProfile.notLinked')}</span>
                                                 </div>
                                             )}
                                         </div>
@@ -356,16 +356,16 @@ export default function ProfilePage() {
 
                                     <div className="space-y-4">
                                         <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                                            <SparklesIcon className="w-3 h-3" /> Thành tựu
+                                            <SparklesIcon className="w-3 h-3" /> {t('userProfile.achievements')}
                                         </h4>
                                         <div className="grid grid-cols-2 gap-3">
                                             <div className="p-3 bg-yellow-400/10 border border-yellow-400/20 rounded-xl flex flex-col items-center justify-center text-center gap-1">
                                                 <Shield className="w-6 h-6 text-yellow-500 fill-yellow-500/20" />
-                                                <span className="text-[10px] font-black uppercase text-yellow-700 dark:text-yellow-400">Newbie</span>
+                                                <span className="text-[10px] font-black uppercase text-yellow-700 dark:text-yellow-400">{t('userProfile.newbie')}</span>
                                             </div>
                                             <div className="p-3 bg-purple-400/10 border border-purple-400/20 rounded-xl flex flex-col items-center justify-center text-center gap-1">
                                                 <Star className="w-6 h-6 text-purple-500 fill-purple-500/20" />
-                                                <span className="text-[10px] font-black uppercase text-purple-700 dark:text-purple-400">Top 100</span>
+                                                <span className="text-[10px] font-black uppercase text-purple-700 dark:text-purple-400">{t('userProfile.top100')}</span>
                                             </div>
                                             <div className="p-3 bg-green-400/10 border border-green-400/20 rounded-xl flex flex-col items-center justify-center text-center gap-1 opacity-50 grayscale">
                                                 <Trophy className="w-6 h-6 text-green-500" />

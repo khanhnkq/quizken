@@ -240,7 +240,7 @@ export const UserProfile: React.FC<
             <button
               onClick={() => setShowEditDialog(true)}
               className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover/avatar:opacity-100 transition-opacity cursor-pointer z-20"
-              title="Chỉnh sửa hồ sơ">
+              title={t('userProfile.editProfile')}>
               <Pencil className="w-6 h-6 text-white" />
             </button>
           )}
@@ -250,7 +250,7 @@ export const UserProfile: React.FC<
             <button
               onClick={() => setShowEditDialog(true)}
               className="absolute -top-1 -right-1 z-30 bg-white hover:bg-primary hover:text-white text-gray-600 p-1.5 rounded-full shadow-md border-2 border-white transition-colors cursor-pointer"
-              title="Chỉnh sửa hồ sơ">
+              title={t('userProfile.editProfile')}>
               <Pencil className="w-3 h-3" />
             </button>
           )}
@@ -274,11 +274,11 @@ export const UserProfile: React.FC<
                 window.dispatchEvent(new Event("popstate"));
               }}
               className="absolute -bottom-1 -left-1 z-30 bg-indigo-600 hover:bg-indigo-700 text-white p-2 rounded-full shadow-lg border-2 border-white transition-all hover:scale-110 active:scale-95 group/frame"
-              title="Đổi khung viền"
+              title={t('userProfile.changeFrame')}
             >
               <Layout className="w-4 h-4" />
               <span className="absolute left-full ml-2 px-2 py-1 bg-slate-800 text-white text-[10px] rounded opacity-0 group-hover/frame:opacity-100 whitespace-nowrap pointer-events-none transition-opacity">
-                Đổi khung viền
+                {t('userProfile.changeFrame')}
               </span>
             </button>
           )}
@@ -367,7 +367,7 @@ export const UserProfile: React.FC<
              </div>
              <Progress value={levelProgressPercent} className="h-2.5 bg-gray-200 dark:bg-slate-700 from-yellow-400 to-orange-500 [&>div]:bg-gradient-to-r" />
              <div className="text-[10px] text-right text-gray-400 font-medium">
-                {Math.round(nextLevelXP - totalXP)} XP {t("profile.toNextLevel", "to next level")}
+                {t("userProfile.toNextLevel", { xp: Math.round(nextLevelXP - totalXP) })}
              </div>
           </div>
 
@@ -381,7 +381,7 @@ export const UserProfile: React.FC<
                   {statistics?.total_quizzes_taken || 0}
                 </span>
                 <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-bold">
-                  {t("dashboard.taken", "Taken")}
+                  {t("userProfile.statsAttempted")}
                 </span>
               </div>
 
@@ -392,7 +392,7 @@ export const UserProfile: React.FC<
                   {statistics?.total_quizzes_created || 0}
                 </span>
                 <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-bold">
-                  {t("dashboard.created", "Created")}
+                  {t("userProfile.statsCreated")}
                 </span>
               </div>
 
@@ -401,7 +401,7 @@ export const UserProfile: React.FC<
                 <Flame className="w-4 h-4 text-orange-500 mb-1" />
                 <span className="text-sm font-bold text-gray-800 dark:text-gray-200">{streak}</span>
                 <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-bold">
-                  {t("dashboard.streak", "Streak")}
+                  {t("userProfile.performance")}
                 </span>
               </div>
             </div>

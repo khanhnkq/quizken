@@ -9,6 +9,7 @@ import { Loader2 } from "lucide-react";
 import { ReactNode, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 
 interface UserProfilePopoverProps {
   userId: string;
@@ -55,6 +56,7 @@ function UserProfileContent({
   level,
 }: Omit<UserProfilePopoverProps, "children">) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { statistics, isLoading } = useDashboardStats(userId);
 
   if (isLoading) {
@@ -94,7 +96,7 @@ function UserProfileContent({
           onClick={() => navigate(`/profile/${userId}`)}
           className="rounded-full h-7 px-3 text-[10px] font-black uppercase tracking-wider bg-indigo-600 hover:bg-indigo-700 text-white border-none shadow-md"
         >
-          Chi tiết ➜
+          {t('userProfile.viewDetails')} ➜
         </Button>
       }
     />
