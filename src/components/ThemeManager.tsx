@@ -8,7 +8,7 @@ export function ThemeManager() {
 
   useEffect(() => {
     // List of all known theme classes to clean up
-    const themeClasses = ["theme-neon", "theme-pastel", "theme-comic", "theme-vn"];
+    const themeClasses = ["theme-neon", "theme-pastel", "theme-comic", "theme-vn", "theme-jjk"];
     
     // Remove all theme classes first
     document.documentElement.classList.remove(...themeClasses);
@@ -45,6 +45,10 @@ export function ThemeManager() {
        else if (profileData.equipped_theme === "theme_vietnam_spirit") {
            themeClass = "theme-vn";
            isDarkTheme = false; 
+       }
+       else if (profileData.equipped_theme === "theme_jujutsu_kaisen") {
+           themeClass = "theme-jjk";
+           isDarkTheme = true;
        }
        
        if (themeClass) {

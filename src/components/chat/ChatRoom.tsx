@@ -14,6 +14,8 @@ import { useChatImages } from "@/contexts/ChatImagesContext";
 import { useProfile } from "@/hooks/useProfile";
 import { VietnamFlagIcon } from "@/components/icons/VietnamFlagIcon";
 import { NeonCyberSkullIcon, PastelCloudIcon, ComicBoomIcon } from "@/components/icons/ThemeIcons";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const STREAK_SLOGANS = [
   "Tui đang đạt chuỗi {streak} ngày nè! Ghê chưa? 😎",
@@ -186,6 +188,19 @@ export function ChatRoom({ onLoginClick }: ChatRoomProps) {
   };
   
   const { profileData } = useProfile(currentUserId);
+  const theme = profileData?.equipped_theme;
+
+  // Fetch detailed theme config (like image_url) from DB
+  const { data: themeItem } = useQuery({
+    queryKey: ['themeItem', theme],
+    queryFn: async () => {
+      if (!theme) return null;
+      // @ts-ignore
+      const { data } = await supabase.from('items').select('image_url').eq('id', theme).single();
+      return data as any;
+    },
+    enabled: !!theme
+  });
 
   // Theme Background Config
   const getThemeBackground = () => {
@@ -208,12 +223,20 @@ export function ChatRoom({ onLoginClick }: ChatRoomProps) {
     <div className="flex flex-col h-full bg-background overflow-hidden relative">
       {/* Background Decor */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden text-foreground flex items-center justify-center">
+        {/* Dynamic Image Background from Theme */}
+        {themeItem?.image_url && (
+            <div 
+                className="absolute inset-0 opacity-[0.08] dark:opacity-[0.12] bg-center bg-no-repeat bg-cover transition-opacity duration-1000"
+                style={{ backgroundImage: `url(${themeItem.image_url})` }}
+            />
+        )}
+
         {themeBg ? (
-           <div className="absolute inset-0 flex items-center justify-center opacity-[0.05]">
+           <div className="absolute inset-0 flex items-center justify-center opacity-[0.03]">
               <themeBg.Icon className={`w-[80%] h-auto ${themeBg.className}`} />
            </div>
-        ) : (
-          /* Dot Pattern - Polka Dots */
+        ) : !themeItem?.image_url && (
+          /* Dot Pattern - Polka Dots (Only if no image/icon theme) */
           <div
             className="absolute inset-0 opacity-[0.4]"
             style={{

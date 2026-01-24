@@ -520,6 +520,7 @@
         "tabs": {
             "overview": "Tổng quan",
             "exchange": "Cửa hàng",
+            "luckyDraw": "Vòng quay may mắn",
             "inventory": "Kho đồ",
             "settings": "Cài đặt"
         },
@@ -589,6 +590,8 @@
     },
     "exchange": {
         "badge": "Cửa hàng phép thuật",
+        "luckyDraw": "Vòng Quay May Mắn",
+        "luckyDescription": "Thử vận may để nhận giao diện độc quyền!",
         "welcome": "Chào mừng đến",
         "subtitle": "Mua sắm & trang trí hồ sơ của bạn.",
         "wallet": "Ví ZCoin",
@@ -625,7 +628,13 @@
         },
         "item": {
             "owned": "Đã sở hữu"
-        }
+        },
+        "changeTheme": "Đổi giao diện",
+        "equip": "Trang bị",
+        "equipped": "Đang dùng",
+        "equipSuccess": "Đã đổi giao diện!",
+        "myThemes": "Kho giao diện",
+        "getMoreThemes": "Săn thêm giao diện ✨"
     },
     "footer": {
         "description": "Tạo bài kiểm tra trắc nghiệm với AI",

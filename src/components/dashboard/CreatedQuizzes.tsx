@@ -193,7 +193,7 @@ export function CreatedQuizzes({
                                         </Badge>
                                     </div>
 
-                                    <h4 className="font-bold text-lg md:text-xl truncate text-gray-900 group-hover:text-blue-600 transition-colors">
+                                    <h4 className="font-bold text-lg md:text-xl truncate text-gray-900 dark:text-white group-hover:text-blue-600 transition-colors">
                                         {quiz.title || t('common.untitledQuiz')}
                                     </h4>
 

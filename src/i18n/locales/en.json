@@ -517,6 +517,7 @@
         "tabs": {
             "overview": "Overview",
             "exchange": "Shop",
+            "luckyDraw": "Lucky Draw",
             "inventory": "Inventory",
             "settings": "Settings"
         },
@@ -586,6 +587,8 @@
     },
     "exchange": {
         "badge": "Magic Shop",
+        "luckyDraw": "Lucky Draw",
+        "luckyDescription": "Try your luck to get exclusive themes!",
         "welcome": "Welcome to",
         "subtitle": "Shop & customize your profile.",
         "wallet": "ZCoin Wallet",
@@ -622,7 +625,13 @@
         },
         "item": {
             "owned": "Owned"
-        }
+        },
+        "changeTheme": "Change Theme",
+        "equip": "Equip",
+        "equipped": "Equipped",
+        "equipSuccess": "Applied Theme!",
+        "myThemes": "My Themes",
+        "getMoreThemes": "Get more themes ✨"
     },
     "footer": {
         "description": "Create multiple-choice quizzes with AI",

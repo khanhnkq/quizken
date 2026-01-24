@@ -55,5 +55,14 @@ export const EXCHANGE_ITEMS: ExchangeItem[] = [
         type: 'powerup',
         icon: '⚡',
         color: 'bg-blue-100 border-blue-300'
+    },
+    {
+        id: 'theme_jujutsu_kaisen',
+        name: 'Jujutsu Sorcerer',
+        description: 'Triển khai Lãnh Địa của riêng bạn. Theme đặc biệt dành cho các Chú Thuật Sư.',
+        price: 1000,
+        type: 'theme',
+        icon: '🤞',
+        color: 'bg-neutral-900 border-red-600 text-red-500' 
     }
 ];

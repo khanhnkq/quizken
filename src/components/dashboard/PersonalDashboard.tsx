@@ -44,6 +44,7 @@ import { useLevelNotification } from "@/hooks/useLevelNotification";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ExchangeTab } from "@/components/exchange/ExchangeTab";
 import { InventoryTab } from "@/components/exchange/InventoryTab";
+import { GachaSystem } from "@/components/exchange/gacha/GachaSystem";
 import ApiKeySettings from "@/components/ApiKeySettings";
 
 interface PersonalDashboardProps {
@@ -216,6 +217,14 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
                 <Store className="w-5 h-5 sm:w-4 sm:h-4" />
                 <span className="hidden sm:inline">
                   {t("dashboard.tabs.exchange")}
+                </span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="lucky-draw"
+                className="flex-1 sm:flex-none relative h-16 rounded-none border-b-2 border-transparent px-2 sm:px-6 hover:bg-slate-50 hover:text-amber-500 data-[state=active]:border-amber-500 data-[state=active]:text-amber-500 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 transition-all flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 text-[10px] sm:text-sm uppercase tracking-wide sm:normal-case sm:tracking-normal">
+                <Sparkles className="w-5 h-5 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">
+                  {t("dashboard.tabs.luckyDraw", "Lucky Draw")}
                 </span>
               </TabsTrigger>
               <TabsTrigger
@@ -436,6 +445,12 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
             value="exchange"
             className="min-h-[500px] pt-4 focus-visible:outline-none">
             <ExchangeTab />
+          </TabsContent>
+
+          <TabsContent
+            value="lucky-draw"
+            className="min-h-[500px] pt-4 focus-visible:outline-none">
+            <GachaSystem />
           </TabsContent>
 
           <TabsContent

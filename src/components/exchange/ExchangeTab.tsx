@@ -17,8 +17,6 @@ import { Input } from '@/components/ui/input';
 
 type FilterType = 'all' | 'avatar' | 'theme' | 'powerup' | 'document';
 
-import { GachaSystem } from './gacha/GachaSystem';
-
 export function ExchangeTab() {
     const { t } = useTranslation();
     const { user } = useAuth();
@@ -29,7 +27,6 @@ export function ExchangeTab() {
     const [purchasingId, setPurchasingId] = useState<string | null>(null);
     const [selectedFilter, setSelectedFilter] = useState<FilterType>('all');
     const [searchQuery, setSearchQuery] = useState('');
-    const [viewMode, setViewMode] = useState<'shop' | 'gacha'>('shop');
 
     const handleBuy = async (item: ExchangeItem) => {
         if (!stats || stats.zcoin < item.price) {
@@ -133,7 +130,7 @@ export function ExchangeTab() {
                     </p>
                 </div>
 
-                {/* Wallet & Mode Switcher */}
+                {/* Wallet (Removed Mode Switcher) */}
                 <div className="flex flex-col items-end gap-4">
                     {/* Wallet Card */}
                     <div className="group">
@@ -158,109 +155,76 @@ export function ExchangeTab() {
                             </div>
                         </div>
                     </div>
-
-                    {/* View Mode Switcher */}
-                    <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-full border border-slate-200 dark:border-slate-700">
-                        <button
-                            onClick={() => setViewMode('shop')}
-                            className={`px-6 py-2 rounded-full font-bold text-sm transition-all ${
-                                viewMode === 'shop' 
-                                    ? 'bg-white dark:bg-slate-700 text-violet-600 shadow-sm' 
-                                    : 'text-slate-500 hover:text-slate-700 dark:text-slate-400'
-                            }`}
-                        >
-                            Shop
-                        </button>
-                        <button
-                            onClick={() => setViewMode('gacha')}
-                            className={`px-6 py-2 rounded-full font-bold text-sm transition-all flex items-center gap-2 ${
-                                viewMode === 'gacha' 
-                                    ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white shadow-sm' 
-                                    : 'text-slate-500 hover:text-slate-700 dark:text-slate-400'
-                            }`}
-                        >
-                            <Sparkles className="w-3 h-3" />
-                            Lucky Draw
-                        </button>
-                    </div>
                 </div>
             </div>
 
-            {viewMode === 'gacha' ? (
-                <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <GachaSystem />
+            {/* Filter & Search Bar */}
+            <div className="sticky top-4 z-30 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md p-2 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-800 flex flex-col md:flex-row gap-4 items-center justify-between animate-in fade-in slide-in-from-bottom-2 duration-500">
+
+                {/* Category Pills */}
+                <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 px-2 scrollbar-hide">
+                    {categories.map((cat) => (
+                        <button
+                            key={cat.id}
+                            onClick={() => setSelectedFilter(cat.id as FilterType)}
+                            className={`
+                                flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm whitespace-nowrap transition-all duration-200 border-2
+                                ${selectedFilter === cat.id
+                                    ? `${cat.color} border-current shadow-md scale-105`
+                                    : 'bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-transparent hover:bg-slate-100 dark:hover:bg-slate-700'}
+                            `}
+                        >
+                            <cat.icon className="w-4 h-4" />
+                            {cat.label}
+                        </button>
+                    ))}
                 </div>
-            ) : (
-                <>
-                    {/* Filter & Search Bar */}
-                    <div className="sticky top-4 z-30 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md p-2 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-800 flex flex-col md:flex-row gap-4 items-center justify-between animate-in fade-in slide-in-from-bottom-2 duration-500">
 
-                        {/* Category Pills */}
-                        <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 px-2 scrollbar-hide">
-                            {categories.map((cat) => (
-                                <button
-                                    key={cat.id}
-                                    onClick={() => setSelectedFilter(cat.id as FilterType)}
-                                    className={`
-                                        flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm whitespace-nowrap transition-all duration-200 border-2
-                                        ${selectedFilter === cat.id
-                                            ? `${cat.color} border-current shadow-md scale-105`
-                                            : 'bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-transparent hover:bg-slate-100 dark:hover:bg-slate-700'}
-                                    `}
-                                >
-                                    <cat.icon className="w-4 h-4" />
-                                    {cat.label}
-                                </button>
-                            ))}
-                        </div>
+                {/* Search Input */}
+                <div className="relative w-full md:w-64 px-2 md:px-0">
+                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <Input
+                        placeholder={t('exchange.searchPlaceholder')}
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="pl-10 h-11 rounded-xl border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 dark:text-white focus:bg-white dark:focus:bg-slate-900 transition-all shadow-inner"
+                    />
+                </div>
+            </div>
 
-                        {/* Search Input */}
-                        <div className="relative w-full md:w-64 px-2 md:px-0">
-                            <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                            <Input
-                                placeholder={t('exchange.searchPlaceholder')}
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-10 h-11 rounded-xl border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 dark:text-white focus:bg-white dark:focus:bg-slate-900 transition-all shadow-inner"
+            {/* Grid Items */}
+            <AnimatePresence mode="popLayout">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {filteredItems.map((item, index) => (
+                        <motion.div
+                            key={item.id}
+                            layout
+                            initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.8 }}
+                            transition={{ duration: 0.3, delay: index * 0.05 }}
+                        >
+                            <ExchangeItemCard
+                                item={item}
+                                userZCoin={stats?.zcoin || 0}
+                                isOwned={ownedItemIds.has(item.id)}
+                                isPurchasing={purchasingId === item.id}
+                                onBuy={handleBuy}
                             />
-                        </div>
+                        </motion.div>
+                    ))}
+                </div>
+            </AnimatePresence>
+
+            {/* Empty State */}
+            {filteredItems.length === 0 && (
+                <div className="text-center py-20 px-4">
+                    <div className="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
+                        <Search className="w-10 h-10 text-slate-300" />
                     </div>
-
-                    {/* Grid Items */}
-                    <AnimatePresence mode="popLayout">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                            {filteredItems.map((item, index) => (
-                                <motion.div
-                                    key={item.id}
-                                    layout
-                                    initial={{ opacity: 0, scale: 0.8, y: 20 }}
-                                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                                    exit={{ opacity: 0, scale: 0.8 }}
-                                    transition={{ duration: 0.3, delay: index * 0.05 }}
-                                >
-                                    <ExchangeItemCard
-                                        item={item}
-                                        userZCoin={stats?.zcoin || 0}
-                                        isOwned={ownedItemIds.has(item.id)}
-                                        isPurchasing={purchasingId === item.id}
-                                        onBuy={handleBuy}
-                                    />
-                                </motion.div>
-                            ))}
-                        </div>
-                    </AnimatePresence>
-
-                    {/* Empty State */}
-                    {filteredItems.length === 0 && (
-                        <div className="text-center py-20 px-4">
-                            <div className="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
-                                <Search className="w-10 h-10 text-slate-300" />
-                            </div>
-                            <h3 className="text-xl font-bold text-slate-600 dark:text-slate-300">{t('exchange.noResults')}</h3>
-                            <p className="text-slate-400">{t('exchange.noResultsDesc')}</p>
-                        </div>
-                    )}
-                </>
+                    <h3 className="text-xl font-bold text-slate-600 dark:text-slate-300">{t('exchange.noResults')}</h3>
+                    <p className="text-slate-400">{t('exchange.noResultsDesc')}</p>
+                </div>
             )}
         </div>
     );
