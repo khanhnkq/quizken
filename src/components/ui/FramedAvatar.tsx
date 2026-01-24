@@ -34,18 +34,15 @@ export const FramedAvatar: React.FC<FramedAvatarProps> = ({
     // We'll use absolute positioning for the frame
     
     return (
-        <div className={cn("relative shrink-0 flex items-center justify-center", className)}>
+        <div className={cn("relative shrink-0 flex items-center justify-center", sizeClasses[size], className)}>
              {/* The Base Avatar */}
             <img
                 src={
                     avatarUrl ||
-                    `https://ui-avatars.com/api/?name=${encodeURIComponent(fallbackName)}&background=random&color=fff`
+                    `https://ui-avatars.com/api/?name=${encodeURIComponent(fallbackName)}&background=random&color=fff&rounded=true`
                 }
                 alt={fallbackName}
-                className={cn(
-                    "rounded-full object-cover border-4 border-white dark:border-slate-700 shadow-md z-10 box-content relative",
-                    sizeClasses[size]
-                )}
+                className="rounded-full aspect-square object-cover border-2 border-white dark:border-slate-700 shadow-md z-10 box-border w-full h-full relative"
             />
 
             {/* The Frame Overlay */}

@@ -8,6 +8,10 @@ interface ProfileData {
   equipped_avatar_frame?: string | null;
   zcoin?: number;
   xp?: number;
+  facebook_url?: string | null;
+  zalo_url?: string | null;
+  bio?: string | null;
+  created_at?: string | null;
 }
 
 interface UseProfileReturn {

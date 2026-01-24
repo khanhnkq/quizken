@@ -12,6 +12,9 @@ import {
   CheckCircle2,
   PenTool,
   Flame,
+  Facebook,
+  Phone,
+  Layout,
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { useTranslation } from "react-i18next";
@@ -46,6 +49,8 @@ export const UserProfile: React.FC<
   disableHoverEffects = false,
   overrideLevel,
   layout = 'responsive',
+  actions,
+  hideStats = false,
 }) => {
   const { t, i18n } = useTranslation();
   const cardRef = useRef<HTMLDivElement>(null);
@@ -202,7 +207,7 @@ export const UserProfile: React.FC<
     <div
       ref={cardRef}
       className={cn(
-        "relative w-full h-full min-h-[220px] rounded-[2.5rem] overflow-hidden transition-all duration-300 cursor-default",
+        "relative w-full h-auto min-h-[220px] rounded-[2.5rem] overflow-hidden transition-all duration-300 cursor-default",
         "bg-gradient-to-br from-pink-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900",
         "border-4 border-white dark:border-slate-700 shadow-xl",
         className,
@@ -257,6 +262,26 @@ export const UserProfile: React.FC<
             <Zap className="w-3 h-3 fill-yellow-900" />
             {t("profile.level")} {level}
           </div>
+
+          {/* New Change Frame Floating Button */}
+          {isEditable && (
+            <button
+              onClick={() => {
+                const params = new URLSearchParams(window.location.search);
+                params.set("tab", "inventory");
+                window.history.pushState({}, "", `${window.location.pathname}?${params.toString()}`);
+                // Trigger a re-render if we are in the same component, or use navigation
+                window.dispatchEvent(new Event("popstate"));
+              }}
+              className="absolute -bottom-1 -left-1 z-30 bg-indigo-600 hover:bg-indigo-700 text-white p-2 rounded-full shadow-lg border-2 border-white transition-all hover:scale-110 active:scale-95 group/frame"
+              title="Đổi khung viền"
+            >
+              <Layout className="w-4 h-4" />
+              <span className="absolute left-full ml-2 px-2 py-1 bg-slate-800 text-white text-[10px] rounded opacity-0 group-hover/frame:opacity-100 whitespace-nowrap pointer-events-none transition-opacity">
+                Đổi khung viền
+              </span>
+            </button>
+          )}
         </div>
 
         {/* Edit Profile Dialog */}
@@ -269,20 +294,53 @@ export const UserProfile: React.FC<
         )}
 
         {/* Info Section */}
-        <div className="flex-1 text-center md:text-left space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/60 dark:bg-slate-700/60 backdrop-blur-sm rounded-full text-blue-600/80 dark:text-blue-400 text-xs font-bold uppercase tracking-wider mb-1 shadow-sm">
-            <Sparkles className="w-3 h-3" />
-            {t("profile.member")}
+        <div className="flex-1 text-center md:text-left space-y-3">
+          <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/60 dark:bg-slate-700/60 backdrop-blur-sm rounded-full text-blue-600/80 dark:text-blue-400 text-xs font-bold uppercase tracking-wider shadow-sm">
+              <Sparkles className="w-3 h-3" />
+              {t("profile.member")}
+            </div>
+
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-yellow-400/20 backdrop-blur-sm rounded-full text-yellow-700 dark:text-yellow-400 text-xs font-bold uppercase tracking-wider shadow-sm border border-yellow-200 dark:border-yellow-400/30">
+              <span className="text-sm">🪙</span>
+              {statistics?.zcoin || 0} ZCoin
+            </div>
+
+            {profileData?.facebook_url && (
+              <a 
+                href={profileData.facebook_url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-100 dark:bg-blue-900/30 rounded-full text-blue-600 dark:text-blue-400 text-xs font-bold hover:scale-105 transition-transform shadow-sm"
+              >
+                <Facebook className="w-3 h-3" />
+                Facebook
+              </a>
+            )}
+
+            {profileData?.zalo_url && (
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-cyan-100 dark:bg-cyan-900/30 rounded-full text-cyan-600 dark:text-cyan-400 text-xs font-bold shadow-sm">
+                <Phone className="w-3 h-3" />
+                Zalo: {profileData.zalo_url}
+              </div>
+            )}
+
+            {actions && (
+              <div className="flex items-center gap-2">
+                {actions}
+              </div>
+            )}
           </div>
 
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-yellow-400/20 backdrop-blur-sm rounded-full text-yellow-700 dark:text-yellow-400 text-xs font-bold uppercase tracking-wider mb-1 shadow-sm ml-2 border border-yellow-200 dark:border-yellow-400/30">
-            <span className="text-sm">🪙</span>
-            {statistics?.zcoin || 0} ZCoin
-          </div>
-
-          <h2 className="text-3xl md:text-4xl font-heading font-black text-gray-800 dark:text-white tracking-tight leading-none">
+          <h2 className="text-3xl md:text-4xl font-heading font-black text-gray-800 dark:text-white tracking-tight leading-none pt-1">
             {userName}
           </h2>
+
+          {profileData?.bio && (
+            <p className="text-sm font-medium text-slate-600 dark:text-slate-400 max-w-sm italic">
+              "{profileData.bio}"
+            </p>
+          )}
 
           <div className="flex flex-col md:flex-row items-center md:items-start gap-3 text-sm font-medium text-gray-500 dark:text-gray-400">
             <div className="flex items-center gap-1.5 bg-white/50 dark:bg-slate-800/50 px-2 py-1 rounded-lg">
@@ -314,38 +372,40 @@ export const UserProfile: React.FC<
           </div>
 
           {/* Quick Stats Grid */}
-          <div className="flex items-center gap-3 mt-4">
-            {/* Quizzes Taken */}
-            <div className="flex-1 bg-white/50 dark:bg-slate-800/50 rounded-xl p-2 flex flex-col items-center">
-              <CheckCircle2 className="w-4 h-4 text-green-500 mb-1" />
-              <span className="text-sm font-bold text-gray-800 dark:text-gray-200">
-                {statistics?.total_quizzes_taken || 0}
-              </span>
-              <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-bold">
-                {t("dashboard.taken", "Taken")}
-              </span>
-            </div>
+          {!hideStats && (
+            <div className="flex items-center gap-3 mt-4">
+              {/* Quizzes Taken */}
+              <div className="flex-1 bg-white/50 dark:bg-slate-800/50 rounded-xl p-2 flex flex-col items-center">
+                <CheckCircle2 className="w-4 h-4 text-green-500 mb-1" />
+                <span className="text-sm font-bold text-gray-800 dark:text-gray-200">
+                  {statistics?.total_quizzes_taken || 0}
+                </span>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-bold">
+                  {t("dashboard.taken", "Taken")}
+                </span>
+              </div>
 
-            {/* Quizzes Created */}
-            <div className="flex-1 bg-white/50 dark:bg-slate-800/50 rounded-xl p-2 flex flex-col items-center">
-              <PenTool className="w-4 h-4 text-purple-500 mb-1" />
-              <span className="text-sm font-bold text-gray-800 dark:text-gray-200">
-                {statistics?.total_quizzes_created || 0}
-              </span>
-              <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-bold">
-                {t("dashboard.created", "Created")}
-              </span>
-            </div>
+              {/* Quizzes Created */}
+              <div className="flex-1 bg-white/50 dark:bg-slate-800/50 rounded-xl p-2 flex flex-col items-center">
+                <PenTool className="w-4 h-4 text-purple-500 mb-1" />
+                <span className="text-sm font-bold text-gray-800 dark:text-gray-200">
+                  {statistics?.total_quizzes_created || 0}
+                </span>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-bold">
+                  {t("dashboard.created", "Created")}
+                </span>
+              </div>
 
-            {/* Streak */}
-            <div className="flex-1 bg-white/50 dark:bg-slate-800/50 rounded-xl p-2 flex flex-col items-center">
-              <Flame className="w-4 h-4 text-orange-500 mb-1" />
-              <span className="text-sm font-bold text-gray-800 dark:text-gray-200">{streak}</span>
-              <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-bold">
-                {t("dashboard.streak", "Streak")}
-              </span>
+              {/* Streak */}
+              <div className="flex-1 bg-white/50 dark:bg-slate-800/50 rounded-xl p-2 flex flex-col items-center">
+                <Flame className="w-4 h-4 text-orange-500 mb-1" />
+                <span className="text-sm font-bold text-gray-800 dark:text-gray-200">{streak}</span>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-bold">
+                  {t("dashboard.streak", "Streak")}
+                </span>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

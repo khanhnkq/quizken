@@ -99,6 +99,11 @@ interface PublicQuiz {
   category: QuizCategory;
   tags: string[];
   difficulty: QuizDifficulty;
+  profiles?: {
+    display_name: string | null;
+    avatar_url: string | null;
+    equipped_avatar_frame: string | null;
+  };
 }
 
 interface QuizQuestion {
@@ -303,7 +308,7 @@ const QuizLibrary: React.FC = () => {
       let query = supabase
         .from("quizzes")
         .select(
-          "id,title,description,prompt,questions,prompt_tokens,candidates_tokens,total_tokens,created_at,user_id,is_public,usage_count,pdf_download_count,category,tags,difficulty",
+          "id,title,description,prompt,questions,prompt_tokens,candidates_tokens,total_tokens,created_at,user_id,is_public,usage_count,pdf_download_count,category,tags,difficulty, profiles:user_id(display_name, avatar_url, equipped_avatar_frame)",
           { count: "exact" }
         )
         .eq("is_public", true);

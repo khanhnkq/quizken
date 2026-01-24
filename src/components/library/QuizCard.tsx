@@ -20,6 +20,7 @@ import {
 import {
   QuizTags,
 } from "./QuizCategoryBadge";
+import { FramedAvatar } from "@/components/ui/FramedAvatar";
 import type { QuizCategory, QuizDifficulty } from "@/lib/constants/quizCategories";
 import { getDifficultyLabel, getCategoryLabel } from "@/lib/constants/quizCategories";
 import { useTranslation } from "react-i18next";
@@ -37,6 +38,11 @@ interface QuizCardProps {
     category: QuizCategory;
     tags: string[];
     difficulty: QuizDifficulty;
+    profiles?: {
+      display_name: string | null;
+      avatar_url: string | null;
+      equipped_avatar_frame: string | null;
+    };
   };
   onPreview: () => void;
   onUse: () => void;
@@ -108,9 +114,23 @@ export const QuizCard: React.FC<QuizCardProps> = ({
         </h3>
 
         {/* Description */}
-        <p className="line-clamp-2 text-sm text-muted-foreground min-h-[2.5rem]">
+        <p className="line-clamp-2 text-sm text-muted-foreground min-h-[2.5rem] mb-2">
           {quiz.description || t('library.card.noDescription')}
         </p>
+
+        {/* Creator Info */}
+        <div className="flex items-center gap-2 mb-1">
+           <FramedAvatar 
+              avatarUrl={quiz.profiles?.avatar_url}
+              frameId={quiz.profiles?.equipped_avatar_frame}
+              fallbackName={quiz.profiles?.display_name || "User"}
+              size="sm"
+              className="w-8 h-8"
+           />
+           <span className="text-xs font-bold text-slate-600 dark:text-slate-400 truncate max-w-[150px]">
+              {quiz.profiles?.display_name || "Unknown Creator"}
+           </span>
+        </div>
 
         {/* Stats Bubbles */}
         <div className="flex items-center gap-3 mt-2">

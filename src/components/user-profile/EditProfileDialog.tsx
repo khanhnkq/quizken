@@ -34,8 +34,16 @@ export function EditProfileDialog({
 
   const [displayName, setDisplayName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
+  const [facebookUrl, setFacebookUrl] = useState("");
+  const [zaloUrl, setZaloUrl] = useState("");
+  const [bio, setBio] = useState("");
+  
   const [originalDisplayName, setOriginalDisplayName] = useState("");
   const [originalAvatarUrl, setOriginalAvatarUrl] = useState("");
+  const [originalFacebookUrl, setOriginalFacebookUrl] = useState("");
+  const [originalZaloUrl, setOriginalZaloUrl] = useState("");
+  const [originalBio, setOriginalBio] = useState("");
+
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -50,7 +58,7 @@ export function EditProfileDialog({
         try {
           const { data, error } = await (supabase as any)
             .from("profiles")
-            .select("display_name, avatar_url")
+            .select("display_name, avatar_url, facebook_url, zalo_url, bio")
             .eq("id", user.id)
             .single();
 
@@ -61,11 +69,21 @@ export function EditProfileDialog({
           // Use profiles data, fallback to Google metadata
           const name = data?.display_name || user.user_metadata?.full_name || user.user_metadata?.name || "";
           const avatar = data?.avatar_url || user.user_metadata?.avatar_url || "";
+          const fb = data?.facebook_url || "";
+          const zalo = data?.zalo_url || "";
+          const bioText = data?.bio || "";
           
           setDisplayName(name);
           setAvatarUrl(avatar);
+          setFacebookUrl(fb);
+          setZaloUrl(zalo);
+          setBio(bioText);
+
           setOriginalDisplayName(name);
           setOriginalAvatarUrl(avatar);
+          setOriginalFacebookUrl(fb);
+          setOriginalZaloUrl(zalo);
+          setOriginalBio(bioText);
         } catch (error) {
           console.error("Error fetching profile:", error);
         } finally {
@@ -134,6 +152,9 @@ export function EditProfileDialog({
         .update({
           display_name: displayName.trim() || null,
           avatar_url: newAvatarUrl || null,
+          facebook_url: facebookUrl.trim() || null,
+          zalo_url: zaloUrl.trim() || null,
+          bio: bio.trim() || null,
           updated_at: new Date().toISOString(),
         })
         .eq("id", user.id);
@@ -165,6 +186,9 @@ export function EditProfileDialog({
   const currentAvatarUrl = previewUrl || avatarUrl;
   const hasChanges =
     displayName !== originalDisplayName ||
+    facebookUrl !== originalFacebookUrl ||
+    zaloUrl !== originalZaloUrl ||
+    bio !== originalBio ||
     selectedFile !== null;
 
   return (
@@ -232,6 +256,44 @@ export function EditProfileDialog({
               className="rounded-xl"
               maxLength={50}
             />
+          </div>
+
+          {/* Social Links & Bio */}
+          <div className="space-y-4 pt-2">
+             <div className="space-y-2">
+                <Label htmlFor="bio">Giới thiệu bản thân</Label>
+                <textarea
+                  id="bio"
+                  value={bio}
+                  onChange={(e) => setBio(e.target.value)}
+                  placeholder="Viết vài dòng giới thiệu về bạn..."
+                  className="w-full min-h-[80px] p-3 rounded-xl border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all resize-none"
+                  maxLength={200}
+                />
+             </div>
+
+             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                    <Label htmlFor="facebook">Facebook Link</Label>
+                    <Input
+                      id="facebook"
+                      value={facebookUrl}
+                      onChange={(e) => setFacebookUrl(e.target.value)}
+                      placeholder="https://facebook.com/..."
+                      className="rounded-xl"
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="zalo">Số điện thoại Zalo</Label>
+                    <Input
+                      id="zalo"
+                      value={zaloUrl}
+                      onChange={(e) => setZaloUrl(e.target.value)}
+                      placeholder="Số điện thoại hoặc link Zalo..."
+                      className="rounded-xl"
+                    />
+                </div>
+             </div>
           </div>
         </div>
 

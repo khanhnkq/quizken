@@ -7,6 +7,8 @@ import { UserProfile } from "@/components/user-profile/UserProfile";
 import { useDashboardStats } from "@/hooks/useDashboardStats";
 import { Loader2 } from "lucide-react";
 import { ReactNode, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 interface UserProfilePopoverProps {
   userId: string;
@@ -52,6 +54,7 @@ function UserProfileContent({
   streak,
   level,
 }: Omit<UserProfilePopoverProps, "children">) {
+  const navigate = useNavigate();
   const { statistics, isLoading } = useDashboardStats(userId);
 
   if (isLoading) {
@@ -75,6 +78,7 @@ function UserProfileContent({
           zcoin: 0,
         }
       }
+      isLoading={isLoading}
       isEditable={false}
       className="shadow-2xl"
       overrideDisplayName={displayName}
@@ -83,6 +87,16 @@ function UserProfileContent({
       streak={streak}
       overrideLevel={level}
       layout="horizontal"
+      actions={
+        <Button 
+          size="sm" 
+          variant="hero" 
+          onClick={() => navigate(`/profile/${userId}`)}
+          className="rounded-full h-7 px-3 text-[10px] font-black uppercase tracking-wider bg-indigo-600 hover:bg-indigo-700 text-white border-none shadow-md"
+        >
+          Chi tiết ➜
+        </Button>
+      }
     />
   );
 }

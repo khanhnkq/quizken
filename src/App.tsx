@@ -26,6 +26,7 @@ const QuizCreatePage = lazy(() => import("./pages/QuizCreatePage"));
 const QuizEditPage = lazy(() => import("./pages/QuizEditPage"));
 const ChatPage = lazy(() => import("./pages/ChatPage"));
 const RedeemCode = lazy(() => import("./pages/RedeemCode"));
+const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 
 // Preload functions for faster navigation
 const preloadRoutes = () => {
@@ -99,6 +100,8 @@ const AppRoutes = () => {
 
         {/* User Domain */}
         <Route path="/user/dashboard" element={<Dashboard />} />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/profile/:userId" element={<ProfilePage />} />
         <Route path="/redeem" element={<RedeemCode />} />
 
         {/* Chat */}

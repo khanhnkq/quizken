@@ -84,6 +84,8 @@ export interface UserProfileProps {
   overrideAvatarUrl?: string | null;
   streak?: number;
   disableHoverEffects?: boolean;
+  actions?: React.ReactNode;
+  hideStats?: boolean;
 }
 
 /**

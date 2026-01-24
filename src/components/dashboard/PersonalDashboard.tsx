@@ -33,6 +33,16 @@ import {
   BookOpenIcon,
   ArrowRight,
   Gift,
+  Facebook,
+  Phone,
+  Info,
+  Calendar,
+  Shield,
+  Star,
+  Zap,
+  Trophy,
+  MapPin,
+  Clock,
 } from "lucide-react";
 import { BackgroundDecorations } from "@/components/ui/BackgroundDecorations";
 import { gsap } from "gsap";
@@ -51,6 +61,24 @@ import ApiKeySettings from "@/components/ApiKeySettings";
 interface PersonalDashboardProps {
   userId?: string;
 }
+
+// Stat Card Component for Profile Tab
+const ProfileStatCard = ({ icon: Icon, label, value, color, delay = 0 }: any) => (
+  <motion.div 
+    initial={{ opacity: 0, scale: 0.9 }}
+    animate={{ opacity: 1, scale: 1 }}
+    transition={{ delay, duration: 0.4 }}
+    className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-md rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-4 hover:shadow-md transition-shadow"
+  >
+    <div className={cn("p-3 rounded-xl", color)}>
+      <Icon className="w-5 h-5 text-white" />
+    </div>
+    <div>
+      <p className="text-xs font-bold uppercase text-muted-foreground tracking-wider">{label}</p>
+      <p className="text-xl font-black text-slate-800 dark:text-slate-100">{value}</p>
+    </div>
+  </motion.div>
+);
 
 export function PersonalDashboard({ userId }: PersonalDashboardProps) {
   const navigate = useNavigate();
@@ -210,6 +238,14 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
                 <LayoutDashboard className="w-5 h-5 sm:w-4 sm:h-4" />
                 <span className="hidden sm:inline">
                   {t("dashboard.tabs.overview")}
+                </span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="profile"
+                className="flex-1 sm:flex-none relative h-16 rounded-none border-b-2 border-transparent px-2 sm:px-6 hover:bg-slate-50 hover:text-indigo-500 data-[state=active]:border-indigo-500 data-[state=active]:text-indigo-500 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 transition-all flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 text-[10px] sm:text-sm uppercase tracking-wide sm:normal-case sm:tracking-normal">
+                <UserIcon className="w-5 h-5 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">
+                  {t("dashboard.tabs.profile", "Hồ sơ")}
                 </span>
               </TabsTrigger>
               <TabsTrigger
@@ -398,18 +434,7 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
-              {/* Profile Card */}
-              <div className="w-full h-full transform hover:scale-[1.01] transition-transform duration-300">
-                <UserProfile
-                  user={user}
-                  statistics={statistics}
-                  isLoading={statsLoading}
-                  className="w-full h-full rounded-[2rem] shadow-lg border-2 border-white bg-white/60 backdrop-blur-sm"
-                  streak={streak}
-                />
-              </div>
-
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-4">
               {/* Statistics Cards */}
               <StatisticsCards
                 statistics={statistics}
@@ -440,6 +465,194 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
                   isLoading={recentLoading}
                 />
               </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent
+            value="profile"
+            className="animate-in fade-in slide-in-from-bottom-4 duration-500 focus-visible:outline-none pt-6 pb-20">
+            
+            <div className="max-w-5xl mx-auto space-y-8">
+               {/* Profile Card at Top */}
+               <motion.div
+                    initial={{ opacity: 0, y: 50 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, type: "spring", bounce: 0.3 }}
+                    className="w-full relative group"
+                >
+                    <UserProfile 
+                        user={user}
+                        statistics={statistics}
+                        isLoading={statsLoading}
+                        isEditable={true}
+                        streak={streak}
+                        hideStats={true}
+                        layout="horizontal"
+                        className="shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] dark:shadow-none border-4 border-white dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl"
+                    />
+                </motion.div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div className="space-y-6">
+                        <motion.div 
+                             initial={{ opacity: 0, scale: 0.8 }}
+                             animate={{ opacity: 1, scale: 1 }}
+                             transition={{ delay: 0.4 }}
+                             className="bg-gradient-to-r from-amber-400 to-orange-500 rounded-[2rem] p-6 text-white text-center shadow-lg relative overflow-hidden"
+                        >
+                            <div className="absolute top-0 right-0 p-4 opacity-20">
+                                <Trophy className="w-16 h-16 rotate-12" />
+                            </div>
+                            <h3 className="text-lg font-bold uppercase tracking-wider mb-1 opacity-90">Hạng hiện tại</h3>
+                            <div className="text-3xl font-black flex items-center justify-center gap-2">
+                                <Star className="w-8 h-8 fill-white" />
+                                <span>Quiz Master</span>
+                            </div>
+                            <p className="text-sm mt-2 opacity-90 font-medium">Top 5% người chơi xuất sắc nhất</p>
+                        </motion.div>
+
+                        <div className="grid grid-cols-1 gap-4 text-slate-600 dark:text-slate-300">
+                             <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                                <div>
+                                    <p className="text-xs font-bold uppercase text-slate-400 mb-1">Tham gia từ</p>
+                                    <p className="text-sm font-bold flex items-center gap-2">
+                                        <Calendar className="w-4 h-4 text-slate-400" />
+                                        {profileData?.created_at ? new Date(profileData.created_at).toLocaleDateString('vi-VN') : 'Mới tham gia'}
+                                    </p>
+                                </div>
+                                <div className="p-3 bg-slate-100 dark:bg-slate-800 rounded-full">
+                                    <Info className="w-5 h-5 text-slate-500" />
+                                </div>
+                             </div>
+                             <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                                <div>
+                                    <p className="text-xs font-bold uppercase text-slate-400 mb-1">Phong độ</p>
+                                    <p className="text-sm font-bold flex items-center gap-2">
+                                        <Zap className="w-4 h-4 text-orange-400" />
+                                        {streak} Ngày Streak
+                                    </p>
+                                </div>
+                                <div className="p-3 bg-orange-50 dark:bg-orange-900/20 rounded-full">
+                                    <Zap className="w-5 h-5 text-orange-500" />
+                                </div>
+                             </div>
+                        </div>
+                    </div>
+
+                    <div className="lg:col-span-2 space-y-8 min-w-0">
+                        <div className="grid grid-cols-2 gap-4">
+                            <ProfileStatCard 
+                                icon={BookOpen} 
+                                label="Đã làm" 
+                                value={statistics?.total_quizzes_taken || 0} 
+                                color="bg-blue-500" 
+                                delay={0.1} 
+                            />
+                            <ProfileStatCard 
+                                icon={PlusCircleIcon} 
+                                label="Đã tạo" 
+                                value={statistics?.total_quizzes_created || 0} 
+                                color="bg-indigo-500" 
+                                delay={0.2} 
+                            />
+                            <ProfileStatCard 
+                                icon={Trophy} 
+                                label="Điểm cao" 
+                                value={statistics?.highest_score || 0} 
+                                color="bg-amber-500" 
+                                delay={0.3} 
+                            />
+                             <ProfileStatCard 
+                                icon={Zap} 
+                                label="ZCoin" 
+                                value={statistics?.zcoin?.toLocaleString() || 0} 
+                                color="bg-yellow-500" 
+                                delay={0.4} 
+                            />
+                        </div>
+
+                        {/* "About Me" Section */}
+                        <motion.section 
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.3 }}
+                            className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl rounded-[2.5rem] p-8 border border-white dark:border-slate-800 shadow-lg relative overflow-hidden"
+                        >
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-3xl -mr-10 -mt-10" />
+                            
+                            <h3 className="text-xl font-black text-slate-800 dark:text-white mb-6 flex items-center gap-3 relative z-10">
+                                <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg text-indigo-600 dark:text-indigo-400">
+                                    <Info className="w-6 h-6" />
+                                </div>
+                                Giới thiệu
+                            </h3>
+                            
+                            <div className="space-y-8 relative z-10">
+                                <div>
+                                    <p className="text-slate-600 dark:text-slate-300 leading-relaxed font-medium bg-gradient-to-br from-slate-50 to-white dark:from-slate-800/50 dark:to-slate-900/50 p-6 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-inner italic">
+                                        {profileData?.bio ? (
+                                            <>
+                                                <span className="text-2xl text-indigo-300 font-serif mr-2">"</span>
+                                                {profileData.bio}
+                                                <span className="text-2xl text-indigo-300 font-serif ml-2">"</span>
+                                            </>
+                                        ) : (
+                                            "Bạn chưa cập nhật tiểu sử."
+                                        )}
+                                    </p>
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                                    <div className="space-y-4">
+                                        <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">Kết nối</h4>
+                                        <div className="space-y-3">
+                                            {profileData?.facebook_url ? (
+                                                <a 
+                                                    href={profileData.facebook_url}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="flex items-center gap-4 p-4 bg-white dark:bg-slate-800 rounded-2xl border-2 border-slate-100 dark:border-slate-800 hover:border-blue-200 dark:hover:border-blue-900 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all group"
+                                                >
+                                                    <Facebook className="w-5 h-5 text-blue-600" />
+                                                    <span className="font-bold text-slate-700 dark:text-slate-200">Facebook</span>
+                                                </a>
+                                            ) : (
+                                                <div className="p-4 bg-slate-50 dark:bg-slate-800/30 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-700 opacity-50 text-sm italic">
+                                                    Chưa thêm Facebook
+                                                </div>
+                                            )}
+
+                                            {profileData?.zalo_url ? (
+                                                <div className="flex items-center gap-4 p-4 bg-white dark:bg-slate-800 rounded-2xl border-2 border-slate-100 dark:border-slate-800">
+                                                    <Phone className="w-5 h-5 text-cyan-600" />
+                                                    <span className="font-bold text-slate-700 dark:text-slate-200">{profileData.zalo_url}</span>
+                                                </div>
+                                            ) : (
+                                                <div className="p-4 bg-slate-50 dark:bg-slate-800/30 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-700 opacity-50 text-sm italic">
+                                                    Chưa thêm Zalo
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-4">
+                                        <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">Thành tựu</h4>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <div className="p-3 bg-yellow-400/10 border border-yellow-400/20 rounded-xl flex flex-col items-center justify-center text-center gap-1">
+                                                <Shield className="w-6 h-6 text-yellow-500 fill-yellow-500/20" />
+                                                <span className="text-[10px] font-black uppercase text-yellow-700 dark:text-yellow-400">Newbie</span>
+                                            </div>
+                                            <div className="p-3 bg-purple-400/10 border border-purple-400/20 rounded-xl flex flex-col items-center justify-center text-center gap-1">
+                                                <Star className="w-6 h-6 text-purple-500 fill-purple-500/20" />
+                                                <span className="text-[10px] font-black uppercase text-purple-700 dark:text-purple-400">Quiz-er</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </motion.section>
+                    </div>
+                </div>
             </div>
           </TabsContent>
 
