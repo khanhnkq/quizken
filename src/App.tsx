@@ -27,6 +27,7 @@ const QuizEditPage = lazy(() => import("./pages/QuizEditPage"));
 const ChatPage = lazy(() => import("./pages/ChatPage"));
 const RedeemCode = lazy(() => import("./pages/RedeemCode"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
+const ChallengePage = lazy(() => import("./pages/ChallengePage"));
 
 // Preload functions for faster navigation
 const preloadRoutes = () => {
@@ -49,7 +50,7 @@ import { GlobalCreateButton } from "@/components/common/GlobalCreateButton";
 import { GlobalChatTicker } from "@/components/chat/GlobalChatTicker";
 import { GlobalQuizListener } from "@/components/common/GlobalQuizListener";
 import { CustomCursor } from "@/components/ui/CustomCursor";
-import { IntroAnimation } from "@/components/layout/IntroAnimation";
+
 
 // GSAP plugins are loaded dynamically in useLayoutEffect to reduce initial bundle size
 
@@ -106,6 +107,10 @@ const AppRoutes = () => {
 
         {/* Chat */}
         <Route path="/chat" element={<ChatPage />} />
+        
+        {/* Challenge Mode */}
+        <Route path="/challenge" element={<ChallengePage />} />
+        <Route path="/challenge/:id" element={<ChallengePage />} />
 
         {/* Legacy redirects (optional - can remove later) */}
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
@@ -237,7 +242,7 @@ const App = () => {
 
 
             <ChatImagesProvider>
-              <IntroAnimation />
+
               {/* 👇 Toaster nằm ngoài ScrollSmoother */}
               <HotToaster />
               <GlobalLevelNotification />

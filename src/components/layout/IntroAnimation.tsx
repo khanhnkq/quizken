@@ -3,9 +3,18 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 export const IntroAnimation = () => {
   const [phase, setPhase] = useState<'walk' | 'trip' | 'reveal' | 'finished'>('walk');
-  const [show, setShow] = useState(true);
+  const [show, setShow] = useState(false); // Default to false to prevent flash if already seen
 
   useEffect(() => {
+    const hasSeen = sessionStorage.getItem('hasSeenIntro');
+    if (hasSeen) {
+      setShow(false);
+      return;
+    }
+    
+    setShow(true); // Only show if not seen
+    sessionStorage.setItem('hasSeenIntro', 'true');
+
     // Sequence
     const tripTimer = setTimeout(() => setPhase('trip'), 2500); // Walk for 2.5s
     const revealTimer = setTimeout(() => {

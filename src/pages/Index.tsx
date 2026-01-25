@@ -8,6 +8,7 @@ import SeoMeta from "@/components/SeoMeta";
 import { shouldDisableScrollSmoother } from "@/utils/deviceDetection";
 import { generateHomepageSchema } from "@/lib/seoSchemas";
 import { ComponentSkeleton } from "@/components/ui/loading-skeleton";
+import { IntroAnimation } from "@/components/layout/IntroAnimation";
 import { gsap } from "gsap";
 
 // Lazy load heavy components
@@ -201,6 +202,7 @@ const Index = () => {
 
   return (
     <>
+      <IntroAnimation />
       <SeoMeta
         title="Tạo Bài Kiểm Tra AI Miễn Phí - QuizKen"
         description="QuizKen giúp giáo viên và học sinh tạo bài kiểm tra trắc nghiệm với AI trong vài giây. Hỗ trợ 100+ chủ đề, tự động chấm điểm, xuất PDF."

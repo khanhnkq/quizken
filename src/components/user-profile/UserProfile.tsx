@@ -187,18 +187,23 @@ export const UserProfile: React.FC<
   const calculatedXP = profileData?.xp ?? calculateXP(statistics);
   const calculatedLevel = calculateLevel(calculatedXP);
 
-  const level = overrideLevel || calculatedLevel;
-  const totalXP = overrideLevel
-    ? Math.max(calculatedXP, calculateCurrentLevelBaseXP(overrideLevel))
-    : calculatedXP;
+  // Use overrideLevel for display if provided, otherwise use calculatedLevel
+  // BUT for progress bar math, we MUST use the level corresponding to the current totalXP 
+  // to avoid negative progress (e.g. if overrideLevel is stale but totalXP is fresh).
+  // Ideally overrideLevel and totalXP should be consistent. If they diverge, 
+  // using calculatedLevel for math is safer.
+  const displayLevel = overrideLevel || calculatedLevel;
+  
+  // Use calculatedLevel for math to ensure the XP range (Base -> Next) contains the TotalXP
+  const mathLevel = calculatedLevel;
 
-  const nextLevelXP = calculateNextLevelXP(level);
-  const currentLevelBaseXP = calculateCurrentLevelBaseXP(level);
+  const nextLevelXP = calculateNextLevelXP(mathLevel);
+  const currentLevelBaseXP = calculateCurrentLevelBaseXP(mathLevel);
   const levelProgressPercent = Math.min(
     100,
     Math.max(
       0,
-      ((totalXP - currentLevelBaseXP) / (nextLevelXP - currentLevelBaseXP)) *
+      ((calculatedXP - currentLevelBaseXP) / (nextLevelXP - currentLevelBaseXP)) *
         100,
     ),
   );
@@ -260,7 +265,7 @@ export const UserProfile: React.FC<
             ref={badgeRef}
             className="absolute -bottom-2 -right-2 z-30 bg-yellow-300 text-yellow-900 px-3 py-1 rounded-full text-xs font-bold shadow-sm border-2 border-white dark:border-slate-700 flex items-center gap-1">
             <Zap className="w-3 h-3 fill-yellow-900" />
-            {t("profile.level")} {level}
+            {t("profile.level")} {displayLevel}
           </div>
 
           {/* New Change Frame Floating Button */}
@@ -362,12 +367,12 @@ export const UserProfile: React.FC<
              <div className="flex justify-between text-xs font-bold text-gray-500 dark:text-gray-400 px-1">
                 <span>XP</span>
                 <span>
-                  {Math.floor(totalXP - currentLevelBaseXP)} / {nextLevelXP - currentLevelBaseXP}
+                  {Math.floor(calculatedXP - currentLevelBaseXP)} / {nextLevelXP - currentLevelBaseXP}
                 </span>
              </div>
              <Progress value={levelProgressPercent} className="h-2.5 bg-gray-200 dark:bg-slate-700 from-yellow-400 to-orange-500 [&>div]:bg-gradient-to-r" />
              <div className="text-[10px] text-right text-gray-400 font-medium">
-                {t("userProfile.toNextLevel", { xp: Math.round(nextLevelXP - totalXP) })}
+                {t("userProfile.toNextLevel", { xp: Math.round(nextLevelXP - calculatedXP) })}
              </div>
           </div>
 

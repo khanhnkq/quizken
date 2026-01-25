@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useState, useEffect, useMemo, useCallback, useRef, useLayoutEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { BackgroundDecorations } from "@/components/ui/BackgroundDecorations";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -80,6 +80,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { PreviewModal } from "@/components/quiz/PreviewModal";
+import { CreateChallengeDialog } from "@/components/challenge/CreateChallengeDialog";
 import { gsap } from "gsap";
 
 interface PublicQuiz {
@@ -127,7 +128,14 @@ const QuizLibrary: React.FC = () => {
   const [searchIn, setSearchIn] = useState<"all" | "title" | "content">("all");
   const [selectedCategory, setSelectedCategory] = useState<QuizCategory | "all">("all");
   const [selectedDifficulty, setSelectedDifficulty] = useState<QuizDifficulty | "all">("all");
+  const [viewMode, setViewMode] = useState<"public" | "mine">("public");
+
   const [shareQuiz, setShareQuiz] = useState<PublicQuiz | null>(null);
+  
+  // Challenge Mode
+  const [searchParams] = useSearchParams();
+  const isChallengeMode = searchParams.get('mode') === 'challenge';
+  const [challengeQuiz, setChallengeQuiz] = useState<PublicQuiz | null>(null);
 
   // Scroll to top on mount
   useEffect(() => {
@@ -279,7 +287,7 @@ const QuizLibrary: React.FC = () => {
       const { data, error } = await supabase
         .from("quizzes")
         .select("category,user_id")
-        .eq("is_public", true);
+        .eq("is_public", true); // Stats currently only for public, maybe update later
 
       if (error) throw error;
 
@@ -311,7 +319,17 @@ const QuizLibrary: React.FC = () => {
           "id,title,description,prompt,questions,prompt_tokens,candidates_tokens,total_tokens,created_at,user_id,is_public,usage_count,pdf_download_count,category,tags,difficulty, profiles:user_id(display_name, avatar_url, equipped_avatar_frame)",
           { count: "exact" }
         )
-        .eq("is_public", true);
+        
+      if (viewMode === 'mine') {
+         if (!user) {
+            setQuizzes([]);
+            setLoading(false);
+            return;
+         }
+         query = query.eq('user_id', user.id);
+      } else {
+         query = query.eq("is_public", true);
+      }
 
       // Apply Search
       if (debouncedQuery) {
@@ -367,7 +385,7 @@ const QuizLibrary: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [currentPage, debouncedQuery, selectedCategory, selectedDifficulty, sortBy]);
+  }, [currentPage, debouncedQuery, selectedCategory, selectedDifficulty, sortBy, viewMode, user]);
 
   // Initial load and refetch on dependencies change
   useEffect(() => {
@@ -451,6 +469,39 @@ const QuizLibrary: React.FC = () => {
     setShareQuiz(quiz);
   };
 
+  const handleCreateChallenge = async (betAmount: number) => {
+    if (!challengeQuiz || !user) return;
+    
+    try {
+      // 1. Create Room (call RPC or Insert directly)
+      // Since we already have existing logic in ChallengeLobby, we can reuse or just replicate insert here.
+      // Replicating insert is cleaner for this context.
+      
+      const { data, error } = await supabase
+        .from('challenges')
+        .insert({
+           host_id: user.id,
+           quiz_id: challengeQuiz.id,
+           bet_amount: betAmount,
+           status: 'waiting'
+        })
+        .select()
+        .single();
+        
+      if (error) throw error;
+      
+      // 2. Redirect to Waiting Room
+      navigate(`/challenge/${data.id}`);
+      
+    } catch (err) {
+       console.error(err);
+       toast({
+         title: "Error creating challenge",
+         variant: "destructive"
+       });
+    }
+  };
+
   return (
     <>
       <SeoMeta
@@ -499,6 +550,32 @@ const QuizLibrary: React.FC = () => {
               <div className="hero-badge inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary font-medium text-sm mx-auto mb-8">
                 <span className="text-lg">✨</span>
                 <span>{t('library.hero.badge')}</span>
+              </div>
+
+              {/* View Mode Toggles */}
+              <div className="flex justify-center mb-8 gap-4">
+                 <Button 
+                   variant={viewMode === 'public' ? 'default' : 'outline'}
+                   onClick={() => { setViewMode('public'); setCurrentPage(1); }}
+                   className="rounded-full px-6"
+                 >
+                   Public Library
+                 </Button>
+                 <Button 
+                   variant={viewMode === 'mine' ? 'default' : 'outline'}
+                   onClick={() => { 
+                      if (!user) {
+                        toast({ title: t("auth.loginRequired"), variant: "warning" });
+                        setShowAuthModal(true);
+                        return;
+                      }
+                      setViewMode('mine'); 
+                      setCurrentPage(1); 
+                   }}
+                   className="rounded-full px-6"
+                 >
+                   My Quizzes
+                 </Button>
               </div>
 
               <h1 className="hero-title font-heading text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[1.1] md:leading-tight text-foreground drop-shadow-sm mb-6">
@@ -722,6 +799,7 @@ const QuizLibrary: React.FC = () => {
                           } as Quiz);
                         }}
                         onUse={() => handleUseQuiz(quiz)}
+                        onChallenge={isChallengeMode ? () => setChallengeQuiz(quiz) : undefined}
                         onShare={() => handleShareQuiz(quiz)}
                         onDownload={async () => {
                           if (!user) {
@@ -912,6 +990,15 @@ const QuizLibrary: React.FC = () => {
           />
           <AuthModal open={showAuthModal} onOpenChange={setShowAuthModal} />
         </div>
+        {/* Create Challenge Dialog */}
+        {challengeQuiz && (
+           <CreateChallengeDialog 
+             isOpen={!!challengeQuiz}
+             onClose={() => setChallengeQuiz(null)}
+             onConfirm={handleCreateChallenge}
+             quizTitle={challengeQuiz.title}
+           />
+        )}
       </div>
     </>
   );

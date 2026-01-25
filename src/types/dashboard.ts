@@ -5,6 +5,7 @@ export interface UserStatistics {
   average_score: number;
   total_time_taken_seconds: number;
   zcoin?: number;
+  total_xp?: number;
 }
 
 export interface ProgressTrendData {

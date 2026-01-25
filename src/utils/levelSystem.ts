@@ -5,21 +5,22 @@ export const ZCOIN_PER_LEVEL_UP = 1000;
 
 export const calculateXP = (stats: UserStatistics | null): number => {
     if (!stats) return 0;
+    if (stats.total_xp !== undefined) return stats.total_xp;
     const createdXP = (stats.total_quizzes_created || 0) * 100;
     const takenXP = Math.round((stats.total_quizzes_taken || 0) * (stats.average_score || 0));
     return createdXP + takenXP;
 };
 
 export const calculateLevel = (xp: number): number => {
-    return Math.floor(Math.sqrt(xp / XP_PER_LEVEL_SCALE)) + 1;
+    return Math.max(1, Math.floor((1 + Math.sqrt(1 + 0.08 * Math.max(0, xp))) / 2));
 };
 
 export const calculateNextLevelXP = (level: number): number => {
-    return XP_PER_LEVEL_SCALE * Math.pow(level, 2);
+    return 50 * level * (level + 1);
 };
 
 export const calculateCurrentLevelBaseXP = (level: number): number => {
-    return XP_PER_LEVEL_SCALE * Math.pow(level - 1, 2);
+    return 50 * level * (level - 1);
 };
 
 export const calculateRewardMultiplier = (level: number): number => {

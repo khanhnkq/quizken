@@ -58,6 +58,7 @@ interface QuizContentProps {
   onDownload: () => Promise<void> | void;
   userId?: string;
   startTime?: number;
+  onComplete?: (score: number, correctCount: number, timeTaken: number) => void;
 }
 
 // Submit quiz attempt via Edge Function for SERVER-SIDE score validation
@@ -131,6 +132,7 @@ export const QuizContent: React.FC<QuizContentProps> = ({
   onDownload,
   userId,
   startTime,
+  onComplete,
 }) => {
   const { t } = useTranslation();
   const { toast } = useToast();
@@ -673,7 +675,13 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                             (localCorrectCount / quiz.questions.length) * 100,
                           );
 
-                          // Fire and forget - don't await
+                          // If EXTERNAL onComplete is provided, use it (e.g. for PvP)
+                          if (onComplete) {
+                            onComplete(localScore, localCorrectCount, timeTaken);
+                            return;
+                          }
+
+                          // Otherwise, default behavior: Save attempt to history
                           saveQuizAttempt(
                             quiz.id,
                             userId,
