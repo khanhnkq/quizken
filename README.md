@@ -311,7 +311,7 @@ For competitive fairness, the following components are protected:
 
 For complete source code evaluation:
 
-**Email:** [your-email@example.com]  
+**Email:** [khanhnguyenkim30825@gmail.com]  
 **Subject:** QuizKen - Full Source Code Request for [Competition Name]
 
 **Alternative:** Create an issue on GitHub for evaluation access
@@ -348,7 +348,7 @@ MIT License - See [LICENSE](LICENSE) file for details.
 
 **Developer:** [@khanhnkq](https://github.com/khanhnkq)
 
-[![Email](https://img.shields.io/badge/Email-Contact-red?style=for-the-badge&logo=gmail&logoColor=white)](mailto:your-email@example.com)
+[![Email](https://img.shields.io/badge/Email-Contact-red?style=for-the-badge&logo=gmail&logoColor=white)](mailto:khanhnguyenkim30825@gmail.com)
 [![GitHub](https://img.shields.io/badge/GitHub-Follow-black?style=for-the-badge&logo=github&logoColor=white)](https://github.com/khanhnkq)
 
 **For Inquiries:**
