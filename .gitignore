@@ -29,3 +29,19 @@ dist-ssr
 *.sw?
 .shared
 .agent
+
+# Database schema & migrations (IP Protection)
+src/integrations/supabase/types.ts
+supabase/migrations/
+supabase/config.toml
+supabase/.temp/
+supabase/.branches/
+
+# Edge Functions (Business Logic Protection)
+supabase/functions/
+
+# Seed data
+supabase/seed*.sql
+
+# Local Supabase files
+.supabase/
