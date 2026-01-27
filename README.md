@@ -202,12 +202,18 @@ npm run lint
 <div align="center">
 
 ### Homepage
+<img width="3840" height="2160" alt="CleanShot 2026-01-27 at 21 01 17@2x" src="https://github.com/user-attachments/assets/c6d4ea0e-ba04-4c91-8161-8e36e0dd0f06" />
+
 *AI-powered quiz generation interface with real-time progress tracking*
 
 ### Quiz Taking Experience
+<img width="3840" height="2160" alt="CleanShot 2026-01-27 at 21 01 42@2x" src="https://github.com/user-attachments/assets/7c7b9bbc-5862-4346-906b-7c9e8757d10c" />
+
 *Clean, intuitive interface for taking quizzes with immediate feedback*
 
 ### Gamification Dashboard
+<img width="3840" height="2160" alt="CleanShot 2026-01-27 at 21 02 00@2x" src="https://github.com/user-attachments/assets/8a112d5d-1227-444f-a6a6-cbca32e9e133" />
+
 *Personal analytics with XP, levels, and achievement tracking*
 
 ### Mobile Responsive
