@@ -59,9 +59,9 @@ All critical calculations (scores, rewards, levels) are performed server-side to
 ## For Judges
 
 To review full implementation details:
-- **Email:** [your-email@example.com]
+- **Contact:** Via GitHub Issues or project repository
 - **Request:** Database schema & migrations access
-- **Alternative:** Comprehensive demo presentation available
+- **Alternative:** Comprehensive demo presentation available upon request
 
 ## Technology Stack
 

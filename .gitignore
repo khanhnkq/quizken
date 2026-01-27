@@ -51,18 +51,14 @@ supabase/seed*.sql
 # ============================================
 
 # Documentation files (IP Protection)
-# Ignore all .md files
+# Ignore all .md files except root README.md and specific docs
 *.md
-# Except root README.md and specific docs files
 !README.md
 !docs/DATABASE_ARCHITECTURE.md
 !docs/SETUP_GUIDE.md
-# Explicitly ignore README.md in subdirectories
+# Re-ignore README.md in subdirectories
 public/**/README.md
 src/**/README.md
-docs/**/README.md
-!docs/DATABASE_ARCHITECTURE.md
-!docs/SETUP_GUIDE.md
 
 # Verification scripts
 seo-verify.sh

@@ -154,8 +154,8 @@ The following are intentionally hidden from this public repository:
 
 For questions or demo requests:
 - **GitHub Issues:** https://github.com/khanhnkq/quizken/issues
-- **Email:** [your-email@example.com]
-- **Demo Request:** Available upon request for judges
+- **Demo Request:** Available upon request for judges and evaluators
+- **Source Code Review:** Contact via repository for full access
 
 ## License
 
