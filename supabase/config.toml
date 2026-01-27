@@ -1,4 +1,0 @@
-project_id = "ajfqxmcyzsdfpexrzfan"
-
-[functions.generate-quiz]
-verify_jwt = false
