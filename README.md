@@ -1,7 +1,8 @@
 <div align="center">
 
 #  QuizKen
-<img width="434" height="575" alt="Image Background Removed" src="https://github.com/user-attachments/assets/676887bd-975d-4931-ac49-f6ecebf08780" />
+<img width="3360" height="2100" alt="CleanShot 2026-01-27 at 13 45 54@2x" src="https://github.com/user-attachments/assets/dfa302fc-8711-4615-9412-e0f2d76e9100" />
+
 
 ### AI-Powered Quiz Generator | Transforming Education with Intelligence
 
