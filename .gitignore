@@ -45,3 +45,18 @@ supabase/seed*.sql
 
 # Local Supabase files
 .supabase/
+
+# ============================================
+# IP PROTECTION FOR COMPETITION
+# ============================================
+
+# Documentation files (IP Protection)
+*.md
+!README.md
+docs/*.md
+!docs/DATABASE_ARCHITECTURE.md
+!docs/SETUP_GUIDE.md
+
+# Verification scripts
+seo-verify.sh
+*.sh
