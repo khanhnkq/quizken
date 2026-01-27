@@ -101,7 +101,12 @@ npx supabase gen types typescript \
   > src/integrations/supabase/types.ts
 ```
 
-**Note:** Database schema và migration files được protected khỏi public repository để bảo vệ intellectual property.
+**IMPORTANT NOTES:**
+- The generated `types.ts` file is automatically ignored by `.gitignore` for security
+- Each developer must regenerate this file locally after pulling schema changes
+- Do NOT commit the `types.ts` file to the repository
+- Database schema và migration files được protected khỏi public repository để bảo vệ intellectual property
+- For team members: Contact the team lead for the project ID and credentials
 
 ## Development Setup
 
