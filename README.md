@@ -1,6 +1,7 @@
 <div align="center">
 
-# 🎯 QuizKen
+#  QuizKen
+<img width="434" height="575" alt="Image Background Removed" src="https://github.com/user-attachments/assets/676887bd-975d-4931-ac49-f6ecebf08780" />
 
 ### AI-Powered Quiz Generator | Transforming Education with Intelligence
 
