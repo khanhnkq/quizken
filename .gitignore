@@ -45,3 +45,21 @@ supabase/seed*.sql
 
 # Local Supabase files
 .supabase/
+
+# ============================================
+# IP PROTECTION FOR COMPETITION
+# ============================================
+
+# Documentation files (IP Protection)
+# Ignore all .md files except root README.md and specific docs
+*.md
+!README.md
+!docs/DATABASE_ARCHITECTURE.md
+!docs/SETUP_GUIDE.md
+# Re-ignore README.md in subdirectories
+public/**/README.md
+src/**/README.md
+
+# Verification scripts
+seo-verify.sh
+*.sh
