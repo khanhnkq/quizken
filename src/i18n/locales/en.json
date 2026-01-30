@@ -16,6 +16,11 @@
         "noNotifications": "No new notifications",
         "newNotifications": "new"
     },
+    "settings": {
+        "appearance": "Appearance & Language",
+        "darkMode": "Mode",
+        "language": "Language"
+    },
     "auth": {
         "title": "Authentication",
         "description": "Please sign in to continue",

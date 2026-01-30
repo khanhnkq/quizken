@@ -142,8 +142,8 @@ export function GlobalChatTicker() {
   }
 
   return (
-    <div className="fixed bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
-      {/* Container for the pill - positioned bottom center */}
+    <div className="fixed bottom-4 right-20 md:bottom-8 md:right-auto md:left-1/2 md:-translate-x-1/2 z-50 pointer-events-none">
+      {/* Container for the pill - positioned bottom center on desktop, bottom right (next to FAB) on mobile */}
       <AnimatePresence mode="wait">
         <motion.div
           key={latestMessage.id}
@@ -153,8 +153,8 @@ export function GlobalChatTicker() {
           transition={{ duration: 0.4, ease: "easeOut" }}
           className="pointer-events-auto cursor-pointer group"
           onClick={() => navigate("/chat")}>
-          <div className="flex items-center gap-3 bg-white/60 dark:bg-slate-900/60 backdrop-blur-lg border border-white/30 dark:border-slate-700/30 shadow-sm rounded-full pl-1 pr-4 py-1 hover:bg-white/80 dark:hover:bg-slate-900/80 hover:shadow-md hover:border-white/50 dark:hover:border-slate-600 transition-all">
-            <Avatar className="h-8 w-8 ring-2 ring-white dark:ring-slate-800 shadow-sm">
+          <div className="flex items-center gap-0 md:gap-3 bg-white/60 dark:bg-slate-900/60 backdrop-blur-lg border border-white/30 dark:border-slate-700/30 shadow-sm rounded-full p-3 md:pl-1 md:pr-4 md:py-1 hover:bg-white/80 dark:hover:bg-slate-900/80 hover:shadow-md hover:border-white/50 dark:hover:border-slate-600 transition-all">
+            <Avatar className="h-8 w-8 ring-2 ring-white dark:ring-slate-800 shadow-sm hidden md:block">
               {latestMessage.profiles?.avatar_url && (
                 <AvatarImage src={latestMessage.profiles.avatar_url} />
               )}
@@ -163,7 +163,7 @@ export function GlobalChatTicker() {
               </AvatarFallback>
             </Avatar>
 
-            <div className="flex flex-col max-w-[200px] md:max-w-xs">
+            <div className="flex-col max-w-[200px] md:max-w-xs hidden md:flex">
               <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider leading-none mb-0.5 flex items-center gap-1.5">
                 {latestMessage.profiles?.display_name || "Quizzer"}
                 <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600"></span>
@@ -175,7 +175,7 @@ export function GlobalChatTicker() {
               </p>
             </div>
 
-            <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors ml-2">
+            <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors md:ml-2">
               <MessageCircle className="h-3 w-3 text-primary" />
             </div>
           </div>

@@ -18,6 +18,11 @@
         "noNotifications": "Không có thông báo mới",
         "newNotifications": "mới"
     },
+    "settings": {
+        "appearance": "Giao diện & Ngôn ngữ",
+        "darkMode": "Giao diện",
+        "language": "Ngôn ngữ"
+    },
     "auth": {
         "title": "Xác thực",
         "description": "Vui lòng đăng nhập để tiếp tục",

@@ -88,6 +88,15 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
   const { user, signOut } = useAuth();
   const { t } = useTranslation();
   const [scrolled, setScrolled] = useState(() => window.scrollY > 20);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check mobile on mount and resize
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile(); // Check immediately
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   // Scroll shadow effect
   useEffect(() => {
@@ -104,7 +113,7 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Fetch data using hooks
+
   const {
     statistics,
     isLoading: statsLoading,
@@ -204,7 +213,7 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
         <motion.div 
           initial={{ width: "90%", opacity: 0 }}
           animate={{ 
-            width: scrolled ? "75%" : "100%", 
+            width: scrolled ? (isMobile ? "94%" : "75%") : "100%", 
             opacity: 1,
             top: scrolled ? 16 : 0
           }}

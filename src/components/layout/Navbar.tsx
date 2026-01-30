@@ -54,13 +54,21 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuPortal,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LogOut } from "lucide-react";
+import { LogOut, Globe, Moon, Sun, Laptop } from "lucide-react";
+import { NavbarThemeMenuItem } from "./NavbarThemeMenuItem";
+import { useTheme } from "@/components/theme-provider";
+
 import { NavbarThemeSelector } from "./NavbarThemeSelector";
 
 const Navbar = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const { setTheme, theme } = useTheme();
   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
@@ -76,7 +84,6 @@ const Navbar = () => {
   const { play } = useAudio();
   const playClick = () => play("click");
   const navRef = useRef<HTMLElement | null>(null);
-  const { i18n } = useTranslation();
   const dateLocale = i18n.language === 'en' ? enUS : vi;
 
   // Global event to open auth modal
@@ -258,9 +265,12 @@ const Navbar = () => {
                 </button>
               </div>
             )}
-            <NavbarThemeSelector />
-            <ModeToggle />
-            <LanguageSwitcher />
+            <div className="hidden sm:flex items-center gap-1">
+              <NavbarThemeSelector />
+              <ModeToggle />
+              <LanguageSwitcher />
+            </div>
+            
             {!loading && (
               <>
                 {user ? (
@@ -331,6 +341,66 @@ const Navbar = () => {
                         <User className="mr-2 h-4 w-4" />
                         <span>{t("nav.profile")}</span>
                       </DropdownMenuItem>
+                      
+                      {/* Mobile-only / Always visible Application Settings in Dropdown */}
+                      <DropdownMenuSeparator className="sm:hidden" />
+                      <DropdownMenuLabel className="sm:hidden text-xs font-normal text-muted-foreground uppercase tracking-wider">
+                        {t('settings.appearance', 'Giao diện & Ngôn ngữ')}
+                      </DropdownMenuLabel>
+                      
+                      {/* Theme Selector (Mobile) */}
+                      <div className="sm:hidden">
+                        <NavbarThemeMenuItem />
+                      </div>
+
+                      {/* Dark Mode (Mobile) */}
+                      <DropdownMenuSub>
+                        <DropdownMenuSubTrigger className="sm:hidden">
+                          <Moon className="mr-2 h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                          <Sun className="absolute mr-2 h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                          <span className="ml-8 sm:ml-0">{t('settings.darkMode', 'Giao diện')}</span>
+                        </DropdownMenuSubTrigger>
+                        <DropdownMenuPortal>
+                          <DropdownMenuSubContent sideOffset={-220} alignOffset={-4} collisionPadding={10}>
+                            <DropdownMenuItem onClick={() => setTheme("light")}>
+                              <Sun className="mr-2 h-4 w-4" />
+                              <span>Light</span>
+                              {theme === "light" && <span className="ml-auto">✓</span>}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => setTheme("dark")}>
+                              <Moon className="mr-2 h-4 w-4" />
+                              <span>Dark</span>
+                              {theme === "dark" && <span className="ml-auto">✓</span>}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => setTheme("system")}>
+                              <Laptop className="mr-2 h-4 w-4" />
+                              <span>System</span>
+                              {theme === "system" && <span className="ml-auto">✓</span>}
+                            </DropdownMenuItem>
+                          </DropdownMenuSubContent>
+                        </DropdownMenuPortal>
+                      </DropdownMenuSub>
+
+                      {/* Language (Mobile) */}
+                      <DropdownMenuSub>
+                        <DropdownMenuSubTrigger className="sm:hidden">
+                          <Globe className="mr-2 h-4 w-4" />
+                          <span>{t('settings.language', 'Ngôn ngữ')}</span>
+                        </DropdownMenuSubTrigger>
+                        <DropdownMenuPortal>
+                          <DropdownMenuSubContent sideOffset={-220} alignOffset={-4} collisionPadding={10}>
+                            <DropdownMenuItem onClick={() => i18n.changeLanguage("vi")}>
+                              <span>Tiếng Việt</span>
+                              {i18n.language === "vi" && <span className="ml-auto">✓</span>}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => i18n.changeLanguage("en")}>
+                              <span>English</span>
+                              {i18n.language === "en" && <span className="ml-auto">✓</span>}
+                            </DropdownMenuItem>
+                          </DropdownMenuSubContent>
+                        </DropdownMenuPortal>
+                      </DropdownMenuSub>
+
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
                         onClick={() => {

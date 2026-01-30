@@ -162,7 +162,7 @@ export function useChatMessages(): UseChatMessagesReturn {
         )] as string[];
 
         // 3. Fetch parent messages if any
-        let replyMap = new Map<string, any>();
+        const replyMap = new Map<string, any>();
         if (replyIds.length > 0) {
           const { data: parents, error: parentError } = await supabase
             .from("chat_messages")

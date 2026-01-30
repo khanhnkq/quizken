@@ -58,6 +58,9 @@ export const UserProfile: React.FC<
   const badgeRef = useRef<HTMLDivElement>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
 
+  // Fetch custom profile data from profiles table
+  const { profileData } = useProfile(user?.id);
+
   // GSAP animations for hover effects (Bounce & Rotate)
   useEffect(() => {
     if (!cardRef.current || shouldReduceAnimations() || disableHoverEffects)
@@ -157,8 +160,7 @@ export const UserProfile: React.FC<
     );
   }
 
-  // Fetch custom profile data from profiles table
-  const { profileData } = useProfile(user?.id);
+
 
   // Use profiles data with fallback to Google metadata, prioritizing overrides
   const userName =
