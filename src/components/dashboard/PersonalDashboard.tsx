@@ -240,65 +240,67 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
             </div>
 
             {/* Center: Tabs Navigation */}
-            <TabsList className="flex-1 max-w-2xl mx-auto flex items-center justify-center bg-transparent border-0 p-0 shadow-none gap-1 sm:gap-4 h-full">
-              <TabsTrigger
-                value="overview"
-                className="flex-1 sm:flex-none relative h-16 rounded-none border-b-2 border-transparent px-2 sm:px-6 hover:bg-slate-50 hover:text-primary data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 transition-all flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 text-[10px] sm:text-sm uppercase tracking-wide sm:normal-case sm:tracking-normal">
-                <LayoutDashboard className="w-5 h-5 sm:w-4 sm:h-4" />
-                <span className="hidden sm:inline">
-                  {t("dashboard.tabs.overview")}
-                </span>
-              </TabsTrigger>
-              <TabsTrigger
-                value="profile"
-                className="flex-1 sm:flex-none relative h-16 rounded-none border-b-2 border-transparent px-2 sm:px-6 hover:bg-slate-50 hover:text-indigo-500 data-[state=active]:border-indigo-500 data-[state=active]:text-indigo-500 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 transition-all flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 text-[10px] sm:text-sm uppercase tracking-wide sm:normal-case sm:tracking-normal">
-                <UserIcon className="w-5 h-5 sm:w-4 sm:h-4" />
-                <span className="hidden sm:inline">
-                  {t("dashboard.tabs.profile", "Hồ sơ")}
-                </span>
-              </TabsTrigger>
-              <TabsTrigger
-                value="exchange"
-                className="flex-1 sm:flex-none relative h-16 rounded-none border-b-2 border-transparent px-2 sm:px-6 hover:bg-slate-50 hover:text-violet-600 data-[state=active]:border-violet-600 data-[state=active]:text-violet-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 transition-all flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 text-[10px] sm:text-sm uppercase tracking-wide sm:normal-case sm:tracking-normal">
-                <Store className="w-5 h-5 sm:w-4 sm:h-4" />
-                <span className="hidden sm:inline">
-                  {t("dashboard.tabs.exchange")}
-                </span>
-              </TabsTrigger>
-              <TabsTrigger
-                value="lucky-draw"
-                className="flex-1 sm:flex-none relative h-16 rounded-none border-b-2 border-transparent px-2 sm:px-6 hover:bg-slate-50 hover:text-amber-500 data-[state=active]:border-amber-500 data-[state=active]:text-amber-500 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 transition-all flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 text-[10px] sm:text-sm uppercase tracking-wide sm:normal-case sm:tracking-normal">
-                <Sparkles className="w-5 h-5 sm:w-4 sm:h-4" />
-                <span className="hidden sm:inline">
-                  {t("dashboard.tabs.luckyDraw", "Lucky Draw")}
-                </span>
-              </TabsTrigger>
+            <div className="flex-1 flex items-center justify-center overflow-x-auto scrollbar-none h-full">
+              <TabsList className="flex items-center bg-transparent p-0 gap-0.5 sm:gap-1 h-full min-w-max">
+                <TabsTrigger
+                  value="overview"
+                  className="h-10 sm:h-12 rounded-full px-2.5 sm:px-4 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-primary data-[state=active]:bg-slate-100 dark:data-[state=active]:bg-slate-800/50 data-[state=active]:text-primary font-semibold text-slate-500 dark:text-slate-400 transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-xs border-0 shadow-none">
+                  <LayoutDashboard className="w-4 h-4" />
+                  <span className="hidden md:inline">
+                    {t("dashboard.tabs.overview")}
+                  </span>
+                </TabsTrigger>
+                <TabsTrigger
+                  value="profile"
+                  className="h-10 sm:h-12 rounded-full px-2.5 sm:px-4 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 hover:text-indigo-600 dark:hover:text-indigo-400 data-[state=active]:bg-indigo-50 dark:data-[state=active]:bg-indigo-950/50 data-[state=active]:text-indigo-600 dark:data-[state=active]:text-indigo-400 font-semibold text-slate-500 dark:text-slate-400 transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-xs border-0 shadow-none">
+                  <UserIcon className="w-4 h-4" />
+                  <span className="hidden md:inline">
+                    {t("dashboard.tabs.profile", "Hồ sơ")}
+                  </span>
+                </TabsTrigger>
+                <TabsTrigger
+                  value="exchange"
+                  className="h-10 sm:h-12 rounded-full px-2.5 sm:px-4 hover:bg-violet-50 dark:hover:bg-violet-950/50 hover:text-violet-600 dark:hover:text-violet-400 data-[state=active]:bg-violet-50 dark:data-[state=active]:bg-violet-950/50 data-[state=active]:text-violet-600 dark:data-[state=active]:text-violet-400 font-semibold text-slate-500 dark:text-slate-400 transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-xs border-0 shadow-none">
+                  <Store className="w-4 h-4" />
+                  <span className="hidden md:inline">
+                    {t("dashboard.tabs.exchange")}
+                  </span>
+                </TabsTrigger>
+                <TabsTrigger
+                  value="lucky-draw"
+                  className="h-10 sm:h-12 rounded-full px-2.5 sm:px-4 hover:bg-amber-50 dark:hover:bg-amber-950/50 hover:text-amber-600 dark:hover:text-amber-400 data-[state=active]:bg-amber-50 dark:data-[state=active]:bg-amber-950/50 data-[state=active]:text-amber-600 dark:data-[state=active]:text-amber-400 font-semibold text-slate-500 dark:text-slate-400 transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-xs border-0 shadow-none">
+                  <Sparkles className="w-4 h-4" />
+                  <span className="hidden md:inline">
+                    {t("dashboard.tabs.luckyDraw", "Lucky Draw")}
+                  </span>
+                </TabsTrigger>
 
-              <TabsTrigger
-                value="inventory"
-                className="flex-1 sm:flex-none relative h-16 rounded-none border-b-2 border-transparent px-2 sm:px-6 hover:bg-slate-50 hover:text-teal-600 data-[state=active]:border-teal-600 data-[state=active]:text-teal-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 transition-all flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 text-[10px] sm:text-sm uppercase tracking-wide sm:normal-case sm:tracking-normal">
-                <Package className="w-5 h-5 sm:w-4 sm:h-4" />
-                <span className="hidden sm:inline">{t("inventory.title")}</span>
-              </TabsTrigger>
-              <TabsTrigger
-                value="settings"
-                className="flex-1 sm:flex-none relative h-16 rounded-none border-b-2 border-transparent px-2 sm:px-6 hover:bg-slate-50 hover:text-slate-600 data-[state=active]:border-slate-600 data-[state=active]:text-slate-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none font-bold text-slate-500 transition-all flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 text-[10px] sm:text-sm uppercase tracking-wide sm:normal-case sm:tracking-normal">
-                <Settings className="w-5 h-5 sm:w-4 sm:h-4" />
-                <span className="hidden sm:inline">
-                  {t("dashboard.tabs.settings")}
-                </span>
-              </TabsTrigger>
-              <button
-                onClick={async () => {
-                  await signOut();
-                  clearQuizProgress();
-                  navigate("/");
-                }}
-                className="flex-1 sm:flex-none relative h-16 rounded-none border-b-2 border-transparent px-2 sm:px-6 hover:bg-slate-50 hover:text-slate-600 font-bold text-slate-500 transition-all flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 text-[10px] sm:text-sm uppercase tracking-wide sm:normal-case sm:tracking-normal">
-                <LogOut className="w-5 h-5 sm:w-4 sm:h-4" />
-                <span className="hidden sm:inline">{t("nav.logout")}</span>
-              </button>
-            </TabsList>
+                <TabsTrigger
+                  value="inventory"
+                  className="h-10 sm:h-12 rounded-full px-2.5 sm:px-4 hover:bg-teal-50 dark:hover:bg-teal-950/50 hover:text-teal-600 dark:hover:text-teal-400 data-[state=active]:bg-teal-50 dark:data-[state=active]:bg-teal-950/50 data-[state=active]:text-teal-600 dark:data-[state=active]:text-teal-400 font-semibold text-slate-500 dark:text-slate-400 transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-xs border-0 shadow-none">
+                  <Package className="w-4 h-4" />
+                  <span className="hidden md:inline">{t("inventory.title")}</span>
+                </TabsTrigger>
+                <TabsTrigger
+                  value="settings"
+                  className="h-10 sm:h-12 rounded-full px-2.5 sm:px-4 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-slate-700 dark:hover:text-slate-300 data-[state=active]:bg-slate-100 dark:data-[state=active]:bg-slate-800/50 data-[state=active]:text-slate-700 dark:data-[state=active]:text-slate-300 font-semibold text-slate-500 dark:text-slate-400 transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-xs border-0 shadow-none">
+                  <Settings className="w-4 h-4" />
+                  <span className="hidden md:inline">
+                    {t("dashboard.tabs.settings")}
+                  </span>
+                </TabsTrigger>
+                <button
+                  onClick={async () => {
+                    await signOut();
+                    clearQuizProgress();
+                    navigate("/");
+                  }}
+                  className="h-10 sm:h-12 rounded-full px-2.5 sm:px-4 hover:bg-red-50 dark:hover:bg-red-950/50 hover:text-red-600 dark:hover:text-red-400 font-semibold text-slate-500 dark:text-slate-400 transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-xs border-0 shadow-none">
+                  <LogOut className="w-4 h-4" />
+                  <span className="hidden md:inline">{t("nav.logout")}</span>
+                </button>
+              </TabsList>
+            </div>
 
             {/* Right: Placeholder for balance */}
             <div className="w-[88px] shrink-0 hidden md:block"></div>

@@ -1,9 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { Sparkles, Star, Music, Heart } from "@/lib/icons";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "@/lib/auth";
+import { useProfile } from "@/hooks/useProfile";
+import { cn } from "@/lib/utils";
 
 const Footer = () => {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const { profileData } = useProfile(user?.id);
+  const isComic = profileData?.equipped_theme === 'theme_comic_manga';
+
   const scrollToGenerator = () => {
     const el = document.getElementById("generator");
     if (!el) return;
@@ -17,18 +24,7 @@ const Footer = () => {
   return (
     <footer id="footer" className="relative pt-32 pb-12 overflow-hidden">
       {/* Wave Divider */}
-      <div className="absolute top-0 left-0 w-full overflow-hidden leading-[0]">
-        <svg
-          className="relative block w-[calc(116%+1.3px)] h-[120px] transform -rotate-180"
-          data-name="Layer 1"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 1200 120"
-          preserveAspectRatio="none">
-          <path
-            d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z"
-            className="fill-secondary/30"></path>
-        </svg>
-      </div>
+      
 
       {/* Main Content with Gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-secondary/30 to-background -z-20"></div>
@@ -52,7 +48,12 @@ const Footer = () => {
           </div>
 
           <div className="space-y-4">
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-heading bg-gradient-to-br from-primary to-primary/60 bg-clip-text text-transparent">
+            <h2 className={cn(
+              "text-4xl md:text-5xl lg:text-6xl font-bold font-heading",
+              isComic 
+                ? "text-black drop-shadow-[4px_4px_0px_#FFD700]" 
+                : "bg-gradient-to-br from-primary to-primary/60 bg-clip-text text-transparent"
+            )}>
               {t('footer.ctaTitle')}
             </h2>
             <p className="text-xl text-muted-foreground font-medium max-w-2xl mx-auto">
@@ -66,7 +67,12 @@ const Footer = () => {
               variant="hero"
               size="xl"
               onClick={scrollToGenerator}
-              className="relative z-10 px-10 py-8 text-xl rounded-[2rem] shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border-[6px] border-white/50 dark:border-slate-700/50 hover:border-white dark:hover:border-slate-600 ring-4 ring-primary/20 hover:ring-primary/40 group overflow-visible"
+              className={cn(
+                "relative z-10 px-10 py-8 text-xl rounded-[2rem] transition-all duration-300 group overflow-visible",
+                isComic 
+                  ? "bg-yellow-400 border-[6px] border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-2 text-black"
+                  : "shadow-xl hover:shadow-2xl hover:-translate-y-2 border-[6px] border-white/50 dark:border-slate-700/50 hover:border-white dark:hover:border-slate-600 ring-4 ring-primary/20 hover:ring-primary/40"
+              )}
             >
               <span className="mr-3">{t('footer.ctaButton')}</span>
               <div className="bg-primary p-1.5 rounded-xl group-hover:rotate-12 transition-transform duration-300 shadow-sm">
@@ -96,7 +102,10 @@ const Footer = () => {
 
       {/* Copyright & Made with Love */}
       <div className="relative container mx-auto px-4 mt-24">
-        <div className="border-t-2 border-dashed border-primary/20 pt-8 flex flex-col items-center justify-center gap-3">
+        <div className={cn(
+          "pt-8 flex flex-col items-center justify-center gap-3",
+          isComic ? "border-t-4 border-black" : "border-t-2 border-dashed border-primary/20"
+        )}>
           <p className="flex items-center gap-2 text-muted-foreground font-medium">
             <span>{t('footer.madeWith')}</span>
             <Heart className="w-5 h-5 text-red-500 fill-red-500 animate-heart-beat" />

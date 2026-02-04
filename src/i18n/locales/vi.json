@@ -279,7 +279,17 @@
             "questions": "Câu",
             "selectQuestionCountShort": "Số câu",
             "selectQuestionCountDesc": "Chọn số lượng câu hỏi cho bài kiểm tra của bạn.",
-            "selectQuestionCountHint": "Chọn số lượng câu hỏi ở nút \"Số câu\""
+            "selectQuestionCountHint": "Chọn số lượng câu hỏi ở nút \"Số câu\"",
+            "difficulty": "Độ khó",
+            "difficultyMixed": "Mix",
+            "difficultyEasy": "Dễ",
+            "difficultyMedium": "Vừa",
+            "difficultyHard": "Khó",
+            "fastMode": "Chế độ nhanh",
+            "aiGenerator": "Tạo bằng AI",
+            "manualGenerator": "Tự tạo tay",
+            "fastModeEnabled": "Đã bật chế độ nhanh",
+            "fastModeDisabled": "Đã tắt chế độ nhanh"
         },
         "flashcard": {
             "loading": "Đang tải flashcards...",

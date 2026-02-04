@@ -57,6 +57,7 @@ import { warmupPdfWorker, generateAndDownloadPdf } from "@/lib/pdfWorkerClient";
 import { containsVietnameseBadwords } from "@/lib/vnBadwordsFilter";
 import type { Quiz, Question } from "@/types/quiz";
 import { GenerationProgress } from "@/components/quiz/GenerationProgress";
+import Mascot from "@/components/ui/Mascot";
 import { QuotaLimitDialog } from "@/components/quiz/QuotaLimitDialog";
 import { QuotaExceededDialog } from "@/components/quiz/QuotaExceededDialog";
 import { ApiKeyErrorDialog } from "@/components/quiz/ApiKeyErrorDialog";
@@ -99,7 +100,7 @@ import {
   calculateLevel,
   calculateCreateReward,
 } from "@/utils/levelSystem";
-import Mascot from "@/components/ui/Mascot";
+
 import { useProfile } from "@/hooks/useProfile";
 import { VietnamMapIcon, VietnamStarIcon, VietnamDrumIcon, VietnamLotusIcon } from "@/components/icons/VietnamIcons";
 import { NeonBoltIcon, NeonCyberSkullIcon, PastelCloudIcon, PastelHeartIcon, ComicPowIcon, ComicBoomIcon } from "@/components/icons/ThemeIcons";
@@ -152,6 +153,13 @@ const QuizGenerator = () => {
   const [quickDialogTab, setQuickDialogTab] = useState<"ai" | "manual" | null>(
     null,
   );
+  
+  // Fast Mode State
+  const [fastMode, setFastMode] = useState(false);
+  
+  // Difficulty State
+  const [difficulty, setDifficulty] = useState<"mixed" | "easy" | "medium" | "hard">("mixed");
+  const [isDifficultySelected, setIsDifficultySelected] = useState(false);
 
   // Chill background music via hook
   const {
@@ -180,6 +188,9 @@ const QuizGenerator = () => {
           generateBtnGradient: "from-red-600 to-yellow-500 shadow-red-500/30 hover:shadow-red-500/50",
           generateIconClass: "",
           inputBorderActive: "border-red-200 dark:border-red-900 ring-red-50/50 dark:ring-red-900/30 shadow-red-100 dark:shadow-red-900/20 hover:shadow-red-200 dark:hover:shadow-red-900/40",
+          fastModeActive: "bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900/50 hover:border-red-300",
+          fastModeZap: "fill-red-500 text-red-500",
+          mainCardBorder: "border-0",
         };
       case 'theme_neon_night':
         return {
@@ -190,6 +201,9 @@ const QuizGenerator = () => {
           generateBtnGradient: "from-cyan-500 to-blue-600 shadow-cyan-500/30 hover:shadow-cyan-500/50",
           generateIconClass: "",
           inputBorderActive: "border-cyan-200 dark:border-cyan-900 ring-cyan-50/50 dark:ring-cyan-900/30 shadow-cyan-100 dark:shadow-cyan-900/20 hover:shadow-cyan-200 dark:hover:shadow-cyan-900/40",
+          fastModeActive: "bg-cyan-50 dark:bg-cyan-950/30 text-cyan-700 dark:text-cyan-400 border-cyan-200 dark:border-cyan-800 hover:bg-cyan-100 dark:hover:bg-cyan-900/50 hover:border-cyan-300",
+          fastModeZap: "fill-cyan-500 text-cyan-500",
+          mainCardBorder: "border-0",
         };
       case 'theme_pastel_dream':
         return {
@@ -200,6 +214,9 @@ const QuizGenerator = () => {
           generateBtnGradient: "from-pink-300 to-purple-400 shadow-pink-500/30 hover:shadow-pink-500/50",
           generateIconClass: "",
           inputBorderActive: "border-pink-200 dark:border-pink-900 ring-pink-50/50 dark:ring-pink-900/30 shadow-pink-100 dark:shadow-pink-900/20 hover:shadow-pink-200 dark:hover:shadow-pink-900/40",
+          fastModeActive: "bg-pink-50 dark:bg-pink-950/30 text-pink-700 dark:text-pink-400 border-pink-200 dark:border-pink-800 hover:bg-pink-100 dark:hover:bg-pink-900/50 hover:border-pink-300",
+          fastModeZap: "fill-pink-500 text-pink-500",
+          mainCardBorder: "border-0",
         };
       case 'theme_comic_manga':
         return {
@@ -207,9 +224,13 @@ const QuizGenerator = () => {
           manualIcon: ComicPowIcon,
           generateIcon: ComicBoomIcon,
           aiColor: "text-yellow-500",
-          generateBtnGradient: "from-yellow-400 to-orange-500 border-2 border-black shadow-yellow-500/30 hover:shadow-yellow-500/50",
+          generateBtnGradient: "from-yellow-400 to-orange-500 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5",
           generateIconClass: "",
-          inputBorderActive: "border-yellow-200 dark:border-yellow-900 ring-yellow-50/50 dark:ring-yellow-900/30 shadow-yellow-100 dark:shadow-yellow-900/20 hover:shadow-yellow-200 dark:hover:shadow-yellow-900/40",
+          inputBorderActive: "border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] ring-0",
+          fastModeActive: "bg-yellow-50 text-yellow-700 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-yellow-100",
+          fastModeZap: "fill-black text-black",
+          mainCardBorder: "border-y-4 border-black",
+          pillStyle: "bg-white border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]",
         };
       default:
         return {
@@ -220,16 +241,19 @@ const QuizGenerator = () => {
           generateBtnGradient: "bg-gradient-to-tr from-green-400 to-green-600 shadow-green-500/30 hover:shadow-green-500/50",
           generateIconClass: "rotate-90",
           inputBorderActive: "border-green-200 dark:border-green-900 ring-4 ring-green-50/50 dark:ring-green-900/30 shadow-green-100 dark:shadow-green-900/20 hover:shadow-green-200 dark:hover:shadow-green-900/40",
+          fastModeActive: "bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800 hover:bg-green-100 dark:hover:bg-green-900/50 hover:border-green-300 shadow-[0_0_15px_rgba(34,197,94,0.2)]",
+          fastModeZap: "fill-green-500 text-green-500",
+          mainCardBorder: "border-0",
         };
     }
   }, [profileData?.equipped_theme]);
 
   const { t, i18n } = useTranslation(); // Add i18n support
   const { statistics, refetch: refetchStats } = useDashboardStats(user?.id);
-  const [questionCount, setQuestionCount] = useState<string>("");
+  const [questionCount, setQuestionCount] = useState<string>("10");
 
   const [isQuestionCountSelected, setIsQuestionCountSelected] =
-    useState<boolean>(false);
+    useState<boolean>(true);
   const [shuffledData, setShuffledData] = useState<ShuffledQuizData | null>(
     null,
   );
@@ -852,7 +876,11 @@ const QuizGenerator = () => {
     setLoading(true);
 
     // 4. Determine Params (handling pending confirmation state)
-    const promptToUse = pendingGenerate?.prompt || prompt;
+    // 4. Determine Params (handling pending confirmation state)
+    let promptToUse = pendingGenerate?.prompt || prompt;
+    if (fastMode) {
+      promptToUse += " (Optimization: Generate concise questions and brief explanations to maximize speed. Keep it short and direct.)";
+    }
     const countToUse = pendingGenerate?.questionCount || questionCount;
     setPendingGenerate(null);
 
@@ -889,6 +917,7 @@ const QuizGenerator = () => {
         questionCount: parseInt(countToUse),
         idempotencyKey,
         language: i18n.language,
+        difficulty: difficulty, // Add difficulty
       };
 
       console.log("▶️ Starting quiz generation request...");
@@ -1374,7 +1403,7 @@ const QuizGenerator = () => {
             initialTab={quickDialogTab}
           />
 
-          <Card className="border-none bg-white dark:bg-slate-950 shadow-none rounded-none overflow-hidden ring-0 relative w-full h-full">
+          <Card className={cn("bg-white dark:bg-slate-950 shadow-none rounded-none overflow-hidden relative w-full h-full", themeConfig.mainCardBorder)}>
             <CardContent className="p-0 flex flex-col justify-center relative z-10 h-full">
               {/* Show Form OR Loading Progress */}
               {loading ? (
@@ -1391,27 +1420,40 @@ const QuizGenerator = () => {
                   <div className="flex flex-col items-center justify-center h-full py-12 md:py-20 space-y-12 relative w-full">
                     {/* Mascot / Visual */}
                     <div
-                      className="relative group cursor-pointer scale-125"
+                      className="relative group cursor-pointer scale-125 transition-all duration-500"
                       onClick={handleToggleChill}>
-                      <div className="absolute inset-0 bg-green-400/20 blur-[60px] rounded-full animate-pulse" />
-                      {isChillPlaying ? (
-                        <Mascot
-                          emotion="cool"
-                          className="w-40 h-40 md:w-52 md:h-52 object-contain relative z-10 drop-shadow-2xl transition-transform duration-500 animate-bounce-slow"
-                          size={200}
-                        />
-                      ) : (
-                        <img
-                          src={logo}
-                          alt="Mascot"
-                          className={cn(
-                            "w-40 h-40 md:w-52 md:h-52 object-contain relative z-10 drop-shadow-2xl transition-transform duration-500",
-                            "hover:scale-110",
-                          )}
-                        />
-                      )}
+                      <div className={cn(
+                        "absolute inset-0 blur-[60px] rounded-full animate-pulse",
+                        fastMode ? "bg-yellow-400/30" : "bg-green-400/20"
+                      )} />
+                      
+                      {/* Fixed Size Wrapper */}
+                      <div className="w-40 h-40 md:w-52 md:h-52 relative flex items-center justify-center">
+                        {fastMode ? (
+                          <Mascot
+                            emotion="amazed"
+                            className="w-full h-full object-contain relative z-10 drop-shadow-2xl transition-transform duration-500 animate-bounce-slow scale-[1.3] md:scale-150"
+                            size={300}
+                          />
+                        ) : isChillPlaying ? (
+                          <Mascot
+                            emotion="cool"
+                            className="w-full h-full object-contain relative z-10 drop-shadow-2xl transition-transform duration-500 animate-bounce-slow scale-[1.3] md:scale-150"
+                            size={300}
+                          />
+                        ) : (
+                          <img
+                            src={logo}
+                            alt="Mascot"
+                            className={cn(
+                              "w-full h-full object-contain relative z-10 drop-shadow-2xl transition-all duration-500",
+                              "hover:scale-110",
+                            )}
+                          />
+                        )}
+                      </div>
                       {/* Music Indicator Mini Badge */}
-                      <div className="absolute bottom-0 right-0 bg-white rounded-full p-2 shadow-lg border border-slate-100">
+                      <div className="absolute bottom-0 right-0 bg-white dark:bg-slate-900 rounded-full p-2 shadow-lg border border-slate-100 dark:border-slate-800">
                         {isChillPlaying ? (
                           <Music4 className="w-4 h-4 text-green-500 animate-spin-slow" />
                         ) : (
@@ -1451,18 +1493,34 @@ const QuizGenerator = () => {
                       </p>
                     </div>
 
-                    {/* Mode Toggle */}
+                    {/* Generator Mode Switcher (Clean & Integrated) */}
                     <div className="flex justify-center -mb-4 z-20 relative">
-                      <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm p-1.5 rounded-full border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-1 cursor-pointer hover:shadow-md transition-all">
-                        <div className="px-4 py-1.5 rounded-full bg-slate-900 dark:bg-slate-700 text-white text-sm font-bold shadow-sm flex items-center gap-2">
-                          <themeConfig.aiIcon className={cn("w-4 h-4", themeConfig.aiColor)} />
-                          <span>AI Generator</span>
+                      <div className={cn(
+                        "p-1.5 rounded-full flex items-center gap-1 transition-all",
+                        profileData?.equipped_theme === 'theme_comic_manga'
+                          ? "bg-white border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                          : "bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border border-slate-200 dark:border-slate-800 shadow-sm"
+                      )}>
+                        <div className={cn(
+                          "px-5 py-2 rounded-full text-sm font-black flex items-center gap-2 cursor-default transition-all",
+                          profileData?.equipped_theme === 'theme_comic_manga'
+                            ? "bg-yellow-400 text-black border-2 border-black"
+                            : "bg-slate-900 dark:bg-slate-700 text-white shadow-sm"
+                        )}>
+                          <themeConfig.aiIcon className={cn("w-4 h-4", profileData?.equipped_theme === 'theme_comic_manga' ? "text-black" : themeConfig.aiColor)} />
+                          <span>{t("quizGenerator.ui.aiGenerator")}</span>
                         </div>
                         <button
                           onClick={() => navigate("/quiz/create")}
-                          className="px-4 py-1.5 rounded-full text-slate-500 dark:text-slate-400 text-sm font-bold hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200 transition-all flex items-center gap-2">
+                          className={cn(
+                            "px-5 py-2 rounded-full text-sm font-black transition-all flex items-center gap-2",
+                            profileData?.equipped_theme === 'theme_comic_manga'
+                              ? "text-black hover:bg-black/5"
+                              : "text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200"
+                          )}
+                        >
                           <themeConfig.manualIcon className="w-4 h-4" />
-                          <span>{t("manualQuiz.title", "Manual")}</span>
+                          <span>{t("quizGenerator.ui.manualGenerator")}</span>
                         </button>
                       </div>
                     </div>
@@ -1471,13 +1529,83 @@ const QuizGenerator = () => {
                     <div className="w-full max-w-5xl mx-auto z-20 px-4 mt-8">
                       <div
                         className={cn(
-                          "flex items-center gap-2 p-2 pl-2 rounded-[2rem] md:rounded-[3rem] bg-white dark:bg-slate-900 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.1)] border-2 transition-all duration-300 transform w-full",
+                          "flex items-center gap-2 p-2 pl-2 rounded-[2rem] md:rounded-[3rem] bg-white dark:bg-slate-900 transition-all duration-300 transform w-full border-2",
+                          profileData?.equipped_theme === 'theme_comic_manga' 
+                            ? "border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] ring-0 focus-within:ring-0" 
+                            : "shadow-[0_10px_40px_-15px_rgba(0,0,0,0.1)] border-slate-100 dark:border-slate-800 focus-within:ring-4 focus-within:ring-orange-50/50 dark:focus-within:ring-orange-900/30",
                           isPromptValid
                             ? themeConfig.inputBorderActive
-                            : "border-slate-100 dark:border-slate-800 hover:border-slate-200 dark:hover:border-slate-700 hover:shadow-lg focus-within:border-orange-200 dark:focus-within:border-orange-900 focus-within:ring-4 focus-within:ring-orange-50/50 dark:focus-within:ring-orange-900/30",
+                            : (profileData?.equipped_theme === 'theme_comic_manga' ? "" : "hover:border-slate-200 dark:hover:border-slate-700 hover:shadow-lg focus-within:border-orange-200 dark:focus-within:border-orange-900"),
                         )}>
+                        {/* Difficulty Selector (Re-positioned) */}
+                        <Popover modal={false}>
+                            <PopoverTrigger asChild>
+                            <Button
+                                variant="ghost"
+                                className={cn(
+                                "h-11 w-11 md:h-12 md:w-12 px-0 rounded-full shrink-0 font-extrabold transition-all duration-300 gap-0 mr-1 hover:bg-transparent",
+                                isDifficultySelected
+                                    ? "bg-transparent"
+                                    : "hover:bg-transparent"
+                                )}
+                            >
+                                <div className={cn(
+                                "flex items-center justify-center w-10 h-10 md:w-11 md:h-11 rounded-full transition-all duration-300 transform hover:scale-110 active:scale-95 shadow-md",
+                                "ring-2 hover:shadow-lg dark:hover:ring-white/40 hover:bg-white/20",
+                                difficulty === "easy" ? "ring-green-400/80 hover:ring-green-400" :
+                                difficulty === "medium" ? "ring-blue-400/80 hover:ring-blue-400" :
+                                difficulty === "hard" ? "ring-red-400/80 hover:ring-red-400" :
+                                "ring-purple-400/80 hover:ring-purple-400"
+                                )}>
+                                {difficulty === "easy" ? <Mascot emotion="happy" size={42} /> :
+                                 difficulty === "medium" ? <Mascot emotion="cool" size={42} /> :
+                                 difficulty === "hard" ? <Mascot emotion="angry" size={42} /> :
+                                 <Mascot emotion="party" size={42} /> // mixed
+                                }
+                                </div>
+                            </Button>
+                            </PopoverTrigger>
+                            <PopoverContent 
+                                className="w-64 p-3 rounded-2xl shadow-xl border-slate-100 dark:border-slate-800 dark:bg-slate-950" 
+                                align="start" 
+                                side="bottom" 
+                                sideOffset={10}
+                                onOpenAutoFocus={(e) => e.preventDefault()}
+                                onCloseAutoFocus={(e) => e.preventDefault()}
+                            >
+                              <div className="space-y-3">
+                                <h4 className="font-bold text-slate-900 dark:text-slate-100 px-1">{t("quizGenerator.ui.difficulty")}</h4>
+                                <div className="grid grid-cols-2 gap-2">
+                                    {[
+                                    { val: "easy", label: t("quizGenerator.ui.difficultyEasy"), emotion: "happy", color: "bg-green-100 dark:bg-green-950/40 text-green-600 dark:text-green-400 border-green-200 dark:border-green-800" },
+                                    { val: "medium", label: t("quizGenerator.ui.difficultyMedium"), emotion: "cool", color: "bg-blue-100 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800" },
+                                    { val: "hard", label: t("quizGenerator.ui.difficultyHard"), emotion: "angry", color: "bg-red-100 dark:bg-red-950/40 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800" },
+                                    { val: "mixed", label: t("quizGenerator.ui.difficultyMixed"), emotion: "party", color: "bg-purple-100 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-800" }
+                                    ].map((opt) => (
+                                    <button
+                                        key={opt.val}
+                                        onClick={() => {
+                                        setDifficulty(opt.val as any);
+                                        setIsDifficultySelected(true);
+                                        }}
+                                        className={cn(
+                                        "flex flex-col items-center justify-center gap-2 p-3 rounded-xl border-2 transition-all duration-200",
+                                        difficulty === opt.val
+                                            ? cn(opt.color, "bg-opacity-100 ring-2 ring-offset-2 ring-slate-300 dark:ring-slate-600 ring-offset-white dark:ring-offset-slate-950")
+                                            : "bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400"
+                                        )}
+                                    >
+                                        <Mascot emotion={opt.emotion as any} size={40} />
+                                        <span className="text-xs font-bold">{opt.label}</span>
+                                    </button>
+                                    ))}
+                                </div>
+                              </div>
+                            </PopoverContent>
+                        </Popover>
+
                         {/* Settings (Question Count) */}
-                        <Popover>
+                        <Popover modal={false}>
                           <PopoverTrigger asChild>
                             <Button
                               variant="ghost"
@@ -1518,20 +1646,23 @@ const QuizGenerator = () => {
                             </Button>
                           </PopoverTrigger>
                           <PopoverContent
-                            className="w-80 p-5 rounded-2xl shadow-xl border-slate-100"
+                            className="w-80 p-5 rounded-2xl shadow-xl border-slate-100 dark:border-slate-800 dark:bg-slate-950"
                             align="start"
                             side="top"
-                            sideOffset={10}>
+                            sideOffset={10}
+                            onOpenAutoFocus={(e) => e.preventDefault()}
+                            onCloseAutoFocus={(e) => e.preventDefault()}
+                          >
                             <div className="space-y-4">
                               <div className="flex items-center gap-2">
                                 <div className="p-2 bg-green-100 rounded-lg">
                                   <Target className="w-4 h-4 text-green-600" />
                                 </div>
-                                <h4 className="font-bold text-slate-900">
+                                <h4 className="font-bold text-slate-900 dark:text-slate-100">
                                   {t("quizGenerator.ui.questionCount")}
                                 </h4>
                               </div>
-                              <p className="text-xs text-slate-500">
+                              <p className="text-xs text-slate-500 dark:text-slate-400">
                                 {t(
                                   "quizGenerator.ui.selectQuestionCountDesc",
                                   "Chọn số lượng câu hỏi cho bài kiểm tra của bạn.",
@@ -1549,7 +1680,7 @@ const QuizGenerator = () => {
                                       "h-10 rounded-xl text-sm font-bold transition-all border-2",
                                       questionCount === count
                                         ? "bg-green-500 text-white border-green-500 shadow-lg shadow-green-500/30 scale-105"
-                                        : "bg-white text-slate-600 border-slate-100 hover:border-green-200 hover:bg-green-50 hover:text-green-700",
+                                        : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-100 dark:border-slate-800 hover:border-green-200 dark:hover:border-green-800 hover:bg-green-50 dark:hover:bg-green-900/30 hover:text-green-700 dark:hover:text-green-400",
                                     )}>
                                     {count}
                                   </button>
@@ -1579,6 +1710,33 @@ const QuizGenerator = () => {
                           />
                         </div>
 
+
+                        {/* Fast Mode Toggle (Refined Setting Style) */}
+                        <Button
+                          variant="ghost"
+                          onClick={() => {
+                            const newMode = !fastMode;
+                            setFastMode(newMode);
+                            toast({
+                                description: newMode ? t("quizGenerator.ui.fastModeEnabled") : t("quizGenerator.ui.fastModeDisabled"),
+                                className: profileData?.equipped_theme === 'theme_comic_manga' ? "border-2 border-black bg-yellow-100 text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] font-bold" : "",
+                                duration: 1500,
+                            });
+                          }}
+                          className={cn(
+                            "h-11 w-11 md:h-12 md:w-12 rounded-full shrink-0 p-0 transition-all duration-300 ml-1 border-2",
+                            fastMode 
+                              ? cn(themeConfig.fastModeActive, "scale-105 shadow-md ring-2 ring-offset-2 ring-slate-100 dark:ring-slate-800 ring-offset-white dark:ring-offset-slate-950")
+                              : "bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 hover:border-slate-300"
+                          )}
+                          title={t("quizGenerator.ui.fastMode")}
+                        >
+                          <Zap className={cn(
+                            "w-5 h-5 transition-all duration-300",
+                            fastMode ? cn(themeConfig.fastModeZap, "animate-pulse") : ""
+                          )} />
+                        </Button>
+
                         {/* Generate Button */}
                         <Button
                           onClick={handleGenerateClick}
@@ -1589,7 +1747,7 @@ const QuizGenerator = () => {
                           }
                           size="icon"
                           className={cn(
-                            "h-11 w-11 md:h-12 md:w-12 rounded-full shrink-0 transition-all duration-300 shadow-md flex items-center justify-center",
+                            "h-11 w-11 md:h-12 md:w-12 rounded-full shrink-0 transition-all duration-300 shadow-md flex items-center justify-center ml-1",
                             isPromptValid && isQuestionCountSelected
                               ? cn(themeConfig.generateBtnGradient, (profileData?.equipped_theme === "theme_comic_manga" ? "bg-amber-400" : "bg-gradient-to-tr" ), "text-white hover:scale-105 active:scale-95")
                               : "bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-600 cursor-not-allowed",
@@ -1621,9 +1779,12 @@ const QuizGenerator = () => {
 
                       {/* Quota Bar (Subtle) */}
                       {user && (
-                        <div className="mt-12 flex justify-center opacity-80 hover:opacity-100 transition-opacity">
+                        <div className="mt-12 flex justify-center opacity-80 hover:opacity-100 transition-opacity relative z-20">
                           {hasApiKey ? (
-                            <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-full px-5 py-2.5 flex items-center gap-3 border-2 border-orange-100 dark:border-orange-900/50 shadow-[0_4px_20px_rgba(251,146,60,0.2)] hover:scale-105 transition-transform cursor-default scale-110">
+                            <div className={cn(
+                              "px-5 py-2.5 flex items-center gap-3 rounded-full transition-transform cursor-default scale-110",
+                              themeConfig.pillStyle || "bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-2 border-orange-100 dark:border-orange-900/50 shadow-[0_4px_20px_rgba(251,146,60,0.2)] hover:scale-105"
+                            )}>
                               <div className="bg-gradient-to-br from-orange-400 to-red-500 rounded-full p-1.5 shadow-inner">
                                 <Zap className="w-4 h-4 text-white fill-white" />
                               </div>

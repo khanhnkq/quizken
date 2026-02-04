@@ -9,6 +9,9 @@ import {
 } from '@/lib/icons';
 import { Card, CardContent } from "@/components/ui/card";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "@/lib/auth";
+import { useProfile } from "@/hooks/useProfile";
+import { cn } from "@/lib/utils";
 
 // Pastel color palette for each feature
 const pastelColors = [
@@ -22,6 +25,10 @@ const pastelColors = [
 
 const Features = () => {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const { profileData } = useProfile(user?.id);
+  const isComic = profileData?.equipped_theme === 'theme_comic_manga';
+  
   const features = [
     {
       icon: Sparkles,
@@ -72,7 +79,12 @@ const Features = () => {
           <div className="inline-flex justify-center p-5 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-full shadow-lg mb-6 animate-bounce-slow">
             <Star className="w-10 h-10 text-[#B5CC89]" />
           </div>
-          <h2 className="text-3xl md:text-4xl lg:text-6xl font-bold font-heading mb-6 bg-gradient-to-br from-foreground to-foreground/60 bg-clip-text text-transparent">
+          <h2 className={cn(
+            "text-3xl md:text-4xl lg:text-6xl font-bold font-heading mb-6 filter",
+            isComic 
+              ? "text-black drop-shadow-[4px_4px_0px_#FFD700]" 
+              : "bg-gradient-to-br from-foreground to-foreground/60 bg-clip-text text-transparent"
+          )}>
             {t('features.title')}
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-medium">

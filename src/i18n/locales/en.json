@@ -276,7 +276,17 @@
             "questions": "Questions",
             "selectQuestionCountShort": "Count",
             "selectQuestionCountDesc": "Choose the number of questions for your quiz.",
-            "selectQuestionCountHint": "Select question count using the \"Count\" button"
+            "selectQuestionCountHint": "Select question count using the \"Count\" button",
+            "difficulty": "Difficulty",
+            "difficultyMixed": "Mixed",
+            "difficultyEasy": "Easy",
+            "difficultyMedium": "Medium",
+            "difficultyHard": "Hard",
+            "fastMode": "Fast Mode",
+            "aiGenerator": "AI Generator",
+            "manualGenerator": "Manual Creator",
+            "fastModeEnabled": "Fast Mode Enabled",
+            "fastModeDisabled": "Fast Mode Disabled"
         },
         "flashcard": {
             "loading": "Loading flashcards...",

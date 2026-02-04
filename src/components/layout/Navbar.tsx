@@ -134,9 +134,17 @@ const Navbar = () => {
       ref={navRef}
       className={cn(
         "fixed z-50 left-1/2 -translate-x-1/2",
-        scrolled
-          ? "rounded-full border border-slate-200/60 dark:border-slate-800/60 shadow-lg dark:shadow-slate-900/50 backdrop-blur-2xl bg-white/70 dark:bg-slate-950/70"
-          : "border-b border-slate-200/60 dark:border-slate-800/60 backdrop-blur-xl bg-white/80 dark:bg-slate-950/80 rounded-none",
+        profileData?.equipped_theme === 'theme_comic_manga'
+          ? cn(
+              scrolled 
+                ? "rounded-full border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-white/95 dark:bg-slate-900/95" 
+                : "border-b-2 border-black bg-white/95 dark:bg-slate-900/95 rounded-none"
+            )
+          : cn(
+              scrolled
+                ? "rounded-full border border-slate-200/60 dark:border-slate-800/60 shadow-lg dark:shadow-slate-900/50 backdrop-blur-2xl bg-white/70 dark:bg-slate-950/70"
+                : "border-b border-slate-200/60 dark:border-slate-800/60 backdrop-blur-xl bg-white/80 dark:bg-slate-950/80 rounded-none"
+            ),
       )}
     >
       <div className="container mx-auto px-4">
@@ -176,79 +184,26 @@ const Navbar = () => {
 
           {/* Right: Auth / User Dropdown */}
           <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
-            {/* Announcements Bell */}
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="rounded-full w-10 h-10 relative bg-white/50 dark:bg-slate-900/50 hover:bg-white dark:hover:bg-slate-800 border-2 border-slate-200 dark:border-slate-800 text-slate-500 hover:text-foreground hidden sm:flex transition-all duration-300 hidden sm:flex"
-                >
-                  <Bell className="w-5 h-5" />
-                  {announcements.length > 0 && (
-                    <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-slate-900" />
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-80 p-0" align="end">
-                <div className="p-3 border-b bg-muted/30 dark:bg-slate-900/50">
-                  <h3 className="font-semibold text-sm flex items-center gap-2">
-                    <Megaphone className="w-4 h-4 text-primary" />
-                    {t('nav.notifications')}
-                    <span className="ml-auto text-xs font-normal text-muted-foreground">
-                      {announcements.length} {t('nav.newNotifications')}
-                    </span>
-                  </h3>
-                </div>
-                <ScrollArea className="h-[300px]">
-                  {isLoadingAnnouncements ? (
-                    <div className="flex items-center justify-center py-8">
-                      <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
-                    </div>
-                  ) : announcements.length === 0 ? (
-                    <div className="py-8 text-center text-muted-foreground text-sm">
-                      {t('nav.noNotifications')}
-                    </div>
-                  ) : (
-                    <div className="p-2 space-y-2">
-                      {announcements.map((item) => (
-                        <div
-                          key={item.id}
-                          className={cn(
-                            "p-3 rounded-lg border text-left",
-                            item.type === "event"
-                              ? "bg-purple-50/50 dark:bg-purple-900/20 border-purple-100 dark:border-purple-800/50"
-                              : "bg-muted/30 dark:bg-slate-800/50 border-border/50 dark:border-slate-700/50",
-                          )}
-                        >
-                          <p className="text-sm font-medium leading-none mb-1.5">
-                            {item.title}
-                          </p>
-                          <p className="text-xs text-muted-foreground leading-relaxed">
-                            {item.content}
-                          </p>
-                          <p className="text-[10px] text-muted-foreground mt-2 opacity-70">
-                            {formatDistanceToNow(new Date(item.created_at), {
-                              addSuffix: true,
-                              locale: dateLocale,
-                            })}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </ScrollArea>
-              </PopoverContent>
-            </Popover>
+
 
             {/* Global Loading Indicator (Navbar Integration) */}
             {isProcessing && (
-              <div className="flex items-center gap-2 md:bg-primary/10 md:border md:border-primary/20 rounded-full md:px-3 md:py-1 animate-in fade-in slide-in-from-right-4 duration-300 pointer-events-none md:pointer-events-auto">
+              <div
+                className={cn(
+                  "flex items-center gap-2 md:bg-primary/10 md:border md:border-primary/20 rounded-full md:px-3 md:py-1 animate-in fade-in slide-in-from-right-4 duration-300 pointer-events-none md:pointer-events-auto",
+                  scrolled && "hidden"
+                )}
+              >
                 <div className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
                 </div>
-                <span className="hidden md:inline text-[10px] font-medium text-primary whitespace-nowrap">
+                <span
+                  className={cn(
+                    "hidden md:inline text-[10px] font-medium text-primary whitespace-nowrap transition-all duration-300 overflow-hidden",
+                    scrolled ? "w-0 opacity-0 md:inline" : "w-auto opacity-100"
+                  )}
+                >
                   {t("quizGenerator.status.generating") || "Creating..."}
                 </span>
 
@@ -258,7 +213,10 @@ const Navbar = () => {
                     e.stopPropagation();
                     setShowCancelConfirm(true);
                   }}
-                  className="ml-1 hidden md:flex items-center justify-center h-4 w-4 rounded-full hover:bg-red-100 text-primary/50 hover:text-red-500 transition-colors pointer-events-auto"
+                  className={cn(
+                    "ml-1 hidden md:flex items-center justify-center h-4 w-4 rounded-full hover:bg-red-100 text-primary/50 hover:text-red-500 transition-colors pointer-events-auto",
+                    scrolled && "hidden"
+                  )}
                   title={t("quizGenerator.actions.cancel") || "Cancel"}
                 >
                   <X className="w-3 h-3" />
@@ -266,6 +224,75 @@ const Navbar = () => {
               </div>
             )}
             <div className="hidden sm:flex items-center gap-1">
+              {/* Announcements Bell */}
+              <Popover modal={false}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="rounded-full w-10 h-10 relative bg-white/50 dark:bg-slate-900/50 hover:bg-white dark:hover:bg-slate-800 border-2 border-slate-200 dark:border-slate-800 text-slate-500 hover:text-foreground transition-all duration-300"
+                  >
+                    <Bell className="w-5 h-5" />
+                    {announcements.length > 0 && (
+                      <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-slate-900" />
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent 
+                  className="w-80 p-0 rounded-2xl shadow-xl border-slate-100 dark:border-slate-800 dark:bg-slate-950 overflow-hidden" 
+                  align="end"
+                  onOpenAutoFocus={(e) => e.preventDefault()}
+                  onCloseAutoFocus={(e) => e.preventDefault()}
+                >
+                  <div className="p-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+                    <h3 className="font-semibold text-sm flex items-center gap-2 text-slate-900 dark:text-slate-100">
+                      <Megaphone className="w-4 h-4 text-primary" />
+                      {t('nav.notifications')}
+                      <span className="ml-auto text-xs font-normal text-slate-500 dark:text-slate-400">
+                        {announcements.length} {t('nav.newNotifications')}
+                      </span>
+                    </h3>
+                  </div>
+                  <ScrollArea className="h-[300px]">
+                    {isLoadingAnnouncements ? (
+                      <div className="flex items-center justify-center py-8">
+                        <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+                      </div>
+                    ) : announcements.length === 0 ? (
+                      <div className="py-8 text-center text-muted-foreground text-sm">
+                        {t('nav.noNotifications')}
+                      </div>
+                    ) : (
+                      <div className="p-2 space-y-2">
+                        {announcements.map((item) => (
+                          <div
+                            key={item.id}
+                            className={cn(
+                              "p-3 rounded-lg border text-left",
+                              item.type === "event"
+                                ? "bg-purple-50/50 dark:bg-purple-900/20 border-purple-100 dark:border-purple-800/50"
+                                : "bg-slate-50/30 dark:bg-slate-900/50 border-slate-100/50 dark:border-slate-800/50",
+                            )}
+                          >
+                            <p className="text-sm font-medium leading-none mb-1.5 text-slate-900 dark:text-slate-100">
+                              {item.title}
+                            </p>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                              {item.content}
+                            </p>
+                            <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-2 opacity-70">
+                              {formatDistanceToNow(new Date(item.created_at), {
+                                addSuffix: true,
+                                locale: dateLocale,
+                              })}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </ScrollArea>
+                </PopoverContent>
+              </Popover>
               <NavbarThemeSelector />
               <ModeToggle />
               <LanguageSwitcher />
@@ -274,7 +301,7 @@ const Navbar = () => {
             {!loading && (
               <>
                 {user ? (
-                  <DropdownMenu>
+                  <DropdownMenu modal={false}>
                     <DropdownMenuTrigger asChild>
                       <Button
                         variant="ghost"
@@ -294,14 +321,18 @@ const Navbar = () => {
                         </Avatar>
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-56">
-                      <DropdownMenuLabel>
+                    <DropdownMenuContent 
+                      align="end" 
+                      className="w-56 rounded-2xl shadow-xl border-slate-100 dark:border-slate-800 dark:bg-slate-950"
+                      onCloseAutoFocus={(e) => e.preventDefault()}
+                    >
+                      <DropdownMenuLabel className="px-3 py-2">
                         <div className="flex flex-col space-y-1">
-                          <p className="text-sm font-medium leading-none">
+                          <p className="text-sm font-bold leading-none text-slate-900 dark:text-slate-100">
                             {profileData?.display_name ||
                               user.email?.split("@")[0]}
                           </p>
-                          <p className="text-xs leading-none text-muted-foreground">
+                          <p className="text-xs leading-none text-slate-500 dark:text-slate-400">
                             {user.email}
                           </p>
                         </div>
@@ -343,8 +374,8 @@ const Navbar = () => {
                       </DropdownMenuItem>
                       
                       {/* Mobile-only / Always visible Application Settings in Dropdown */}
-                      <DropdownMenuSeparator className="sm:hidden" />
-                      <DropdownMenuLabel className="sm:hidden text-xs font-normal text-muted-foreground uppercase tracking-wider">
+                      <DropdownMenuSeparator className="sm:hidden border-slate-100 dark:border-slate-800" />
+                      <DropdownMenuLabel className="sm:hidden text-xs font-normal text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                         {t('settings.appearance', 'Giao diện & Ngôn ngữ')}
                       </DropdownMenuLabel>
                       

@@ -3,17 +3,24 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useTranslation } from "react-i18next";
+import { useToast } from "@/hooks/use-toast";
 import logo from "@/assets/logo/logo.png";
-import { Send, Sparkles, Zap, ArrowLeft } from "lucide-react";
+import { Send, Sparkles, Zap, ArrowLeft, Settings2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { containsVietnameseBadwords } from "@/lib/vnBadwordsFilter";
+import Mascot from "@/components/ui/Mascot";
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover";
 
 interface ChatInterfaceProps {
-    onComplete: (topic: string, count: string) => void;
+    onComplete: (topic: string, count: string, fastMode: boolean, difficulty: string) => void;
     onCancel: () => void;
-    userRemaining?: number;
     userLimit?: number;
     hasApiKey?: boolean;
+    isComic?: boolean;
 }
 
 type Step = "GREETING" | "TOPIC" | "COUNT" | "CONFIRM";
@@ -25,14 +32,28 @@ interface Message {
     timestamp: number;
 }
 
-export const ChatInterface: React.FC<ChatInterfaceProps> = ({ onComplete, onCancel, userRemaining = 0, userLimit = 5, hasApiKey = false }) => {
+export const ChatInterface: React.FC<ChatInterfaceProps> = ({ 
+    onComplete, 
+    onCancel, 
+    userRemaining = 0, 
+    userLimit = 5, 
+    hasApiKey = false,
+    isComic = false
+}) => {
     const { t } = useTranslation();
+    const { toast } = useToast();
     const [messages, setMessages] = useState<Message[]>([]);
     const [inputValue, setInputValue] = useState("");
     const [step, setStep] = useState<Step>("GREETING");
     const [isTyping, setIsTyping] = useState(false);
     const [topic, setTopic] = useState("");
     const [topicError, setTopicError] = useState("");
+    
+    // New settings state
+    const [fastMode, setFastMode] = useState(false);
+    const [difficulty, setDifficulty] = useState<"mixed" | "easy" | "medium" | "hard">("mixed");
+    const [isDifficultySelected, setIsDifficultySelected] = useState(false);
+
     const scrollRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -117,7 +138,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ onComplete, onCanc
             setStep("CONFIRM");
             addBotMessage(t("quizGenerator.chat.confirming"));
             setTimeout(() => {
-                onComplete(topic, value);
+                onComplete(topic, value, fastMode, difficulty);
             }, 1500);
         } else if (step === "GREETING") {
             // Suggestion chips for topics
@@ -223,14 +244,24 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ onComplete, onCanc
                 )}
             </div>
 
+
             {/* Input / Interaction Area */}
             <div className="p-4 bg-background border-t space-y-3">
                 {/* Suggestion Chips */}
                 {!isTyping && step === "GREETING" && (
-                    <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
+                    <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none px-1">
                         {topicSuggestions.map((s) => (
-                            <Button key={s} variant="secondary" size="sm" onClick={() => handleOptionSelect(s)} className="rounded-full flex-shrink-0 border bg-secondary/50 hover:bg-primary/10 hover:text-primary transition-all">
-                                <Sparkles className="w-3 h-3 mr-1" /> {s}
+                            <Button 
+                                key={s} 
+                                variant="secondary" 
+                                size="sm" 
+                                onClick={() => handleOptionSelect(s)} 
+                                className={cn(
+                                    "rounded-full flex-shrink-0 border bg-secondary/50 hover:bg-primary/10 hover:text-primary transition-all text-xs h-8",
+                                    isComic && "border-2 border-black bg-yellow-400 text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-yellow-300 hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
+                                )}
+                            >
+                                <Sparkles className={cn("w-3 h-3 mr-1", isComic && "text-black")} /> {s}
                             </Button>
                         ))}
                     </div>
@@ -240,8 +271,17 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ onComplete, onCanc
                 {!isTyping && step === "COUNT" && (
                     <div className="flex gap-2 flex-wrap justify-center pb-2">
                         {countOptions.map((n) => (
-                            <Button key={n} variant="secondary" size="sm" onClick={() => handleOptionSelect(n)} className="rounded-full flex-shrink-0 border bg-secondary/50 hover:bg-primary/10 hover:text-primary transition-all">
-                                <Sparkles className="w-3 h-3 mr-1" /> {n} {t("quizGenerator.ui.questions")}
+                            <Button 
+                                key={n} 
+                                variant="secondary" 
+                                size="sm" 
+                                onClick={() => handleOptionSelect(n)} 
+                                className={cn(
+                                    "rounded-full flex-shrink-0 border bg-secondary/50 hover:bg-primary/10 hover:text-primary transition-all",
+                                    isComic && "border-2 border-black bg-orange-400 text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-orange-300 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]"
+                                )}
+                            >
+                                <Sparkles className={cn("w-3 h-3 mr-1", isComic && "text-black")} /> {n} {t("quizGenerator.ui.questions")}
                             </Button>
                         ))}
                     </div>
@@ -256,9 +296,15 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ onComplete, onCanc
                     </div>
                 )}
 
-                {/* Text Input */}
-                <div className="flex items-center gap-2">
-                    <Input
+                {/* Unified Input Bar */}
+                <div className={cn(
+                    "flex items-center p-1 pl-4 rounded-[2rem] border transition-all relative",
+                    isComic 
+                        ? "bg-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus-within:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]"
+                        : "bg-secondary/20 border-primary/10 focus-within:ring-2 focus-within:ring-primary/20 focus-within:bg-background focus-within:shadow-sm",
+                    topicError && "border-destructive/50"
+                )}>
+                    <input
                         ref={inputRef}
                         value={inputValue}
                         onChange={(e) => {
@@ -269,18 +315,102 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ onComplete, onCanc
                         }}
                         onKeyDown={handleKeyDown}
                         placeholder={step === "COUNT" ? t("quizGenerator.chat.inputPlaceholderCount") : t("quizGenerator.chat.inputPlaceholder")}
-                        className={cn(
-                            "rounded-full px-4 h-11 focus-visible:ring-primary/20 bg-secondary/20",
-                            topicError ? "border-destructive/50 focus-visible:border-destructive" : "border-primary/20"
-                        )}
+                        className="flex-1 bg-transparent border-none outline-none text-sm placeholder:text-muted-foreground mr-2 h-10 min-w-0"
                         disabled={step === "COUNT" || isTyping || step === "CONFIRM"}
                     />
+
+                    {/* Settings Actions (Only visible in GREETING/TOPIC) */}
+                    {(step === "GREETING" || step === "TOPIC") && (
+                       <div className="flex items-center gap-1 mr-1 border-r pr-2 border-border/10">
+                            {/* Difficulty Selector */}
+                            <Popover modal={false}>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className={cn(
+                                            "h-8 w-8 rounded-full transition-all",
+                                            isComic && "hover:bg-yellow-100",
+                                            !isComic && "hover:bg-secondary",
+                                            isDifficultySelected && (isComic ? "bg-yellow-200" : "bg-primary/10 text-primary")
+                                        )}
+                                        title={t("quizGenerator.ui.difficulty")}
+                                    >
+                                        {difficulty === "easy" ? <div className="w-3 h-3 rounded-full bg-green-500 border-2 border-white shadow-sm" /> :
+                                         difficulty === "medium" ? <div className="w-3 h-3 rounded-full bg-blue-500 border-2 border-white shadow-sm" /> :
+                                         difficulty === "hard" ? <div className="w-3 h-3 rounded-full bg-red-500 border-2 border-white shadow-sm" /> :
+                                         <Settings2 className="w-4 h-4 opacity-70" />
+                                        }
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-48 p-1 rounded-xl" align="center" side="top" sideOffset={10}>
+                                    <div className="grid grid-cols-1 gap-1">
+                                        {[
+                                            { val: "easy", label: t("quizGenerator.ui.difficultyEasy"), color: "bg-green-500" },
+                                            { val: "medium", label: t("quizGenerator.ui.difficultyMedium"), color: "bg-blue-500" },
+                                            { val: "hard", label: t("quizGenerator.ui.difficultyHard"), color: "bg-red-500" },
+                                            { val: "mixed", label: t("quizGenerator.ui.difficultyMixed"), color: "bg-purple-500" }
+                                        ].map((opt) => (
+                                            <button
+                                                key={opt.val}
+                                                onClick={() => {
+                                                    setDifficulty(opt.val as any);
+                                                    setIsDifficultySelected(true);
+                                                }}
+                                                className={cn(
+                                                    "flex items-center gap-3 p-2 rounded-lg text-xs font-bold transition-all w-full text-left",
+                                                    difficulty === opt.val
+                                                        ? "bg-secondary text-foreground"
+                                                        : "hover:bg-secondary/50 text-muted-foreground"
+                                                )}
+                                            >
+                                                <div className={cn("w-2.5 h-2.5 rounded-full shadow-sm", opt.color)} />
+                                                <span>{opt.label}</span>
+                                                {difficulty === opt.val && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-foreground/50" />}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </PopoverContent>
+                            </Popover>
+
+                            {/* Fast Mode Toggle */}
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => {
+                                    const newMode = !fastMode;
+                                    setFastMode(newMode);
+                                    toast({
+                                        description: newMode ? t("quizGenerator.ui.fastModeEnabled") : t("quizGenerator.ui.fastModeDisabled"),
+                                        className: isComic ? "border-2 border-black bg-yellow-100 text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] font-bold" : "",
+                                        duration: 1500,
+                                    });
+                                }}
+                                className={cn(
+                                    "h-8 w-8 rounded-full transition-all",
+                                    isComic 
+                                        ? cn(fastMode ? "bg-yellow-400 text-black hover:bg-yellow-500" : "hover:bg-yellow-100 text-muted-foreground")
+                                        : cn(fastMode ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : "hover:bg-secondary text-muted-foreground hover:text-foreground")
+                                )}
+                                title={t("quizGenerator.ui.fastMode")}
+                            >
+                                <Zap className={cn("w-4 h-4", fastMode && "fill-current")} />
+                            </Button>
+                       </div>
+                    )}
+
                     <Button
                         onClick={handleSend}
                         disabled={!inputValue.trim() || step === "COUNT" || isTyping || step === "CONFIRM"}
-                        className="rounded-full h-11 w-11 p-0 shrink-0 bg-primary shadow-lg hover:shadow-primary/25 hover:scale-105 transition-all"
+                        className={cn(
+                            "rounded-full h-9 w-9 p-0 shrink-0 transition-all",
+                            isComic
+                                ? "bg-black text-white hover:bg-black/80"
+                                : "bg-primary shadow-sm hover:shadow-md hover:scale-105"
+                        )}
+                        size="icon"
                     >
-                        <Send className="w-5 h-5" />
+                        <Send className="w-4 h-4" />
                     </Button>
                 </div>
             </div>

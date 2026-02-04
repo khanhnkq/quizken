@@ -28,6 +28,7 @@ const ChatPage = lazy(() => import("./pages/ChatPage"));
 const RedeemCode = lazy(() => import("./pages/RedeemCode"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const ChallengePage = lazy(() => import("./pages/ChallengePage"));
+const BossBattlePage = lazy(() => import("./pages/BossBattlePage"));
 
 // Preload functions for faster navigation
 const preloadRoutes = () => {
@@ -111,6 +112,9 @@ const AppRoutes = () => {
         {/* Challenge Mode */}
         <Route path="/challenge" element={<ChallengePage />} />
         <Route path="/challenge/:id" element={<ChallengePage />} />
+
+        {/* Boss Mode */}
+        <Route path="/boss" element={<BossBattlePage />} />
 
         {/* Legacy redirects (optional - can remove later) */}
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

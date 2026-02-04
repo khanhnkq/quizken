@@ -116,7 +116,7 @@ export function NavbarThemeSelector() {
             onComplete={() => setIsTransitioning(false)}
         />
 
-        <Popover open={open} onOpenChange={setOpen}>
+        <Popover open={open} onOpenChange={setOpen} modal={false}>
         <PopoverTrigger asChild>
             <Button
             variant="ghost"
@@ -128,13 +128,18 @@ export function NavbarThemeSelector() {
             <span className="sr-only">Change Theme</span>
             </Button>
         </PopoverTrigger>
-        <PopoverContent align="end" className="w-[340px] p-0 overflow-hidden rounded-2xl border-slate-200 shadow-xl">
-            <div className="p-3 bg-muted/40 border-b flex items-center justify-between">
-                <h3 className="font-bold text-sm flex items-center gap-2">
+        <PopoverContent 
+          align="end" 
+          className="w-[340px] p-0 overflow-hidden rounded-2xl border-slate-100 dark:border-slate-800 dark:bg-slate-950 shadow-xl"
+          onOpenAutoFocus={(e) => e.preventDefault()}
+          onCloseAutoFocus={(e) => e.preventDefault()}
+        >
+            <div className="p-3 bg-slate-50/50 dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                <h3 className="font-bold text-sm flex items-center gap-2 text-slate-900 dark:text-slate-100">
                     <Palette className="w-4 h-4 text-primary" />
                     {t('inventory.myThemes', 'My Themes')}
                 </h3>
-                <span className="text-xs text-muted-foreground bg-background px-2 py-0.5 rounded-full border">
+                <span className="text-xs text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-900 px-2 py-0.5 rounded-full border border-slate-100 dark:border-slate-800">
                     {myThemes.length} owned
                 </span>
             </div>
@@ -148,7 +153,7 @@ export function NavbarThemeSelector() {
                             "relative group flex flex-col items-center p-3 rounded-xl border-2 transition-all duration-200 text-center space-y-2",
                             !profileData?.equipped_theme 
                                 ? "bg-primary/5 border-primary ring-1 ring-primary/20" 
-                                : "bg-card border-border hover:border-primary/50 hover:bg-accent/50 hover:scale-[1.02]"
+                                : "bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 hover:border-primary/50 hover:bg-slate-50 dark:hover:bg-slate-800 hover:scale-[1.02]"
                         )}
                     >
                         {!profileData?.equipped_theme && (
@@ -157,7 +162,7 @@ export function NavbarThemeSelector() {
                             </div>
                         )}
                         
-                        <div className="w-12 h-12 bg-muted/50 rounded-lg flex items-center justify-center text-2xl shadow-inner group-hover:shadow-md transition-all overflow-hidden p-1">
+                        <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center text-2xl shadow-inner group-hover:shadow-md transition-all overflow-hidden p-1">
                             <img 
                                 src="/images/mascot/happy.png" 
                                 alt="Default"
@@ -166,10 +171,10 @@ export function NavbarThemeSelector() {
                         </div>
                         
                         <div>
-                            <div className="font-bold text-xs truncate max-w-[120px]">
+                            <div className="font-bold text-xs truncate max-w-[120px] text-slate-900 dark:text-slate-100">
                                 Default
                             </div>
-                            <div className="text-[10px] text-muted-foreground">
+                            <div className="text-[10px] text-slate-500 dark:text-slate-400">
                                 {!profileData?.equipped_theme ? t('inventory.equipped') : t('inventory.equip')}
                             </div>
                         </div>
@@ -185,7 +190,7 @@ export function NavbarThemeSelector() {
                                     "relative group flex flex-col items-center p-3 rounded-xl border-2 transition-all duration-200 text-center space-y-2",
                                     isEquipped 
                                         ? "bg-primary/5 border-primary ring-1 ring-primary/20" 
-                                        : "bg-card border-border hover:border-primary/50 hover:bg-accent/50 hover:scale-[1.02]"
+                                        : "bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 hover:border-primary/50 hover:bg-slate-50 dark:hover:bg-slate-800 hover:scale-[1.02]"
                                 )}
                             >
                                 {isEquipped && (
@@ -194,7 +199,7 @@ export function NavbarThemeSelector() {
                                     </div>
                                 )}
                                 
-                                <div className="w-12 h-12 bg-muted/50 rounded-lg flex items-center justify-center text-2xl shadow-inner group-hover:shadow-md transition-all">
+                                <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center text-2xl shadow-inner group-hover:shadow-md transition-all">
                                     {theme.details?.image_url ? (
                                         <img src={theme.details.image_url} alt="" className="w-full h-full object-cover rounded-lg" />
                                     ) : (
@@ -203,10 +208,10 @@ export function NavbarThemeSelector() {
                                 </div>
                                 
                                 <div>
-                                    <div className="font-bold text-xs truncate max-w-[120px]">
+                                    <div className="font-bold text-xs truncate max-w-[120px] text-slate-900 dark:text-slate-100">
                                         {theme.details?.name}
                                     </div>
-                                    <div className="text-[10px] text-muted-foreground">
+                                    <div className="text-[10px] text-slate-500 dark:text-slate-400">
                                         {isEquipped ? t('inventory.equipped') : t('inventory.equip')}
                                     </div>
                                 </div>
@@ -217,11 +222,11 @@ export function NavbarThemeSelector() {
             </ScrollArea>
             
             {/* Footer: Link to Gacha */}
-            <div className="p-3 border-t bg-muted/40 text-center">
+            <div className="p-3 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 text-center">
                 <Button 
                     variant="outline" 
                     size="sm" 
-                    className="w-full text-xs font-bold text-amber-600 border-amber-200 hover:bg-amber-50 hover:text-amber-700"
+                    className="w-full text-xs font-bold text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-900 hover:bg-amber-50 dark:hover:bg-amber-950/30 hover:text-amber-700"
                     onClick={() => {
                         setOpen(false);
                         navigate("/user/dashboard?tab=lucky-draw");

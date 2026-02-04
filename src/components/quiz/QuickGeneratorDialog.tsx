@@ -344,11 +344,22 @@ export function QuickGeneratorDialog({ open, onOpenChange, initialTab = null }: 
     };
 
     // Actual generation logic - accepts optional overrides from ChatInterface
-    const proceedWithGeneration = async (overridePrompt?: string, overrideCount?: string) => {
+    const proceedWithGeneration = async (
+        overridePrompt?: string, 
+        overrideCount?: string,
+        overrideFastMode?: boolean,
+        overrideDifficulty?: string
+    ) => {
         const activePrompt = overridePrompt ?? prompt;
         const activeCount = overrideCount ?? questionCount;
 
-        console.log(`[QuickGenerator] Proceeding with: prompt="${activePrompt}", count=${activeCount}`);
+        // Apply Fast Mode prompt optimization if enabled
+        let promptToSend = activePrompt;
+        if (overrideFastMode) {
+             promptToSend += " (Optimization: Generate concise questions and brief explanations to maximize speed. Keep it short and direct.)";
+        }
+
+        console.log(`[QuickGenerator] Proceeding with: prompt="${promptToSend}", count=${activeCount}, difficulty=${overrideDifficulty}`);
 
         const isValid = validatePrompt(activePrompt);
         if (!isValid) {
@@ -401,11 +412,12 @@ export function QuickGeneratorDialog({ open, onOpenChange, initialTab = null }: 
                 duplicate?: boolean;
             }>("generate-quiz/start-quiz", {
                 body: {
-                    prompt: activePrompt,
+                    prompt: promptToSend,
                     device: deviceInfo,
                     questionCount: parseInt(activeCount),
                     idempotencyKey,
                     language: i18n.language,
+                    difficulty: overrideDifficulty || "mixed",
                 },
             });
 
@@ -569,7 +581,12 @@ export function QuickGeneratorDialog({ open, onOpenChange, initialTab = null }: 
 
                     {loading ? (
                         /* Loading State - Show Cute Progress */
-                        <div className="relative overflow-hidden bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-2 border-primary/10 dark:border-primary/20 shadow-2xl rounded-3xl p-8">
+                        <div className={cn(
+                            "relative overflow-hidden border-2 shadow-2xl rounded-3xl p-8",
+                            profileData?.equipped_theme === 'theme_comic_manga'
+                                ? "bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"
+                                : "bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-primary/10 dark:border-primary/20"
+                        )}>
                             <GenerationProgress
                                 generationStatus={genStatus ?? generationStatus ?? "processing"}
                                 generationProgress={genProgress || generationProgress || t("quizGenerator.toasts.preparing")}
@@ -578,7 +595,12 @@ export function QuickGeneratorDialog({ open, onOpenChange, initialTab = null }: 
                         </div>
                     ) : activeTab === null ? (
                         /* Mode Selection - Messenger/Telegram Style */
-                        <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-2 border-primary/10 dark:border-primary/20 shadow-2xl rounded-3xl overflow-hidden">
+                        <div className={cn(
+                            "shadow-2xl rounded-3xl overflow-hidden border-2",
+                            profileData?.equipped_theme === 'theme_comic_manga'
+                                ? "bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"
+                                : "bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-primary/10 dark:border-primary/20"
+                        )}>
                             {/* Header */}
                             <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-900/50">
                                 <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100">{t("quickGenerator.title")}</h2>
@@ -595,10 +617,20 @@ export function QuickGeneratorDialog({ open, onOpenChange, initialTab = null }: 
                                 {/* AI Mode Row */}
                                 <button
                                     onClick={() => setActiveTab("ai")}
-                                    className="w-full flex items-center gap-4 px-4 py-4 hover:bg-gray-50 dark:hover:bg-slate-800/60 transition-colors text-left group"
+                                    className={cn(
+                                        "w-full flex items-center gap-4 px-4 py-4 transition-colors text-left group border-b",
+                                        profileData?.equipped_theme === 'theme_comic_manga'
+                                            ? "hover:bg-yellow-400/10 border-black"
+                                            : "hover:bg-gray-50 dark:hover:bg-slate-800/60 border-gray-100 dark:border-slate-800"
+                                    )}
                                 >
                                     <div className="relative shrink-0">
-                                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-violet-100 to-indigo-100 dark:from-violet-900 dark:to-indigo-900 flex items-center justify-center overflow-hidden border border-transparent dark:border-white/10 group-hover:dark:border-white/20 transition-colors">
+                                        <div className={cn(
+                                            "w-12 h-12 rounded-full flex items-center justify-center overflow-hidden border transition-colors",
+                                            profileData?.equipped_theme === 'theme_comic_manga'
+                                                ? "bg-yellow-400 border-2 border-black"
+                                                : "bg-gradient-to-br from-violet-100 to-indigo-100 dark:from-violet-900 dark:to-indigo-900 border-transparent dark:border-white/10 group-hover:dark:border-white/20"
+                                        )}>
                                             <img src={logo} alt="AI Bot" className="w-10 h-10 object-contain" />
                                         </div>
                                         {/* Online indicator */}
@@ -621,10 +653,20 @@ export function QuickGeneratorDialog({ open, onOpenChange, initialTab = null }: 
                                 {/* Manual Mode Row */}
                                 <button
                                     onClick={() => setActiveTab("manual")}
-                                    className="w-full flex items-center gap-4 px-4 py-4 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors text-left group"
+                                    className={cn(
+                                        "w-full flex items-center gap-4 px-4 py-4 transition-colors text-left group",
+                                        profileData?.equipped_theme === 'theme_comic_manga'
+                                            ? "hover:bg-orange-400/10"
+                                            : "hover:bg-gray-50 dark:hover:bg-slate-800"
+                                    )}
                                 >
                                     <div className="relative shrink-0">
-                                        <div className={cn("w-12 h-12 rounded-full bg-gradient-to-br flex items-center justify-center border border-transparent dark:border-white/10 group-hover:dark:border-white/20 transition-colors", themeConfig.manualGradient)}>
+                                        <div className={cn(
+                                            "w-12 h-12 rounded-full flex items-center justify-center border transition-colors",
+                                            profileData?.equipped_theme === 'theme_comic_manga'
+                                                ? "bg-orange-400 border-2 border-black"
+                                                : cn("bg-gradient-to-br border-transparent dark:border-white/10 group-hover:dark:border-white/20", themeConfig.manualGradient)
+                                        )}>
                                             <themeConfig.manualIcon className="w-6 h-6 text-white" />
                                         </div>
                                     </div>
@@ -647,15 +689,16 @@ export function QuickGeneratorDialog({ open, onOpenChange, initialTab = null }: 
 
                         <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-2 border-primary/10 dark:border-primary/20 shadow-2xl rounded-3xl overflow-hidden h-[600px] flex flex-col">
                             <ChatInterface
-                                onComplete={(topic, count) => {
+                                onComplete={(topic, count, fastMode, difficulty) => {
                                     setPrompt(topic);
                                     setQuestionCount(count);
-                                    proceedWithGeneration(topic, count);
+                                    proceedWithGeneration(topic, count, fastMode, difficulty);
                                 }}
                                 onCancel={() => setActiveTab(null)}
                                 userRemaining={userRemaining}
                                 userLimit={userLimit}
                                 hasApiKey={hasApiKey}
+                                isComic={profileData?.equipped_theme === 'theme_comic_manga'}
                             />
                         </div>
                     ) : (
