@@ -273,12 +273,12 @@ export function useUserProgress() {
       if (ids.length === 0) return;
 
       // Optimistic UI Update
-      let currentLessons = [...completedLessons];
+      const currentLessons = [...completedLessons];
       const newIdsToAdd = ids.filter((id) => !currentLessons.includes(id));
 
       const newLessons = [...currentLessons, ...newIdsToAdd];
 
-      let newScores = { ...lessonScores };
+      const newScores = { ...lessonScores };
       if (score !== undefined && !Array.isArray(lessonId)) {
         newScores[lessonId as string] = score;
       }

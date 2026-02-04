@@ -233,6 +233,8 @@
                 "openQuiz": "Làm quiz",
                 "questions": "câu hỏi"
             },
+            "showMore": "Xem thêm",
+            "showLess": "Thu gọn",
             "suggestions": {
                 "python": "Python Cơ bản",
                 "marketing": "Marketing Căn bản"
@@ -436,19 +438,6 @@
         "arts": "Nghệ thuật",
         "artsDesc": "Hội họa, điêu khắc, kiến trúc",
         "music": "Âm nhạc",
-        "musicDesc": "Âm nhạc, nhạc cụ, ca sĩ"
-    },
-    "difficulty": {
-        "easy": "Dễ",
-        "medium": "Trung bình",
-        "hard": "Khó"
-    },
-    "quiz": {
-        "noDescription": "Không có mô tả",
-        "question": "Câu {{number}}",
-        "of": "/ {{total}}",
-        "nextButton": "Câu tiếp theo",
-        "submitButton": "Nộp bài",
         "results": "Kết quả",
         "score": "Điểm số",
         "correct": "Đúng",
@@ -1146,6 +1135,9 @@
     "manualQuiz": {
         "title": "Tạo Quiz Thủ Công",
         "subtitle": "Nhập câu hỏi và đáp án trực tiếp",
+        "checkAI": "Kiểm tra AI",
+        "autoFill": "Tự động điền",
+        "quickAdd": "Thêm nhanh +5",
         "quizTitle": "Tiêu đề Quiz",
         "titlePlaceholder": "VD: Ôn tập Lịch sử Việt Nam",
         "description": "Mô tả (tuỳ chọn)",
@@ -1180,12 +1172,17 @@
             "minQuestions": "Cần ít nhất 1 câu hỏi",
             "minQuestionsDesc": "Quiz phải có ít nhất 1 câu hỏi",
             "validationFailed": "Lỗi nhập liệu",
+            "autoFillTitleRequired": "Vui lòng nhập tên Quiz để Auto Fill hoạt động tốt nhất",
+            "autoFillQuestionRequired": "Vui lòng nhập ít nhất một câu hỏi để Auto Fill",
+            "quickAddFailed": "Thêm nhanh thất bại",
             "fixErrors": "Vui lòng kiểm tra và sửa các lỗi",
             "saveFailed": "Lưu quiz thất bại"
         },
         "success": {
             "title": "Đã tạo quiz thành công!",
-            "description": "Quiz với {{count}} câu hỏi đã được lưu"
+            "description": "Quiz với {{count}} câu hỏi đã được lưu",
+            "quickAdd": "Đã thêm nhanh câu hỏi",
+            "quickAddDesc": "Đã thêm {{count}} câu hỏi mới."
         }
     },
     "share": {

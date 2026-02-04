@@ -74,7 +74,7 @@ export function useFlashcardImagePreloader({
       const frontImg = new Image();
       frontImg.onload = () => {
         // Log for debugging preload timing
-        // eslint-disable-next-line no-console
+         
         console.log("preloader: front image loaded", {
           index,
           path: frontImagePath,
@@ -83,7 +83,7 @@ export function useFlashcardImagePreloader({
         checkComplete();
       };
       frontImg.onerror = () => {
-        // eslint-disable-next-line no-console
+         
         console.log("preloader: front image error", {
           index,
           path: frontImagePath,
@@ -98,7 +98,7 @@ export function useFlashcardImagePreloader({
       const backImg = new Image();
       backImg.onload = () => {
         // Log for debugging preload timing
-        // eslint-disable-next-line no-console
+         
         console.log("preloader: back image loaded", {
           index,
           path: backImagePath,
@@ -107,7 +107,7 @@ export function useFlashcardImagePreloader({
         checkComplete();
       };
       backImg.onerror = () => {
-        // eslint-disable-next-line no-console
+         
         console.log("preloader: back image error", {
           index,
           path: backImagePath,
@@ -150,12 +150,12 @@ export function useFlashcardImagePreloader({
             return preloadImage(idx)
               .then(() => {
                 setLoadedImages((prev) => new Set(prev).add(idx));
-                // eslint-disable-next-line no-console
+                 
                 console.log("preloader: batch loaded", idx);
               })
               .catch(() => {
                 setErrorImages((prev) => new Set(prev).add(idx));
-                // eslint-disable-next-line no-console
+                 
                 console.log("preloader: batch error", idx);
               });
           })

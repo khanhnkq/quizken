@@ -37,13 +37,29 @@ export function ChatInput({
     if (!message.trim() || isSending || !isAuthenticated) return;
 
     setIsSending(true);
-    const success = await onSendMessage(message, replyingTo?.id);
-    if (success) {
-      setMessage("");
-      onCancelReply?.();
-      textareaRef.current?.focus();
+    try {
+      // Content Moderation Check
+      const { checkToxicContent } = await import("@/lib/utils/badwords");
+      const toxicWord = checkToxicContent(message);
+      if (toxicWord) {
+        const { toast } = await import("@/hooks/use-toast");
+        toast({
+          title: "⚠️ Nội dung không phù hợp",
+          description: `Tin nhắn của bạn chứa từ ngữ không phù hợp (${toxicWord}). Hãy giữ phòng chat văn minh nhé! ✨`,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const success = await onSendMessage(message, replyingTo?.id);
+      if (success) {
+        setMessage("");
+        onCancelReply?.();
+        textareaRef.current?.focus();
+      }
+    } finally {
+      setIsSending(false);
     }
-    setIsSending(false);
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {

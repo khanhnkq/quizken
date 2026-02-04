@@ -75,8 +75,12 @@ export function ChatMessage({
     }
   }
 
+  const [isExpanded, setIsExpanded] = useState(false);
+  const CHAR_LIMIT = 300;
+
   const renderContent = () => {
     if (parsed?.type === "streak_share" && parsed.data) {
+      // ... (rest of streak_share logic)
       let { streak, slogan, imageId } = parsed.data;
 
       // Fallback for old messages: Generate consistent imageId from message.id
@@ -266,10 +270,28 @@ export function ChatMessage({
       );
     }
 
+    const isLongMessage = message.content.length > CHAR_LIMIT;
+    const displayContent = isLongMessage && !isExpanded 
+      ? message.content.substring(0, CHAR_LIMIT) + "..." 
+      : message.content;
+
     return (
-      <p className="text-sm whitespace-pre-wrap break-words">
-        {message.content}
-      </p>
+      <div className="flex flex-col gap-1">
+        <p className="text-sm whitespace-pre-wrap break-words">
+          {displayContent}
+        </p>
+        {isLongMessage && (
+          <button 
+            onClick={() => setIsExpanded(!isExpanded)}
+            className={cn(
+              "text-xs font-bold mt-1 self-start hover:underline opacity-80",
+              isOwnMessage ? "text-white" : "text-primary"
+            )}
+          >
+            {isExpanded ? t("chat.showLess", "Thu gọn") : t("chat.showMore", "Xem thêm")}
+          </button>
+        )}
+      </div>
     );
   };
 

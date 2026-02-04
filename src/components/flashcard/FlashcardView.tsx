@@ -84,7 +84,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
       }
 
       // Debug log
-      // eslint-disable-next-line no-console
+       
       console.log("flashcard: waiting for image before navigate", {
         targetIndex,
       });
@@ -97,7 +97,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
         elapsed += intervalMs;
         if (loadedImages.has(targetIndex) || elapsed >= maxWait) {
           window.clearInterval(interval);
-          // eslint-disable-next-line no-console
+           
           console.log("flashcard: proceeding navigation", {
             targetIndex,
             elapsed,

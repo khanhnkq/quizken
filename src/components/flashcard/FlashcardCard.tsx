@@ -79,7 +79,7 @@ export const FlashcardCard: React.FC<FlashcardCardProps> = ({
 
   // Debug log after image path calculation to avoid referencing uninitialized variables
   React.useEffect(() => {
-    // eslint-disable-next-line no-console
+     
     console.log("card: render", {
       currentIndex,
       isImagePreloaded,

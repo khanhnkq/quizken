@@ -232,6 +232,8 @@
                 "openQuiz": "Open quiz",
                 "questions": "questions"
             },
+            "showMore": "Read more",
+            "showLess": "Show less",
             "suggestions": {
                 "python": "Python Basics",
                 "marketing": "Marketing 101"
@@ -1137,6 +1139,9 @@
     "manualQuiz": {
         "title": "Manual Quiz Creator",
         "subtitle": "Enter questions and answers directly",
+        "checkAI": "Check AI",
+        "autoFill": "Auto Fill",
+        "quickAdd": "Quick Add +5",
         "quizTitle": "Quiz Title",
         "titlePlaceholder": "E.g., Vietnam History Review",
         "description": "Description (optional)",
@@ -1171,13 +1176,18 @@
             "minQuestions": "Need at least 1 question",
             "minQuestionsDesc": "Quiz must have at least 1 question",
             "validationFailed": "Validation Error",
+            "autoFillTitleRequired": "Quiz title is required for Auto Fill",
+            "autoFillQuestionRequired": "Please enter at least one question to Auto Fill",
+            "quickAddFailed": "Quick Add Failed",
             "fixErrors": "Please check and fix the errors",
             "saveFailed": "Failed to save quiz"
         },
         "success": {
             "title": "Quiz created successfully!",
             "updated": "Quiz updated successfully!",
-            "description": "Quiz with {{count}} questions has been saved"
+            "description": "Quiz with {{count}} questions has been saved",
+            "quickAdd": "Quick Add Complete",
+            "quickAddDesc": "Added {{count}} new questions."
         }
     },
     "share": {

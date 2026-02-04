@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "react-i18next";
-import { Plus, Trash2, Check, X, GripVertical, Sparkles, ArrowLeft, PenLine, Image as ImageIcon, Loader2, Bot } from "lucide-react";
+import { Plus, Trash2, Check, X, GripVertical, Sparkles, ArrowLeft, PenLine, Image as ImageIcon, Loader2, Bot, Lightbulb, Zap, Wand2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { uploadImage } from "@/lib/cloudinary";
@@ -88,6 +89,8 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
   // AI Validation State
   const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
   const [isChecking, setIsChecking] = useState(false);
+  const [isGeneratingExplanations, setIsGeneratingExplanations] = useState(false);
+  const [isGeneratingQuestions, setIsGeneratingQuestions] = useState(false);
 
   // Fetch quiz data if handling edit mode
   React.useEffect(() => {
@@ -157,7 +160,7 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
   }, [questions.length, toast, t]);
 
   // Update question text
-  const updateQuestion = useCallback((index: number, field: keyof Question, value: any) => {
+  const updateQuestion = useCallback((index: number, field: keyof Question, value: Question[keyof Question]) => {
     setQuestions(prev => prev.map((q, i) => 
       i === index ? { ...q, [field]: value } : q
     ));
@@ -336,6 +339,149 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
     }
   };
 
+  // Handle Auto Fill
+  const handleAutoFill = async () => {
+    // Validation
+    if (!title.trim()) {
+       toast({
+         title: t("manualQuiz.errors.validationFailed"),
+         description: t("manualQuiz.errors.autoFillTitleRequired"),
+         variant: "destructive",
+       });
+       return;
+    }
+
+    // Check if there are any questions at all
+    if (questions.length === 0) {
+        toast({
+          title: t("manualQuiz.errors.validationFailed"),
+          description: t("manualQuiz.errors.autoFillQuestionRequired"),
+          variant: "destructive",
+        });
+        return;
+    }
+    
+    // Check if at least one question has content
+    const hasContent = questions.some(q => q.question.trim().length > 0);
+    if (!hasContent) {
+        toast({
+          title: t("manualQuiz.errors.validationFailed"),
+          description: t("manualQuiz.errors.autoFillQuestionRequired"),
+          variant: "destructive",
+        });
+        return;
+    }
+
+    setIsGeneratingExplanations(true);
+    try {
+      // Send current state so AI knows what to fill
+      const payload = questions.map((q, index) => ({
+        index,
+        question: q.question,
+        options: q.options,
+        correctAnswer: q.correctAnswer,
+        explanation: q.explanation
+      }));
+
+      const { data, error } = await supabase.functions.invoke('generate-explanation', {
+        body: { 
+          questions: payload,
+          language: i18n.language 
+        }
+      });
+
+      if (error) throw error;
+
+      if (data && data.results && Array.isArray(data.results)) {
+        setQuestions(prev => {
+          const newQuestions = [...prev];
+          data.results.forEach((item: { index: number, options?: string[], correctAnswer?: number, explanation?: string }) => {
+            if (newQuestions[item.index]) {
+              const q = newQuestions[item.index];
+              // Only overwrite if new data provided
+              newQuestions[item.index] = {
+                ...q,
+                options: (item.options && item.options.length >= 2) ? item.options : q.options,
+                correctAnswer: (typeof item.correctAnswer === 'number') ? item.correctAnswer : q.correctAnswer,
+                explanation: item.explanation || q.explanation
+              };
+            }
+          });
+          return newQuestions;
+        });
+
+        toast({
+          title: "Auto Fill Complete",
+          description: `Generated content for ${data.results.length} questions.`,
+          variant: "success",
+        });
+      }
+
+    } catch (error) {
+      console.error("Auto Fill Failed:", error);
+      toast({
+        title: "Auto Fill Failed",
+        description: (error as Error).message || "Could not generate content.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingExplanations(false);
+    }
+  };
+
+  // Handle Quick Add Questions
+  const handleQuickAddQuestions = async () => {
+    // Validation: Title required
+    if (!title.trim()) {
+        toast({
+          title: t("manualQuiz.errors.validationFailed"),
+          description: t("manualQuiz.errors.autoFillTitleRequired"),
+          variant: "destructive",
+        });
+        return;
+     }
+
+    setIsGeneratingQuestions(true);
+    try {
+        const { data, error } = await supabase.functions.invoke('generate-explanation', {
+            body: { 
+              action: 'generate_questions',
+              topic: title,
+              count: 5,
+              language: i18n.language 
+            }
+        });
+
+        if (error) throw error;
+
+        if (data && data.results && Array.isArray(data.results)) {
+            const newQuestions: Question[] = data.results.map((item: any) => ({
+                question: item.question || "",
+                options: Array.isArray(item.options) ? item.options : ["", "", "", ""],
+                correctAnswer: typeof item.correctAnswer === 'number' ? item.correctAnswer : 0,
+                explanation: item.explanation || ""
+            }));
+
+            setQuestions(prev => [...prev, ...newQuestions]);
+
+            toast({
+                title: t("manualQuiz.success.quickAdd"),
+                description: t("manualQuiz.success.quickAddDesc", { count: newQuestions.length }),
+                variant: "success",
+            });
+        }
+    } catch (error) {
+        console.error("Quick Add Failed:", error);
+        toast({
+            title: t("manualQuiz.errors.quickAddFailed"),
+            description: (error as Error).message || "Could not generate questions.",
+            variant: "destructive",
+        });
+    } finally {
+        setIsGeneratingQuestions(false);
+    }
+  };
+
   // Save quiz
   const handleSave = useCallback(async () => {
     if (!user) {
@@ -459,7 +605,7 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
   const isDialog = variant === "dialog";
 
   return (
-    <div className={cn("flex flex-col", isDialog ? "h-[500px]" : "w-full pb-20")}>
+    <div className={cn("flex flex-col", isDialog ? "h-[500px]" : "w-full pb-32")}>
       {/* Header - Sticky (Only for Dialog) */}
       {isDialog && (
       <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950 dark:to-teal-950 dark:border-slate-800 shrink-0">
@@ -482,33 +628,44 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
           </div>
         </div>
         <div className="flex items-center gap-2">
-           <Button
+          <Button
             variant="outline"
             onClick={handleCheckQuiz}
-            disabled={isChecking || saving}
+            disabled={isChecking || saving || isGeneratingQuestions}
             size="sm"
             className="rounded-full px-3 text-sm border-blue-200 text-blue-700 hover:bg-blue-50 dark:border-blue-800 dark:text-blue-300 dark:hover:bg-blue-900/20"
           >
             {isChecking ? (
-              <Loader2 className="w-4 h-4 animate-spin mr-1" />
+              <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
-              <Bot className="w-4 h-4 mr-1" />
+              <Bot className="w-4 h-4" />
             )}
-            Check AI
+            <span className="hidden sm:inline ml-1">{t("manualQuiz.checkAI")}</span>
+          </Button>
+          <Button
+            variant="outline"
+            onClick={handleAutoFill}
+            disabled={isGeneratingExplanations || saving || isGeneratingQuestions}
+            size="sm"
+            className="rounded-full px-3 text-sm border-purple-200 text-purple-700 hover:bg-purple-50 dark:border-purple-800 dark:text-purple-300 dark:hover:bg-purple-900/20"
+          >
+            {isGeneratingExplanations ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Wand2 className="w-4 h-4" />
+            )}
+            <span className="hidden sm:inline ml-1">{t("manualQuiz.autoFill")}</span>
           </Button>
           <Button 
           onClick={handleSave} 
-          disabled={saving}
+          disabled={saving || isGeneratingQuestions}
           className="rounded-full px-4 text-sm"
           size="sm"
         >
           {saving ? (
             <span className="animate-pulse">{t("common.saving")}</span>
           ) : (
-            <>
-              <themeConfig.saveIcon className="w-4 h-4 mr-1" />
-              {t("manualQuiz.saveQuiz")}
-            </>
+            t("manualQuiz.saveQuiz")
           )}
         </Button>
         </div>
@@ -559,13 +716,30 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
             </CardContent>
           </Card>
 
-          {/* Validation Result area */}
-          {validationResult && (
-             <QuizValidationResult 
-                result={validationResult} 
-                questions={questions}
-             />
-          )}
+          {/* Validation Result Dialog */}
+          <Dialog open={!!validationResult} onOpenChange={(open) => !open && setValidationResult(null)}>
+            <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>{t("validation.report_title")}</DialogTitle>
+                <DialogDescription>
+                  Review the feedback from AI for your quiz.
+                </DialogDescription>
+              </DialogHeader>
+              
+              {validationResult && (
+                 <QuizValidationResult 
+                    result={validationResult} 
+                    questions={questions}
+                 />
+              )}
+              
+              <DialogFooter>
+                 <Button onClick={() => setValidationResult(null)}>
+                   {t("common.close")}
+                 </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
 
           {/* Questions */}
           <div className="space-y-4">
@@ -575,16 +749,25 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
                  <Button
                   variant="outline"
                   onClick={handleCheckQuiz}
-                  disabled={isChecking || saving}
+                  disabled={isChecking || saving || isGeneratingQuestions}
                   size="sm"
-                  className="rounded-full text-blue-700 hover:bg-blue-50 border-blue-200 dark:border-blue-800 dark:text-blue-300 dark:hover:bg-blue-900/20"
                 >
-                  {isChecking ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Bot className="w-4 h-4 mr-1" />}
-                  Check AI
+                   {isChecking ? <Loader2 className="w-4 h-4 animate-spin" /> : <Bot className="w-4 h-4" />}
+                   <span className="hidden sm:inline ml-1">{t("manualQuiz.checkAI")}</span>
                 </Button>
                 <Button variant="outline" size="sm" onClick={addQuestion} disabled={saving || isChecking}>
-                  <Plus className="w-4 h-4 mr-1" />
-                  {t("manualQuiz.addQuestion")}
+                  <Plus className="w-4 h-4" />
+                  <span className="hidden sm:inline ml-1">{t("manualQuiz.addQuestion")}</span>
+                </Button>
+                <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={handleQuickAddQuestions} 
+                    disabled={saving || isChecking || isGeneratingQuestions}
+                    className="border-amber-200 text-amber-700 hover:bg-amber-50 dark:border-amber-800 dark:text-amber-300 dark:hover:bg-amber-900/20"
+                >
+                  {isGeneratingQuestions ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
+                  <span className="hidden sm:inline ml-1">{t("manualQuiz.quickAdd")}</span>
                 </Button>
               </div>
             </div>
@@ -754,42 +937,58 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
       </div>
       {/* Sticky Footer for Page Mode */}
       {!isDialog && (
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-white dark:bg-slate-950 border-t dark:border-slate-800 z-50">
-          <div className="max-w-4xl mx-auto flex items-center justify-between">
-            <div className="flex items-center gap-4">
-                <p className="text-sm text-slate-500 hidden md:block">
-                  {t("manualQuiz.questionsCount", { count: questions.length })}
-                </p>
+        <div className="fixed bottom-0 left-0 right-0 px-4 pt-4 pb-16 bg-white/90 dark:bg-slate-950/90 backdrop-blur-md border-t dark:border-slate-800 z-[1000] shadow-[0_-4px_20px_-4px_rgba(0,0,0,0.1)]">
+          <div className="max-w-7xl mx-auto flex items-center justify-between gap-4 w-full">
+            <div className="flex items-center gap-2 md:gap-3">
                  <Button
                   variant="outline"
                   onClick={handleCheckQuiz}
-                  disabled={isChecking || saving}
-                  className="border-blue-200 text-blue-700 hover:bg-blue-50 dark:border-blue-800 dark:text-blue-300 dark:hover:bg-blue-900/20"
+                  disabled={isChecking || saving || isGeneratingQuestions}
+                  className="border-blue-200 text-blue-700 hover:bg-blue-50 dark:border-blue-800 dark:text-blue-300 dark:hover:bg-blue-900/20 px-3 whitespace-nowrap"
                 >
                   {isChecking ? (
-                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                    <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (
-                    <Bot className="w-4 h-4 mr-2" />
+                    <Bot className="w-4 h-4" />
                   )}
-                  Check AI
+                  <span className="hidden sm:inline ml-2">{t("manualQuiz.checkAI")}</span>
+                </Button>
+                 <Button
+                  variant="outline"
+                  onClick={handleAutoFill}
+                  disabled={isGeneratingExplanations || saving || isGeneratingQuestions}
+                  className="border-purple-200 text-purple-700 hover:bg-purple-50 dark:border-purple-800 dark:text-purple-300 dark:hover:bg-purple-900/20 px-3 whitespace-nowrap"
+                >
+                  {isGeneratingExplanations ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Wand2 className="w-4 h-4" />
+                  )}
+                  <span className="hidden sm:inline ml-2">{t("manualQuiz.autoFill")}</span>
+                </Button>
+                <Button 
+                    variant="outline" 
+                    onClick={handleQuickAddQuestions} 
+                    disabled={saving || isChecking || isGeneratingQuestions}
+                    className="border-amber-200 text-amber-700 hover:bg-amber-50 dark:border-amber-800 dark:text-amber-300 dark:hover:bg-amber-900/20 px-3 whitespace-nowrap"
+                >
+                  {isGeneratingQuestions ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
+                  <span className="hidden sm:inline ml-2">{t("manualQuiz.quickAdd")}</span>
                 </Button>
             </div>
-            <div className="flex items-center gap-3 ml-auto">
-              <Button variant="outline" onClick={onCancel} disabled={saving || isChecking}>
+            <div className="flex items-center gap-2 md:gap-3">
+              <Button variant="outline" onClick={onCancel} disabled={saving || isChecking} className="whitespace-nowrap px-4 md:px-6">
                 {t("common.cancel")}
               </Button>
               <Button 
                 onClick={handleSave} 
                 disabled={saving || isChecking}
-                className="rounded-full px-6 bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/25 transition-all"
+                className="rounded-full px-5 md:px-8 bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/25 transition-all font-bold whitespace-nowrap"
               >
                 {saving ? (
                   <span className="animate-pulse">{t("common.saving")}</span>
                 ) : (
-                  <>
-                    <themeConfig.saveIcon className="w-4 h-4 mr-2" />
-                    {quizId ? t("manualQuiz.updateQuiz") : t("manualQuiz.saveQuiz")}
-                  </>
+                  (quizId ? t("manualQuiz.updateQuiz") : t("manualQuiz.saveQuiz"))
                 )}
               </Button>
             </div>

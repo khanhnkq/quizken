@@ -219,7 +219,7 @@ describe('Concurrency Fixes', () => {
   describe('Multi-Tab Coordination', () => {
     it('should coordinate localStorage writes across tabs', () => {
       const channel = new MockBroadcastChannel('test-channel');
-      let receivedMessages: any[] = [];
+      const receivedMessages: any[] = [];
 
       channel.addEventListener('message', (event) => {
         receivedMessages.push(event.data);
@@ -293,7 +293,7 @@ describe('Concurrency Fixes', () => {
 
     it('should broadcast polling status updates', () => {
       const channel = new MockBroadcastChannel('polling-coordination');
-      let receivedUpdates: any[] = [];
+      const receivedUpdates: any[] = [];
 
       channel.addEventListener('message', (event) => {
         if (event.data.type === 'polling-status') {

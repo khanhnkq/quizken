@@ -114,7 +114,7 @@ export const FlipCard: React.FC<FlipCardProps> = ({
     const needsLoaded = next ? backImageLoaded : frontImageLoaded;
     if (!needsLoaded) {
       // Queue flip and wait for image to load
-      // eslint-disable-next-line no-console
+       
       console.log("FlipCard: queuing flip until image loaded", {
         current: flipped,
         target: next,
