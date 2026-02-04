@@ -127,7 +127,7 @@ export function useQuizGeneration<Quiz = unknown>() {
           // Build the Edge Function URL based on Supabase project URL
           const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
           const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
-          const functionUrl = `${supabaseUrl}/functions/v1/generate-quiz/get-quiz-status?quiz_id=${currentQuizIdRef.current}`;
+          const functionUrl = `${supabaseUrl}/functions/v1/generate-quiz-from-file/get-quiz-status?quiz_id=${currentQuizIdRef.current}`;
 
           // Get current session for auth
           const { data: { session } } = await supabase.auth.getSession();

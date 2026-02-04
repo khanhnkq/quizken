@@ -38,7 +38,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useGenerationPersistence } from "@/hooks/useGenerationPersistence";
 import { ApiKeyErrorDialog } from "./ApiKeyErrorDialog";
-import { Sparkles, PenLine, ArrowLeft, X } from "lucide-react";
+import { FileUploadInterface } from "./FileUploadInterface";
+import { Sparkles, PenLine, ArrowLeft, X, Upload } from "lucide-react";
 import logo from "@/assets/logo/logo.png";
 import { useProfile } from "@/hooks/useProfile";
 import { VietnamMapIcon, VietnamStarIcon, VietnamDrumIcon, VietnamLotusIcon } from "@/components/icons/VietnamIcons";
@@ -48,7 +49,7 @@ import { cn } from "@/lib/utils";
 interface QuickGeneratorDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    initialTab?: "ai" | "manual" | null;
+    initialTab?: "ai" | "manual" | "file" | null;
 }
 
 export function QuickGeneratorDialog({ open, onOpenChange, initialTab = null }: QuickGeneratorDialogProps) {
@@ -115,7 +116,7 @@ export function QuickGeneratorDialog({ open, onOpenChange, initialTab = null }: 
     const [currentQuizId, setCurrentQuizId] = useState<string | null>(null);
     const [showApiKeyErrorDialog, setShowApiKeyErrorDialog] = useState(false);
     const [apiKeyError, setApiKeyError] = useState("");
-    const [activeTab, setActiveTab] = useState<"ai" | "manual" | null>(initialTab);
+    const [activeTab, setActiveTab] = useState<"ai" | "manual" | "file" | null>(initialTab);
 
     // Update activeTab when dialog opens with specific tab
     useEffect(() => {
@@ -682,6 +683,40 @@ export function QuickGeneratorDialog({ open, onOpenChange, initialTab = null }: 
                                         </svg>
                                     </div>
                                 </button>
+                                
+                                {/* File Upload Mode Row */}
+                                <button
+                                    onClick={() => setActiveTab("file")}
+                                    className={cn(
+                                        "w-full flex items-center gap-4 px-4 py-4 transition-colors text-left group border-t border-gray-100 dark:border-slate-800",
+                                        profileData?.equipped_theme === 'theme_comic_manga'
+                                            ? "hover:bg-blue-400/10 border-black"
+                                            : "hover:bg-gray-50 dark:hover:bg-slate-800"
+                                    )}
+                                >
+                                    <div className="relative shrink-0">
+                                        <div className={cn(
+                                            "w-12 h-12 rounded-full flex items-center justify-center border transition-colors",
+                                            profileData?.equipped_theme === 'theme_comic_manga'
+                                                ? "bg-blue-400 border-2 border-black"
+                                                : "bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-blue-900 dark:to-cyan-900 border-transparent dark:border-white/10 group-hover:dark:border-white/20"
+                                        )}>
+                                            <Upload className={cn("w-6 h-6", profileData?.equipped_theme === 'theme_comic_manga' ? "text-white" : "text-blue-600 dark:text-blue-300")} />
+                                        </div>
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center justify-between">
+                                            <h3 className="font-semibold text-gray-900 dark:text-gray-100 group-hover:text-primary transition-colors">Upload File (PDF/Image)</h3>
+                                            <span className="text-xs text-blue-600 dark:text-blue-300 font-medium bg-blue-100 dark:bg-blue-900/50 px-2 py-0.5 rounded-full border border-blue-200 dark:border-blue-700/50">BETA</span>
+                                        </div>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400 truncate mt-0.5">Generate quiz from study materials</p>
+                                    </div>
+                                    <div className="shrink-0 text-gray-400 dark:text-slate-600 group-hover:text-primary dark:group-hover:text-primary transition-colors">
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </div>
+                                </button>
                             </div>
                         </div>
                     ) : activeTab === "ai" ? (
@@ -701,9 +736,20 @@ export function QuickGeneratorDialog({ open, onOpenChange, initialTab = null }: 
                                 isComic={profileData?.equipped_theme === 'theme_comic_manga'}
                             />
                         </div>
+                    ) : activeTab === "file" ? (
+                        /* File Upload Interface */
+                        <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-2 border-primary/10 dark:border-primary/20 shadow-2xl rounded-3xl overflow-hidden h-[600px] flex flex-col">
+                            <FileUploadInterface
+                                onComplete={(quizId) => {
+                                    onOpenChange(false);
+                                    navigate(`/quiz/play/${quizId}`);
+                                }}
+                                onCancel={() => setActiveTab(null)}
+                                isComic={profileData?.equipped_theme === 'theme_comic_manga'}
+                            />
+                        </div>
                     ) : (
                         /* Manual Quiz Editor */
-
                         <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-2 border-primary/10 dark:border-primary/20 shadow-2xl rounded-3xl overflow-hidden">
                             <ManualQuizEditor
                                 onComplete={(quizId) => {

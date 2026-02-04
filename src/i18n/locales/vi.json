@@ -796,15 +796,7 @@
         "reasons": {
             "invalid": "API Key không hợp lệ hoặc đã hết hạn",
             "noAccess": "API Key không có quyền truy cập Gemini AI",
-            "limitReached": "Đã đạt giới hạn sử dụng API",
-            "network": "Lỗi kết nối mạng"
-        },
-        "fixTitle": "Cách khắc phục:",
-        "steps": {
-            "login": "Đăng nhập để sử dụng API key cá nhân",
-            "settings": "Truy cập API Settings trong Navbar",
-            "newKey": "Lấy API key mới từ",
-            "enableAccess": "Kích hoạt quyền truy cập Gemini AI"
+            "limitReached": "Đã đạt giới hạn sử dụng API"
         },
         "buttons": {
             "retry": "Thử lại sau",
@@ -1252,6 +1244,20 @@
             "title1": "Premium",
             "title1Highlight": "Theme",
             "subtitle": "Trải nghiệm giao diện động chất lượng cao."
+        }
+    },
+    "validation": {
+        "report_title": "Báo cáo kiểm duyệt",
+        "valid_title": "Tuyệt vời!",
+        "valid_desc": "Không tìm thấy vấn đề nào.",
+        "suggestion": "Gợi ý",
+        "question": "Câu hỏi",
+        "types": {
+            "fact": "Độ chính xác",
+            "grammar": "Chính tả & Ngữ pháp",
+            "safety": "An toàn nội dung",
+            "suggestion": "Gợi ý",
+            "logic": "Logic"
         }
     }
 }

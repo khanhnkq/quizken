@@ -792,17 +792,6 @@
             "noAccess": "API Key does not have Gemini AI access",
             "limitReached": "API usage limit reached",
             "network": "Network connection error"
-        },
-        "fixTitle": "How to fix:",
-        "steps": {
-            "login": "Log in to use personal API key",
-            "settings": "Go to API Settings in Navbar",
-            "newKey": "Get a new API key from",
-            "enableAccess": "Enable Gemini AI access"
-        },
-        "buttons": {
-            "retry": "Try again later",
-            "update": "Update API Key"
         }
     },
     "quotaDialog": {
@@ -1247,6 +1236,20 @@
             "title1": "Premium",
             "title1Highlight": "Theme",
             "subtitle": "Experience high-quality dynamic themes."
+        }
+    },
+    "validation": {
+        "report_title": "Validation Report",
+        "valid_title": "All Good!",
+        "valid_desc": "No issues found.",
+        "suggestion": "Suggestion",
+        "question": "Question",
+        "types": {
+            "fact": "Factual Accuracy",
+            "grammar": "Spelling & Grammar",
+            "safety": "Safety",
+            "suggestion": "Suggestion",
+            "logic": "Logic"
         }
     }
 }

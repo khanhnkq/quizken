@@ -10,7 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "react-i18next";
-import { Plus, Trash2, Check, X, GripVertical, Sparkles, ArrowLeft, PenLine, Image as ImageIcon, Loader2 } from "lucide-react";
+import { Plus, Trash2, Check, X, GripVertical, Sparkles, ArrowLeft, PenLine, Image as ImageIcon, Loader2, Bot } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { uploadImage } from "@/lib/cloudinary";
@@ -18,6 +18,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { VietnamMapIcon, VietnamStarIcon, VietnamDrumIcon, VietnamLotusIcon } from "@/components/icons/VietnamIcons";
 import { NeonBoltIcon, NeonCyberSkullIcon, PastelCloudIcon, PastelHeartIcon, ComicPowIcon, ComicBoomIcon } from "@/components/icons/ThemeIcons";
 import type { Question, Quiz } from "@/types/quiz";
+import QuizValidationResult, { ValidationResult } from "./QuizValidationResult";
 
 interface ManualQuizEditorProps {
   onComplete?: (quizId: string) => void;
@@ -27,7 +28,7 @@ interface ManualQuizEditorProps {
 }
 
 export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", quizId }: ManualQuizEditorProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { toast } = useToast();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -83,6 +84,10 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
   const [saving, setSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState<number | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  
+  // AI Validation State
+  const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
+  const [isChecking, setIsChecking] = useState(false);
 
   // Fetch quiz data if handling edit mode
   React.useEffect(() => {
@@ -259,6 +264,78 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
     return Object.keys(newErrors).length === 0;
   }, [title, questions, t]);
 
+  // Perform AI Validation
+  const performAiCheck = useCallback(async (): Promise<ValidationResult | null> => {
+    setIsChecking(true);
+    setValidationResult(null);
+
+    try {
+      const quizPayload = {
+        title,
+        description,
+        questions: questions.map(q => ({
+          question: q.question,
+          options: q.options,
+          correctAnswer: q.correctAnswer,
+          explanation: q.explanation
+        })),
+        language: i18n.language // Get current language from i18n
+      };
+
+      const { data, error } = await supabase.functions.invoke('check-quiz-content', {
+        body: { quiz: quizPayload }
+      });
+
+      if (error) throw error;
+
+      setValidationResult(data);
+      return data;
+
+    } catch (error) {
+      console.error("AI Check Failed:", error);
+      toast({
+        title: "AI Check Failed",
+        description: (error as Error).message || "Could not validate quiz.",
+        variant: "destructive",
+      });
+      return null;
+    } finally {
+      setIsChecking(false);
+    }
+  }, [title, description, questions, i18n.language, toast]);
+
+  // Handle AI Check Button Click
+  const handleCheckQuiz = async () => {
+    if (!validationResult) {
+       if (!validate()) {
+         toast({
+           title: t("manualQuiz.errors.validationFailed"),
+           description: "Please fix basic errors before checking with AI.",
+           variant: "destructive",
+         });
+         return;
+       }
+    }
+
+    const result = await performAiCheck();
+    
+    if (result) {
+      if (result.isValid && (!result.issues || result.issues.length === 0)) {
+         toast({
+            title: "AI Check Complete",
+            description: "No issues found!",
+            variant: "success",
+         });
+      } else {
+         toast({
+            title: "AI Check Complete",
+            description: `Found ${result.issues?.length || 0} potential issues.`,
+            variant: "default",
+         });
+      }
+    }
+  };
+
   // Save quiz
   const handleSave = useCallback(async () => {
     if (!user) {
@@ -282,6 +359,31 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
     setSaving(true);
 
     try {
+      // 1. Enforce AI Validation
+      let currentValidation = validationResult;
+      
+      // If never checked, or we want to force re-check (safer)
+      // Ideally we force check to ensure data hasn't changed since last check. 
+      // For now, let's FORCE check every time on save to be safe as per request.
+      currentValidation = await performAiCheck();
+
+      if (!currentValidation) {
+        // AI Check failed (network error etc), abort save
+        setSaving(false);
+        return; 
+      }
+
+      if (!currentValidation.isValid) {
+        toast({
+          title: "Validation Failed",
+          description: "Please fix the issues reported by AI before saving.",
+          variant: "destructive",
+        });
+        setSaving(false);
+        return; // BLOCK SAVE
+      }
+
+      // 2. Proceed with Save if Valid
       // Clean questions (remove empty options)
       const cleanedQuestions = questions.map(q => ({
         question: q.question.trim(),
@@ -352,7 +454,7 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
     } finally {
       setSaving(false);
     }
-  }, [user, validate, questions, title, description, toast, t, onComplete, navigate]);
+  }, [user, validate, questions, title, description, toast, t, onComplete, navigate, isPublic, quizId, performAiCheck, validationResult]);
 
   const isDialog = variant === "dialog";
 
@@ -379,7 +481,22 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
             <p className="text-xs text-gray-500 dark:text-gray-400">{t("manualQuiz.subtitle")}</p>
           </div>
         </div>
-        <Button 
+        <div className="flex items-center gap-2">
+           <Button
+            variant="outline"
+            onClick={handleCheckQuiz}
+            disabled={isChecking || saving}
+            size="sm"
+            className="rounded-full px-3 text-sm border-blue-200 text-blue-700 hover:bg-blue-50 dark:border-blue-800 dark:text-blue-300 dark:hover:bg-blue-900/20"
+          >
+            {isChecking ? (
+              <Loader2 className="w-4 h-4 animate-spin mr-1" />
+            ) : (
+              <Bot className="w-4 h-4 mr-1" />
+            )}
+            Check AI
+          </Button>
+          <Button 
           onClick={handleSave} 
           disabled={saving}
           className="rounded-full px-4 text-sm"
@@ -394,6 +511,7 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
             </>
           )}
         </Button>
+        </div>
       </div>
       )}
 
@@ -411,6 +529,7 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder={t("manualQuiz.titlePlaceholder")}
                   className={cn(errors.title && "border-red-500")}
+                  disabled={saving || isChecking}
                 />
                 {errors.title && <p className="text-xs text-red-500 mt-1">{errors.title}</p>}
               </div>
@@ -422,6 +541,7 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder={t("manualQuiz.descriptionPlaceholder")}
                   rows={2}
+                  disabled={saving || isChecking}
                 />
               </div>
 
@@ -439,14 +559,34 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
             </CardContent>
           </Card>
 
+          {/* Validation Result area */}
+          {validationResult && (
+             <QuizValidationResult 
+                result={validationResult} 
+                questions={questions}
+             />
+          )}
+
           {/* Questions */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold">{t("manualQuiz.questions")} ({questions.length})</h3>
-              <Button variant="outline" size="sm" onClick={addQuestion}>
-                <Plus className="w-4 h-4 mr-1" />
-                {t("manualQuiz.addQuestion")}
-              </Button>
+              <div className="flex gap-2">
+                 <Button
+                  variant="outline"
+                  onClick={handleCheckQuiz}
+                  disabled={isChecking || saving}
+                  size="sm"
+                  className="rounded-full text-blue-700 hover:bg-blue-50 border-blue-200 dark:border-blue-800 dark:text-blue-300 dark:hover:bg-blue-900/20"
+                >
+                  {isChecking ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Bot className="w-4 h-4 mr-1" />}
+                  Check AI
+                </Button>
+                <Button variant="outline" size="sm" onClick={addQuestion} disabled={saving || isChecking}>
+                  <Plus className="w-4 h-4 mr-1" />
+                  {t("manualQuiz.addQuestion")}
+                </Button>
+              </div>
             </div>
 
             {questions.map((q, qIndex) => (
@@ -462,6 +602,7 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
                         placeholder={t("manualQuiz.questionPlaceholder")}
                         className={cn(errors[`q${qIndex}`] && "border-red-500")}
                         rows={2}
+                        disabled={saving || isChecking}
                       />
                       {errors[`q${qIndex}`] && <p className="text-xs text-red-500 mt-1">{errors[`q${qIndex}`]}</p>}
                     </div>
@@ -470,6 +611,7 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
                       size="icon"
                       onClick={() => removeQuestion(qIndex)}
                       className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/20"
+                      disabled={saving || isChecking}
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
@@ -490,13 +632,14 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
                                         className="hidden" 
                                         accept="image/*"
                                         onChange={(e) => e.target.files?.[0] && handleImageUpload(e.target.files[0], qIndex)}
-                                        disabled={uploadingImage === qIndex}
+                                        disabled={uploadingImage === qIndex || saving || isChecking}
                                     />
                                 </label>
                                 <button 
                                     onClick={() => updateQuestion(qIndex, "image", null)}
                                     className="p-2 bg-white rounded-full hover:bg-red-50 text-red-500 transition-colors"
                                     title={t("manualQuiz.removeImage")}
+                                    disabled={saving || isChecking}
                                 >
                                     <Trash2 className="w-4 h-4" />
                                 </button>
@@ -539,9 +682,11 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
                             "w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all",
                             q.correctAnswer === optIndex
                               ? "bg-green-500 border-green-500 text-white"
-                              : "border-gray-300 dark:border-slate-600 hover:border-green-400 dark:hover:border-green-400 text-gray-400 dark:text-slate-400"
+                              : "border-gray-300 dark:border-slate-600 hover:border-green-400 dark:hover:border-green-400 text-gray-400 dark:text-slate-400",
+                            (saving || isChecking) && "opacity-50 cursor-not-allowed"
                           )}
                           title={t("manualQuiz.markCorrect")}
+                          disabled={saving || isChecking}
                         >
                           {q.correctAnswer === optIndex && <Check className="w-4 h-4" />}
                         </button>
@@ -550,6 +695,7 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
                           onChange={(e) => updateOption(qIndex, optIndex, e.target.value)}
                           placeholder={t("manualQuiz.optionPlaceholder", { num: optIndex + 1 })}
                           className="flex-1"
+                          disabled={saving || isChecking}
                         />
                         {q.options.length > 2 && (
                           <Button
@@ -557,6 +703,7 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
                             size="icon"
                             onClick={() => removeOption(qIndex, optIndex)}
                             className="text-gray-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400"
+                            disabled={saving || isChecking}
                           >
                             <X className="w-4 h-4" />
                           </Button>
@@ -569,6 +716,7 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
                         size="sm"
                         onClick={() => addOption(qIndex)}
                         className="text-gray-500"
+                        disabled={saving || isChecking}
                       >
                         <Plus className="w-3 h-3 mr-1" />
                         {t("manualQuiz.addOption")}
@@ -585,6 +733,7 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
                       value={q.explanation || ""}
                       onChange={(e) => updateQuestion(qIndex, "explanation", e.target.value)}
                       placeholder={t("manualQuiz.explanationPlaceholder")}
+                      disabled={saving || isChecking}
                     />
                   </div>
                 </CardContent>
@@ -595,6 +744,7 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
               variant="outline" 
               className="w-full border-dashed border-2 py-8 text-slate-500 dark:text-slate-400 dark:border-slate-700 hover:text-primary hover:border-primary hover:bg-primary/5 dark:hover:bg-primary/10 transition-all mt-4"
               onClick={addQuestion}
+              disabled={saving || isChecking}
             >
               <Plus className="w-5 h-5 mr-2" />
               {t("manualQuiz.addQuestion")}
@@ -606,16 +756,31 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
       {!isDialog && (
         <div className="fixed bottom-0 left-0 right-0 p-4 bg-white dark:bg-slate-950 border-t dark:border-slate-800 z-50">
           <div className="max-w-4xl mx-auto flex items-center justify-between">
-            <p className="text-sm text-slate-500 hidden md:block">
-              {t("manualQuiz.questionsCount", { count: questions.length })}
-            </p>
+            <div className="flex items-center gap-4">
+                <p className="text-sm text-slate-500 hidden md:block">
+                  {t("manualQuiz.questionsCount", { count: questions.length })}
+                </p>
+                 <Button
+                  variant="outline"
+                  onClick={handleCheckQuiz}
+                  disabled={isChecking || saving}
+                  className="border-blue-200 text-blue-700 hover:bg-blue-50 dark:border-blue-800 dark:text-blue-300 dark:hover:bg-blue-900/20"
+                >
+                  {isChecking ? (
+                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                  ) : (
+                    <Bot className="w-4 h-4 mr-2" />
+                  )}
+                  Check AI
+                </Button>
+            </div>
             <div className="flex items-center gap-3 ml-auto">
-              <Button variant="outline" onClick={onCancel} disabled={saving}>
+              <Button variant="outline" onClick={onCancel} disabled={saving || isChecking}>
                 {t("common.cancel")}
               </Button>
               <Button 
                 onClick={handleSave} 
-                disabled={saving}
+                disabled={saving || isChecking}
                 className="rounded-full px-6 bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/25 transition-all"
               >
                 {saving ? (
