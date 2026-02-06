@@ -91,7 +91,14 @@ export function ChatInput({
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      handleSend();
+      if (showSuggestions) {
+        // If suggestions are shown, Enter selects the first one (Quít Quít)
+        insertMention("Quít Quít");
+      } else {
+        handleSend();
+      }
+    } else if (e.key === "Escape" && showSuggestions) {
+      setShowSuggestions(false);
     }
   };
 
