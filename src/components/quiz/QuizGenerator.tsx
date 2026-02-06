@@ -877,10 +877,7 @@ const QuizGenerator = () => {
 
     // 4. Determine Params (handling pending confirmation state)
     // 4. Determine Params (handling pending confirmation state)
-    let promptToUse = pendingGenerate?.prompt || prompt;
-    if (fastMode) {
-      promptToUse += " (Optimization: Generate concise questions and brief explanations to maximize speed. Keep it short and direct.)";
-    }
+    const promptToUse = pendingGenerate?.prompt || prompt;
     const countToUse = pendingGenerate?.questionCount || questionCount;
     setPendingGenerate(null);
 
@@ -917,7 +914,8 @@ const QuizGenerator = () => {
         questionCount: parseInt(countToUse),
         idempotencyKey,
         language: i18n.language,
-        difficulty: difficulty, // Add difficulty
+        difficulty: difficulty,
+        fastMode: fastMode,
       };
 
       console.log("▶️ Starting quiz generation request...");

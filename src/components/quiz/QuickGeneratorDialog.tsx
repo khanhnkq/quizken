@@ -355,11 +355,7 @@ export function QuickGeneratorDialog({ open, onOpenChange, initialTab = null }: 
         const activeCount = overrideCount ?? questionCount;
 
         // Apply Fast Mode prompt optimization if enabled
-        let promptToSend = activePrompt;
-        if (overrideFastMode) {
-             promptToSend += " (Optimization: Generate concise questions and brief explanations to maximize speed. Keep it short and direct.)";
-        }
-
+        const promptToSend = activePrompt;
         console.log(`[QuickGenerator] Proceeding with: prompt="${promptToSend}", count=${activeCount}, difficulty=${overrideDifficulty}`);
 
         const isValid = validatePrompt(activePrompt);
@@ -419,6 +415,7 @@ export function QuickGeneratorDialog({ open, onOpenChange, initialTab = null }: 
                     idempotencyKey,
                     language: i18n.language,
                     difficulty: overrideDifficulty || "mixed",
+                    fastMode: overrideFastMode ?? false,
                 },
             });
 
