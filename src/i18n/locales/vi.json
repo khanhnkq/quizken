@@ -198,7 +198,13 @@
                 "auth": "Xin visa vào server... 🎫",
                 "limit": "Đếm xem còn bao nhiêu lượt... 🔢",
                 "generate": "AI đang vắt óc suy nghĩ... 🤯",
-                "done": "Xong rồi nè! Triển thôi! 🎉"
+                "parsing": "Đang giải mã kết quả AI... 🔍",
+                "saving": "Đang lưu vào kho kiến thức... 💾",
+                "done": "Xong rồi nè! Triển thôi! 🎉",
+                "starting": "Đang khởi động tiến trình... 🚀",
+                "authenticating": "Đang xác thực bảo mật... 🔒",
+                "limits": "Đang kiểm tra quota... 📊",
+                "ai_generating": "AI đang sáng tạo nội dung... ✨"
             },
             "backgroundNote": "Bạn có thể đóng cửa sổ này, tụi mình sẽ báo khi xong!",
             "cancelButton": "Thôi không tạo nữa",
@@ -330,6 +336,10 @@
             "topics": "Chủ đề",
             "creators": "Người tạo"
         },
+        "viewMode": {
+            "public": "Thư viện chung",
+            "mine": "Của tôi"
+        },
         "search": {
             "placeholder": "Tìm kiếm trong tiêu đề, mô tả, câu hỏi...",
             "clear": "Xóa tìm kiếm",
@@ -447,6 +457,11 @@
         "correctAnswer": "Đáp án đúng",
         "retakeButton": "Làm lại"
     },
+    "difficulty": {
+        "easy": "Dễ",
+        "medium": "Vừa",
+        "hard": "Khó"
+    },
     "quizContent": {
         "defaultDescription": "Trả lời các câu hỏi bên dưới và xem giải thích sau khi chấm điểm",
         "badge": "Bài kiểm tra",
@@ -477,9 +492,14 @@
         "displayError": "Lỗi hiển thị câu hỏi",
         "unknownError": "Lỗi không xác định",
         "answerAll": "Hãy trả lời hết tất cả {{total}} câu hỏi (Đã trả lời {{answered}}/{{total}})",
-        "grade": "Chấm điểm"
+        "grade": "Chấm điểm",
+        "sources": "Nguồn tham khảo"
     },
     "playQuiz": {
+        "generating": {
+            "title": "Đang tạo phép thuật...",
+            "description": "Quít Quít đang tạo quiz cho bạn. Chờ xíu nhé!"
+        },
         "notFound": {
             "title": "Không tìm thấy Quiz",
             "description": "Quiz này có thể đã bị xóa hoặc không công khai."
@@ -488,7 +508,8 @@
         "cancelQuiz": "Hủy bài làm",
         "error": "Lỗi",
         "failedToLoad": "Không thể tải quiz",
-        "quizIdNotFound": "Không tìm thấy ID quiz"
+        "quizIdNotFound": "Không tìm thấy ID quiz",
+        "untitledQuiz": "Bài quiz chưa có tiêu đề"
     },
     "quizDetail": {
         "previewContent": "Xem trước nội dung",
@@ -1256,5 +1277,22 @@
             "suggestion": "Gợi ý",
             "logic": "Logic"
         }
+    },
+    "redeem": {
+        "title": "GIFTCODE",
+        "subtitle": "Nhập mã để nhận thưởng giới hạn",
+        "placeholder": "CODE...",
+        "button": "Đổi Quà Ngay",
+        "processing": "Đang xử lý...",
+        "success": "Thành Công!",
+        "failed": "Thất Bại!",
+        "successToast": "Đổi quà thành công!",
+        "errorSystem": "Lỗi hệ thống",
+        "errorOccurred": "Có lỗi xảy ra, vui lòng thử lại.",
+        "inputRequired": "Vui lòng nhập mã code",
+        "exclusiveRewards": "Phần thưởng độc quyền",
+        "instantDelivery": "Nhận quà ngay lập tức",
+        "back": "Tuyệt vời",
+        "retry": "Thử lại"
     }
 }

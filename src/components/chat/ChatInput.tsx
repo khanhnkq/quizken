@@ -2,6 +2,13 @@ import { useState, useRef, KeyboardEvent } from "react";
 import { Send, LogIn, Share2, Flame, Coins } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Command,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { cn } from "@/lib/utils";
 
 // Add ChatMessage interface if not imported
 import type { ChatMessage } from "@/hooks/useChatMessages";
@@ -31,7 +38,26 @@ export function ChatInput({
 }: ChatInputProps) {
   const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newValue = e.target.value;
+    setMessage(newValue);
+
+    // Simple detection: if the last character is '@' or we are typing after '@'
+    // Regex to match '@' followed by optional characters at the end of the string
+    const match = newValue.match(/@([\p{L}\p{N}_]*)$/u);
+    setShowSuggestions(!!match);
+  };
+
+  const insertMention = (name: string) => {
+    // Replace the query with the full mention
+    const newValue = message.replace(/@([\p{L}\p{N}_]*)$/u, `@${name} `);
+    setMessage(newValue);
+    setShowSuggestions(false);
+    textareaRef.current?.focus();
+  };
 
   const handleSend = async () => {
     if (!message.trim() || isSending || !isAuthenticated) return;
@@ -127,11 +153,32 @@ export function ChatInput({
           );
         })()}
 
-        <div className="flex gap-2 items-end">
+        <div className="flex gap-2 items-end relative">
+          {showSuggestions && (
+            <div className="absolute bottom-full left-0 mb-2 w-64 bg-popover border rounded-md shadow-md z-50 overflow-hidden animate-in fade-in slide-in-from-bottom-2">
+              <Command className="w-full">
+                <CommandList>
+                  <CommandGroup heading="Gợi ý">
+                    <CommandItem
+                      onSelect={() => insertMention("Quít Quít")}
+                      className="cursor-pointer gap-2"
+                    >
+                      <img
+                        src="https://res.cloudinary.com/dgk3boljk/image/upload/v1770347600/user/avatar/jwpbwzeltiowzbaasp5u.webp"
+                        alt="Quít Quít"
+                        className="w-5 h-5 rounded-full object-cover"
+                      />
+                      <span>Quít Quít</span>
+                    </CommandItem>
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </div>
+          )}
           <Textarea
             ref={textareaRef}
             value={message}
-            onChange={(e) => setMessage(e.target.value)}
+            onChange={handleInputChange}
             onKeyDown={handleKeyDown}
             placeholder="Nhập tin nhắn... (Enter để gửi, Shift+Enter để xuống dòng)"
             className="min-h-[44px] max-h-[120px] resize-none"

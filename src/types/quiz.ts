@@ -9,6 +9,10 @@ export interface Question {
   correctAnswer: number;
   explanation?: string;
   image?: string | null;
+  sources?: {
+    title: string;
+    url: string;
+  }[];
 }
 
 export interface Quiz {

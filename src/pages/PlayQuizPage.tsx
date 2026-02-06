@@ -40,6 +40,10 @@ export default function PlayQuizPage() {
     const [showResults, setShowResults] = useState(false);
     const startTimeRef = useRef<number>(Date.now());
 
+    const [status, setStatus] = useState<string>("pending");
+    const [progress, setProgress] = useState<string>("Initializing...");
+    const pollingInterval = useRef<NodeJS.Timeout | null>(null);
+
     // Fetch quiz data and restore progress if available
     useEffect(() => {
         const fetchQuiz = async () => {
@@ -52,7 +56,7 @@ export default function PlayQuizPage() {
             try {
                 const { data, error: fetchError } = await supabase
                     .from("quizzes")
-                    .select("id, title, description, questions, created_at")
+                    .select("id, title, description, questions, created_at, status, progress")
                     .eq("id", quizId)
                     .single();
 
@@ -65,6 +69,23 @@ export default function PlayQuizPage() {
 
                 if (!data) {
                     setError(t('playQuiz.notFound.title'));
+                    setIsLoading(false);
+                    return;
+                }
+
+                setStatus(data.status || "pending");
+                setProgress(data.progress || "Loading...");
+
+                // If processing, don't set quiz yet, just continue polling
+                if (data.status === "pending" || data.status === "processing") {
+                    console.log("Quiz is generating, starting poll...");
+                    setIsLoading(false); // Stop main loading, show progress screen
+                    return;
+                }
+                
+                // If failed
+                if (data.status === "failed") {
+                    setError(data.progress || t('playQuiz.failedToLoad'));
                     setIsLoading(false);
                     return;
                 }
@@ -84,15 +105,12 @@ export default function PlayQuizPage() {
                 setQuiz(quizData);
                 setGlobalQuiz(quizData); // Sync to global store so Generator knows about it
 
-
-
-
                 // Check for saved progress (synchronously from localStorage)
                 const saved = getQuizProgress();
                 if (saved && saved.quizId === quizId) {
                     // Restore saved progress
                     setUserAnswers(saved.userAnswers);
-                    // Use saved startTime, or null if it wasn't set (although legacy saves might have number)
+                    // Use saved startTime, or null if it wasn't set
                     startTimeRef.current = saved.startTime || 0;
                     console.log("✅ Restored quiz progress");
                 } else {
@@ -122,7 +140,53 @@ export default function PlayQuizPage() {
         };
 
         fetchQuiz();
-    }, [quizId]); // Removed savedProgress and saveProgress from dependency to avoid loop
+    }, [quizId]);
+
+    // Polling effect
+    useEffect(() => {
+        if (status === "pending" || status === "processing") {
+            const poll = async () => {
+                const { data } = await supabase
+                    .from("quizzes")
+                    .select("status, progress, questions, title, description, id")
+                    .eq("id", quizId)
+                    .single();
+                
+                if (data) {
+                    setStatus(data.status);
+                    setProgress(data.progress || "Processing...");
+                    if (data.status === "completed") {
+                         // Stop polling and set quiz
+                         // Fix: Trigger a re-fetch or manually set quiz data here
+                         // For simplicity, let's just reload the page or re-call fetch? 
+                         // Better: Set the quiz state directly.
+                         
+                        const questions = Array.isArray(data.questions) ? data.questions : JSON.parse(data.questions as string);
+                        const quizData: Quiz = {
+                            id: data.id,
+                            title: data.title || t('common.untitledQuiz'),
+                            description: data.description || "",
+                            questions: questions as Question[],
+                        };
+                        setQuiz(quizData);
+                        setGlobalQuiz(quizData);
+                        setUserAnswers(new Array(quizData.questions.length).fill(-1));
+                    } else if (data.status === "failed") {
+                        setError(data.progress || "Quiz generation failed");
+                    }
+                }
+            };
+            
+            pollingInterval.current = setInterval(poll, 2000);
+        } else {
+            if (pollingInterval.current) clearInterval(pollingInterval.current);
+        }
+
+        return () => {
+            if (pollingInterval.current) clearInterval(pollingInterval.current);
+        };
+    }, [status, quizId]); // Re-run if status changes (e.g. from pending to processing)
+
 
     // Handle answer selection - save progress
     const handleAnswerSelect = useCallback(
@@ -220,6 +284,30 @@ export default function PlayQuizPage() {
                     <Skeleton className="h-12 w-64 rounded-full" />
                     <Skeleton className="h-96 w-full rounded-[2.5rem]" />
                 </div>
+            </div>
+        );
+    }
+
+    // Generating State
+    if (status === "pending" || status === "processing") {
+        return (
+            <div className="min-h-screen bg-gray-50/50 dark:bg-slate-950 flex flex-col items-center justify-center p-8 space-y-6">
+                 <BackgroundDecorations />
+                 <div className="relative w-32 h-32">
+                    <div className="absolute inset-0 rounded-full border-4 border-gray-200 dark:border-slate-800"></div>
+                    <div className="absolute inset-0 rounded-full border-4 border-primary border-t-transparent animate-spin"></div>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                        <Sparkles className="w-12 h-12 text-primary animate-pulse" />
+                    </div>
+                 </div>
+                 <div className="text-center space-y-2 z-10">
+                     <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-400">
+                        {t('playQuiz.generating.title')}
+                    </h2>
+                    <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto">
+                        {progress ? (t(progress) === progress ? progress : t(progress)) : t('playQuiz.generating.description')}
+                    </p>
+                 </div>
             </div>
         );
     }

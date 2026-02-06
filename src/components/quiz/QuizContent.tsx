@@ -12,7 +12,7 @@ import {
   Clock,
   CircleHelp,
 } from "@/lib/icons";
-import { Share } from "lucide-react";
+import { Share, Link as LinkIcon } from "lucide-react";
 import { BackgroundDecorations } from "@/components/ui/BackgroundDecorations";
 import {
   Card,
@@ -627,6 +627,30 @@ export const QuizContent: React.FC<QuizContentProps> = ({
                               </span>
                               {currentQuestion.explanation}
                             </p>
+
+                            {/* Sources Section */}
+                            {currentQuestion.sources && currentQuestion.sources.length > 0 && (
+                              <div className="mt-3">
+                                <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground block mb-2">
+                                  {t("quizContent.sources", "Nguồn tham khảo")}:
+                                </span>
+                                <div className="flex flex-wrap gap-2">
+                                  {currentQuestion.sources.map((source, idx) => (
+                                    <a
+                                      key={idx}
+                                      href={source.url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-xs bg-secondary/50 hover:bg-secondary text-primary px-2 py-1 rounded-md transition-colors flex items-center gap-1 border border-border/50"
+                                      title={source.title}
+                                    >
+                                      <LinkIcon className="w-3 h-3" />
+                                      <span className="truncate max-w-[150px]">{source.title || source.url}</span>
+                                    </a>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>

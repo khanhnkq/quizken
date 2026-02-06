@@ -75,7 +75,7 @@ export function useQuizGeneration<Quiz = unknown>() {
       currentQuizIdRef.current = quizId;
       setIsPolling(true);
       setStatus("pending");
-      setProgress("Đang chuẩn bị...");
+      setProgress("quizGenerator.generationProgress.steps.starting");
 
       console.log(`[useQuizGeneration] startMonitoring for quizId=${quizId}`);
 

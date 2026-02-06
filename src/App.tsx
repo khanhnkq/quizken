@@ -53,8 +53,6 @@ import { GlobalQuizListener } from "@/components/common/GlobalQuizListener";
 import { CustomCursor } from "@/components/ui/CustomCursor";
 
 
-// GSAP plugins are loaded dynamically in useLayoutEffect to reduce initial bundle size
-
 // Cross-page toast notification receiver
 const ToastBroadcastReceiver = () => {
   useEffect(() => {
@@ -255,6 +253,7 @@ const App = () => {
                 <GlobalCreateButton />
                 <GlobalChatTicker />
                 <GlobalQuizListener />
+
               </BrowserRouter>
               <Analytics />
             </ChatImagesProvider>

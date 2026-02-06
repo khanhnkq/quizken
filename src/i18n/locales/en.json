@@ -197,7 +197,13 @@
                 "auth": "Getting visa for server... 🎫",
                 "limit": "Counting your remaining tries... 🔢",
                 "generate": "AI is brainstorming hard... 🤯",
-                "done": "All done! Let's go! 🎉"
+                "parsing": "Decrypting AI results... 🔍",
+                "saving": "Storing in knowledge repository... 💾",
+                "done": "All done! Let's go! 🎉",
+                "starting": "Starting generation process... 🚀",
+                "authenticating": "Authenticating security... 🔒",
+                "limits": "Checking quota limits... 📊",
+                "ai_generating": "AI is creating content... ✨"
             },
             "backgroundNote": "You can close this window, we'll notify you when done!",
             "cancelButton": "Cancel creation",
@@ -326,6 +332,10 @@
             "quizzes": "Quizzes",
             "topics": "Topics",
             "creators": "Creators"
+        },
+        "viewMode": {
+            "public": "Public Library",
+            "mine": "My Quizzes"
         },
         "search": {
             "placeholder": "Search in title, description, questions...",
@@ -487,9 +497,14 @@
         "displayError": "Error displaying question",
         "unknownError": "Unknown error",
         "answerAll": "Please answer all {{total}} questions ({{answered}}/{{total}} answered)",
-        "grade": "Grade"
+        "grade": "Grade",
+        "sources": "Sources"
     },
     "playQuiz": {
+        "generating": {
+            "title": "Creating Magic...",
+            "description": "Quít Quít is crafting your quiz. Hang tight!"
+        },
         "notFound": {
             "title": "Quiz Not Found",
             "description": "This quiz may have been deleted or is not public."
@@ -498,7 +513,8 @@
         "cancelQuiz": "Cancel Quiz",
         "error": "Error",
         "failedToLoad": "Failed to load quiz",
-        "quizIdNotFound": "Quiz ID not found"
+        "quizIdNotFound": "Quiz ID not found",
+        "untitledQuiz": "Untitled Quiz"
     },
     "quizDetail": {
         "previewContent": "Preview Content",
@@ -1261,5 +1277,22 @@
             "suggestion": "Suggestion",
             "logic": "Logic"
         }
+    },
+    "redeem": {
+        "title": "GIFTCODE",
+        "subtitle": "Enter code to receive limited rewards",
+        "placeholder": "CODE...",
+        "button": "Redeem Now",
+        "processing": "Processing...",
+        "success": "Success!",
+        "failed": "Failed!",
+        "successToast": "Redeemed successfully!",
+        "errorSystem": "System Error",
+        "errorOccurred": "An error occurred, please try again.",
+        "inputRequired": "Please enter a code",
+        "exclusiveRewards": "Exclusive Rewards",
+        "instantDelivery": "Instant Delivery",
+        "back": "Awesome",
+        "retry": "Try again"
     }
 }

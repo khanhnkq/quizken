@@ -31,7 +31,7 @@ export default function RedeemCode({ isEmbedded = false }: RedeemCodeProps) {
         e.preventDefault();
         
         if (!code.trim()) {
-            toast.error("Vui lòng nhập mã code");
+            toast.error(t('redeem.inputRequired'));
             return;
         }
 
@@ -47,7 +47,7 @@ export default function RedeemCode({ isEmbedded = false }: RedeemCodeProps) {
 
             if (data.success) {
                 setResult({ success: true, message: data.message });
-                toast.success("Đổi quà thành công!");
+                toast.success(t('redeem.successToast'));
                 
                 // Fire massive confetti
                 const duration = 3000;
@@ -84,8 +84,8 @@ export default function RedeemCode({ isEmbedded = false }: RedeemCodeProps) {
 
         } catch (err: any) {
             console.error(err);
-            setResult({ success: false, message: "Có lỗi xảy ra, vui lòng thử lại." });
-            toast.error("Lỗi hệ thống");
+            setResult({ success: false, message: t('redeem.errorOccurred') });
+            toast.error(t('redeem.errorSystem'));
         } finally {
             setIsLoading(false);
         }
@@ -157,10 +157,10 @@ export default function RedeemCode({ isEmbedded = false }: RedeemCodeProps) {
 
                             <div className="space-y-2">
                                 <h1 className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-indigo-800 to-slate-900 dark:from-white dark:via-indigo-200 dark:to-indigo-400 tracking-tight">
-                                    GIFTCODE
+                                    {t('redeem.title')}
                                 </h1>
                                 <p className="text-slate-500 dark:text-slate-400 font-medium">
-                                    {t('dashboard.tabs.giftcode_desc', 'Nhập mã để nhận thưởng giới hạn')}
+                                    {t('redeem.subtitle')}
                                 </p>
                             </div>
 
@@ -169,7 +169,7 @@ export default function RedeemCode({ isEmbedded = false }: RedeemCodeProps) {
                                 <div className="relative group">
                                     <div className="absolute -inset-0.5 bg-gradient-to-r from-pink-400 to-purple-400 dark:from-pink-600 dark:to-purple-600 rounded-2xl opacity-50 group-hover:opacity-100 transition duration-200 blur pointer-events-none"></div>
                                     <Input
-                                        placeholder="CODE..."
+                                        placeholder={t('redeem.placeholder')}
                                         value={code}
                                         onChange={(e) => setCode(e.target.value)}
                                         className="relative z-10 w-full h-20 bg-white dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-800 rounded-xl text-center text-3xl font-black text-slate-800 dark:text-white placeholder:text-slate-300 dark:placeholder:text-slate-700 focus:border-purple-500 focus:ring-0 transition-all uppercase tracking-[0.3em] shadow-inner"
@@ -195,12 +195,12 @@ export default function RedeemCode({ isEmbedded = false }: RedeemCodeProps) {
                                         {isLoading ? (
                                             <>
                                                 <Loader2 className="w-6 h-6 animate-spin" />
-                                                Processing...
+                                                {t('redeem.processing')}
                                             </>
                                         ) : (
                                             <>
                                                 <Ticket className="w-6 h-6" />
-                                                {t('actions.redeem', 'Đổi Quà Ngay')}
+                                                {t('redeem.button')}
                                             </>
                                         )}
                                     </span>
@@ -236,14 +236,14 @@ export default function RedeemCode({ isEmbedded = false }: RedeemCodeProps) {
                                             )}
                                         </div>
                                         <h3 className="text-2xl font-black mb-2 uppercase">
-                                            {result.success ? 'Thành Công!' : 'Thất Bại!'}
+                                            {result.success ? t('redeem.success') : t('redeem.failed')}
                                         </h3>
                                         <p className="font-medium opacity-90 break-words">{result.message}</p>
                                         <Button 
                                             onClick={() => setResult(null)}
                                             className="mt-6 w-full bg-slate-900/10 dark:bg-white/20 hover:bg-slate-900/20 dark:hover:bg-white/30 text-current border-0"
                                         >
-                                            {result.success ? 'Tuyệt vời' : 'Thử lại'}
+                                            {result.success ? t('redeem.back') : t('redeem.retry')}
                                         </Button>
                                     </div>
                                 </motion.div>
@@ -255,11 +255,11 @@ export default function RedeemCode({ isEmbedded = false }: RedeemCodeProps) {
 
                 <div className="mt-8 flex justify-center gap-4 text-slate-400 dark:text-slate-500 text-sm font-semibold">
                     <span className="flex items-center gap-2">
-                        <Sparkles className="w-4 h-4" /> Exclusive Rewards
+                        <Sparkles className="w-4 h-4" /> {t('redeem.exclusiveRewards')}
                     </span>
                     <span>•</span>
                     <span className="flex items-center gap-2">
-                        <Zap className="w-4 h-4" /> Instant Delivery
+                        <Zap className="w-4 h-4" /> {t('redeem.instantDelivery')}
                     </span>
                 </div>
 

@@ -546,37 +546,8 @@ const QuizLibrary: React.FC = () => {
             </div>
 
             <div className="container mx-auto max-w-4xl text-center relative z-10">
-              {/* Badge */}
-              <div className="hero-badge inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary font-medium text-sm mx-auto mb-8">
-                <span className="text-lg">✨</span>
-                <span>{t('library.hero.badge')}</span>
-              </div>
+              
 
-              {/* View Mode Toggles */}
-              <div className="flex justify-center mb-8 gap-4">
-                 <Button 
-                   variant={viewMode === 'public' ? 'default' : 'outline'}
-                   onClick={() => { setViewMode('public'); setCurrentPage(1); }}
-                   className="rounded-full px-6"
-                 >
-                   Public Library
-                 </Button>
-                 <Button 
-                   variant={viewMode === 'mine' ? 'default' : 'outline'}
-                   onClick={() => { 
-                      if (!user) {
-                        toast({ title: t("auth.loginRequired"), variant: "warning" });
-                        setShowAuthModal(true);
-                        return;
-                      }
-                      setViewMode('mine'); 
-                      setCurrentPage(1); 
-                   }}
-                   className="rounded-full px-6"
-                 >
-                   My Quizzes
-                 </Button>
-              </div>
 
               <h1 className="hero-title font-heading text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[1.1] md:leading-tight text-foreground drop-shadow-sm mb-6">
                 <span className="relative inline-block">
@@ -600,7 +571,7 @@ const QuizLibrary: React.FC = () => {
 
             <div className="w-full md:container mx-auto max-w-6xl relative z-10">
               {/* Stats - Playful Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6 mb-16">
+              <div className="hidden md:grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6 mb-16">
                 {/* Quizzes Card */}
                 <Card className={cn(
                   "stats-card rounded-3xl border-4 border-primary/20 dark:border-primary/10 bg-gradient-to-br from-green-50 to-white dark:from-green-950/30 dark:to-slate-900/50 backdrop-blur-md shadow-xl transition-all duration-300 group cursor-pointer overflow-hidden",
@@ -666,7 +637,7 @@ const QuizLibrary: React.FC = () => {
               </div>
 
               {/* Search & Filters */}
-              <div className="search-filter-section max-w-4xl mx-auto mb-12 space-y-4 relative z-10">
+              <div className="search-filter-section max-w-5xl mx-auto mb-12 space-y-4 relative z-10">
                 {/* Search Bar */}
                 <div className="relative">
                   <Search className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 h-5 w-5 md:h-8 md:w-8 text-primary/40" />
@@ -697,8 +668,49 @@ const QuizLibrary: React.FC = () => {
                 </div>
 
                 {/* Filters Row */}
-                <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
-                  <div className="flex flex-wrap gap-3 items-center">
+                <div className="flex flex-col lg:flex-row gap-4 items-center lg:items-center justify-between">
+                  <div className="flex flex-wrap lg:flex-nowrap gap-2 md:gap-3 items-center justify-center lg:justify-start w-full lg:w-auto overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0">
+                    {/* View Mode Toggle Group */}
+                    <div className="flex bg-secondary/20 p-1 rounded-[22px] border-4 border-border backdrop-blur-sm">
+                      <Button
+                        variant="ghost"
+                        onClick={() => {
+                          play("toggle");
+                          setViewMode('public');
+                          setCurrentPage(1);
+                        }}
+                        className={cn(
+                          "h-10 rounded-[14px] px-3 md:px-5 font-heading font-bold transition-all duration-300 text-sm md:text-base",
+                          viewMode === 'public' 
+                            ? "bg-primary text-primary-foreground shadow-lg scale-105" 
+                            : "hover:bg-primary/10 text-muted-foreground hover:text-primary"
+                        )}
+                      >
+                        {t('library.viewMode.public', 'Public Library')}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        onClick={() => {
+                          play("toggle");
+                          if (!user) {
+                            toast({ title: t("auth.loginRequired"), variant: "warning" });
+                            setShowAuthModal(true);
+                            return;
+                          }
+                          setViewMode('mine');
+                          setCurrentPage(1);
+                        }}
+                        className={cn(
+                          "h-10 rounded-[14px] px-3 md:px-5 font-heading font-bold transition-all duration-300 text-sm md:text-base",
+                          viewMode === 'mine'
+                            ? "bg-primary text-primary-foreground shadow-lg scale-105"
+                            : "hover:bg-primary/10 text-muted-foreground hover:text-primary"
+                        )}
+                      >
+                        {t('library.viewMode.mine', 'My Quizzes')}
+                      </Button>
+                    </div>
+
                     {/* Sort By */}
                     <div className="flex items-center gap-2">
                       <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
@@ -708,7 +720,7 @@ const QuizLibrary: React.FC = () => {
                           play("toggle");
                           setSortBy(v as typeof sortBy);
                         }}>
-                        <SelectTrigger className="w-full sm:w-[180px] h-12 rounded-2xl border-4 border-border font-heading font-medium">
+                        <SelectTrigger className="w-full sm:w-[160px] h-12 rounded-2xl border-4 border-border font-heading font-medium">
                           <SelectValue placeholder={t('library.search.sortBy')} />
                         </SelectTrigger>
                         <SelectContent>
@@ -745,7 +757,6 @@ const QuizLibrary: React.FC = () => {
                       </Select>
                     </div>
 
-                    {/* Category & Difficulty Filters */}
                     <CategoryFilters
                       selectedCategory={selectedCategory}
                       selectedDifficulty={selectedDifficulty}
@@ -753,6 +764,7 @@ const QuizLibrary: React.FC = () => {
                       onDifficultyChange={setSelectedDifficulty}
                       availableCategories={availableCategories}
                     />
+
                   </div>
 
                   {/* Search Results Count */}
@@ -970,7 +982,7 @@ const QuizLibrary: React.FC = () => {
                 </div>
               )}
             </div>
-          </section >
+          </section>
 
 
           <PreviewModal

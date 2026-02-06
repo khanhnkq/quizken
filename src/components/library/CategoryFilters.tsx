@@ -44,7 +44,7 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
   const { play } = useAudio();
 
   return (
-    <div className="flex flex-wrap gap-3 items-center">
+    <div className="flex flex-wrap lg:flex-nowrap gap-2 md:gap-3 items-center justify-center lg:justify-start">
       {/* Category Filter */}
       <Select
         value={selectedCategory}
@@ -52,7 +52,7 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
           play("toggle");
           onCategoryChange(v as QuizCategory | "all");
         }}>
-        <SelectTrigger className="w-full sm:w-[180px] h-12 rounded-2xl border-4 border-border font-heading font-medium">
+        <SelectTrigger className="w-full sm:w-[160px] h-12 rounded-2xl border-4 border-border font-heading font-medium">
           <SelectValue placeholder={t('library.search.category')} />
         </SelectTrigger>
         <SelectContent>

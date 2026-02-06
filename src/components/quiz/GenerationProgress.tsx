@@ -16,11 +16,11 @@ interface GenerationProgressProps {
 const progressStepKeys = ["init", "auth", "limit", "generate", "done"] as const;
 
 const progressStepMatches = [
-  ["starting generation", "đang chuẩn bị", "brewing coffee"],
-  ["authenticating", "getting visa"],
-  ["checking rate limits", "rate limit", "counting"],
-  ["generating with ai", "brainstorming"],
-  ["completed", "all done"],
+  ["starting", "đang chuẩn bị", "brewing coffee", "quizgenerator.generationprogress.steps.starting", "quizgenerator.generationprogress.steps.init"],
+  ["authenticating", "getting visa", "quizgenerator.generationprogress.steps.authenticating", "quizgenerator.generationprogress.steps.auth"],
+  ["limit", "checking rate limits", "counting", "quizgenerator.generationprogress.steps.limits", "quizgenerator.generationprogress.steps.limit"],
+  ["generating", "brainstorming", "quizgenerator.generationprogress.steps.ai_generating", "quizgenerator.generationprogress.steps.generate"],
+  ["completed", "all done", "quizgenerator.generationprogress.steps.done"],
 ];
 
 const getActiveStep = (progressText: string | undefined): number => {
@@ -141,8 +141,11 @@ export const GenerationProgress: React.FC<GenerationProgressProps> = ({
             {getTitle()}
           </h3>
           <p className="text-base font-medium text-muted-foreground min-h-[1.5em] transition-all">
-            {generationProgress ||
-              t("quizGenerator.generationProgress.processing")}
+            {generationProgress
+              ? t(generationProgress) === generationProgress
+                ? generationProgress
+                : t(generationProgress)
+              : t("quizGenerator.generationProgress.processing")}
           </p>
         </div>
 
