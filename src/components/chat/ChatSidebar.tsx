@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { 
   Users, 
   Crown, 
@@ -7,8 +8,10 @@ import {
   Megaphone,
   Hash,
   Loader2,
-  ArrowLeft
+  ArrowLeft,
+  MessageCircle
 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -17,19 +20,38 @@ import { Button } from "@/components/ui/button";
 import { useTopUsers } from "@/hooks/useTopUsers";
 import { useAnnouncements } from "@/hooks/useAnnouncements";
 
-const chatRooms = [
-  { id: "general", name: "Phòng Chat Chung", icon: Hash, isActive: true },
-  { id: "quiz", name: "Thảo luận Quiz", icon: Megaphone, isActive: false },
-  { id: "help", name: "Hỏi đáp", icon: Star, isActive: false },
+const defaultChatRooms = [
+  { id: "general", name: "Phòng Chat Chung", icon: Hash },
+  { id: "quits_quits", name: "Chat với Quít Quít", icon: MessageCircle },
+  { id: "quiz", name: "Thảo luận Quiz", icon: Megaphone },
+  { id: "help", name: "Hỏi đáp", icon: Star },
 ];
 
 interface ChatSidebarProps {
   onBack?: () => void;
+  selectedRoomId?: string;
+  onRoomSelect?: (roomId: string) => void;
 }
 
-export function ChatSidebar({ onBack }: ChatSidebarProps) {
+export function ChatSidebar({ onBack, selectedRoomId = "general", onRoomSelect }: ChatSidebarProps) {
   const { users: topUsers, isLoading: isLoadingTopUsers } = useTopUsers(20);
   const { announcements, isLoading: isLoadingAnnouncements } = useAnnouncements();
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) {
+        setCurrentUserId(data.user.id);
+      }
+    });
+  }, []);
+
+  const chatRooms = defaultChatRooms.map(room => {
+    if (room.id === "quits_quits" && currentUserId) {
+      return { ...room, id: `quits_quits_${currentUserId}` };
+    }
+    return room;
+  });
 
   return (
     <div className="w-80 h-full bg-background border-r flex flex-col">
@@ -63,9 +85,10 @@ export function ChatSidebar({ onBack }: ChatSidebarProps) {
               {chatRooms.map((room) => (
                 <button
                   key={room.id}
+                  onClick={() => onRoomSelect?.(room.id)}
                   className={cn(
                     "w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors",
-                    room.isActive 
+                    selectedRoomId === room.id || (room.id.startsWith("quits_quits_") && selectedRoomId.startsWith("quits_quits_"))
                       ? "bg-primary/10 text-primary font-medium" 
                       : "hover:bg-muted text-muted-foreground"
                   )}

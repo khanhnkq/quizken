@@ -9,6 +9,7 @@ import { SeoMeta } from "@/components/SeoMeta";
 
 export default function ChatPage() {
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [activeRoomId, setActiveRoomId] = useState("general");
 
   return (
     <>
@@ -20,12 +21,19 @@ export default function ChatPage() {
       <div className="flex h-screen bg-background overflow-hidden">
         {/* Sidebar - Hidden on mobile */}
         <div className="hidden lg:block">
-          <ChatSidebar onBack={() => window.history.back()} />
+          <ChatSidebar 
+            onBack={() => window.history.back()} 
+            selectedRoomId={activeRoomId}
+            onRoomSelect={setActiveRoomId}
+          />
         </div>
 
         {/* Chat Room - Full width */}
         <div className="flex-1 min-w-0">
-          <ChatRoom onLoginClick={() => setShowAuthModal(true)} />
+          <ChatRoom 
+            roomId={activeRoomId}
+            onLoginClick={() => setShowAuthModal(true)} 
+          />
         </div>
       </div>
 

@@ -31,6 +31,7 @@ export function GlobalChatTicker() {
       const { data: msgData, error: msgError } = await supabase
         .from("chat_messages")
         .select("id, content, user_id, created_at")
+        .eq("room_id", "general")
         .order("created_at", { ascending: false })
         .limit(1)
         .single();
@@ -38,9 +39,7 @@ export function GlobalChatTicker() {
       if (msgError || !msgData) return;
 
       // 2. Fetch profile using RPC
-      const { data: profiles, error: profileError } = await (
-        supabase as any
-      ).rpc("get_chat_user_profiles", {
+      const { data: profiles, error: profileError } = await supabase.rpc("get_chat_user_profiles", {
         user_ids: [msgData.user_id],
       });
 
@@ -78,15 +77,13 @@ export function GlobalChatTicker() {
           // Fetch the full details manually to avoid join issues
           const { data: msgData } = await supabase
             .from("chat_messages")
-            .select("id, content, user_id, created_at")
+            .select("id, content, user_id, created_at, room_id")
             .eq("id", payload.new.id)
             .single();
 
-          if (!msgData) return;
+          if (!msgData || msgData.room_id !== "general") return;
 
-          const { data: profiles, error: profileError } = await (
-            supabase as any
-          ).rpc("get_chat_user_profiles", {
+          const { data: profiles, error: profileError } = await supabase.rpc("get_chat_user_profiles", {
             user_ids: [msgData.user_id],
           });
 

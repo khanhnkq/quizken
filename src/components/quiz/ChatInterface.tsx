@@ -5,7 +5,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useTranslation } from "react-i18next";
 import { useToast } from "@/hooks/use-toast";
 import logo from "@/assets/logo/logo.png";
-import { Send, Sparkles, Zap, ArrowLeft, Settings2 } from "lucide-react";
+import { Send, Sparkles, Zap, ArrowLeft, Settings2, Layers, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { containsVietnameseBadwords } from "@/lib/vnBadwordsFilter";
 import Mascot from "@/components/ui/Mascot";
@@ -14,13 +14,23 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/lib/auth";
 
 interface ChatInterfaceProps {
-    onComplete: (topic: string, count: string, fastMode: boolean, difficulty: string) => void;
+    onComplete: (topic: string, count: string, fastMode: boolean, difficulty: string, documentIds?: string[]) => void;
     onCancel: () => void;
+    userRemaining?: number;
     userLimit?: number;
     hasApiKey?: boolean;
     isComic?: boolean;
+}
+
+interface RagDocument {
+    id: string;
+    title: string;
+    created_at: string;
 }
 
 type Step = "GREETING" | "TOPIC" | "COUNT" | "CONFIRM";
@@ -42,6 +52,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 }) => {
     const { t } = useTranslation();
     const { toast } = useToast();
+    const { user } = useAuth();
     const [messages, setMessages] = useState<Message[]>([]);
     const [inputValue, setInputValue] = useState("");
     const [step, setStep] = useState<Step>("GREETING");
@@ -54,8 +65,42 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     const [difficulty, setDifficulty] = useState<"mixed" | "easy" | "medium" | "hard">("mixed");
     const [isDifficultySelected, setIsDifficultySelected] = useState(false);
 
+    // RAG State
+    const [isRagOpen, setIsRagOpen] = useState(false);
+    const [documents, setDocuments] = useState<RagDocument[]>([]);
+    const [selectedDocs, setSelectedDocs] = useState<string[]>([]);
+    const [isLoadingDocs, setIsLoadingDocs] = useState(false);
+
     const scrollRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
+
+    // Fetch documents on popover open
+    useEffect(() => {
+        if (isRagOpen && user && documents.length === 0) {
+            setIsLoadingDocs(true);
+            const fetchDocs = async () => {
+                const { data, error } = await supabase
+                    .from("documents")
+                    .select("id, title, created_at")
+                    .eq("user_id", user.id)
+                    .order("created_at", { ascending: false });
+
+                if (!error && data) {
+                    setDocuments(data);
+                }
+                setIsLoadingDocs(false);
+            };
+            fetchDocs();
+        }
+    }, [isRagOpen, user, documents.length]);
+
+    const handleToggleDoc = (docId: string) => {
+        setSelectedDocs(prev => 
+            prev.includes(docId) 
+                ? prev.filter(id => id !== docId)
+                : [...prev, docId]
+        );
+    };
 
     // Validate topic input
     const validateTopic = (input: string): boolean => {
@@ -90,7 +135,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     // Initial Greeting
     useEffect(() => {
         addBotMessage(t("quizGenerator.chat.greeting"));
-    }, []);
+    }, [t]);
 
     const addBotMessage = (text: string, delay = 600) => {
         setIsTyping(true);
@@ -138,8 +183,8 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             setStep("CONFIRM");
             addBotMessage(t("quizGenerator.chat.confirming"));
             setTimeout(() => {
-                onComplete(topic, value, fastMode, difficulty);
-            }, 1500);
+                onComplete(topic, value, fastMode, difficulty, selectedDocs);
+            }, 2500);
         } else if (step === "GREETING") {
             // Suggestion chips for topics
             addUserMessage(value);
@@ -354,7 +399,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                                             <button
                                                 key={opt.val}
                                                 onClick={() => {
-                                                    setDifficulty(opt.val as any);
+                                                    setDifficulty(opt.val as "easy" | "medium" | "hard" | "mixed");
                                                     setIsDifficultySelected(true);
                                                 }}
                                                 className={cn(
@@ -382,8 +427,8 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                                     setFastMode(newMode);
                                     toast({
                                         description: newMode ? t("quizGenerator.ui.fastModeEnabled") : t("quizGenerator.ui.fastModeDisabled"),
-                                        className: isComic ? "border-2 border-black bg-yellow-100 text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] font-bold" : "",
                                         duration: 1500,
+                                        ...(isComic ? { className: "border-2 border-black bg-yellow-100 text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] font-bold" } : {}),
                                     });
                                 }}
                                 className={cn(
@@ -396,6 +441,68 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                             >
                                 <Zap className={cn("w-4 h-4", fastMode && "fill-current")} />
                             </Button>
+
+                             {/* RAG Toggle */}
+                             <Popover modal={false} open={isRagOpen} onOpenChange={setIsRagOpen}>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className={cn(
+                                            "h-8 w-8 rounded-full transition-all",
+                                            isComic && "hover:bg-yellow-100",
+                                            !isComic && "hover:bg-secondary",
+                                            selectedDocs.length > 0 && (isComic ? "bg-yellow-200" : "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400")
+                                        )}
+                                        title={t("knowledgeBase.title")}
+                                    >
+                                        <Layers className={cn("w-4 h-4", selectedDocs.length > 0 && "fill-current")} />
+                                        {selectedDocs.length > 0 && (
+                                            <span className="absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full bg-red-500 text-[8px] text-white">
+                                                {selectedDocs.length}
+                                            </span>
+                                        )}
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-64 p-3 rounded-xl" align="end" side="top" sideOffset={10}>
+                                    <div className="space-y-2">
+                                        <h4 className="font-medium text-sm leading-none mb-2">{t("knowledgeBase.title")}</h4>
+                                        <p className="text-xs text-muted-foreground mb-2">
+                                            {t("knowledgeBase.selectDocs")}
+                                        </p>
+                                        <ScrollArea className="h-[200px] pr-2">
+                                            {isLoadingDocs ? (
+                                                <div className="flex justify-center items-center h-20">
+                                                    <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+                                                </div>
+                                            ) : documents.length === 0 ? (
+                                                <div className="text-center py-4 text-xs text-muted-foreground">
+                                                    {t("knowledgeBase.noDocuments")}
+                                                </div>
+                                            ) : (
+                                                <div className="space-y-2">
+                                                    {documents.map((doc) => (
+                                                        <div key={doc.id} className="flex items-center space-x-2 p-1 hover:bg-muted/50 rounded-md">
+                                                            <Checkbox 
+                                                                id={`doc-${doc.id}`} 
+                                                                checked={selectedDocs.includes(doc.id)}
+                                                                onCheckedChange={() => handleToggleDoc(doc.id)}
+                                                            />
+                                                            <label
+                                                                htmlFor={`doc-${doc.id}`}
+                                                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer line-clamp-1 break-all"
+                                                                title={doc.title}
+                                                            >
+                                                                {doc.title}
+                                                            </label>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </ScrollArea>
+                                    </div>
+                                </PopoverContent>
+                            </Popover>
                        </div>
                     )}
 

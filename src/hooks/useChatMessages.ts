@@ -11,6 +11,7 @@ export interface ChatMessage {
   display_name?: string;
   reactions?: Record<string, string[]>; // emoji -> userIds[]
   reply_to_id?: string | null;
+  room_id: string;
   reply_to?: {
     id: string;
     content: string;
@@ -35,6 +36,8 @@ export interface UseChatMessagesReturn {
   sendZCoinShare: (payload: ZCoinSharePayload) => Promise<boolean>;
   deleteMessage: (messageId: string) => Promise<boolean>;
   toggleReaction: (messageId: string, emoji: string) => Promise<boolean>; // NEW
+  triggerGreeting: () => Promise<void>;
+  isBotTyping: boolean;
   currentUserId: string | null;
   userProfiles: Map<string, UserProfile>;
 }
@@ -63,9 +66,10 @@ export interface ZCoinSharePayload {
   imageId: number;
 }
 
-export function useChatMessages(): UseChatMessagesReturn {
+export function useChatMessages(roomId: string = "general"): UseChatMessagesReturn {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isBotTyping, setIsBotTyping] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [userProfiles, setUserProfiles] = useState<Map<string, UserProfile>>(
     new Map(),
@@ -73,6 +77,8 @@ export function useChatMessages(): UseChatMessagesReturn {
   const { toast } = useToast();
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
   const shareTimestampsRef = useRef<number[]>([]);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const BOT_USER_ID = "00000000-0000-0000-0000-000000000001";
 
   // Fetch user profiles for given user IDs
   const fetchUserProfiles = useCallback(
@@ -84,7 +90,7 @@ export function useChatMessages(): UseChatMessagesReturn {
       if (newIds.length === 0) return;
 
       try {
-        const { data, error } = await (supabase as any).rpc(
+        const { data, error } = await supabase.rpc(
           "get_chat_user_profiles",
           {
             user_ids: newIds,
@@ -97,9 +103,10 @@ export function useChatMessages(): UseChatMessagesReturn {
         }
 
         if (data && Array.isArray(data)) {
+          const profiles = data as UserProfile[];
           setUserProfiles((prev) => {
             const newMap = new Map(prev);
-            data.forEach((profile: UserProfile) => {
+            profiles.forEach((profile: UserProfile) => {
               newMap.set(profile.user_id, profile);
             });
             return newMap;
@@ -131,16 +138,18 @@ export function useChatMessages(): UseChatMessagesReturn {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Fetch initial messages - only run once on mount
+  // Fetch initial messages - re-run when roomId changes
   useEffect(() => {
     let isMounted = true;
+    setIsLoading(true);
 
     const fetchMessages = async () => {
       try {
         // 1. Fetch recent messages raw (without join)
-        const { data: rawMessages, error } = await (supabase as any)
+        const { data: rawMessages, error } = await supabase
           .from("chat_messages")
           .select("*")
+          .eq("room_id", roomId)
           .order("created_at", { ascending: false })
           .limit(MESSAGE_LIMIT);
 
@@ -170,7 +179,7 @@ export function useChatMessages(): UseChatMessagesReturn {
             .in("id", replyIds);
             
           if (!parentError && parents) {
-            parents.forEach((p: any) => replyMap.set(p.id, p));
+            parents.forEach((p: { id: string; content: string; user_id: string }) => replyMap.set(p.id, p));
           }
         }
 
@@ -201,7 +210,7 @@ export function useChatMessages(): UseChatMessagesReturn {
     return () => {
       isMounted = false;
     };
-  }, []); // Empty dependency array - run only once
+  }, [roomId]); // Re-run when roomId changes
 
   // Fetch user profiles when messages change
   useEffect(() => {
@@ -214,7 +223,7 @@ export function useChatMessages(): UseChatMessagesReturn {
   // Subscribe to realtime changes
   useEffect(() => {
     channelRef.current = supabase
-      .channel("chat_messages_channel")
+      .channel(`chat_messages_${roomId}`)
       .on(
         "postgres_changes",
         {
@@ -224,6 +233,23 @@ export function useChatMessages(): UseChatMessagesReturn {
         },
         (payload) => {
           const newMessage = payload.new as ChatMessage;
+          
+          // Client-side filtering check
+          if (newMessage.room_id !== roomId) {
+            console.log(`[Chat Realtime] Ignored ${newMessage.id} for room ${newMessage.room_id} (current ${roomId})`);
+            return;
+          }
+          
+          console.log(`[Chat Realtime] Incoming ${payload.eventType} for room ${roomId}:`, newMessage.content);
+          
+          // Clear typing indicator if Bot sends a message
+          if (newMessage.user_id === BOT_USER_ID) {
+            setIsBotTyping(false);
+            if (typingTimeoutRef.current) {
+              clearTimeout(typingTimeoutRef.current);
+            }
+          }
+          
           setMessages((prev) => {
             // Avoid duplicates
             if (prev.some((m) => m.id === newMessage.id)) return prev;
@@ -281,14 +307,19 @@ export function useChatMessages(): UseChatMessagesReturn {
           );
         },
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log(`[Chat Realtime] Room ${roomId} subscription status:`, status);
+      });
 
     return () => {
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current);
       }
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
     };
-  }, []);
+  }, [roomId]);
 
   // Send message
   const sendMessage = useCallback(
@@ -313,9 +344,10 @@ export function useChatMessages(): UseChatMessagesReturn {
       }
 
       try {
-        console.log("Sending message with replyToId:", replyToId);
-        const { error } = await (supabase as any).from("chat_messages").insert({
+        console.log("Sending message with replyToId:", replyToId, "in room:", roomId);
+        const { error } = await supabase.from("chat_messages").insert({
           user_id: currentUserId,
+          room_id: roomId, // Target specific room
           content: trimmedContent,
           reply_to_id: replyToId ? replyToId : null,
         });
@@ -324,6 +356,17 @@ export function useChatMessages(): UseChatMessagesReturn {
           console.error("Insert error:", error);
           throw error;
         }
+
+        // Trigger bot typing indicator if appropriate
+        if (roomId.startsWith("quits_quits") || trimmedContent.includes("@Quít Quít")) {
+          setIsBotTyping(true);
+          // Auto-clear after 15s if no response
+          if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+          typingTimeoutRef.current = setTimeout(() => {
+            setIsBotTyping(false);
+          }, 15000);
+        }
+
         return true;
       } catch (error) {
         console.error("Error sending message:", error);
@@ -335,7 +378,7 @@ export function useChatMessages(): UseChatMessagesReturn {
         return false;
       }
     },
-    [currentUserId, toast],
+    [currentUserId, toast, roomId],
   );
 
   const sendQuizShare = useCallback(
@@ -383,8 +426,9 @@ export function useChatMessages(): UseChatMessagesReturn {
       });
 
       try {
-        const { error } = await (supabase as any).from("chat_messages").insert({
+        const { error } = await supabase.from("chat_messages").insert({
           user_id: currentUserId,
+          room_id: roomId,
           content,
         });
 
@@ -403,7 +447,7 @@ export function useChatMessages(): UseChatMessagesReturn {
         return false;
       }
     },
-    [currentUserId, toast],
+    [currentUserId, toast, roomId],
   );
 
   const sendStreakShare = useCallback(
@@ -440,8 +484,9 @@ export function useChatMessages(): UseChatMessagesReturn {
       });
 
       try {
-        const { error } = await (supabase as any).from("chat_messages").insert({
+        const { error } = await supabase.from("chat_messages").insert({
           user_id: currentUserId,
+          room_id: roomId,
           content,
         });
 
@@ -457,7 +502,7 @@ export function useChatMessages(): UseChatMessagesReturn {
         return false;
       }
     },
-    [currentUserId, toast],
+    [currentUserId, toast, roomId],
   );
 
   const sendZCoinShare = useCallback(
@@ -494,8 +539,9 @@ export function useChatMessages(): UseChatMessagesReturn {
       });
 
       try {
-        const { error } = await (supabase as any).from("chat_messages").insert({
+        const { error } = await supabase.from("chat_messages").insert({
           user_id: currentUserId,
+          room_id: roomId,
           content,
         });
 
@@ -511,14 +557,14 @@ export function useChatMessages(): UseChatMessagesReturn {
         return false;
       }
     },
-    [currentUserId, toast],
+    [currentUserId, toast, roomId],
   );
 
   // Delete message
   const deleteMessage = useCallback(
     async (messageId: string): Promise<boolean> => {
       try {
-        const { error } = await (supabase as any)
+        const { error } = await supabase
           .from("chat_messages")
           .delete()
           .eq("id", messageId);
@@ -579,7 +625,7 @@ export function useChatMessages(): UseChatMessagesReturn {
       );
 
       try {
-        const { error } = await (supabase as any).rpc("toggle_chat_reaction", {
+        const { error } = await supabase.rpc("toggle_chat_reaction", {
           p_message_id: messageId,
           p_emoji: emoji,
         });
@@ -601,6 +647,38 @@ export function useChatMessages(): UseChatMessagesReturn {
     [currentUserId, toast],
   );
 
+  // Trigger greeting for private room
+  const triggerGreeting = useCallback(async () => {
+    if (!currentUserId || !roomId.startsWith('quits_quits')) return;
+    
+    console.log("[Chat] Triggering bot greeting for private room...");
+    try {
+      setIsBotTyping(true);
+      // Auto-clear after 15s if no response
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+      typingTimeoutRef.current = setTimeout(() => {
+        setIsBotTyping(false);
+      }, 15000);
+
+      const { data: session } = await supabase.auth.getSession();
+      await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat-ai-response`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${session?.session?.access_token || ''}`, // Note: Edge function uses Secret check but we pass this for future
+          "X-Quit-Quit-Secret": 'quit-quit-webhook-secret-2024'
+        },
+        body: JSON.stringify({
+          action: 'trigger_greeting',
+          userId: currentUserId,
+          room_id: roomId
+        })
+      });
+    } catch (err) {
+      console.error("Failed to trigger greeting:", err);
+    }
+  }, [currentUserId, roomId]);
+
   return {
     messages,
     isLoading,
@@ -610,6 +688,8 @@ export function useChatMessages(): UseChatMessagesReturn {
     sendStreakShare,
     sendZCoinShare,
     toggleReaction,
+    triggerGreeting,
+    isBotTyping,
     currentUserId,
     userProfiles,
   };

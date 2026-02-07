@@ -204,7 +204,8 @@
                 "starting": "Đang khởi động tiến trình... 🚀",
                 "authenticating": "Đang xác thực bảo mật... 🔒",
                 "limits": "Đang kiểm tra quota... 📊",
-                "ai_generating": "AI đang sáng tạo nội dung... ✨"
+                "ai_generating": "AI đang sáng tạo nội dung... ✨",
+                "analyzing_docs": "Đang đọc tài liệu của bạn... 📚"
             },
             "backgroundNote": "Bạn có thể đóng cửa sổ này, tụi mình sẽ báo khi xong!",
             "cancelButton": "Thôi không tạo nữa",
@@ -224,7 +225,7 @@
         "chat": {
             "greeting": "Hé lô! 👋 Hôm nay mình ôn luyện chủ đề gì nào?",
             "askCount": "Chủ đề hay đó! 🧠 Bạn muốn làm bao nhiêu câu cho \"{{topic}}\"?",
-            "confirming": "Ok chốt đơn! Đang khởi động máy móc... 🍳",
+            "confirming": "Ok! Đang bắt đầu tạo quiz cho bạn đây... Chờ tí nhé! 🚀",
             "inputPlaceholder": "Nhập chủ đề (vd: Lịch sử VN)...",
             "inputPlaceholderCount": "Chọn số lượng ở trên...",
             "questionsCount": "{{count}} câu hỏi",
@@ -1294,5 +1295,37 @@
         "instantDelivery": "Nhận quà ngay lập tức",
         "back": "Tuyệt vời",
         "retry": "Thử lại"
+    },
+    "knowledgeBase": {
+        "title": "Kho Kiến Thức (RAG)",
+        "description": "Tải lên tài liệu để AI học và tạo quiz chính xác hơn.",
+        "addDocument": "Thêm tài liệu mới",
+        "uploading": "Đang tải lên...",
+        "selectDocs": "Chọn tài liệu tham khảo",
+        "selectFile": "Chọn file PDF/TXT...",
+        "processing": "Đang xử lý",
+        "noDocuments": "Chưa có tài liệu nào.",
+        "uploadToStart": "Tải lên ngay để bắt đầu!",
+        "uploadSuccess": "Thành công!",
+        "uploadSuccessDesc": "Tài liệu đã được tải lên và xử lý.",
+        "uploadError": "Lỗi tải lên",
+        "deleteConfirm": "Bạn có chắc muốn xóa tài liệu này?",
+        "deleted": "Đã xóa",
+        "deletedDesc": "Tài liệu đã được xóa khỏi hệ thống.",
+        "deleteError": "Lỗi xóa",
+        "deleteErrorDesc": "Không thể xóa tài liệu.",
+        "updated": "Đã cập nhật",
+        "updatedDesc": "Tên tài liệu đã được thay đổi.",
+        "updateError": "Lỗi cập nhật",
+        "updateErrorDesc": "Không thể đổi tên tài liệu.",
+        "rename": "Đổi tên",
+        "delete": "Xóa",
+        "useDocuments": "Sử dụng tài liệu",
+        "useDocumentsDesc": "Quiz sẽ được tạo dựa trên nội dung đã chọn.",
+        "selectAppliedDocs": "Chọn tài liệu áp dụng:",
+        "noDocsAvailable": "Chưa có tài liệu.",
+        "loginRequired": "Vui lòng đăng nhập để tải tài liệu.",
+        "fetchError": "Lỗi tải tài liệu",
+        "fetchErrorDesc": "Không thể tải danh sách tài liệu. Vui lòng thử lại."
     }
 }

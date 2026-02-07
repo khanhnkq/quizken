@@ -349,14 +349,15 @@ export function QuickGeneratorDialog({ open, onOpenChange, initialTab = null }: 
         overridePrompt?: string, 
         overrideCount?: string,
         overrideFastMode?: boolean,
-        overrideDifficulty?: string
+        overrideDifficulty?: string,
+        overrideDocumentIds?: string[]
     ) => {
         const activePrompt = overridePrompt ?? prompt;
         const activeCount = overrideCount ?? questionCount;
 
         // Apply Fast Mode prompt optimization if enabled
         const promptToSend = activePrompt;
-        console.log(`[QuickGenerator] Proceeding with: prompt="${promptToSend}", count=${activeCount}, difficulty=${overrideDifficulty}`);
+        console.log(`[QuickGenerator] Proceeding with: prompt="${promptToSend}", count=${activeCount}, difficulty=${overrideDifficulty}, documentIds=${overrideDocumentIds}`);
 
         const isValid = validatePrompt(activePrompt);
         if (!isValid) {
@@ -416,6 +417,7 @@ export function QuickGeneratorDialog({ open, onOpenChange, initialTab = null }: 
                     language: i18n.language,
                     difficulty: overrideDifficulty || "mixed",
                     fastMode: overrideFastMode ?? false,
+                    documentIds: overrideDocumentIds,
                 },
             });
 
@@ -721,10 +723,10 @@ export function QuickGeneratorDialog({ open, onOpenChange, initialTab = null }: 
 
                         <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-2 border-primary/10 dark:border-primary/20 shadow-2xl rounded-3xl overflow-hidden h-[600px] flex flex-col">
                             <ChatInterface
-                                onComplete={(topic, count, fastMode, difficulty) => {
+                                onComplete={(topic, count, fastMode, difficulty, documentIds) => {
                                     setPrompt(topic);
                                     setQuestionCount(count);
-                                    proceedWithGeneration(topic, count, fastMode, difficulty);
+                                    proceedWithGeneration(topic, count, fastMode, difficulty, documentIds);
                                 }}
                                 onCancel={() => setActiveTab(null)}
                                 userRemaining={userRemaining}

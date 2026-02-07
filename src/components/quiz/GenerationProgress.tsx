@@ -13,12 +13,13 @@ interface GenerationProgressProps {
   onCancel: () => void;
 }
 
-const progressStepKeys = ["init", "auth", "limit", "generate", "done"] as const;
+const progressStepKeys = ["init", "auth", "limit", "analyzing_docs", "generate", "done"] as const;
 
 const progressStepMatches = [
   ["starting", "đang chuẩn bị", "brewing coffee", "quizgenerator.generationprogress.steps.starting", "quizgenerator.generationprogress.steps.init"],
   ["authenticating", "getting visa", "quizgenerator.generationprogress.steps.authenticating", "quizgenerator.generationprogress.steps.auth"],
   ["limit", "checking rate limits", "counting", "quizgenerator.generationprogress.steps.limits", "quizgenerator.generationprogress.steps.limit"],
+  ["analyzing", "đang đọc tài liệu", "analyzing your documents", "quizgenerator.generationprogress.steps.analyzing_docs"],
   ["generating", "brainstorming", "quizgenerator.generationprogress.steps.ai_generating", "quizgenerator.generationprogress.steps.generate"],
   ["completed", "all done", "quizgenerator.generationprogress.steps.done"],
 ];

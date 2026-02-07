@@ -104,6 +104,12 @@ import {
 import { useProfile } from "@/hooks/useProfile";
 import { VietnamMapIcon, VietnamStarIcon, VietnamDrumIcon, VietnamLotusIcon } from "@/components/icons/VietnamIcons";
 import { NeonBoltIcon, NeonCyberSkullIcon, PastelCloudIcon, PastelHeartIcon, ComicPowIcon, ComicBoomIcon } from "@/components/icons/ThemeIcons";
+import { KnowledgeBaseManager } from "@/components/knowledge/KnowledgeBaseManager";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 type TokenUsage = { prompt: number; candidates: number; total: number };
 
@@ -118,61 +124,7 @@ type GenerationState = {
 const QuizGenerator = () => {
   const customIsProfane = (input: string) =>
     containsVietnameseBadwords(String(input || ""));
-  const [prompt, setPrompt] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const [debugData, setDebugData] = useState<unknown>(null);
-  const {
-    quiz,
-    userAnswers,
-    showResults,
-    tokenUsage,
-    setQuiz,
-    setUserAnswers,
-    setShowResults,
-    setTokenUsage,
-  } = useQuizStore();
-  const [loadingMessage, setLoadingMessage] = useState<string>("");
-  const [loadingProgress, setLoadingProgress] = useState<number>(0);
-  const [promptError, setPromptError] = useState<string>("");
-  const [isPromptValid, setIsPromptValid] = useState<boolean>(false);
-  const [showQuotaDialog, setShowQuotaDialog] = useState<boolean>(false);
-  const [showUserQuotaDialog, setShowUserQuotaDialog] =
-    useState<boolean>(false);
-  const [quotaErrorMessage, setQuotaErrorMessage] = useState<string>("");
-  const [showApiKeyErrorDialog, setShowApiKeyErrorDialog] =
-    useState<boolean>(false);
-  const [apiKeyError, setApiKeyError] = useState<string>("");
-  const [showConfirmDialog, setShowConfirmDialog] = useState<boolean>(false);
-  const [showNewQuizConfirm, setShowNewQuizConfirm] = useState<boolean>(false); // For new quiz overwrite confirmation
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [pendingGenerate, setPendingGenerate] = useState<any>(null); // To store valid generation request while waiting for confirm
-
-  // Dialog state for manual/AI toggle
-  const [showQuickDialog, setShowQuickDialog] = useState(false);
-  const [quickDialogTab, setQuickDialogTab] = useState<"ai" | "manual" | null>(
-    null,
-  );
   
-  // Fast Mode State
-  const [fastMode, setFastMode] = useState(false);
-  
-  // Difficulty State
-  const [difficulty, setDifficulty] = useState<"mixed" | "easy" | "medium" | "hard">("mixed");
-  const [isDifficultySelected, setIsDifficultySelected] = useState(false);
-
-  // Chill background music via hook
-  const {
-    isPlaying: isChillPlaying,
-    toggle: toggleChill,
-    pause: pauseChill,
-  } = useChillMusic();
-
-  // Async quiz polling state
-  const [quizId, setQuizId] = useState<string | null>(null);
-  const [generationStatus, setGenerationStatus] = useState<string | null>(null);
-  const [generationProgress, setGenerationProgress] = useState<string>("");
-  const { toast } = useToast();
   const { user, loading: authLoading } = useAuth();
   const { profileData } = useProfile(user?.id);
 
@@ -227,7 +179,7 @@ const QuizGenerator = () => {
           generateBtnGradient: "from-yellow-400 to-orange-500 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5",
           generateIconClass: "",
           inputBorderActive: "border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] ring-0",
-          fastModeActive: "bg-yellow-50 text-yellow-700 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-yellow-100",
+          fastModeActive: "bg-yellow-5 text-yellow-700 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-yellow-100",
           fastModeZap: "fill-black text-black",
           mainCardBorder: "border-y-4 border-black",
           pillStyle: "bg-white border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]",
@@ -247,6 +199,91 @@ const QuizGenerator = () => {
         };
     }
   }, [profileData?.equipped_theme]);
+
+  const [prompt, setPrompt] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [debugData, setDebugData] = useState<unknown>(null);
+  const {
+    quiz,
+    userAnswers,
+    showResults,
+    tokenUsage,
+    setQuiz,
+    setUserAnswers,
+    setShowResults,
+    setTokenUsage,
+  } = useQuizStore();
+  const [loadingMessage, setLoadingMessage] = useState<string>("");
+  const [loadingProgress, setLoadingProgress] = useState<number>(0);
+  const [promptError, setPromptError] = useState<string>("");
+  const [isPromptValid, setIsPromptValid] = useState<boolean>(false);
+  const [showQuotaDialog, setShowQuotaDialog] = useState<boolean>(false);
+  const [showUserQuotaDialog, setShowUserQuotaDialog] =
+    useState<boolean>(false);
+  const [quotaErrorMessage, setQuotaErrorMessage] = useState<string>("");
+  const [showApiKeyErrorDialog, setShowApiKeyErrorDialog] =
+    useState<boolean>(false);
+  const [apiKeyError, setApiKeyError] = useState<string>("");
+  const [showConfirmDialog, setShowConfirmDialog] = useState<boolean>(false);
+  const [showNewQuizConfirm, setShowNewQuizConfirm] = useState<boolean>(false); // For new quiz overwrite confirmation
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [pendingGenerate, setPendingGenerate] = useState<any>(null); // To store valid generation request while waiting for confirm
+
+  // Dialog state for manual/AI toggle
+  const [showQuickDialog, setShowQuickDialog] = useState(false);
+  const [quickDialogTab, setQuickDialogTab] = useState<"ai" | "manual" | null>(
+    null,
+  );
+  
+  // Fast Mode State
+  const [fastMode, setFastMode] = useState(false);
+  
+  // Difficulty State
+  const [difficulty, setDifficulty] = useState<"mixed" | "easy" | "medium" | "hard">("mixed");
+  const [isDifficultySelected, setIsDifficultySelected] = useState(false);
+
+  // RAG State
+  const [useRAG, setUseRAG] = useState(false);
+  const [selectedDocs, setSelectedDocs] = useState<string[]>([]);
+  const [availableDocs, setAvailableDocs] = useState<{id: string, title: string}[]>([]);
+  const [isDocsLoading, setIsDocsLoading] = useState(false);
+
+  // Fetch documents when RAG is enabled
+  useEffect(() => {
+      if (useRAG && user?.id) {
+          fetchDocuments();
+      }
+  }, [useRAG, user?.id]);
+
+  const fetchDocuments = async () => {
+      setIsDocsLoading(true);
+      const { data } = await supabase.from("documents").select("id, title").order("created_at", { ascending: false });
+      if (data) setAvailableDocs(data);
+      setIsDocsLoading(false);
+  };
+
+  const toggleDocSelection = (docId: string) => {
+      setSelectedDocs(prev => 
+          prev.includes(docId) 
+              ? prev.filter(id => id !== docId)
+              : [...prev, docId]
+      );
+  };
+
+  // Chill background music via hook
+  const {
+    isPlaying: isChillPlaying,
+    toggle: toggleChill,
+    pause: pauseChill,
+  } = useChillMusic();
+
+  // Async quiz polling state
+  const [quizId, setQuizId] = useState<string | null>(null);
+  const [generationStatus, setGenerationStatus] = useState<string | null>(null);
+  const [generationProgress, setGenerationProgress] = useState<string>("");
+  const { toast } = useToast();
+
 
   const { t, i18n } = useTranslation(); // Add i18n support
   const { statistics, refetch: refetchStats } = useDashboardStats(user?.id);
@@ -916,6 +953,7 @@ const QuizGenerator = () => {
         language: i18n.language,
         difficulty: difficulty,
         fastMode: fastMode,
+        documentIds: useRAG ? selectedDocs : [],
       };
 
       console.log("▶️ Starting quiz generation request...");
@@ -1709,6 +1747,71 @@ const QuizGenerator = () => {
                         </div>
 
 
+                        {/* RAG Toggle */}
+                        <Sheet>
+                            <SheetTrigger asChild>
+                                <Button
+                                    variant="ghost"
+                                    className={cn(
+                                        "h-11 w-11 md:h-12 md:w-12 rounded-full shrink-0 p-0 transition-all duration-300 ml-1 border-2",
+                                        useRAG
+                                            ? "bg-yellow-100 dark:bg-yellow-900/30 border-yellow-400 text-yellow-700 dark:text-yellow-400 shadow-md ring-2 ring-offset-2 ring-yellow-400/20"
+                                            : "bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 hover:border-slate-300"
+                                    )}
+                                    title={t("knowledgeBase.title")}
+                                >
+                                    <Layers className={cn("w-5 h-5", useRAG ? "text-yellow-600 dark:text-yellow-400" : "")} />
+                                </Button>
+                            </SheetTrigger>
+                            <SheetContent className="w-[400px] sm:w-[540px] overflow-y-auto">
+                                <SheetHeader>
+                                    <SheetTitle>{t("knowledgeBase.title")}</SheetTitle>
+                                </SheetHeader>
+                                <div className="mt-6 space-y-6">
+                                    <div className="flex items-center justify-between p-4 bg-yellow-50 dark:bg-yellow-900/10 rounded-lg border border-yellow-200 dark:border-yellow-700/50">
+                                    <div>
+                                            <h4 className="font-bold text-sm">{t("knowledgeBase.useDocuments")}</h4>
+                                            <p className="text-xs text-gray-500">{t("knowledgeBase.useDocumentsDesc")}</p>
+                                        </div>
+                                        <Switch checked={useRAG} onCheckedChange={setUseRAG} />
+                                    </div>
+
+                                    {useRAG && (
+                                        <div className="border rounded-lg p-4 animate-in fade-in slide-in-from-top-2">
+                                            <h4 className="text-sm font-semibold mb-3">{t("knowledgeBase.selectAppliedDocs")}</h4>
+                                            {isDocsLoading && <Loader2 className="w-4 h-4 animate-spin" />}
+                                            {!isDocsLoading && availableDocs.length === 0 && (
+                                                <p className="text-xs text-gray-400 text-center py-4">{t("knowledgeBase.noDocsAvailable")}</p>
+                                            )}
+                                            <ScrollArea className="h-40">
+                                                <div className="space-y-2">
+                                                    {availableDocs.map(doc => (
+                                                        <div key={doc.id} className="flex items-center space-x-2">
+                                                            <Checkbox
+                                                                id={`doc-${doc.id}`}
+                                                                checked={selectedDocs.includes(doc.id)}
+                                                                onCheckedChange={() => toggleDocSelection(doc.id)}
+                                                            />
+                                                            <label
+                                                                htmlFor={`doc-${doc.id}`}
+                                                                className="text-sm cursor-pointer truncate flex-1"
+                                                            >
+                                                                {doc.title}
+                                                            </label>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </ScrollArea>
+                                        </div>
+                                    )}
+
+                                    <div className="border-t pt-6">
+                                        <KnowledgeBaseManager />
+                                    </div>
+                                </div>
+                            </SheetContent>
+                        </Sheet>
+
                         {/* Fast Mode Toggle (Refined Setting Style) */}
                         <Button
                           variant="ghost"
@@ -1717,7 +1820,6 @@ const QuizGenerator = () => {
                             setFastMode(newMode);
                             toast({
                                 description: newMode ? t("quizGenerator.ui.fastModeEnabled") : t("quizGenerator.ui.fastModeDisabled"),
-                                className: profileData?.equipped_theme === 'theme_comic_manga' ? "border-2 border-black bg-yellow-100 text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] font-bold" : "",
                                 duration: 1500,
                             });
                           }}

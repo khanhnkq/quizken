@@ -203,7 +203,8 @@
                 "starting": "Starting generation process... 🚀",
                 "authenticating": "Authenticating security... 🔒",
                 "limits": "Checking quota limits... 📊",
-                "ai_generating": "AI is creating content... ✨"
+                "ai_generating": "AI is creating content... ✨",
+                "analyzing_docs": "Analyzing your documents... 📚"
             },
             "backgroundNote": "You can close this window, we'll notify you when done!",
             "cancelButton": "Cancel creation",
@@ -223,7 +224,7 @@
         "chat": {
             "greeting": "Hi there! 👋 What kind of quiz shall we brew today?",
             "askCount": "Awesome topic! 🧠 How many questions to cook up for \"{{topic}}\"?",
-            "confirming": "On it! Firing up the servers... 🍳",
+            "confirming": "Ok! Starting to generate your quiz... Please wait! 🚀",
             "inputPlaceholder": "Type a topic (e.g. Vietnam History)...",
             "inputPlaceholderCount": "Select a number above...",
             "questionsCount": "{{count}} questions",
@@ -1294,5 +1295,37 @@
         "instantDelivery": "Instant Delivery",
         "back": "Awesome",
         "retry": "Try again"
+    },
+    "knowledgeBase": {
+        "title": "Knowledge Base (RAG)",
+        "description": "Upload documents for AI to learn and generate more accurate quizzes.",
+        "addDocument": "Add New Document",
+        "uploading": "Uploading...",
+        "selectDocs": "Select documents for context",
+        "selectFile": "Select PDF/TXT file...",
+        "processing": "Processing",
+        "noDocuments": "No documents yet.",
+        "uploadToStart": "Upload now to start!",
+        "uploadSuccess": "Success!",
+        "uploadSuccessDesc": "Document uploaded and processed.",
+        "uploadError": "Upload Error",
+        "deleteConfirm": "Are you sure you want to delete this document?",
+        "deleted": "Deleted",
+        "deletedDesc": "Document removed from system.",
+        "deleteError": "Delete Error",
+        "deleteErrorDesc": "Could not delete document.",
+        "updated": "Updated",
+        "updatedDesc": "Document title changed.",
+        "updateError": "Update Error",
+        "updateErrorDesc": "Could not rename document.",
+        "rename": "Rename",
+        "delete": "Delete",
+        "useDocuments": "Use Documents",
+        "useDocumentsDesc": "Quiz will be generated based on selected content.",
+        "selectAppliedDocs": "Select documents to apply:",
+        "noDocsAvailable": "No documents available.",
+        "loginRequired": "Please log in to upload documents.",
+        "fetchError": "Fetch Error",
+        "fetchErrorDesc": "Could not fetch document list. Please try again."
     }
 }

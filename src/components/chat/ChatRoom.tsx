@@ -9,6 +9,7 @@ import { ChatMessage } from "./ChatMessage";
 import { ChatInput } from "./ChatInput";
 import { ShareQuizModal } from "./ShareQuizModal";
 import { ShareableQuiz } from "@/hooks/useShareableQuizzes";
+import { TypingIndicator } from "./TypingIndicator";
 import { useToast } from "@/hooks/use-toast";
 import { useChatImages } from "@/contexts/ChatImagesContext";
 import { useProfile } from "@/hooks/useProfile";
@@ -77,9 +78,10 @@ const STREAK_SLOGANS = [
 
 interface ChatRoomProps {
   onLoginClick?: () => void;
+  roomId?: string;
 }
 
-export function ChatRoom({ onLoginClick }: ChatRoomProps) {
+export function ChatRoom({ onLoginClick, roomId = "general" }: ChatRoomProps) {
   const { images } = useChatImages();
 
   const {
@@ -91,9 +93,11 @@ export function ChatRoom({ onLoginClick }: ChatRoomProps) {
     sendZCoinShare,
     deleteMessage,
     toggleReaction,
+    triggerGreeting,
+    isBotTyping,
     currentUserId,
     userProfiles,
-  } = useChatMessages();
+  } = useChatMessages(roomId);
   const { streak } = useUserProgress();
   const { statistics } = useDashboardStats(currentUserId || undefined);
   const zcoin = statistics?.zcoin || 0;
@@ -102,9 +106,9 @@ export function ChatRoom({ onLoginClick }: ChatRoomProps) {
   const [autoScroll, setAutoScroll] = useState(true);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"quiz" | "streak">("quiz");
-  const [replyingTo, setReplyingTo] = useState<any | null>(null);
+  const [replyingTo, setReplyingTo] = useState<ChatMessage | null>(null);
 
-  const handleReply = (message: any) => {
+  const handleReply = (message: ChatMessage) => {
     const profile = userProfiles.get(message.user_id);
     setReplyingTo({
       ...message,
@@ -179,6 +183,13 @@ export function ChatRoom({ onLoginClick }: ChatRoomProps) {
     }
   }, [messages, autoScroll, isLoading]);
 
+  // Trigger greeting for private room if empty
+  useEffect(() => {
+    if (roomId.startsWith("quits_quits") && !isLoading && messages.length === 0) {
+      triggerGreeting();
+    }
+  }, [roomId, isLoading, messages.length, triggerGreeting]);
+
   // Detect if user scrolled up
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const target = e.target as HTMLDivElement;
@@ -195,9 +206,8 @@ export function ChatRoom({ onLoginClick }: ChatRoomProps) {
     queryKey: ['themeItem', theme],
     queryFn: async () => {
       if (!theme) return null;
-      // @ts-ignore
       const { data } = await supabase.from('items').select('image_url').eq('id', theme).single();
-      return data as any;
+      return data as { image_url: string } | null;
     },
     enabled: !!theme
   });
@@ -218,6 +228,15 @@ export function ChatRoom({ onLoginClick }: ChatRoomProps) {
      }
   };
   const themeBg = getThemeBackground();
+
+  const getRoomName = () => {
+      if (roomId.startsWith('quits_quits')) return 'Chat với Quít Quít';
+      switch(roomId) {
+          case 'quiz': return 'Thảo luận Quiz';
+          case 'help': return 'Hỏi đáp';
+          default: return 'Phòng Chat Chung';
+      }
+  };
 
   return (
     <div className="flex flex-col h-full bg-background overflow-hidden relative">
@@ -250,11 +269,11 @@ export function ChatRoom({ onLoginClick }: ChatRoomProps) {
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b relative z-10 bg-background h-[60px]">
         <div className="flex items-center gap-2">
-          <MessageCircle className="h-5 w-5 text-primary" />
-          <h2 className="font-bold text-lg">Phòng Chat Chung</h2>
+          {roomId.startsWith('quits_quits') ? <MessageCircle className="h-5 w-5 text-primary" /> : <MessageCircle className="h-5 w-5 text-primary" />}
+          <h2 className="font-bold text-lg">{getRoomName()}</h2>
         </div>
         <div className="flex items-center gap-2 text-sm">
-          {isConnected && (
+          {isConnected && roomId === 'general' && (
             <span className="flex items-center gap-1.5 px-2 py-1 bg-green-100 text-green-700 rounded-full">
               <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
               <Users className="h-3.5 w-3.5" />
@@ -306,6 +325,14 @@ export function ChatRoom({ onLoginClick }: ChatRoomProps) {
                   />
                 );
               })}
+              
+              {isBotTyping && (
+                <TypingIndicator 
+                  avatarUrl={userProfiles.get("00000000-0000-0000-0000-000000000001")?.avatar_url}
+                  displayName={userProfiles.get("00000000-0000-0000-0000-000000000001")?.display_name}
+                />
+              )}
+              
               <div ref={messagesEndRef} />
             </div>
           )}
