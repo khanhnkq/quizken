@@ -42,19 +42,7 @@ export default defineConfig({
         manualChunks(id) {
           if (!id) return;
 
-          // Local icons - separate chunk
-          if (
-            id.includes("src/lib/icons") ||
-            id.includes("/lib/icons") ||
-            id.includes("@/lib/icons")
-          ) {
-            return "app-icons";
-          }
 
-          // Radix UI components - separate chunk
-          if (id.includes("@radix-ui")) {
-            return "radix-ui";
-          }
 
           // React Hook Form + Zod - separate chunk
           if (id.includes("react-hook-form") || id.includes("zod")) {
@@ -138,7 +126,6 @@ export default defineConfig({
       "react",
       "react-dom",
       "react/jsx-runtime",
-      "@/lib/icons",
       "@tanstack/react-query",
     ],
   },
