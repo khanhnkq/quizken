@@ -29,7 +29,12 @@ const GamePlayerMatchPage = () => {
     const [timerValue, setTimerValue] = useState(0);
     const [leaderboardData, setLeaderboardData] = useState<LeaderboardParticipant[]>([]);
 
-    const fetchLeaderboard = async () => {
+    const fetchLeaderboard = async (retryCount = 0) => {
+         // Small delay to ensure Host's DB writes are propagated
+         if (retryCount === 0) {
+             await new Promise(resolve => setTimeout(resolve, 500));
+         }
+
          // Fetch participants with their scores directly (calculated by Host)
          const { data: participants } = await supabase
             .from('game_participants')
@@ -44,6 +49,14 @@ const GamePlayerMatchPage = () => {
                  avatar_url: p.avatar_url,
                  score: p.score || 0
              }));
+
+             // If all scores are 0 and we haven't retried too many times, retry
+             const hasScores = leaderboard.some(p => p.score > 0);
+             if (!hasScores && retryCount < 3) {
+                 console.log(`Scores not ready, retrying... (attempt ${retryCount + 1})`);
+                 await new Promise(resolve => setTimeout(resolve, 500));
+                 return fetchLeaderboard(retryCount + 1);
+             }
 
              setLeaderboardData(leaderboard);
          }
