@@ -811,6 +811,17 @@
             "noAccess": "API Key does not have Gemini AI access",
             "limitReached": "API usage limit reached",
             "network": "Network connection error"
+        },
+        "fixTitle": "How to fix",
+        "steps": {
+            "login": "Log in to your account",
+            "settings": "Go to API Settings",
+            "newKey": "Get a new API key from",
+            "enableAccess": "Ensure Gemini AI access is enabled"
+        },
+        "buttons": {
+            "retry": "Retry",
+            "update": "Update API Key"
         }
     },
     "quotaDialog": {
@@ -1327,5 +1338,103 @@
         "loginRequired": "Please log in to upload documents.",
         "fetchError": "Fetch Error",
         "fetchErrorDesc": "Could not fetch document list. Please try again."
+    },
+    "game": {
+        "lobby": {
+            "hostTitle": "Host Game",
+            "joinTitle": "Join Game",
+            "selectQuiz": "Select Quiz",
+            "createRoom": "Create Room",
+            "enterCode": "Enter Code",
+            "nickname": "Nickname",
+            "joinButton": "Join Game",
+            "orEnterCode": "or enter code",
+            "scanQR": "Scan QR to Join",
+            "enterPin": "Game PIN",
+            "hostTab": "Host Game",
+            "joinTab": "Join Game",
+            "myQuizzes": "My Quizzes",
+            "publicQuizzes": "Public Quizzes",
+            "searchPlaceholder": "Search quizzes...",
+            "noQuizzes": "No quizzes found",
+            "createQuiz": "Create New Quiz",
+            "mascot": {
+                "slogan": "The ultimate multiplayer quiz battle.",
+                "cta": "Survive or get roasted!"
+            },
+            "loginToJoinArena": "Log in to join the arena!",
+            "loginRegister": "Login / Register",
+            "hostYourOwn": "Host Your Own Game",
+            "hostLoginDesc": "Log in to create battles and challenge friends!",
+            "loginToHost": "Login to Host",
+            "selectQuizError": "Please select a quiz",
+            "createRoomError": "Error creating room",
+            "enterCodeError": "Enter the code!",
+            "enterCodeDesc": "We need the Game PIN to find your battle.",
+            "loginRequired": "Login Required",
+            "loginRequiredDesc": "You must be logged in to join.",
+            "roomNotFound": "Room not found! Check the code.",
+            "gameAlreadyStarted": "Game already started or finished!",
+            "oops": "Oops!"
+        },
+        "host": {
+            "exit": "Exit",
+            "nowHosting": "Now Hosting",
+            "timePerQuestion": "Time per Question",
+            "waiting": "Waiting for players...",
+            "players": "Players",
+            "startGame": "Start Game",
+            "endGame": "End Game",
+            "copyLink": "Click to Copy Link",
+            "clickToCopy": "Click to Copy",
+            "copied": "Copied!",
+            "shareLink": "Share it with your friends!",
+            "endGameConfirm": "End Game?",
+            "endGameDesc": "Are you sure you want to exit? This will end the game for everyone in the lobby.",
+            "cancel": "Cancel",
+            "loading": "Loading Arena...",
+            "joinAt": "Join at",
+            "hostRole": "Host",
+            "unknownQuiz": "Unknown Quiz",
+            "errorLoading": "Error loading room",
+            "roomNotFound": "Room not found",
+            "roomDeleted": "This room may have been deleted.",
+            "newPlayer": "👋 New Player Joined!",
+            "readyToRumble": "is ready to rumble!",
+            "realtimeError": "Realtime Error",
+            "failedStart": "Failed to start",
+            "linkCopied": "Link copied!",
+            "errorEnding": "Error ending game",
+            "couldNotDelete": "Could not delete room.",
+            "gameEnded": "Game Ended",
+            "roomClosed": "Room has been closed.",
+            "errorUpdatingTime": "Error updating time"
+        },
+        "player": {
+            "ready": "Ready",
+            "playing": "Playing",
+            "joined": "Joined",
+            "status": "Status",
+            "waitingForHost": "Waiting for host to start...",
+            "youAreIn": "You are in!",
+            "enterName": "Enter your nickname",
+            "loginToJoin": "Login to join the fun!",
+            "loginNow": "LOGIN NOW",
+            "joiningAs": "Joining as",
+            "lookAtScreen": "Look at the big screen!",
+            "gameStarting": "Game Starting!",
+            "getReady": "Get ready...",
+            "hostClosedRoom": "The host has closed the room.",
+            "gameStarted": "Game already started",
+            "joinSuccess": "Joined successfully!",
+            "joinFailed": "Join failed",
+            "unknownError": "An unknown error occurred"
+        },
+        "common": {
+            "status": "Status",
+            "seconds": "Seconds",
+            "s": "s",
+            "playerFallback": "Player"
+        }
     }
 }

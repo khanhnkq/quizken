@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -21,6 +21,7 @@ export function GlobalChatTicker() {
   const navigate = useNavigate();
   const [latestMessage, setLatestMessage] = useState<ChatMessage | null>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const isDragging = useRef(false);
 
   useEffect(() => {
     // Hide logic handled in return, hooks must run always
@@ -139,7 +140,15 @@ export function GlobalChatTicker() {
   }
 
   return (
-    <div className="fixed bottom-4 right-20 md:bottom-8 md:right-auto md:left-1/2 md:-translate-x-1/2 z-50 pointer-events-none">
+    <motion.div 
+        drag
+        dragMomentum={false}
+        whileDrag={{ scale: 1.05, cursor: "grabbing" }}
+        onDragStart={() => { isDragging.current = true; }}
+        onDragEnd={() => { setTimeout(() => { isDragging.current = false; }, 150); }}
+        className="fixed bottom-4 right-20 md:bottom-8 md:right-auto md:left-1/2 z-50 cursor-grab active:cursor-grabbing"
+        style={{ x: window.innerWidth >= 768 ? "-50%" : "0%" }} // Handle centering logic via style to play nice with drag
+    >
       {/* Container for the pill - positioned bottom center on desktop, bottom right (next to FAB) on mobile */}
       <AnimatePresence mode="wait">
         <motion.div
@@ -148,9 +157,13 @@ export function GlobalChatTicker() {
           animate={{ y: 0, opacity: 1, scale: 1 }}
           exit={{ y: -20, opacity: 0, scale: 0.95 }}
           transition={{ duration: 0.4, ease: "easeOut" }}
-          className="pointer-events-auto cursor-pointer group"
-          onClick={() => navigate("/chat")}>
-          <div className="flex items-center gap-0 md:gap-3 bg-white/60 dark:bg-slate-900/60 backdrop-blur-lg border border-white/30 dark:border-slate-700/30 shadow-sm rounded-full p-3 md:pl-1 md:pr-4 md:py-1 hover:bg-white/80 dark:hover:bg-slate-900/80 hover:shadow-md hover:border-white/50 dark:hover:border-slate-600 transition-all">
+          className="pointer-events-auto group"
+          onClick={() => {
+              if (!isDragging.current) {
+                  navigate("/chat");
+              }
+          }}>
+          <div className="flex items-center gap-0 md:gap-3 bg-white/60 dark:bg-slate-900/60 backdrop-blur-lg border border-white/30 dark:border-slate-700/30 shadow-sm rounded-full p-3 md:pl-1 md:pr-4 md:py-1 hover:bg-white/80 dark:hover:bg-slate-900/80 hover:shadow-md hover:border-white/50 dark:hover:border-slate-600 transition-all select-none">
             <Avatar className="h-8 w-8 ring-2 ring-white dark:ring-slate-800 shadow-sm hidden md:block">
               {latestMessage.profiles?.avatar_url && (
                 <AvatarImage src={latestMessage.profiles.avatar_url} />
@@ -178,6 +191,6 @@ export function GlobalChatTicker() {
           </div>
         </motion.div>
       </AnimatePresence>
-    </div>
+    </motion.div>
   );
 }

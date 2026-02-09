@@ -27,7 +27,12 @@ const QuizEditPage = lazy(() => import("./pages/QuizEditPage"));
 const ChatPage = lazy(() => import("./pages/ChatPage"));
 const RedeemCode = lazy(() => import("./pages/RedeemCode"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
-const ChallengePage = lazy(() => import("./pages/ChallengePage"));
+const GameLobbyPage = lazy(() => import("./pages/GameLobbyPage"));
+const GameHostPage = lazy(() => import("./pages/GameHostPage"));
+const GameHostMatchPage = lazy(() => import("./pages/GameHostMatchPage"));
+const GamePlayerPage = lazy(() => import("./pages/GamePlayerPage"));
+const GamePlayerMatchPage = lazy(() => import("./pages/GamePlayerMatchPage"));
+
 
 
 // Preload functions for faster navigation
@@ -106,10 +111,17 @@ const AppRoutes = () => {
 
         {/* Chat */}
         <Route path="/chat" element={<ChatPage />} />
+
+        {/* Multiplayer Game */}
+        <Route path="/game/lobby" element={<GameLobbyPage />} />
+        <Route path="/game/host/:roomId" element={<GameHostPage />} />
+        <Route path="/game/host/:roomId/play" element={<GameHostMatchPage />} />
+        <Route path="/game/play/:roomId" element={<GamePlayerPage />} />
+        <Route path="/game/play/:roomId/match" element={<GamePlayerMatchPage />} />
+
+
         
-        {/* Challenge Mode */}
-        <Route path="/challenge" element={<ChallengePage />} />
-        <Route path="/challenge/:id" element={<ChallengePage />} />
+
 
         {/* Legacy redirects (optional - can remove later) */}
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

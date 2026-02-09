@@ -80,7 +80,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { PreviewModal } from "@/components/quiz/PreviewModal";
-import { CreateChallengeDialog } from "@/components/challenge/CreateChallengeDialog";
+
 import { gsap } from "gsap";
 
 interface PublicQuiz {
@@ -132,10 +132,7 @@ const QuizLibrary: React.FC = () => {
 
   const [shareQuiz, setShareQuiz] = useState<PublicQuiz | null>(null);
   
-  // Challenge Mode
-  const [searchParams] = useSearchParams();
-  const isChallengeMode = searchParams.get('mode') === 'challenge';
-  const [challengeQuiz, setChallengeQuiz] = useState<PublicQuiz | null>(null);
+
 
   // Scroll to top on mount
   useEffect(() => {
@@ -469,38 +466,7 @@ const QuizLibrary: React.FC = () => {
     setShareQuiz(quiz);
   };
 
-  const handleCreateChallenge = async (betAmount: number) => {
-    if (!challengeQuiz || !user) return;
-    
-    try {
-      // 1. Create Room (call RPC or Insert directly)
-      // Since we already have existing logic in ChallengeLobby, we can reuse or just replicate insert here.
-      // Replicating insert is cleaner for this context.
-      
-      const { data, error } = await supabase
-        .from('challenges')
-        .insert({
-           host_id: user.id,
-           quiz_id: challengeQuiz.id,
-           bet_amount: betAmount,
-           status: 'waiting'
-        })
-        .select()
-        .single();
-        
-      if (error) throw error;
-      
-      // 2. Redirect to Waiting Room
-      navigate(`/challenge/${data.id}`);
-      
-    } catch (err) {
-       console.error(err);
-       toast({
-         title: "Error creating challenge",
-         variant: "destructive"
-       });
-    }
-  };
+
 
   return (
     <>
@@ -811,7 +777,7 @@ const QuizLibrary: React.FC = () => {
                           } as Quiz);
                         }}
                         onUse={() => handleUseQuiz(quiz)}
-                        onChallenge={isChallengeMode ? () => setChallengeQuiz(quiz) : undefined}
+
                         onShare={() => handleShareQuiz(quiz)}
                         onDownload={async () => {
                           if (!user) {
@@ -1002,15 +968,7 @@ const QuizLibrary: React.FC = () => {
           />
           <AuthModal open={showAuthModal} onOpenChange={setShowAuthModal} />
         </div>
-        {/* Create Challenge Dialog */}
-        {challengeQuiz && (
-           <CreateChallengeDialog 
-             isOpen={!!challengeQuiz}
-             onClose={() => setChallengeQuiz(null)}
-             onConfirm={handleCreateChallenge}
-             quizTitle={challengeQuiz.title}
-           />
-        )}
+
       </div>
     </>
   );

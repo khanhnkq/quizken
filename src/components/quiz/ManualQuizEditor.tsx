@@ -43,30 +43,40 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
           headerIcon: VietnamLotusIcon,
           headerGradient: "from-pink-500 to-rose-500",
           saveIcon: VietnamStarIcon,
+          activeOptionColor: "bg-red-500 border-red-500 text-white",
+          hoverOptionBorder: "hover:border-red-400 dark:hover:border-red-400",
         };
       case 'theme_neon_night':
         return {
           headerIcon: NeonCyberSkullIcon,
           headerGradient: "from-cyan-500 to-blue-600",
           saveIcon: NeonBoltIcon,
+          activeOptionColor: "bg-cyan-500 border-cyan-500 text-white",
+          hoverOptionBorder: "hover:border-cyan-400 dark:hover:border-cyan-400",
         };
       case 'theme_pastel_dream':
         return {
           headerIcon: PastelCloudIcon,
           headerGradient: "from-pink-300 to-purple-400",
           saveIcon: PastelHeartIcon,
+          activeOptionColor: "bg-pink-400 border-pink-400 text-white",
+          hoverOptionBorder: "hover:border-pink-300 dark:hover:border-pink-300",
         };
       case 'theme_comic_manga':
         return {
           headerIcon: ComicPowIcon,
           headerGradient: "from-yellow-400 to-orange-500 border-2 border-black",
           saveIcon: ComicBoomIcon,
+          activeOptionColor: "bg-yellow-400 border-black text-black",
+          hoverOptionBorder: "hover:border-black dark:hover:border-black",
         };
       default:
         return {
            headerIcon: PenLine,
            headerGradient: "from-emerald-500 to-teal-500",
            saveIcon: Sparkles,
+           activeOptionColor: "bg-green-500 border-green-500 text-white",
+           hoverOptionBorder: "hover:border-green-400 dark:hover:border-green-400",
         };
     }
   }, [profileData?.equipped_theme]);
@@ -864,8 +874,8 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
                           className={cn(
                             "w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all",
                             q.correctAnswer === optIndex
-                              ? "bg-green-500 border-green-500 text-white"
-                              : "border-gray-300 dark:border-slate-600 hover:border-green-400 dark:hover:border-green-400 text-gray-400 dark:text-slate-400",
+                              ? themeConfig.activeOptionColor // USE THEME CONFIG
+                              : cn("border-gray-300 dark:border-slate-600 text-gray-400 dark:text-slate-400", themeConfig.hoverOptionBorder),
                             (saving || isChecking) && "opacity-50 cursor-not-allowed"
                           )}
                           title={t("manualQuiz.markCorrect")}

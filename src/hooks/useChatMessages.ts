@@ -140,6 +140,13 @@ export function useChatMessages(roomId: string = "general"): UseChatMessagesRetu
 
   // Fetch initial messages - re-run when roomId changes
   useEffect(() => {
+    setIsBotTyping(false);
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+  }, [roomId]);
+
+  useEffect(() => {
     let isMounted = true;
     setIsLoading(true);
 

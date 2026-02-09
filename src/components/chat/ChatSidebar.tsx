@@ -23,8 +23,8 @@ import { useAnnouncements } from "@/hooks/useAnnouncements";
 const defaultChatRooms = [
   { id: "general", name: "Phòng Chat Chung", icon: Hash },
   { id: "quits_quits", name: "Chat với Quít Quít", icon: MessageCircle },
-  { id: "quiz", name: "Thảo luận Quiz", icon: Megaphone },
-  { id: "help", name: "Hỏi đáp", icon: Star },
+  // { id: "quiz", name: "Thảo luận Quiz", icon: Megaphone },
+  // { id: "help", name: "Hỏi đáp", icon: Star },
 ];
 
 interface ChatSidebarProps {

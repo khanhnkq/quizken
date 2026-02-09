@@ -50,7 +50,7 @@ interface QuizCardProps {
   onShare: () => void;
   formatDate: (dateString: string) => string;
   formatNumber: (n: number) => string;
-  onChallenge?: () => void;
+
 }
 
 export const QuizCard: React.FC<QuizCardProps> = ({
@@ -61,7 +61,7 @@ export const QuizCard: React.FC<QuizCardProps> = ({
   onShare,
   formatDate,
   formatNumber,
-  onChallenge,
+
 }) => {
   const { t } = useTranslation();
   const questionCount = Array.isArray(quiz.questions) ? quiz.questions.length : 0;
@@ -166,17 +166,6 @@ export const QuizCard: React.FC<QuizCardProps> = ({
       {/* Action Buttons - Match Hero Section Style */}
       <div className="p-5 pt-4 mt-auto border-t-2 border-border/30 bg-secondary/10 dark:bg-secondary/5">
         <div className="flex gap-3">
-          {onChallenge ? (
-            <Button
-              className="flex-1 rounded-3xl font-heading shadow-xl border-4 border-red-500 hover:border-red-600 active:scale-95 transition-all duration-200 text-sm bg-red-500 hover:bg-red-600 text-white"
-              variant="hero"
-              size="lg"
-              onClick={onChallenge}
-            >
-              <div className="mr-1.5 font-black text-lg">VS</div>
-              {t('library.card.challenge', 'Challenge')}
-            </Button>
-           ) : (
             <Button
               className="flex-1 rounded-3xl font-heading shadow-xl border-4 border-primary hover:border-primary-foreground/50 active:scale-95 transition-all duration-200 text-sm bg-primary text-white"
               variant="hero"
@@ -186,7 +175,6 @@ export const QuizCard: React.FC<QuizCardProps> = ({
               <Sparkles className="w-4 h-4 mr-1.5" />
               {t('library.card.use')}
             </Button>
-           )}
 
           <Button
             variant="ghost"

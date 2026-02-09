@@ -22,13 +22,15 @@ interface MascotProps {
 }
 
 const Mascot: React.FC<MascotProps> = ({
-  emotion = "neutral",
+  emotion = "happy",
   size = 40,
   className = "",
   alt,
 }) => {
-  // Đường dẫn tới thư mục public
-  const imagePath = `/images/mascot/${emotion}.png`;
+  // Map neutral to happy since neutral.png doesn't exist
+  const effectiveEmotion = emotion === "neutral" ? "happy" : emotion;
+  // Dashboard path
+  const imagePath = `/images/mascot/${effectiveEmotion}.png`;
 
   return (
     <img
