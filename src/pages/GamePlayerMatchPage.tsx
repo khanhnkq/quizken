@@ -10,6 +10,8 @@ import { cn } from '@/lib/utils';
 import { Question } from '@/types/quiz';
 import { ActiveMatchView } from '@/components/game/match/ActiveMatchView';
 import { GameAwardView, LeaderboardParticipant } from '@/components/game/match/GameAwardView';
+import { BossBattlePlayerView } from '@/components/game/boss/BossBattlePlayerView';
+import { BossBattleResultView } from '@/components/game/boss/BossBattleResultView';
 
 const GamePlayerMatchPage = () => {
     const { t } = useTranslation();
@@ -28,6 +30,9 @@ const GamePlayerMatchPage = () => {
     const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
     const [timerValue, setTimerValue] = useState(0);
     const [leaderboardData, setLeaderboardData] = useState<LeaderboardParticipant[]>([]);
+    
+    // Boss Battle State
+    const [myDamage, setMyDamage] = useState(0);
 
     const fetchLeaderboard = async (retryCount = 0) => {
          // Small delay to ensure Host's DB writes are propagated
@@ -98,6 +103,13 @@ const GamePlayerMatchPage = () => {
             }
 
             setRoom(roomData);
+
+            // If room was reset to lobby (replay), redirect back to lobby
+            if (roomData.status === 'waiting' && roomData.phase === 'lobby') {
+                toast({ title: "Returning to Lobby", description: "The host has restarted the game." });
+                navigate(`/game/play/${roomId}`);
+                return;
+            }
             setPhase(roomData.phase);
             
             // Parse Questions
@@ -200,14 +212,22 @@ const GamePlayerMatchPage = () => {
 
 
     const handleSubmitAnswer = async (index: number) => {
-        if (isSubmitted || phase !== 'question' || !participantId) return;
+        if (isSubmitted || phase !== 'question' || !participantId || !currentQuestion) return;
 
         setSelectedAnswer(index);
         setIsSubmitted(true);
 
-        // Check correctness locally (optimistic)
-        const correct = index === currentQuestion?.correctAnswer;
+        const correct = index === currentQuestion.correctAnswer;
         setIsCorrect(correct);
+
+        // Boss Battle Logic: Calculate Local Damage Visual
+        if (room?.game_mode === 'boss_battle') {
+             if (correct) {
+                 setMyDamage(500); // Visual only
+             } else {
+                 setMyDamage(0);
+             }
+        }
 
         // Send to DB
         const { error } = await supabase
@@ -245,10 +265,28 @@ const GamePlayerMatchPage = () => {
     return (
         <>
             {phase === 'leaderboard' ? (
-                <GameAwardView 
-                    participants={leaderboardData}
-                    isHost={false}
-                    onExit={() => navigate('/')}
+                room?.game_mode === 'boss_battle' ? (
+                    <BossBattleResultView 
+                        bossHp={room?.boss_hp ?? 0}
+                        isHost={false}
+                        onExit={() => navigate('/')}
+                    />
+                ) : (
+                    <GameAwardView 
+                        participants={leaderboardData}
+                        // Current player result
+                        isWinner={leaderboardData[0]?.id === participantId}
+                        rank={leaderboardData.findIndex(p => p.id === participantId) + 1}
+                        totalScore={leaderboardData.find(p => p.id === participantId)?.score || 0}
+                        isHost={false}
+                        onExit={() => navigate('/')}
+                    />
+                )
+            ) : phase === 'result' && room?.game_mode === 'boss_battle' ? (
+                <BossBattlePlayerView 
+                    bossHp={room?.boss_hp ?? 0}
+                    maxBossHp={room?.max_boss_hp ?? 1000}
+                    myDamage={myDamage}
                 />
             ) : (
                 <ActiveMatchView 
@@ -262,6 +300,8 @@ const GamePlayerMatchPage = () => {
                     isHost={false}
                     phase={phase}
                     onAnswer={handleSubmitAnswer}
+                    correctAnswer={currentQuestion?.correctAnswer}
+                    isCorrect={isCorrect}
                 />
             )}
         </>

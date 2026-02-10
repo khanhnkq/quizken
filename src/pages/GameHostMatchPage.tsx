@@ -9,6 +9,8 @@ import { Question } from '@/types/quiz';
 import { useAuth } from '@/lib/auth';
 import { ActiveMatchView } from '@/components/game/match/ActiveMatchView';
 import { GameAwardView, LeaderboardParticipant } from '@/components/game/match/GameAwardView';
+import { BossBattleHostView } from '@/components/game/boss/BossBattleHostView';
+import { BossBattleResultView } from '@/components/game/boss/BossBattleResultView';
 
 const GameHostMatchPage = () => {
     const { t } = useTranslation();
@@ -26,6 +28,9 @@ const GameHostMatchPage = () => {
     const [timerTotal, setTimerTotal] = useState(20);
     const [phase, setPhase] = useState<'question' | 'result' | 'leaderboard'>('question');
     const [leaderboardData, setLeaderboardData] = useState<LeaderboardParticipant[]>([]);
+    
+    // Boss Battle State
+    const [roundDamage, setRoundDamage] = useState(0);
 
     // Player State for Host
     const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
@@ -160,11 +165,51 @@ const GameHostMatchPage = () => {
         }
     };
 
-    const handleTimeUp = () => {
+    const handleTimeUp = async () => {
         if (phase === 'result') return;
+        
+        let newBossHp = room?.boss_hp;
+
+        // Boss Battle Logic: Calculate Damage
+        if (room?.game_mode === 'boss_battle') {
+             try {
+                 const { data: answers } = await supabase
+                    .from('game_answers')
+                    .select('is_correct')
+                    .eq('room_id', roomId)
+                    .eq('question_index', room?.current_question_index || 0);
+                
+                 if (answers) {
+                     const correctCount = answers.filter(a => a.is_correct).length;
+                     // Base Damage Calculation (can be improved with time bonus later)
+                     const damage = correctCount * 500; 
+                     setRoundDamage(damage);
+
+                     if (room.boss_hp) {
+                         newBossHp = Math.max(0, room.boss_hp - damage);
+                     }
+                 }
+             } catch (e) {
+                 console.error("Error calculating boss damage", e);
+             }
+        }
+
         setPhase('result');
-        // Update DB to show results
-        updateRoomPhase('result');
+        
+        // Update DB
+        const updateData: any = { phase: 'result' };
+        if (newBossHp !== undefined && room?.game_mode === 'boss_battle') {
+            updateData.boss_hp = newBossHp;
+             // Optimistic update
+            setRoom((prev: any) => ({ ...prev, boss_hp: newBossHp }));
+        }
+
+        const { error } = await supabase
+            .from('game_rooms')
+            .update(updateData)
+            .eq('id', roomId);
+            
+         if (error) console.error("Error updating phase to result", error);
     };
 
     const handleNextQuestion = () => {
@@ -252,7 +297,12 @@ const GameHostMatchPage = () => {
         // Delete previous answers
         await supabase.from('game_answers').delete().eq('room_id', roomId);
 
-        navigate(`/game/host/${roomId}`); // Or just reload/reset state
+        // Reset participant scores to 0
+        await supabase.from('game_participants')
+            .update({ score: 0 })
+            .eq('room_id', roomId);
+
+        navigate(`/game/host/${roomId}`);
         window.location.reload(); 
     };
 
@@ -315,12 +365,39 @@ const GameHostMatchPage = () => {
     return (
         <>
             {phase === 'leaderboard' ? (
-                <GameAwardView 
-                    participants={leaderboardData}
-                    isHost={true}
-                    onReplay={handleReplay}
-                    onExit={handleExit}
-                />
+                room?.game_mode === 'boss_battle' ? (
+                    <BossBattleResultView 
+                        bossHp={room?.boss_hp ?? 0}
+                        isHost={true}
+                        onExit={handleExit}
+                        onReplay={handleReplay} // Optional: Need to check if re-play logic works for boss mode
+                    />
+                ) : (
+                    <GameAwardView 
+                        participants={leaderboardData}
+                        isHost={true}
+                        onReplay={handleReplay}
+                        onExit={handleExit}
+                    />
+                )
+            ) : phase === 'result' && room?.game_mode === 'boss_battle' ? (
+                <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 relative overflow-hidden">
+                     <BossBattleHostView 
+                        bossHp={room?.boss_hp ?? 0}
+                        maxBossHp={room?.max_boss_hp ?? 1000}
+                        totalDamageTaken={roundDamage}
+                        roundDamages={[]}
+                     />
+                     <div className="mt-8 z-50">
+                        <Button 
+                            onClick={handleNextQuestion}
+                            className="bg-purple-600 hover:bg-purple-700 text-white font-bold text-2xl h-16 w-64 rounded-full shadow-2xl border-4 border-white/20 animate-bounce"
+                        >
+                             Next Question
+                             <Trophy className="ml-2 w-6 h-6" />
+                        </Button>
+                     </div>
+                </div>
             ) : (
                 <ActiveMatchView 
                     question={currentQuestion}

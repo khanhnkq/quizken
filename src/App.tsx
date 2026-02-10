@@ -23,7 +23,7 @@ const Phase1View = lazy(() => import("./components/english/phases/Phase1View"));
 const Phase2View = lazy(() => import("./components/english/phases/Phase2View"));
 const MyNotebook = lazy(() => import("./components/english/MyNotebook"));
 const QuizCreatePage = lazy(() => import("./pages/QuizCreatePage"));
-const QuizEditPage = lazy(() => import("./pages/QuizEditPage"));
+const QuizEditPage = lazy(() => import("./pages/QuizCreatePage"));
 const ChatPage = lazy(() => import("./pages/ChatPage"));
 const RedeemCode = lazy(() => import("./pages/RedeemCode"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
@@ -56,6 +56,8 @@ import { GlobalCreateButton } from "@/components/common/GlobalCreateButton";
 import { GlobalChatTicker } from "@/components/chat/GlobalChatTicker";
 import { GlobalQuizListener } from "@/components/common/GlobalQuizListener";
 import { CustomCursor } from "@/components/ui/CustomCursor";
+
+import { NavbarActionProvider } from "@/contexts/NavbarActionContext";
 
 
 // Cross-page toast notification receiver
@@ -118,11 +120,6 @@ const AppRoutes = () => {
         <Route path="/game/host/:roomId/play" element={<GameHostMatchPage />} />
         <Route path="/game/play/:roomId" element={<GamePlayerPage />} />
         <Route path="/game/play/:roomId/match" element={<GamePlayerMatchPage />} />
-
-
-        
-
-
         {/* Legacy redirects (optional - can remove later) */}
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
@@ -158,30 +155,7 @@ const App = () => {
           ]);
         if (!isMounted) return;
         gsap.registerPlugin(ScrollSmoother, ScrollTrigger);
-
-        const timer = setTimeout(() => {
-          if (
-            document.querySelector("#smooth-wrapper") &&
-            document.querySelector("#smooth-content")
-          ) {
-            ScrollSmoother.create({
-              wrapper: "#smooth-wrapper",
-              content: "#smooth-content",
-              smooth: 0.5,
-              effects: false,
-              smoothTouch: 0.1,
-              normalizeScroll: true,
-            });
-          } else {
-            console.log(
-              "ScrollSmoother elements not found, skipping initialization",
-            );
-          }
-        }, 1);
-
-        if (!isMounted) {
-          clearTimeout(timer);
-        }
+        // NOTE: ScrollSmoother instance is created in Index.tsx where #smooth-wrapper lives
       } catch (e) {
         console.error("Failed to load GSAP plugins:", e);
       }
@@ -248,24 +222,21 @@ const App = () => {
         <ThemeManager />
         <TooltipProvider>
           <ChillMusicProvider>
-
-
-
-
             <ChatImagesProvider>
-
               {/* 👇 Toaster nằm ngoài ScrollSmoother */}
               <HotToaster />
               <GlobalLevelNotification />
               <ToastBroadcastReceiver />
               <BrowserRouter
-                future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+                future={{ v7_relativeSplatPath: true }}>
+                <NavbarActionProvider>
                 <AppRoutes />
                 <GlobalResumeButton />
                 <GlobalCreateButton />
                 <GlobalChatTicker />
                 <GlobalQuizListener />
 
+                </NavbarActionProvider>
               </BrowserRouter>
               <Analytics />
             </ChatImagesProvider>

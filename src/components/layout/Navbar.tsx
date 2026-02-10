@@ -65,6 +65,7 @@ import { NavbarThemeMenuItem } from "./NavbarThemeMenuItem";
 import { useTheme } from "@/components/theme-provider";
 
 import { NavbarThemeSelector } from "./NavbarThemeSelector";
+import { useNavbarActions } from "@/contexts/NavbarActionContext";
 
 const Navbar = () => {
   const { t, i18n } = useTranslation();
@@ -85,6 +86,17 @@ const Navbar = () => {
   const playClick = () => play("click");
   const navRef = useRef<HTMLElement | null>(null);
   const dateLocale = i18n.language === 'en' ? enUS : vi;
+  const { actions } = useNavbarActions();
+
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  const shouldCollapse = scrolled && !isMobile;
 
   // Global event to open auth modal
   useEffect(() => {
@@ -126,9 +138,9 @@ const Navbar = () => {
       key={location.pathname}
       initial={{ width: "90%", opacity: 0 }}
       animate={{ 
-        width: scrolled ? "75%" : "100%", 
+        width: shouldCollapse ? "75%" : "100%", 
         opacity: 1,
-        top: scrolled ? 16 : 0 // 16px is top-4
+        top: shouldCollapse ? 16 : 0 // 16px is top-4
       }}
       transition={{ duration: 0.7, ease: "easeInOut" }}
       ref={navRef}
@@ -136,12 +148,12 @@ const Navbar = () => {
         "fixed z-50 left-1/2 -translate-x-1/2",
         profileData?.equipped_theme === 'theme_comic_manga'
           ? cn(
-              scrolled 
+              shouldCollapse 
                 ? "rounded-full border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-white/95 dark:bg-slate-900/95" 
                 : "border-b-2 border-black bg-white/95 dark:bg-slate-900/95 rounded-none"
             )
           : cn(
-              scrolled
+              shouldCollapse
                 ? "rounded-full border border-slate-200/60 dark:border-slate-800/60 shadow-lg dark:shadow-slate-900/50 backdrop-blur-2xl bg-white/70 dark:bg-slate-950/70"
                 : "border-b border-slate-200/60 dark:border-slate-800/60 backdrop-blur-xl bg-white/80 dark:bg-slate-950/80 rounded-none"
             ),
@@ -161,8 +173,9 @@ const Navbar = () => {
             </span>
           </Link>
 
-          {/* Center: Nav Links */}
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center h-full gap-1 sm:gap-1">
+          {/* Center: Nav Links - Hide if actions are present to make space */}
+          {!actions && (
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center h-full gap-1 sm:gap-1">
             {navItems.map((item) => (
               <Link
                 key={item.path}
@@ -180,10 +193,18 @@ const Navbar = () => {
               </Link>
             ))}
             {/* Dashboard Link (Show when logged in) */}
-          </div>
+            </div>
+          )}
 
           {/* Right: Auth / User Dropdown */}
           <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
+            
+            {/* Dynamic Actions from Pages */}
+            {actions && (
+              <div className="flex items-center gap-2 mr-2 border-r border-slate-200 dark:border-slate-800 pr-4">
+                {actions}
+              </div>
+            )}
 
 
             {/* Global Loading Indicator (Navbar Integration) */}
@@ -191,7 +212,7 @@ const Navbar = () => {
               <div
                 className={cn(
                   "flex items-center gap-2 md:bg-primary/10 md:border md:border-primary/20 rounded-full md:px-3 md:py-1 animate-in fade-in slide-in-from-right-4 duration-300 pointer-events-none md:pointer-events-auto",
-                  scrolled && "hidden"
+                  shouldCollapse && "hidden"
                 )}
               >
                 <div className="relative flex h-2 w-2">
@@ -215,7 +236,7 @@ const Navbar = () => {
                   }}
                   className={cn(
                     "ml-1 hidden md:flex items-center justify-center h-4 w-4 rounded-full hover:bg-red-100 text-primary/50 hover:text-red-500 transition-colors pointer-events-auto",
-                    scrolled && "hidden"
+                    shouldCollapse && "hidden"
                   )}
                   title={t("quizGenerator.actions.cancel") || "Cancel"}
                 >

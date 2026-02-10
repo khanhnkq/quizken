@@ -64,8 +64,18 @@ const GamePlayerPage = () => {
                 .single();
              
              if (roomData && roomData.quizzes) {
-                 // @ts-ignore
+                 // @ts-expect-error - quizzes is actually a single object here
                  setQuizTitle(roomData.quizzes.title);
+             }
+
+             // Check session directly (not state) to avoid race condition
+             const sessionKey = `quiz_game_session_${roomId}`;
+             const hasSession = sessionStorage.getItem(sessionKey) !== null;
+
+             // If room is already playing and player has session, redirect to match
+             if (roomData && roomData.status === 'playing' && hasSession) {
+                 navigate(`/game/play/${roomId}/match`);
+                 return;
              }
 
              // Fetch Participants

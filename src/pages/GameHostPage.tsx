@@ -44,6 +44,8 @@ const GameHostPage = () => {
     
     // Time Limit State
     const [timeLimit, setTimeLimit] = useState<string>("20");
+    // Game Mode State
+    const [gameMode, setGameMode] = useState<'classic' | 'boss_battle'>('classic');
 
     const joinLink = `${window.location.origin}/game/play/${roomId}`; // Define joinLink for QR and Copy
 
@@ -76,6 +78,9 @@ const GameHostPage = () => {
             setRoom(data);
             if (data.time_limit_seconds) {
                 setTimeLimit(data.time_limit_seconds.toString());
+            }
+            if (data.game_mode) {
+                setGameMode(data.game_mode);
             }
             setIsLoading(false);
         };
@@ -200,14 +205,40 @@ const GameHostPage = () => {
         const timeLimitSec = parseInt(timeLimit) || 20;
         const timerEndsAt = new Date(now.getTime() + (timeLimitSec + 5) * 1000); // 5s buffer for "Get Ready"
 
+        const updateData: any = { 
+            status: 'playing', 
+            phase: 'question',
+            current_question_index: 0,
+            timer_ends_at: timerEndsAt.toISOString()
+        };
+
+        // Boss Battle Setup
+        if (gameMode === 'boss_battle') {
+            try {
+                // Fetch question count
+                const { count, error: countError } = await supabase
+                    .from('questions')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('quiz_id', room.quiz_id);
+                
+                if (!countError && count !== null) {
+                    // Import calculateBossMaxHp dynamically or define helper
+                    const playerCount = participants.length;
+                    // Formula: (Players * 500) * (Questions / 1.5)
+                    const baseHp = 500;
+                    const maxHp = (Math.max(1, playerCount) * baseHp) * Math.ceil(Math.max(1, count) / 1.5);
+                    
+                    updateData.boss_hp = maxHp;
+                    updateData.max_boss_hp = maxHp;
+                }
+            } catch (e) {
+                console.error("Error calculating boss HP", e);
+            }
+        }
+
         const { error } = await supabase
             .from('game_rooms')
-            .update({ 
-                status: 'playing', 
-                phase: 'question',
-                current_question_index: 0,
-                timer_ends_at: timerEndsAt.toISOString()
-            })
+            .update(updateData)
             .eq('id', roomId);
 
         if (error) {
@@ -264,6 +295,18 @@ const GameHostPage = () => {
         }
     };
 
+    const handleGameModeChange = async (value: 'classic' | 'boss_battle') => {
+        setGameMode(value);
+        const { error } = await supabase
+            .from('game_rooms')
+            .update({ game_mode: value })
+            .eq('id', roomId);
+            
+        if (error) {
+            toast({ title: "Error updating mode", description: error.message, variant: "destructive" });
+        }
+    };
+
     if (isLoading) {
         return <div className="min-h-screen flex flex-col items-center justify-center gap-4 text-white">
             <Loader2 className="w-12 h-12 animate-spin text-yellow-400" />
@@ -288,6 +331,8 @@ const GameHostPage = () => {
                     quizTitle={room.quizzes?.title || "Unknown Quiz"}
                     timeLimit={timeLimit}
                     onTimeLimitChange={handleTimeLimitChange}
+                    gameMode={gameMode}
+                    onGameModeChange={handleGameModeChange}
                     onExit={handleExit}
                 />
 

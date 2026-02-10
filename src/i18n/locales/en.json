@@ -204,7 +204,8 @@
                 "authenticating": "Authenticating security... 🔒",
                 "limits": "Checking quota limits... 📊",
                 "ai_generating": "AI is creating content... ✨",
-                "analyzing_docs": "Analyzing your documents... 📚"
+                "analyzing_docs": "Analyzing your documents... 📚",
+                "fallback_ai": "Switching to backup AI... 🔄"
             },
             "backgroundNote": "You can close this window, we'll notify you when done!",
             "cancelButton": "Cancel creation",
@@ -1184,6 +1185,8 @@
         "addImage": "Add Image",
         "changeImage": "Change Image",
         "removeImage": "Remove Image",
+    "clearOptions": "Clear all options",
+    "clear": "Clear",
         "uploading": "Uploading...",
         "options": "Options",
         "optionPlaceholder": "Option {{num}}",
@@ -1308,7 +1311,7 @@
         "retry": "Try again"
     },
     "knowledgeBase": {
-        "title": "Knowledge Base (RAG)",
+        "title": "Knowledge Base",
         "description": "Upload documents for AI to learn and generate more accurate quizzes.",
         "addDocument": "Add New Document",
         "uploading": "Uploading...",
@@ -1380,6 +1383,9 @@
         "host": {
             "exit": "Exit",
             "nowHosting": "Now Hosting",
+            "gameMode": "Game Mode",
+            "modeClassic": "Classic",
+            "modeBoss": "Boss Battle",
             "timePerQuestion": "Time per Question",
             "waiting": "Waiting for players...",
             "players": "Players",

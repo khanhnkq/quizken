@@ -1,17 +1,19 @@
 
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Clock } from 'lucide-react';
+import { Clock, Swords, Trophy } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface HostHeaderProps {
     quizTitle: string;
     timeLimit: string;
     onTimeLimitChange: (value: string) => void;
+    gameMode: 'classic' | 'boss_battle';
+    onGameModeChange: (value: 'classic' | 'boss_battle') => void;
     onExit: () => void;
 }
 
-export const HostHeader = ({ quizTitle, timeLimit, onTimeLimitChange, onExit }: HostHeaderProps) => {
+export const HostHeader = ({ quizTitle, timeLimit, onTimeLimitChange, gameMode, onGameModeChange, onExit }: HostHeaderProps) => {
     const { t } = useTranslation();
 
     return (
@@ -27,6 +29,33 @@ export const HostHeader = ({ quizTitle, timeLimit, onTimeLimitChange, onExit }: 
             </div>
             
             <div className="flex items-center gap-6">
+                {/* Game Mode Selector */}
+                <div className="flex flex-col items-end mr-2 gap-1">
+                    <span className="text-sm font-bold text-muted-foreground uppercase tracking-wider">{t('game.host.gameMode', 'Game Mode')}</span>
+                    <div className="w-48">
+                        <Select value={gameMode} onValueChange={(v) => onGameModeChange(v as 'classic' | 'boss_battle')}>
+                            <SelectTrigger className="h-14 rounded-2xl bg-white/50 dark:bg-black/20 border-2 border-transparent focus:border-primary/50 shadow-sm font-bold text-lg px-4">
+                                {gameMode === 'classic' ? <Trophy className="w-6 h-6 mr-3 text-yellow-500" /> : <Swords className="w-6 h-6 mr-3 text-red-500" />}
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="classic" className="font-bold">
+                                    <div className="flex items-center gap-2">
+                                        <Trophy className="w-5 h-5 text-yellow-500" />
+                                        {t('game.host.modeClassic', 'Classic')}
+                                    </div>
+                                </SelectItem>
+                                <SelectItem value="boss_battle" className="font-bold">
+                                    <div className="flex items-center gap-2">
+                                        <Swords className="w-5 h-5 text-red-500" />
+                                        {t('game.host.modeBoss', 'Boss Battle')}
+                                    </div>
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </div>
+                {/* Time Limit Selector */}
                 <div className="flex flex-col items-end mr-2 gap-1">
                         <span className="text-sm font-bold text-muted-foreground uppercase tracking-wider">{t('game.host.timePerQuestion')}</span>
                         <div className="w-44">

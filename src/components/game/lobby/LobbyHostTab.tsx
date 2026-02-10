@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, BookOpen, User, Trophy } from 'lucide-react';
+import { Loader2, BookOpen, User, Trophy, Swords } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/lib/auth';
 import { useNavigate } from 'react-router-dom';
@@ -17,11 +17,13 @@ interface LobbyHostTabProps {
     myQuizzes: Quiz[];
     selectedQuizId: string;
     setSelectedQuizId: (id: string) => void;
+    gameMode: 'classic' | 'boss_battle';
+    setGameMode: (mode: 'classic' | 'boss_battle') => void;
     isLoading: boolean;
     onHost: () => void;
 }
 
-export const LobbyHostTab = ({ myQuizzes, selectedQuizId, setSelectedQuizId, isLoading, onHost }: LobbyHostTabProps) => {
+export const LobbyHostTab = ({ myQuizzes, selectedQuizId, setSelectedQuizId, gameMode, setGameMode, isLoading, onHost }: LobbyHostTabProps) => {
     const { t } = useTranslation();
     const { user } = useAuth();
     const navigate = useNavigate();
@@ -67,6 +69,34 @@ export const LobbyHostTab = ({ myQuizzes, selectedQuizId, setSelectedQuizId, isL
                         </div>
                     </div>
                     
+                    {/* Game Mode Selector */}
+                    <div className="space-y-3">
+                        <Label className="text-base font-bold text-muted-foreground ml-4 uppercase tracking-wider">{t('game.lobby.gameMode', 'Game Mode')}</Label>
+                        <div className="relative">
+                            <Select value={gameMode} onValueChange={(v) => setGameMode(v as 'classic' | 'boss_battle')}>
+                                <SelectTrigger className="w-full h-20 rounded-[2rem] bg-white/50 dark:bg-black/20 border-4 border-transparent focus:border-primary/50 text-foreground font-bold text-lg shadow-inner px-6 py-4">
+                                    <div className="flex items-center gap-3">
+                                        {gameMode === 'classic' ? <Trophy className="w-6 h-6 text-yellow-500" /> : <Swords className="w-6 h-6 text-red-500" />}
+                                        <SelectValue />
+                                    </div>
+                                </SelectTrigger>
+                                <SelectContent className="rounded-xl border-2 border-primary/20 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl">
+                                    <SelectItem value="classic" className="text-base font-bold py-3 cursor-pointer focus:bg-primary/10 focus:text-primary">
+                                        <div className="flex items-center gap-2">
+                                            <Trophy className="w-5 h-5 text-yellow-500" />
+                                            {t('game.lobby.modeClassic', 'Classic')}
+                                        </div>
+                                    </SelectItem>
+                                    <SelectItem value="boss_battle" className="text-base font-bold py-3 cursor-pointer focus:bg-primary/10 focus:text-primary">
+                                        <div className="flex items-center gap-2">
+                                            <Swords className="w-5 h-5 text-red-500" />
+                                            {t('game.lobby.modeBoss', 'Boss Battle')}
+                                        </div>
+                                    </SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
                 
                     <Button 
                         className="w-full h-20 rounded-[2rem] text-2xl font-black bg-primary text-primary-foreground hover:bg-primary/90 border-4 border-white/20 shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 mt-4"

@@ -574,7 +574,10 @@ export function QuickGeneratorDialog({ open, onOpenChange, initialTab = null }: 
     return (
         <>
             <Dialog open={open} onOpenChange={handleOpenChange}>
-                <DialogContent className="max-w-2xl p-0 overflow-hidden bg-transparent border-none shadow-none sm:max-w-2xl [&>button]:hidden">
+                <DialogContent className={cn(
+                    "p-0 overflow-hidden bg-transparent border-none shadow-none [&>button]:hidden transition-all duration-300",
+                    "max-w-4xl sm:max-w-4xl"
+                )}>
                     {/* Visually hidden title for accessibility */}
                     <DialogTitle className="sr-only">{t("quickGenerator.title")}</DialogTitle>
                     <DialogDescription className="sr-only">{t("quickGenerator.description")}</DialogDescription>
@@ -596,7 +599,7 @@ export function QuickGeneratorDialog({ open, onOpenChange, initialTab = null }: 
                     ) : activeTab === null ? (
                         /* Mode Selection - Messenger/Telegram Style */
                         <div className={cn(
-                            "shadow-2xl rounded-3xl overflow-hidden border-2",
+                            "shadow-2xl rounded-3xl overflow-hidden border-2 h-[80vh] max-h-[800px] min-h-[600px] flex flex-col",
                             profileData?.equipped_theme === 'theme_comic_manga'
                                 ? "bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"
                                 : "bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-primary/10 dark:border-primary/20"
@@ -721,7 +724,7 @@ export function QuickGeneratorDialog({ open, onOpenChange, initialTab = null }: 
                     ) : activeTab === "ai" ? (
                         /* AI Chat Interface */
 
-                        <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-2 border-primary/10 dark:border-primary/20 shadow-2xl rounded-3xl overflow-hidden h-[600px] flex flex-col">
+                        <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-2 border-primary/10 dark:border-primary/20 shadow-2xl rounded-3xl overflow-hidden h-[80vh] max-h-[800px] min-h-[600px] flex flex-col">
                             <ChatInterface
                                 onComplete={(topic, count, fastMode, difficulty, documentIds) => {
                                     setPrompt(topic);
@@ -737,7 +740,7 @@ export function QuickGeneratorDialog({ open, onOpenChange, initialTab = null }: 
                         </div>
                     ) : activeTab === "file" ? (
                         /* File Upload Interface */
-                        <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-2 border-primary/10 dark:border-primary/20 shadow-2xl rounded-3xl overflow-hidden h-[600px] flex flex-col">
+                        <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-2 border-primary/10 dark:border-primary/20 shadow-2xl rounded-3xl overflow-hidden h-[80vh] max-h-[800px] min-h-[600px] flex flex-col">
                             <FileUploadInterface
                                 onComplete={(quizId) => {
                                     onOpenChange(false);
@@ -749,7 +752,7 @@ export function QuickGeneratorDialog({ open, onOpenChange, initialTab = null }: 
                         </div>
                     ) : (
                         /* Manual Quiz Editor */
-                        <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-2 border-primary/10 dark:border-primary/20 shadow-2xl rounded-3xl overflow-hidden">
+                        <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-2 border-primary/10 dark:border-primary/20 shadow-2xl rounded-3xl overflow-hidden h-[80vh] max-h-[800px] min-h-[600px] flex flex-col">
                             <ManualQuizEditor
                                 onComplete={(quizId) => {
                                     onOpenChange(false);

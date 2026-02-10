@@ -75,26 +75,13 @@ export const KnowledgeBaseManager = () => {
       setUploadProgress(30);
       const textContent = await extractTextFromFile(file);
 
-      // 2. Upload raw file to Storage
+      // 2. Insert metadata to DB
       setUploadProgress(50);
-      const fileExt = file.name.split(".").pop();
-      const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
-      const filePath = `${user.id}/${fileName}`;
-
-      const { error: storageError } = await supabase.storage
-        .from("documents")
-        .upload(filePath, file);
-
-      if (storageError) throw storageError;
-
-      // 3. Insert metadata to DB
-      setUploadProgress(70);
       const { data: docData, error: dbError } = await supabase
         .from("documents")
         .insert({
           user_id: user.id,
           title: file.name,
-          storage_path: filePath,
           mime_type: file.type,
           file_size: file.size,
         })
@@ -103,8 +90,8 @@ export const KnowledgeBaseManager = () => {
 
       if (dbError) throw dbError;
 
-      // 4. Call Edge Function to process/embed
-      setUploadProgress(90);
+      // 3. Call Edge Function to process/embed
+      setUploadProgress(80);
       const { error: funcError } = await supabase.functions.invoke("process-document", {
         body: {
           documentId: docData.id,
@@ -135,18 +122,11 @@ export const KnowledgeBaseManager = () => {
     }
   };
 
-  const handleDelete = async (id: string, path: string) => {
+  const handleDelete = async (id: string) => {
     if (!confirm(t("knowledgeBase.deleteConfirm"))) return;
 
     try {
-      // 1. Delete from Storage
-      const { error: storageError } = await supabase.storage
-        .from("documents")
-        .remove([path]);
-
-      if (storageError) console.warn("Storage delete warning:", storageError);
-
-      // 2. Delete from DB (Cascade deletes sections)
+      // Delete from DB (Cascade deletes sections)
       const { error: dbError } = await supabase
         .from("documents")
         .delete()
@@ -302,7 +282,7 @@ export const KnowledgeBaseManager = () => {
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => handleDelete(doc.id, (doc as any).storage_path)}
+                      onClick={() => handleDelete(doc.id)}
                       className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md"
                       title={t("knowledgeBase.delete")}
                     >

@@ -1,4 +1,4 @@
-import { useEffect, useRef, lazy, Suspense, useLayoutEffect } from "react";
+import { useEffect, useRef, lazy, Suspense } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
 import HomeHero from "@/components/sections/HomeHero";
@@ -20,51 +20,11 @@ const Index = () => {
   const hasScrolled = useRef(false);
   const mainRef = useRef<HTMLDivElement>(null);
 
-  // Entry Animations
-  useLayoutEffect(() => {
+  // Section scroll animations (hero elements are animated by HomeHero itself)
+  useEffect(() => {
+    if (!mainRef.current) return;
+    
     const ctx = gsap.context(() => {
-      // Navbar (if not already animated globally, but good to reinforce)
-      gsap.from("nav", {
-        y: -100,
-        opacity: 0,
-        duration: 1,
-        ease: "power3.out",
-        delay: 0.2
-      });
-
-      // Hero Section Elements
-      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
-
-      tl.from(".hero-badge", {
-        y: 20,
-        opacity: 0,
-        duration: 0.6,
-      })
-        .from(".hero-title", {
-          y: 50,
-          opacity: 0,
-          duration: 0.8,
-          stagger: 0.1,
-        }, "-=0.4")
-        .from(".hero-description", {
-          y: 30,
-          opacity: 0,
-          duration: 0.8,
-        }, "-=0.6")
-        .from(".hero-input", {
-          scale: 0.9,
-          opacity: 0,
-          duration: 0.6,
-          ease: "back.out(1.7)",
-        }, "-=0.4")
-        .from(".hero-floating-icon", {
-          scale: 0,
-          opacity: 0,
-          duration: 0.8,
-          stagger: 0.1,
-          ease: "elastic.out(1, 0.5)",
-        }, "-=0.4");
-
       // Quiz Generator Section
       gsap.from(".quiz-generator-section", {
         scrollTrigger: {
@@ -92,6 +52,55 @@ const Index = () => {
     }, mainRef);
 
     return () => ctx.revert();
+  }, []);
+
+  // Initialize ScrollSmoother (moved from App.tsx to properly manage lifecycle)
+  useEffect(() => {
+    if (shouldDisableScrollSmoother()) return;
+
+    let smoother: any = null;
+    let isMounted = true;
+
+    const initSmoother = async () => {
+      try {
+        const { default: ScrollSmoother } = await import("gsap/ScrollSmoother");
+        if (!isMounted) return;
+
+        // Kill any existing instance before creating a new one
+        const existing = ScrollSmoother.get();
+        if (existing) existing.kill();
+
+        // Small delay to ensure DOM is ready
+        await new Promise(r => setTimeout(r, 50));
+        if (!isMounted) return;
+
+        if (
+          document.querySelector("#smooth-wrapper") &&
+          document.querySelector("#smooth-content")
+        ) {
+          smoother = ScrollSmoother.create({
+            wrapper: "#smooth-wrapper",
+            content: "#smooth-content",
+            smooth: 0.5,
+            effects: false,
+            smoothTouch: 0.1,
+            normalizeScroll: true,
+          });
+        }
+      } catch (e) {
+        console.error("Failed to create ScrollSmoother:", e);
+      }
+    };
+
+    initSmoother();
+
+    return () => {
+      isMounted = false;
+      if (smoother) {
+        smoother.kill();
+        smoother = null;
+      }
+    };
   }, []);
 
   useEffect(() => {

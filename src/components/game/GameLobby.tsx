@@ -31,6 +31,7 @@ export const GameLobby = () => {
 
     // Host State
     const [selectedQuizId, setSelectedQuizId] = useState<string>('');
+    const [gameMode, setGameMode] = useState<'classic' | 'boss_battle'>('classic');
     const [myQuizzes, setMyQuizzes] = useState<any[]>([]);
 
     // Player State
@@ -71,7 +72,8 @@ export const GameLobby = () => {
                     quiz_id: selectedQuizId,
                     code: code,
                     status: 'waiting',
-                    phase: 'lobby'
+                    phase: 'lobby',
+                    game_mode: gameMode
                 })
                 .select()
                 .single();
@@ -235,6 +237,8 @@ export const GameLobby = () => {
                                         myQuizzes={myQuizzes}
                                         selectedQuizId={selectedQuizId}
                                         setSelectedQuizId={setSelectedQuizId}
+                                        gameMode={gameMode}
+                                        setGameMode={setGameMode}
                                         isLoading={isLoading}
                                         onHost={handleCreateRoom}
                                     />

@@ -205,7 +205,8 @@
                 "authenticating": "Đang xác thực bảo mật... 🔒",
                 "limits": "Đang kiểm tra quota... 📊",
                 "ai_generating": "AI đang sáng tạo nội dung... ✨",
-                "analyzing_docs": "Đang đọc tài liệu của bạn... 📚"
+                "analyzing_docs": "Đang đọc tài liệu của bạn... 📚",
+                "fallback_ai": "Đang chuyển sang AI dự phòng... 🔄"
             },
             "backgroundNote": "Bạn có thể đóng cửa sổ này, tụi mình sẽ báo khi xong!",
             "cancelButton": "Thôi không tạo nữa",
@@ -296,7 +297,7 @@
             "difficultyHard": "Khó",
             "fastMode": "Chế độ nhanh",
             "aiGenerator": "Tạo bằng AI",
-            "manualGenerator": "Tự tạo tay",
+            "manualGenerator": "Tạo thủ công",
             "fastModeEnabled": "Đã bật chế độ nhanh",
             "fastModeDisabled": "Đã tắt chế độ nhanh"
         },
@@ -1182,6 +1183,8 @@
         "addImage": "Thêm ảnh",
         "changeImage": "Thay ảnh",
         "removeImage": "Xóa ảnh",
+    "clearOptions": "Xóa tất cả câu trả lời",
+    "clear": "Xóa",
         "uploading": "Đang tải lên...",
         "options": "Các lựa chọn",
         "optionPlaceholder": "Đáp án {{num}}",
@@ -1305,7 +1308,7 @@
         "retry": "Thử lại"
     },
     "knowledgeBase": {
-        "title": "Kho Kiến Thức (RAG)",
+        "title": "Kho Kiến Thức",
         "description": "Tải lên tài liệu để AI học và tạo quiz chính xác hơn.",
         "addDocument": "Thêm tài liệu mới",
         "uploading": "Đang tải lên...",
@@ -1377,6 +1380,9 @@
         "host": {
             "exit": "Thoát",
             "nowHosting": "Đang tổ chức",
+            "gameMode": "Chế độ chơi",
+            "modeClassic": "Cổ điển",
+            "modeBoss": "Đánh Boss",
             "timePerQuestion": "Thời gian mỗi câu",
             "waiting": "Đang chờ người chơi...",
             "players": "Người chơi",

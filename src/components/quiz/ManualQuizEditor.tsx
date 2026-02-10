@@ -1,5 +1,5 @@
-import React, { useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useCallback, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,13 +11,17 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "react-i18next";
-import { Plus, Trash2, Check, X, GripVertical, Sparkles, ArrowLeft, PenLine, Image as ImageIcon, Loader2, Bot, Lightbulb, Zap, Wand2 } from "lucide-react";
+import { Plus, Trash2, Check, X, GripVertical, Sparkles, ArrowLeft, PenLine, Image as ImageIcon, Loader2, Bot, Lightbulb, Zap, Wand2, Layers, Eraser } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { uploadImage } from "@/lib/cloudinary";
 import { useProfile } from "@/hooks/useProfile";
 import { VietnamMapIcon, VietnamStarIcon, VietnamDrumIcon, VietnamLotusIcon } from "@/components/icons/VietnamIcons";
 import { NeonBoltIcon, NeonCyberSkullIcon, PastelCloudIcon, PastelHeartIcon, ComicPowIcon, ComicBoomIcon } from "@/components/icons/ThemeIcons";
+import { KnowledgeBaseManager } from "@/components/knowledge/KnowledgeBaseManager";
+import { useNavbarActions } from "@/contexts/NavbarActionContext";
 import type { Question, Quiz } from "@/types/quiz";
 import QuizValidationResult, { ValidationResult } from "./QuizValidationResult";
 
@@ -34,6 +38,7 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
   const { user } = useAuth();
   const navigate = useNavigate();
   const { profileData } = useProfile(user?.id);
+  const { setActions } = useNavbarActions();
 
   const themeConfig = React.useMemo(() => {
     const theme = profileData?.equipped_theme;
@@ -101,6 +106,35 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
   const [isChecking, setIsChecking] = useState(false);
   const [isGeneratingExplanations, setIsGeneratingExplanations] = useState(false);
   const [isGeneratingQuestions, setIsGeneratingQuestions] = useState(false);
+  const [pendingSave, setPendingSave] = useState(false);
+
+  // RAG State
+  const [useRAG, setUseRAG] = useState(false);
+  const [selectedDocs, setSelectedDocs] = useState<string[]>([]);
+  const [availableDocs, setAvailableDocs] = useState<{id: string, title: string}[]>([]);
+  const [isDocsLoading, setIsDocsLoading] = useState(false);
+
+  // Fetch documents when RAG is enabled
+  useEffect(() => {
+    if (useRAG && user?.id) {
+      fetchDocuments();
+    }
+  }, [useRAG, user?.id]);
+
+  const fetchDocuments = async () => {
+    setIsDocsLoading(true);
+    const { data } = await supabase.from("documents").select("id, title").order("created_at", { ascending: false });
+    if (data) setAvailableDocs(data);
+    setIsDocsLoading(false);
+  };
+
+  const toggleDocSelection = useCallback((docId: string) => {
+    setSelectedDocs(prev =>
+      prev.includes(docId)
+        ? prev.filter(id => id !== docId)
+        : [...prev, docId]
+    );
+  }, []);
 
   // Fetch quiz data if handling edit mode
   React.useEffect(() => {
@@ -318,7 +352,7 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
   }, [title, description, questions, i18n.language, toast]);
 
   // Handle AI Check Button Click
-  const handleCheckQuiz = async () => {
+  const handleCheckQuiz = useCallback(async () => {
     if (!validationResult) {
        if (!validate()) {
          toast({
@@ -347,10 +381,10 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
          });
       }
     }
-  };
+  }, [validationResult, validate, toast, t, performAiCheck]);
 
   // Handle Auto Fill
-  const handleAutoFill = async () => {
+  const handleAutoFill = useCallback(async () => {
     // Validation
     if (!title.trim()) {
        toast({
@@ -396,7 +430,8 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
       const { data, error } = await supabase.functions.invoke('generate-explanation', {
         body: { 
           questions: payload,
-          language: i18n.language 
+          language: i18n.language,
+          documentIds: useRAG ? selectedDocs : []
         }
       });
 
@@ -437,10 +472,10 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
     } finally {
       setIsGeneratingExplanations(false);
     }
-  };
+  }, [title, questions, t, i18n.language, useRAG, selectedDocs, toast]);
 
   // Handle Quick Add Questions
-  const handleQuickAddQuestions = async () => {
+  const handleQuickAddQuestions = useCallback(async () => {
     // Validation: Title required
     if (!title.trim()) {
         toast({
@@ -458,7 +493,8 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
               action: 'generate_questions',
               topic: title,
               count: 5,
-              language: i18n.language 
+              language: i18n.language,
+              documentIds: useRAG ? selectedDocs : []
             }
         });
 
@@ -490,56 +526,17 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
     } finally {
         setIsGeneratingQuestions(false);
     }
-  };
+  }, [title, t, i18n.language, useRAG, selectedDocs, toast]);
 
-  // Save quiz
-  const handleSave = useCallback(async () => {
-    if (!user) {
-      toast({
-        title: t("auth.required"),
-        description: t("auth.loginToCreate"),
-        variant: "warning",
-      });
-      return;
-    }
-
-    if (!validate()) {
-      toast({
-        title: t("manualQuiz.errors.validationFailed"),
-        description: t("manualQuiz.errors.fixErrors"),
-        variant: "destructive",
-      });
-      return;
-    }
-
+  // Step 1: Actually save & navigate (called from dialog confirm button or directly if AI check fails)
+  const executeSave = useCallback(async () => {
+    if (!user) return;
+    
+    setPendingSave(false);
+    setValidationResult(null);
     setSaving(true);
 
     try {
-      // 1. Enforce AI Validation
-      let currentValidation = validationResult;
-      
-      // If never checked, or we want to force re-check (safer)
-      // Ideally we force check to ensure data hasn't changed since last check. 
-      // For now, let's FORCE check every time on save to be safe as per request.
-      currentValidation = await performAiCheck();
-
-      if (!currentValidation) {
-        // AI Check failed (network error etc), abort save
-        setSaving(false);
-        return; 
-      }
-
-      if (!currentValidation.isValid) {
-        toast({
-          title: "Validation Failed",
-          description: "Please fix the issues reported by AI before saving.",
-          variant: "destructive",
-        });
-        setSaving(false);
-        return; // BLOCK SAVE
-      }
-
-      // 2. Proceed with Save if Valid
       // Clean questions (remove empty options)
       const cleanedQuestions = questions.map(q => ({
         question: q.question.trim(),
@@ -558,8 +555,6 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
           .update({
              title: title.trim(),
              description: description.trim() || null,
-            // Only update prompt if not AI generated, or let user override it. 
-            // Ideally keep original prompt if AI, but here we just update metadata.
              questions: cleanedQuestions,
              is_public: isPublic,
              updated_at: new Date().toISOString()
@@ -610,12 +605,220 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
     } finally {
       setSaving(false);
     }
-  }, [user, validate, questions, title, description, toast, t, onComplete, navigate, isPublic, quizId, performAiCheck, validationResult]);
+  }, [user, questions, title, description, toast, t, onComplete, navigate, isPublic, quizId]);
+
+  // Step 2: Run AI check and show dialog for user review, or save directly if AI check fails
+  const handleSave = useCallback(async () => {
+    if (!user) {
+      toast({
+        title: t("auth.required"),
+        description: t("auth.loginToCreate"),
+        variant: "warning",
+      });
+      return;
+    }
+
+    if (!validate()) {
+      toast({
+        title: t("manualQuiz.errors.validationFailed"),
+        description: t("manualQuiz.errors.fixErrors"),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Run AI check — dialog will open via setValidationResult
+    const checkResult = await performAiCheck();
+
+    if (!checkResult) {
+      // AI Check failed (network error etc) — save directly without AI review
+      await executeSave();
+      return;
+    }
+
+    // Mark that we're waiting for user confirmation in the dialog
+    setPendingSave(true);
+    // Dialog is now open (validationResult is set by performAiCheck)
+    // User must click "Confirm & Save" or "Close" in the dialog
+  }, [user, validate, toast, t, performAiCheck, executeSave]);
+
+  // Navbar Actions Integration
+  useEffect(() => {
+    if (variant !== "page") {
+      setActions(null);
+      return;
+    }
+
+    const isBusy = saving || isChecking || isGeneratingQuestions || isGeneratingExplanations;
+
+    setActions(
+      <div className="flex items-center gap-1 md:gap-2">{variant === 'page' ? (
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            asChild
+            disabled={isBusy} 
+            className="px-2 sm:px-3 text-muted-foreground h-9"
+            title={t("common.back")}
+          >
+            <Button onClick={() => navigate("/")}>
+               <ArrowLeft className="w-4 h-4 sm:hidden" />
+               <span className="hidden sm:inline">{t("common.back")}</span>
+            </Button>
+           </Button>
+        ) : onCancel && (
+           <Button 
+             variant="ghost" 
+             size="sm" 
+             type="button"
+             onClick={(e) => {
+               e.preventDefault();
+               onCancel();
+             }} 
+             disabled={isBusy} 
+             className="px-2 sm:px-3 text-muted-foreground h-9"
+             title={t("common.cancel")}
+           >
+              <X className="w-4 h-4 sm:hidden" />
+              <span className="hidden sm:inline">{t("common.cancel")}</span>
+            </Button>
+        )}
+           <Sheet>
+          <SheetTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    disabled={isBusy}
+                    className={cn(
+                      "px-2 sm:px-3 text-xs sm:text-sm whitespace-nowrap h-9",
+                      useRAG
+                        ? "text-yellow-700 bg-yellow-50 hover:bg-yellow-100 dark:text-yellow-400 dark:bg-yellow-900/20"
+                        : "text-slate-500 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800/50"
+                    )}
+                    title={t("knowledgeBase.title")}
+                  >
+                    <Layers className="w-4 h-4" />
+                    <span className="hidden xl:inline ml-2">{t("knowledgeBase.title")}</span>
+                    {useRAG && selectedDocs.length > 0 && (
+                      <span className="ml-1 bg-yellow-400 text-yellow-900 text-xs font-bold px-1.5 py-0.5 rounded-full">{selectedDocs.length}</span>
+                    )}
+                  </Button>
+                </SheetTrigger>
+                <SheetContent className="w-[400px] sm:w-[540px] overflow-y-auto">
+                  <SheetHeader>
+                    <SheetTitle>{t("knowledgeBase.title")}</SheetTitle>
+                  </SheetHeader>
+                  <div className="mt-6 space-y-6">
+                    <div className="flex items-center justify-between p-4 bg-yellow-50 dark:bg-yellow-900/10 rounded-lg border border-yellow-200 dark:border-yellow-700/50">
+                      <div>
+                        <h4 className="font-bold text-sm">{t("knowledgeBase.useDocuments")}</h4>
+                        <p className="text-xs text-gray-500">{t("knowledgeBase.useDocumentsDesc")}</p>
+                      </div>
+                      <Switch checked={useRAG} onCheckedChange={setUseRAG} />
+                    </div>
+
+                    {useRAG && (
+                      <div className="border rounded-lg p-4 animate-in fade-in slide-in-from-top-2">
+                        <h4 className="text-sm font-semibold mb-3">{t("knowledgeBase.selectAppliedDocs")}</h4>
+                        {isDocsLoading && <Loader2 className="w-4 h-4 animate-spin" />}
+                        {!isDocsLoading && availableDocs.length === 0 && (
+                          <p className="text-xs text-gray-400 text-center py-4">{t("knowledgeBase.noDocsAvailable")}</p>
+                        )}
+                        <ScrollArea className="h-40">
+                          <div className="space-y-2">
+                            {availableDocs.map(doc => (
+                              <div key={doc.id} className="flex items-center space-x-2">
+                                <Checkbox
+                                  id={`doc-navbar-${doc.id}`}
+                                  checked={selectedDocs.includes(doc.id)}
+                                  onCheckedChange={() => toggleDocSelection(doc.id)}
+                                />
+                                <label htmlFor={`doc-navbar-${doc.id}`} className="text-sm cursor-pointer truncate flex-1">
+                                  {doc.title}
+                                </label>
+                              </div>
+                            ))}
+                          </div>
+                        </ScrollArea>
+                      </div>
+                    )}
+
+                    <div className="border-t pt-6">
+                      <KnowledgeBaseManager />
+                    </div>
+                  </div>
+                </SheetContent>
+              </Sheet>
+               <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleCheckQuiz}
+                disabled={isBusy}
+                className="text-blue-700 hover:bg-blue-50 dark:text-blue-300 dark:hover:bg-blue-900/20 px-2 sm:px-3 text-xs sm:text-sm whitespace-nowrap h-9"
+                title={t("manualQuiz.checkAI")}
+              >
+                {isChecking ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Bot className="w-4 h-4" />
+                )}
+                <span className="hidden xl:inline ml-2">{t("manualQuiz.checkAI")}</span>
+              </Button>
+               <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleAutoFill}
+                disabled={isBusy}
+                className="text-purple-700 hover:bg-purple-50 dark:text-purple-300 dark:hover:bg-purple-900/20 px-2 sm:px-3 text-xs sm:text-sm whitespace-nowrap h-9"
+                title={t("manualQuiz.autoFill")}
+              >
+                {isGeneratingExplanations ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Wand2 className="w-4 h-4" />
+                )}
+                <span className="hidden xl:inline ml-2">{t("manualQuiz.autoFill")}</span>
+              </Button>
+              <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={handleQuickAddQuestions} 
+                  disabled={isBusy}
+                  className="text-amber-700 hover:bg-amber-50 dark:text-amber-300 dark:hover:bg-amber-900/20 px-2 sm:px-3 text-xs sm:text-sm whitespace-nowrap h-9"
+                  title={t("manualQuiz.quickAdd")}
+              >
+                {isGeneratingQuestions ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
+                <span className="hidden xl:inline ml-2">{t("manualQuiz.quickAdd")}</span>
+              </Button>
+        
+        <div className="h-6 w-px bg-slate-200 dark:bg-slate-800 mx-1 hidden sm:block" />
+
+
+        <Button 
+          onClick={handleSave} 
+          disabled={isBusy}
+          size="sm"
+          className="rounded-full px-3 sm:px-4 bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm transition-all font-bold whitespace-nowrap h-9 text-xs sm:text-sm ml-1"
+        >
+          {saving ? (
+            <span className="animate-pulse">{t("common.saving")}</span>
+          ) : (
+            (quizId ? t("manualQuiz.updateQuiz") : t("manualQuiz.saveQuiz"))
+          )}
+        </Button>
+    </div>
+    );
+
+    return () => setActions(null);
+  }, [
+    variant, i18n.language, t, useRAG, selectedDocs, isDocsLoading, availableDocs, isChecking, saving, isGeneratingQuestions, isGeneratingExplanations,
+    handleCheckQuiz, handleAutoFill, handleQuickAddQuestions, handleSave, onCancel, quizId, toggleDocSelection, setActions, navigate
+  ]);
 
   const isDialog = variant === "dialog";
 
   return (
-    <div className={cn("flex flex-col", isDialog ? "h-[500px]" : "w-full pb-32")}>
+    <div className={cn("flex flex-col", isDialog ? "h-full" : "w-full pb-32")}>
       {/* Header - Sticky (Only for Dialog) */}
       {isDialog && (
       <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950 dark:to-teal-950 dark:border-slate-800 shrink-0">
@@ -634,10 +837,73 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
           </div>
           <div>
             <h2 className="text-sm font-bold text-gray-800 dark:text-gray-100">{quizId ? t("manualQuiz.editTitle") : t("manualQuiz.title")}</h2>
-            <p className="text-xs text-gray-500 dark:text-gray-400">{t("manualQuiz.subtitle")}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className={cn(
+                  "rounded-full px-3 text-sm",
+                  useRAG
+                    ? "border-yellow-400 text-yellow-700 bg-yellow-50 hover:bg-yellow-100 dark:border-yellow-600 dark:text-yellow-400 dark:bg-yellow-900/20"
+                    : "border-slate-200 text-slate-500 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-400"
+                )}
+              >
+                <Layers className="w-4 h-4" />
+                <span className="hidden sm:inline ml-1">{t("knowledgeBase.title")}</span>
+                {useRAG && selectedDocs.length > 0 && (
+                  <span className="ml-1 bg-yellow-400 text-yellow-900 text-xs font-bold px-1.5 py-0.5 rounded-full">{selectedDocs.length}</span>
+                )}
+              </Button>
+            </SheetTrigger>
+            <SheetContent className="w-[400px] sm:w-[540px] overflow-y-auto">
+              <SheetHeader>
+                <SheetTitle>{t("knowledgeBase.title")}</SheetTitle>
+              </SheetHeader>
+              <div className="mt-6 space-y-6">
+                <div className="flex items-center justify-between p-4 bg-yellow-50 dark:bg-yellow-900/10 rounded-lg border border-yellow-200 dark:border-yellow-700/50">
+                  <div>
+                    <h4 className="font-bold text-sm">{t("knowledgeBase.useDocuments")}</h4>
+                    <p className="text-xs text-gray-500">{t("knowledgeBase.useDocumentsDesc")}</p>
+                  </div>
+                  <Switch checked={useRAG} onCheckedChange={setUseRAG} />
+                </div>
+
+                {useRAG && (
+                  <div className="border rounded-lg p-4 animate-in fade-in slide-in-from-top-2">
+                    <h4 className="text-sm font-semibold mb-3">{t("knowledgeBase.selectAppliedDocs")}</h4>
+                    {isDocsLoading && <Loader2 className="w-4 h-4 animate-spin" />}
+                    {!isDocsLoading && availableDocs.length === 0 && (
+                      <p className="text-xs text-gray-400 text-center py-4">{t("knowledgeBase.noDocsAvailable")}</p>
+                    )}
+                    <ScrollArea className="h-40">
+                      <div className="space-y-2">
+                        {availableDocs.map(doc => (
+                          <div key={doc.id} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={`doc-${doc.id}`}
+                              checked={selectedDocs.includes(doc.id)}
+                              onCheckedChange={() => toggleDocSelection(doc.id)}
+                            />
+                            <label htmlFor={`doc-${doc.id}`} className="text-sm cursor-pointer truncate flex-1">
+                              {doc.title}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                  </div>
+                )}
+
+                <div className="border-t pt-6">
+                  <KnowledgeBaseManager />
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
           <Button
             variant="outline"
             onClick={handleCheckQuiz}
@@ -682,9 +948,21 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
       </div>
       )}
 
+      
+
       {/* Content - Scrollable */}
       <div className={cn("flex-1 p-4", isDialog ? "overflow-y-auto min-h-0" : "")}>
         <div className={cn("space-y-6 mx-auto", isDialog ? "max-w-2xl" : "max-w-4xl")}>
+          {!isDialog && (
+        <div className="mb-6">
+           <div>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-50 tracking-tight">{quizId ? t("manualQuiz.editTitle") : t("manualQuiz.title")}</h1>
+            
+           </div>
+        </div>
+      )}
+
+
           {/* Quiz Metadata */}
           <Card>
             <CardContent className="pt-6 space-y-4">
@@ -727,7 +1005,12 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
           </Card>
 
           {/* Validation Result Dialog */}
-          <Dialog open={!!validationResult} onOpenChange={(open) => !open && setValidationResult(null)}>
+          <Dialog open={!!validationResult} onOpenChange={(open) => {
+            if (!open) {
+              setValidationResult(null);
+              setPendingSave(false);
+            }
+          }}>
             <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>{t("validation.report_title")}</DialogTitle>
@@ -743,10 +1026,19 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
                  />
               )}
               
-              <DialogFooter>
-                 <Button onClick={() => setValidationResult(null)}>
-                   {t("common.close")}
+              <DialogFooter className="gap-2">
+                 <Button variant="outline" onClick={() => { setValidationResult(null); setPendingSave(false); }}>
+                   {pendingSave ? t("common.cancel") : t("common.close")}
                  </Button>
+                 {pendingSave && (
+                   <Button onClick={executeSave} disabled={saving}>
+                     {saving ? (
+                       <span className="animate-pulse">{t("common.saving")}</span>
+                     ) : (
+                       t("manualQuiz.saveQuiz")
+                     )}
+                   </Button>
+                 )}
               </DialogFooter>
             </DialogContent>
           </Dialog>
@@ -755,31 +1047,7 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold">{t("manualQuiz.questions")} ({questions.length})</h3>
-              <div className="flex gap-2">
-                 <Button
-                  variant="outline"
-                  onClick={handleCheckQuiz}
-                  disabled={isChecking || saving || isGeneratingQuestions}
-                  size="sm"
-                >
-                   {isChecking ? <Loader2 className="w-4 h-4 animate-spin" /> : <Bot className="w-4 h-4" />}
-                   <span className="hidden sm:inline ml-1">{t("manualQuiz.checkAI")}</span>
-                </Button>
-                <Button variant="outline" size="sm" onClick={addQuestion} disabled={saving || isChecking}>
-                  <Plus className="w-4 h-4" />
-                  <span className="hidden sm:inline ml-1">{t("manualQuiz.addQuestion")}</span>
-                </Button>
-                <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={handleQuickAddQuestions} 
-                    disabled={saving || isChecking || isGeneratingQuestions}
-                    className="border-amber-200 text-amber-700 hover:bg-amber-50 dark:border-amber-800 dark:text-amber-300 dark:hover:bg-amber-900/20"
-                >
-                  {isGeneratingQuestions ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
-                  <span className="hidden sm:inline ml-1">{t("manualQuiz.quickAdd")}</span>
-                </Button>
-              </div>
+              
             </div>
 
             {questions.map((q, qIndex) => (
@@ -865,7 +1133,24 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
 
                   {/* Options */}
                   <div className="space-y-2">
-                    <Label>{t("manualQuiz.options")}</Label>
+                    <div className="flex items-center justify-between">
+                        <Label>{t("manualQuiz.options")}</Label>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                                const newQuestions = [...questions];
+                                newQuestions[qIndex].options = newQuestions[qIndex].options.map(() => "");
+                                setQuestions(newQuestions);
+                            }}
+                            className="h-6 px-2 text-xs text-muted-foreground hover:text-red-500"
+                            title={t("manualQuiz.clearOptions")}
+                            disabled={saving || isChecking}
+                        >
+                            <Eraser className="w-3 h-3 mr-1" />
+                            {t("manualQuiz.clear")}
+                        </Button>
+                    </div>
                     {q.options.map((opt, optIndex) => (
                       <div key={optIndex} className="flex items-center gap-2">
                         <button
@@ -945,66 +1230,7 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
           </div>
         </div>
       </div>
-      {/* Sticky Footer for Page Mode */}
-      {!isDialog && (
-        <div className="fixed bottom-0 left-0 right-0 px-4 pt-4 pb-16 bg-white/90 dark:bg-slate-950/90 backdrop-blur-md border-t dark:border-slate-800 z-[1000] shadow-[0_-4px_20px_-4px_rgba(0,0,0,0.1)]">
-          <div className="max-w-7xl mx-auto flex items-center justify-between gap-4 w-full">
-            <div className="flex items-center gap-2 md:gap-3">
-                 <Button
-                  variant="outline"
-                  onClick={handleCheckQuiz}
-                  disabled={isChecking || saving || isGeneratingQuestions}
-                  className="border-blue-200 text-blue-700 hover:bg-blue-50 dark:border-blue-800 dark:text-blue-300 dark:hover:bg-blue-900/20 px-3 whitespace-nowrap"
-                >
-                  {isChecking ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <Bot className="w-4 h-4" />
-                  )}
-                  <span className="hidden sm:inline ml-2">{t("manualQuiz.checkAI")}</span>
-                </Button>
-                 <Button
-                  variant="outline"
-                  onClick={handleAutoFill}
-                  disabled={isGeneratingExplanations || saving || isGeneratingQuestions}
-                  className="border-purple-200 text-purple-700 hover:bg-purple-50 dark:border-purple-800 dark:text-purple-300 dark:hover:bg-purple-900/20 px-3 whitespace-nowrap"
-                >
-                  {isGeneratingExplanations ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <Wand2 className="w-4 h-4" />
-                  )}
-                  <span className="hidden sm:inline ml-2">{t("manualQuiz.autoFill")}</span>
-                </Button>
-                <Button 
-                    variant="outline" 
-                    onClick={handleQuickAddQuestions} 
-                    disabled={saving || isChecking || isGeneratingQuestions}
-                    className="border-amber-200 text-amber-700 hover:bg-amber-50 dark:border-amber-800 dark:text-amber-300 dark:hover:bg-amber-900/20 px-3 whitespace-nowrap"
-                >
-                  {isGeneratingQuestions ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
-                  <span className="hidden sm:inline ml-2">{t("manualQuiz.quickAdd")}</span>
-                </Button>
-            </div>
-            <div className="flex items-center gap-2 md:gap-3">
-              <Button variant="outline" onClick={onCancel} disabled={saving || isChecking} className="whitespace-nowrap px-4 md:px-6">
-                {t("common.cancel")}
-              </Button>
-              <Button 
-                onClick={handleSave} 
-                disabled={saving || isChecking}
-                className="rounded-full px-5 md:px-8 bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/25 transition-all font-bold whitespace-nowrap"
-              >
-                {saving ? (
-                  <span className="animate-pulse">{t("common.saving")}</span>
-                ) : (
-                  (quizId ? t("manualQuiz.updateQuiz") : t("manualQuiz.saveQuiz"))
-                )}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+
     </div>
   );
 }

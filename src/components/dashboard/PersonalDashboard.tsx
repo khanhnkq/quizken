@@ -90,6 +90,8 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
   const [scrolled, setScrolled] = useState(() => window.scrollY > 20);
   const [isMobile, setIsMobile] = useState(false);
 
+  const shouldCollapse = scrolled && !isMobile;
+
   // Check mobile on mount and resize
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -213,14 +215,14 @@ export function PersonalDashboard({ userId }: PersonalDashboardProps) {
         <motion.div 
           initial={{ width: "90%", opacity: 0 }}
           animate={{ 
-            width: scrolled ? (isMobile ? "94%" : "75%") : "100%", 
+            width: shouldCollapse ? "75%" : "100%", 
             opacity: 1,
-            top: scrolled ? 16 : 0
+            top: shouldCollapse ? 16 : 0
           }}
           transition={{ duration: 0.7, ease: "easeInOut" }}
           className={cn(
             "fixed z-50 left-1/2 -translate-x-1/2",
-            scrolled 
+            shouldCollapse 
               ? "rounded-full border border-slate-200/60 dark:border-slate-800/60 shadow-lg dark:shadow-slate-900/50 backdrop-blur-2xl bg-white/90 dark:bg-slate-950/90" 
               : "border-b border-slate-200/60 dark:border-slate-800/60 backdrop-blur-xl bg-white/80 dark:bg-slate-900/80 shadow-sm rounded-none"
           )}

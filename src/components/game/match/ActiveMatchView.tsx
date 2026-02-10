@@ -19,6 +19,8 @@ interface ActiveMatchViewProps {
     onAnswer: (index: number) => void;
     onNext?: () => void;
     onSkip?: () => void;
+    correctAnswer?: number;
+    isCorrect?: boolean | null;
 }
 
 export const ActiveMatchView: React.FC<ActiveMatchViewProps> = ({
@@ -33,7 +35,9 @@ export const ActiveMatchView: React.FC<ActiveMatchViewProps> = ({
     phase,
     onAnswer,
     onNext,
-    onSkip
+    onSkip,
+    correctAnswer,
+    isCorrect
 }) => {
     return (
         <div className="min-h-screen bg-background relative overflow-hidden font-outfit flex flex-col items-center">
@@ -121,8 +125,10 @@ export const ActiveMatchView: React.FC<ActiveMatchViewProps> = ({
                 {/* Options Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 w-full">
                     {question?.options.map((option, index) => {
-                        const isCorrect = index === question.correctAnswer;
-                        const showAnswer = phase === 'result';
+                        // Use prop correctAnswer if available, fallback to question object
+                        const validCorrectAnswer = correctAnswer ?? question?.correctAnswer;
+                        const isOptionCorrect = index === validCorrectAnswer;
+                        const showAnswer = phase === 'result' || phase === 'finished'; // Allow explicit finished phase
                         
                         // Distinct colors for options (Kahoot-style but polished)
                         const colors = [
@@ -151,9 +157,9 @@ export const ActiveMatchView: React.FC<ActiveMatchViewProps> = ({
                                     isSubmitted && selectedAnswer === index && !showAnswer && "ring-4 ring-white scale-100 z-10 brightness-110",
                                     
                                     // Result States
-                                    showAnswer && isCorrect && "bg-green-500 border-green-700 ring-4 ring-green-300 scale-105 z-10 shadow-green-500/50 shadow-2xl text-white",
-                                    showAnswer && !isCorrect && selectedAnswer === index && "bg-red-500 border-red-700 opacity-100 ring-4 ring-red-300 text-white", // Wrong choice
-                                    showAnswer && !isCorrect && selectedAnswer !== index && "bg-muted border-muted-foreground/20 opacity-30 grayscale text-muted-foreground shadow-none border-b-2"
+                                    showAnswer && isOptionCorrect && "bg-green-500 border-green-700 ring-4 ring-green-300 scale-105 z-10 shadow-green-500/50 shadow-2xl text-white",
+                                    showAnswer && !isOptionCorrect && selectedAnswer === index && "bg-red-500 border-red-700 opacity-100 ring-4 ring-red-300 text-white", // Wrong choice
+                                    showAnswer && !isOptionCorrect && selectedAnswer !== index && "bg-muted border-muted-foreground/20 opacity-30 grayscale text-muted-foreground shadow-none border-b-2"
                                 )}
                             >
                                 <div className="flex items-center w-full gap-5">
