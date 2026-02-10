@@ -1,7 +1,7 @@
 import React from "react";
 import { ManualQuizEditor } from "@/components/quiz/ManualQuizEditor";
 import { useNavigate } from "react-router-dom";
-import Navbar from "@/components/layout/Navbar";
+import { SimpleNavbar } from "@/components/layout/SimpleNavbar";
 import { BackgroundDecorations } from "@/components/ui/BackgroundDecorations";
 
 const QuizCreatePage = () => {
@@ -13,7 +13,7 @@ const QuizCreatePage = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 relative">
-      <Navbar />
+      <SimpleNavbar />
       <div className="fixed inset-0 z-0 pointer-events-none">
         <BackgroundDecorations />
       </div>

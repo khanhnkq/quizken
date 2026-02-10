@@ -652,20 +652,19 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
     const isBusy = saving || isChecking || isGeneratingQuestions || isGeneratingExplanations;
 
     setActions(
-      <div className="flex items-center gap-1 md:gap-2">{variant === 'page' ? (
+      <div className="w-full flex items-center justify-between">
+        {variant === 'page' ? (
           <Button 
             variant="ghost" 
             size="sm" 
-            asChild
+            onClick={() => navigate("/")}
             disabled={isBusy} 
-            className="px-2 sm:px-3 text-muted-foreground h-9"
+            className="flex items-center gap-2 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 transition-colors"
             title={t("common.back")}
           >
-            <Button onClick={() => navigate("/")}>
-               <ArrowLeft className="w-4 h-4 sm:hidden" />
-               <span className="hidden sm:inline">{t("common.back")}</span>
-            </Button>
-           </Button>
+             <ArrowLeft className="w-5 h-5" />
+             <span className="font-medium text-base hidden sm:inline">{t("common.back")}</span>
+          </Button>
         ) : onCancel && (
            <Button 
              variant="ghost" 
@@ -676,13 +675,15 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
                onCancel();
              }} 
              disabled={isBusy} 
-             className="px-2 sm:px-3 text-muted-foreground h-9"
+             className="flex items-center gap-2 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 transition-colors"
              title={t("common.cancel")}
            >
-              <X className="w-4 h-4 sm:hidden" />
-              <span className="hidden sm:inline">{t("common.cancel")}</span>
+              <X className="w-5 h-5" />
+              <span className="font-medium text-base hidden sm:inline">{t("common.cancel")}</span>
             </Button>
         )}
+        
+        <div className="flex items-center gap-1 md:gap-2">
            <Sheet>
           <SheetTrigger asChild>
                   <Button
@@ -806,6 +807,7 @@ export function ManualQuizEditor({ onComplete, onCancel, variant = "dialog", qui
             (quizId ? t("manualQuiz.updateQuiz") : t("manualQuiz.saveQuiz"))
           )}
         </Button>
+        </div>
     </div>
     );
 

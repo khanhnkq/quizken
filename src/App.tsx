@@ -23,7 +23,6 @@ const Phase1View = lazy(() => import("./components/english/phases/Phase1View"));
 const Phase2View = lazy(() => import("./components/english/phases/Phase2View"));
 const MyNotebook = lazy(() => import("./components/english/MyNotebook"));
 const QuizCreatePage = lazy(() => import("./pages/QuizCreatePage"));
-const QuizEditPage = lazy(() => import("./pages/QuizCreatePage"));
 const ChatPage = lazy(() => import("./pages/ChatPage"));
 const RedeemCode = lazy(() => import("./pages/RedeemCode"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
@@ -106,7 +105,6 @@ const AppRoutes = () => {
         <Route element={<ProtectedRoute />}>
           {/* Quiz Domain */}
           <Route path="/quiz/create" element={<QuizCreatePage />} />
-          <Route path="/quiz/edit/:id" element={<QuizEditPage />} />
           <Route path="/quiz/library" element={<QuizLibrary />} />
 
           {/* User Domain */}
