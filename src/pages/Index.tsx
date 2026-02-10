@@ -202,6 +202,19 @@ const Index = () => {
     }
   }, [location, navigate]);
 
+  // Handle redirect from protected routes
+  useEffect(() => {
+    const state = location.state as { from?: Location } | null;
+    if (state?.from) {
+      // Dispatch event to open auth modal
+      const event = new Event("open-auth-modal");
+      window.dispatchEvent(event);
+      
+      // Clear state to prevent reopening on refresh
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location, navigate]);
+
   // Reset hasScrolled when leaving the page
   useEffect(() => {
     return () => {

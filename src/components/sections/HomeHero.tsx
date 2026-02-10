@@ -456,9 +456,6 @@ const HomeHero = () => {
                                                 <h3 className="text-4xl font-black tracking-tighter mb-2 text-primary drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)] uppercase">
                                                     {themeAssets.badgeText || "HERO MODE"}
                                                 </h3>
-                                                <p className="text-sm font-bold text-white/80 uppercase tracking-widest bg-black/50 inline-block px-2 py-1 rounded backdrop-blur-sm">
-                                                    Interactive Theme
-                                                </p>
                                             </div>
                                         </div>
                                     ) : (

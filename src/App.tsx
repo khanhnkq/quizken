@@ -58,6 +58,8 @@ import { GlobalQuizListener } from "@/components/common/GlobalQuizListener";
 import { CustomCursor } from "@/components/ui/CustomCursor";
 
 import { NavbarActionProvider } from "@/contexts/NavbarActionContext";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 
 
 // Cross-page toast notification receiver
@@ -98,16 +100,29 @@ const AppRoutes = () => {
 
         <Route path="/about" element={<About />} />
 
-        {/* Quiz Domain */}
-        <Route path="/quiz/create" element={<QuizCreatePage />} />
-        <Route path="/quiz/edit/:id" element={<QuizEditPage />} />
-        <Route path="/quiz/library" element={<QuizLibrary />} />
+        <Route path="/about" element={<About />} />
+
+        {/* Protected Routes */}
+        <Route element={<ProtectedRoute />}>
+          {/* Quiz Domain */}
+          <Route path="/quiz/create" element={<QuizCreatePage />} />
+          <Route path="/quiz/edit/:id" element={<QuizEditPage />} />
+          <Route path="/quiz/library" element={<QuizLibrary />} />
+
+          {/* User Domain */}
+          <Route path="/user/dashboard" element={<Dashboard />} />
+          <Route path="/profile" element={<ProfilePage />} />
+
+          {/* Multiplayer Game Host */}
+          <Route path="/game/lobby" element={<GameLobbyPage />} />
+          <Route path="/game/host/:roomId" element={<GameHostPage />} />
+          <Route path="/game/host/:roomId/play" element={<GameHostMatchPage />} />
+        </Route>
+
         <Route path="/quiz/play/:quizId" element={<PlayQuizPage />} />
         <Route path="/quiz/result/:attemptId" element={<QuizDetailPage />} />
 
-        {/* User Domain */}
-        <Route path="/user/dashboard" element={<Dashboard />} />
-        <Route path="/profile" element={<ProfilePage />} />
+        {/* Public User Routes */}
         <Route path="/profile/:userId" element={<ProfilePage />} />
         <Route path="/redeem" element={<RedeemCode />} />
 
@@ -115,9 +130,8 @@ const AppRoutes = () => {
         <Route path="/chat" element={<ChatPage />} />
 
         {/* Multiplayer Game */}
-        <Route path="/game/lobby" element={<GameLobbyPage />} />
-        <Route path="/game/host/:roomId" element={<GameHostPage />} />
-        <Route path="/game/host/:roomId/play" element={<GameHostMatchPage />} />
+        {/* Multiplayer Game Public Routes */}
+        {/* Host routes moved to protected section */}
         <Route path="/game/play/:roomId" element={<GamePlayerPage />} />
         <Route path="/game/play/:roomId/match" element={<GamePlayerMatchPage />} />
         {/* Legacy redirects (optional - can remove later) */}
@@ -229,14 +243,16 @@ const App = () => {
               <ToastBroadcastReceiver />
               <BrowserRouter
                 future={{ v7_relativeSplatPath: true }}>
-                <NavbarActionProvider>
-                <AppRoutes />
-                <GlobalResumeButton />
-                <GlobalCreateButton />
-                <GlobalChatTicker />
-                <GlobalQuizListener />
+                <AuthProvider>
+                  <NavbarActionProvider>
+                  <AppRoutes />
+                  <GlobalResumeButton />
+                  <GlobalCreateButton />
+                  <GlobalChatTicker />
+                  <GlobalQuizListener />
 
-                </NavbarActionProvider>
+                  </NavbarActionProvider>
+                </AuthProvider>
               </BrowserRouter>
               <Analytics />
             </ChatImagesProvider>
